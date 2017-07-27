@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Description>HAN adapter interface of the TRuDI application.</Description>
+    <Authors>Thomas Müller</Authors>
+    <Company>IVU Softwareentwicklung GmbH</Company>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <RestoreSources>$(RestoreSources);../../private-packages;https://api.nuget.org/v3/index.json</RestoreSources>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.ViewFeatures" Version="2.0.0-preview2-final" />
+    <PackageReference Include="NETStandard.Library" Version="2.0.0-preview2-25401-01" />
+  </ItemGroup>
+
+</Project>
