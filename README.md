@@ -1,8 +1,8 @@
-# IF_Adapter_TRuDI
+ï»¿# IF_Adapter_TRuDI
 
 Ansprechpartner:
 
-	Thomas Müller
+	Thomas MÃ¼ller
 	IVU Softwareentwicklung GmbH
 	tmueller@ivugmbh.de
 	Tel.: 09471 / 30 73 237  
@@ -15,7 +15,7 @@ Ansprechpartner:
 
 ## Namenskonvention
 
-Assemblies müssen folgendermaßen benannt werden, z.B.:
+Assemblies mÃ¼ssen folgendermaÃŸen benannt werden, z.B.:
 
 ```csharp
 TRuDI.HanAdapter.Example
@@ -37,15 +37,15 @@ namespace TRuDI.HanAdapter.Example
 
 ## Einbinden von IHanAdapter
 
-Das Interface muss über das NuGet-Paket "TRuDI.HanAdapter.Interface.1.0.0.nupkg" in das jeweilige Projekt eingebunden werden.
-Im Repository ist ebenfalls das zugehörige Projekt zu finden. Dieses dient allerdings nur zur Dokumentation der Schnittstelle und sollte nicht direkt verwendet werden.
+Das Interface muss Ã¼ber das NuGet-Paket "TRuDI.HanAdapter.Interface.1.0.0.nupkg" in das jeweilige Projekt eingebunden werden.
+Im Repository ist ebenfalls das zugehÃ¶rige Projekt zu finden. Dieses dient allerdings nur zur Dokumentation der Schnittstelle und sollte nicht direkt verwendet werden.
 
 ## HTTPS
 
-Für den Zugriff auf die Gateways über HTTPS stellt die IVU Softwareentwicklung eine TLS-Bibliothek sowie einen HTTP-Client zur verfügung.
-Diese Komponenten gewährleisten die geforderte TLS-Funktionalität unter allen zu unterstüzenden Plattformen. 
+FÃ¼r den Zugriff auf die Gateways Ã¼ber HTTPS stellt die IVU Softwareentwicklung eine TLS-Bibliothek sowie einen HTTP-Client zur verfÃ¼gung.
+Diese Komponenten gewÃ¤hrleisten die geforderte TLS-FunktionalitÃ¤t unter allen zu unterstÃ¼zenden Plattformen. 
 
-Es werden folgende Cipher Suites unterstützt:
+Es werden folgende Cipher Suites unterstÃ¼tzt:
 - TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256
 - TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384
 - TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
@@ -66,15 +66,15 @@ Die NuGet-Pakete sind im Verzeichnis "private-packages" zu funden. Dieses Verzei
 
 Zum Logging innerhalb des Adapters empfehlen wir LibLog zu verwenden: https://github.com/damianh/LibLog 
 
-Die Ausgeben der Log-Meldungen übernimmt dadurch der Logger im aufrufenden Programm. Im Beispiel ist dies Serilog (https://serilog.net/)
+Die Ausgeben der Log-Meldungen Ã¼bernimmt dadurch der Logger im aufrufenden Programm. Im Beispiel ist dies Serilog (https://serilog.net/)
 
 ## Build der Beispiele
 
-Im Verzeichnis ``src\TRuDI.HanAdapter.Test`` folgende Befehle ausführen
+Im Verzeichnis ``src\TRuDI.HanAdapter.Test`` folgende Befehle ausfÃ¼hren
 
 - ``dotnet restore``
 
-	Stellt die in der Projekt-Datei angegebenen Abhänigkeiten wieder her (z.B. Download von NuGet-Paketen).
+	Stellt die in der Projekt-Datei angegebenen AbhÃ¤nigkeiten wieder her (z.B. Download von NuGet-Paketen).
 
 - ``dotnet build``
 
@@ -82,22 +82,34 @@ Im Verzeichnis ``src\TRuDI.HanAdapter.Test`` folgende Befehle ausführen
 
 - ``dotnet run``
 
-	Test-Applikation ausführen.
+	Test-Applikation ausfÃ¼hren.
 
 
 ## Ablauf
 
-### Grundsätzliches
+### GrundsÃ¤tzliches
 
-Methoden, welche länger als 3 Sekunden zur Ausführung benötigen, sollten über den Callback ``Action<ProgressInfo> progressCallback`` den 
-Benutzer über den aktuellen Fortschritt der jeweiligen Operation informieren. 
+Methoden, welche lÃ¤nger als 3 Sekunden zur AusfÃ¼hrung benÃ¶tigen, sollten Ã¼ber den Callback ``Action<ProgressInfo> progressCallback`` den 
+Benutzer Ã¼ber den aktuellen Fortschritt der jeweiligen Operation informieren. 
 
-Über das ``CancellationToken`` ist es dem Benutzer möglich, die aktuelle Operation jederzeit abzubrechen.
+Ãœber das ``CancellationToken`` ist es dem Benutzer mÃ¶glich, die aktuelle Operation jederzeit abzubrechen.
 
 ### 1. Verbindungsaufbau zum Gateway mittels ``Connect``
 
-### 2. Laden der zum Kunden gehörenden Verträge mittels ``LoadAvailableContracts``
+#### Authentifizierung Ã¼ber ein Client-Zertifikat
 
-### 3. Laden der Daten zum vom Kunden ausgewählten Vertrag mittels ``LoadData``
+FÃ¼r die Authentifizierung Ã¼ber ein Client-Zertifikat muss dieses Zertifikat inklusive des privaten SchlÃ¼ssels in Form einer PKCS#12-Datei (https://tools.ietf.org/html/rfc7292) vorliegen.
+
+Eine PKCS#12-Datei kann mittels OpenSSL wie folgt erstellt werden:
+
+```
+openssl pkcs12 -export -in Zertifikat.crt -inkey Schluessel.key -out Zertifikat_mit_Schluessel.p12
+```
+
+Der Inhalt der PKCS12-Datei wird der ``Connect()``-Methode unverÃ¤ndert Ã¼bergeben. 
+
+### 2. Laden der zum Kunden gehÃ¶renden VertrÃ¤ge mittels ``LoadAvailableContracts``
+
+### 3. Laden der Daten zum vom Kunden ausgewÃ¤hlten Vertrag mittels ``LoadData``
 
 
