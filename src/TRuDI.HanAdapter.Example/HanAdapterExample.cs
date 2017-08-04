@@ -15,6 +15,7 @@
 
     using TRuDI.HanAdapter.Example.Logging;
     using TRuDI.HanAdapter.Interface;
+    using TRuDI.HanAdapter.Example.Components;
 
     /// <summary>
     /// This isn't a really running example! It should serve as a starting point only.
@@ -172,8 +173,20 @@
             throw new NotImplementedException();
         }
 
-        public ViewComponent SmgwImageViewComponent { get; }
+        public ViewComponent SmgwImageViewComponent
+        {
+            get
+            {
+                return new GatewayImageExampleView();
+            }
+        }
 
-        public ViewComponent ManufacturerParametersViewComponent { get; }
+        public ViewComponent ManufacturerParametersViewComponent
+        {
+            get
+            {
+                return new ManufacturerParametersExampleView();
+            }
+        }
     }
 }

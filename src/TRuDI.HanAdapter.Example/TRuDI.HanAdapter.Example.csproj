@@ -17,6 +17,18 @@
   </PropertyGroup>
   
   <ItemGroup>
+    <None Remove="Content\example-smgw.png" />
+    <None Remove="Views\Shared\Components\GatewayImageExampleView\Default.cshtml" />
+    <None Remove="Views\Shared\Components\ManufacturerParametersExampleView\Default.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Content\example-smgw.png" />
+    <EmbeddedResource Include="Views\Shared\Components\GatewayImageExampleView\Default.cshtml" />
+    <EmbeddedResource Include="Views\Shared\Components\ManufacturerParametersExampleView\Default.cshtml" />
+  </ItemGroup>
+  
+  <ItemGroup>
     <PackageReference Include="IVU.Http" Version="1.0.4" />
     <PackageReference Include="NETStandard.Library" Version="2.0.0-preview2-25401-01" />
     <PackageReference Include="TRuDI.HanAdapter.Interface" Version="1.0.0" />
