@@ -15,7 +15,7 @@ Ansprechpartner:
 
 ## Namenskonvention
 
-Assemblies müssen wie folge benannt werden, z.B.:
+Assemblies müssen folgendermaßen benannt werden, z.B.:
 
 ```csharp
 TRuDI.HanAdapter.Example
@@ -43,7 +43,7 @@ Im Repository ist ebenfalls das zugehörige Projekt zu finden. Dieses dient aller
 ## HTTPS
 
 Für den Zugriff auf die Gateways über HTTPS stellt die IVU Softwareentwicklung eine TLS-Bibliothek sowie einen HTTP-Client zur verfügung.
-Dies stellt gewährleistet TLS-Kompatibilität unter allen zu unterstüzenden Plattformen. 
+Diese Komponenten gewährleisten die geforderte TLS-Funktionalität unter allen zu unterstüzenden Plattformen. 
 
 Es werden folgende Cipher Suites unterstützt:
 - TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256
@@ -58,7 +58,7 @@ Elliptische Kurven:
 - NIST P-256
 - NIST P-384
 
-Die HTTP-Client-Klasse basiert auf der Version aus dem .Net Core Foundation Libraries: https://msdn.microsoft.com/en-us/library/system.net.http.httpclient
+Die HTTP-Client-Klasse basiert auf der Version aus den .Net Core Foundation Libraries: https://msdn.microsoft.com/en-us/library/system.net.http.httpclient
 
 Die NuGet-Pakete sind im Verzeichnis "private-packages" zu funden. Dieses Verzeichnis ist in den Beispiel-Projekten auch als Paket-Quelle angegeben.
 
@@ -66,7 +66,7 @@ Die NuGet-Pakete sind im Verzeichnis "private-packages" zu funden. Dieses Verzei
 
 Zum Logging innerhalb des Adapters empfehlen wir LibLog zu verwenden: https://github.com/damianh/LibLog 
 
-Das eigentliche ausgeben der Log-Meldungen übernimmt dadurch der Logger im aufrufenden Programm. Im Beispiel ist dies Serilog (https://serilog.net/)
+Die Ausgeben der Log-Meldungen übernimmt dadurch der Logger im aufrufenden Programm. Im Beispiel ist dies Serilog (https://serilog.net/)
 
 ## Build der Beispiele
 
@@ -89,7 +89,7 @@ Im Verzeichnis ``src\TRuDI.HanAdapter.Test`` folgende Befehle ausführen
 
 ### Grundsätzliches
 
-Methoden, welche länger als 2 bis 4 Sekunden zur Ausführung benötigen, sollten über den Callback ``Action<ProgressInfo> progressCallback`` den 
+Methoden, welche länger als 3 Sekunden zur Ausführung benötigen, sollten über den Callback ``Action<ProgressInfo> progressCallback`` den 
 Benutzer über den aktuellen Fortschritt der jeweiligen Operation informieren. 
 
 Über das ``CancellationToken`` ist es dem Benutzer möglich, die aktuelle Operation jederzeit abzubrechen.
