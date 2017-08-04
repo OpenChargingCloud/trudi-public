@@ -64,7 +64,7 @@ namespace TRuDI.HanAdapter.Interface
         /// </summary>
         /// <param name="ct">Token for user initiated cancellation.</param>
         /// <param name="progressCallback">This callback must be called regularly.</param>
-        /// <returns></returns>
+        /// <returns>List with contract informations. If there's no contract for the user, a empty list should be returned.</returns>
         Task<(IReadOnlyList<ContractInfo> contracts, AdapterError error)> LoadAvailableContracts(
             CancellationToken ct,
             Action<ProgressInfo> progressCallback);
