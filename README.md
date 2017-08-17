@@ -94,6 +94,27 @@ Benutzer über den aktuellen Fortschritt der jeweiligen Operation informieren.
 
 Über das ``CancellationToken`` ist es dem Benutzer möglich, die aktuelle Operation jederzeit abzubrechen.
 
+### Reihenfolge der Methoden-Aufrufe
+
+1. ``Connect()``
+
+    Wird nach eingabe der Verbindungsparameter durch den Verbraucher aufgerufen.
+
+2. ``LoadAvailableContracts()``
+
+    Unmittelbar nach ``Connect()`` erfolg das Laden der für den Verbraucher relevanten Verträge.
+
+3. ``LoadData()``
+
+    Die Daten des vom Verbraucher gewählten Vertrages werden abgerufen.
+
+4. ``GetCurrentRegisterValues()``
+ 
+    Die aktuellen Registerwerte zum gegebenen Vertrag ermitteln.  
+
+5. ``Disconnect()``
+
+
 ### 1. Verbindungsaufbau zum Gateway mittels ``Connect``
 
 #### Authentifizierung über ein Client-Zertifikat
@@ -108,8 +129,144 @@ openssl pkcs12 -export -in Zertifikat.crt -inkey Schluessel.key -out Zertifikat_
 
 Der Inhalt der PKCS12-Datei wird der ``Connect()``-Methode unverändert übergeben. 
 
-### 2. Laden der zum Kunden gehörenden Verträge mittels ``LoadAvailableContracts``
+#### Beispiel-Implementierung
 
-### 3. Laden der Daten zum vom Kunden ausgewählten Vertrag mittels ``LoadData``
+```csharp
+public async Task<(ConnectResult result, AdapterError error)> Connect(
+            string deviceId,
+            IPEndPoint endpoint,
+            byte[] pkcs12Data,
+            string password,
+            Dictionary<string, string> manufacturerSettings,
+            TimeSpan timeout,
+            CancellationToken ct,
+            Action<ProgressInfo> progressCallback)
+{
+    this.logger.Info("Connecting to {0} using a client certificate", endpoint);
+
+    this.baseUri = $"https://{endpoint.Address}:{endpoint.Port}/base/path/to/data";
+
+    var clientHandler = new IVU.Http.HttpClientHandler
+                            {
+                                AutomaticDecompression = DecompressionMethods.GZip 
+                            };
+            
+    // Load the client certificate
+    clientHandler.ClientCertificate = new ClientCertificateWithKey(pkcs12Data, password);
+
+    X509Certificate2 serverCert = null;
+    clientHandler.ServerCertificateCustomValidationCallback += (message, cert, chain, policyErrors) =>
+        {
+            // Important: chain an policyErrors are currently not filled
+            serverCert = new X509Certificate2(cert);
+
+            // accept the server certificate and continue with TLS handshake
+            return true;
+        };
+
+    // Create the HttpClient instance
+    this.client = new IVU.Http.HttpClient(clientHandler);
+
+    // Set headers common for all calls
+    this.client.DefaultRequestHeaders.Add("SMGW-ID", deviceId);
+
+    // If there's a header value that changes with every request, create a HttpRequestMessage...
+    var req = new IVU.Http.HttpRequestMessage(HttpMethod.Get, this.baseUri + "/login");
+    req.Headers.Add("Request-GUID", Guid.NewGuid().ToString());
+
+    try
+    {
+        // ... and call client.SendAsync with it. Otherwise client.GetAsync() can also be used.
+        var loginResult = await this.client.SendAsync(req, ct);
+        if (!loginResult.IsSuccessStatusCode)
+        {
+            return (null, new AdapterError(ErrorType.AuthenticationFailed));
+        }
+    }
+    catch (Exception ex)
+    {
+        this.logger.ErrorException("Connect failed to {0}", ex, endpoint);
+        return (null, new AdapterError(ErrorType.AuthenticationFailed));
+    }
+
+    // Query firmware version...
+
+    return (new ConnectResult(serverCert, new FirmwareVersion[]{ /* ... */ }) null);
+}
+```
+
+#### Authentifizierung über Benutzername und Passwort
+
+#### Beispiel-Implementierung mit HTTP Digest Access Authentication nach RFC 7616 
+
+```csharp
+public async Task<(ConnectResult result, AdapterError error)> Connect(
+            string deviceId,
+            IPEndPoint endpoint,
+            string user,
+            string password,
+            Dictionary<string, string> manufacturerSettings,
+            TimeSpan timeout,
+            CancellationToken ct,
+            Action<ProgressInfo> progressCallback)
+{
+    this.logger.Info("Connecting to {0} using user/password authentication", endpoint);
+
+    this.baseUri = $"https://{endpoint.Address}:{endpoint.Port}/base/path/to/data";
+
+    var clientHandler = new IVU.Http.HttpClientHandler
+                            {
+                                AutomaticDecompression = DecompressionMethods.GZip
+                            };
+
+    X509Certificate2 serverCert = null;
+    clientHandler.ServerCertificateCustomValidationCallback += (message, cert, chain, policyErrors) =>
+        {
+            // Important: chain an policyErrors are currently not filled
+            serverCert = new X509Certificate2(cert);
+
+            // accept the server certificate and continue with TLS handshake
+            return true;
+        };
+
+    // This example gateway uses Digest Access Authentication: add the DigestAuthMessageHandler to the client handler chain:
+    var digestAuthMessageHandler = new DigestAuthMessageHandler(clientHandler, user, password);
+
+    // Create the HttpClient instance
+    this.client = new IVU.Http.HttpClient(digestAuthMessageHandler);
+
+    // Set headers common for all calls
+    this.client.DefaultRequestHeaders.Add("SMGW-ID", deviceId);
+
+    // If there's a header value that changes with every request, create a HttpRequestMessage...
+    var req = new IVU.Http.HttpRequestMessage(HttpMethod.Get, this.baseUri + "/login");
+    req.Headers.Add("Request-GUID", Guid.NewGuid().ToString());
+
+    try
+    {
+        // ... and call client.SendAsync with it. Otherwise client.GetAsync() can also be used.
+        var loginResult = await this.client.SendAsync(req, ct);
+        if (!loginResult.IsSuccessStatusCode)
+        {
+            return (null, new AdapterError(ErrorType.AuthenticationFailed));
+        }
+    }
+    catch (Exception ex)
+    {
+        this.logger.ErrorException("Connect failed to {0}", ex, endpoint);
+        return (null, new AdapterError(ErrorType.AuthenticationFailed));
+    }
+
+    // Query firmware version...
+
+    return (new ConnectResult(serverCert, new FirmwareVersion[]{ /* ... */ }) null);
+}
+```
+
+### 2. Laden der zum Verbraucher gehörenden Verträge mittels ``LoadAvailableContracts``
+
+### 3. Laden der Daten zum vom Verbraucher ausgewählten Vertrag mittels ``LoadData``
+
+### 4. Abruf der aktuellen Registerwerte durch ``GetCurrentRegisterValues``
 
 

@@ -10,7 +10,7 @@
 
     using TRuDI.HanAdapter.Example;
     using TRuDI.HanAdapter.Interface;
-    using TRuDI.HanAdapter.Test.Validation;
+    using TRuDI.HanAdapter.XmlValidation;
 
     class Program
     {
@@ -49,7 +49,7 @@
                 return;
             }
 
-            Log.Information("Certificate: Issuer: {0}, Subject: {1}", connectResult.cert.Issuer, connectResult.cert.Subject);
+            Log.Information("Certificate: Issuer: {0}, Subject: {1}", connectResult.result.Certificate.Issuer, connectResult.result.Certificate.Subject);
 
             var contractsResult = await adapter.LoadAvailableContracts(cts.Token, ProgressCallback);
             if (contractsResult.error != null)
@@ -73,13 +73,22 @@
                 return;
             }
 
-            if (Ar2418Validation.Validate(dataResult.trudiXml))
+            try
             {
-                Log.Information("Validation of result XML succseeded.");
+                Ar2418Validation.ValidateSchema(dataResult.trudiXml);
+                var model = XmlModelParser.ParseHanAdapterModel(dataResult.trudiXml.Root.Descendants());
+                model = ModelValidation.ValidateModel(model);
+                ContextValidation.ValidateContext(model, ctx);
             }
-            else
+            catch (AggregateException ae)
             {
-                Log.Error("Validation of result XML failed.");
+                Log.Error(ae.Message.Split(">")[0]);
+                ae.Flatten()?.InnerExceptions?.ToList().ForEach(ie => Log.Error(ie.Message));
+                Log.Error("Validation failed.");
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
             }
         }
 

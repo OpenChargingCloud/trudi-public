@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <RestoreSources>$(RestoreSources);../../private-packages;https://api.nuget.org/v3/index.json</RestoreSources>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <None Remove="Schemata\AR_2418-6.xsd" />
+    <None Remove="Schemata\atom.xsd" />
+    <None Remove="Schemata\espi_derived.xsd" />
+    <None Remove="Schemata\xml.xsd" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Schemata\AR_2418-6.xsd" />
+    <EmbeddedResource Include="Schemata\atom.xsd" />
+    <EmbeddedResource Include="Schemata\espi_derived.xsd" />
+    <EmbeddedResource Include="Schemata\xml.xsd" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="TRuDI.HanAdapter.Interface" Version="1.0.5" />
+  </ItemGroup>
+
+</Project>

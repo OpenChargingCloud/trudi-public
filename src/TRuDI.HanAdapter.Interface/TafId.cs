@@ -1,5 +1,8 @@
 namespace TRuDI.HanAdapter.Interface
 {
+    /// <summary>
+    /// Enumeration of TAF-IDs.
+    /// </summary>
     public enum TafId
     {
         /// <summary>

@@ -3,12 +3,9 @@ namespace TRuDI.HanAdapter.Interface
     using System;
     using System.Collections.Generic;
     using System.Net;
-    using System.Security.Cryptography.X509Certificates;
     using System.Threading;
     using System.Threading.Tasks;
     using System.Xml.Linq;
-
-    using Microsoft.AspNetCore.Mvc;
 
     /// <summary>
     /// Plugin interface for a TRuDI HAN device adapter.
@@ -27,7 +24,7 @@ namespace TRuDI.HanAdapter.Interface
         /// <param name="ct">Token for user initiated cancellation.</param>
         /// <param name="progressCallback">This callback must be called regularly. At the latest before the specified timeout occurs and the connection is still in progress to get established.</param>
         /// <returns>Cert is filled with the gateway's TLS certificate when the connection is established. Otherwise the error object exists.</returns>
-        Task<(X509Certificate2 cert, AdapterError error)> Connect(
+        Task<(ConnectResult result, AdapterError error)> Connect(
             string deviceId,
             IPEndPoint endpoint,
             string user,
@@ -49,7 +46,7 @@ namespace TRuDI.HanAdapter.Interface
         /// <param name="ct">Token for user initiated cancellation.</param>
         /// <param name="progressCallback">This callback must be called regularly. At the latest before the specified timeout occurs and the connection is still in progress to get established.</param>
         /// <returns>Cert is filled with the gateway's TLS certificate when the connection is established. Otherwise the error object exists.</returns>
-        Task<(X509Certificate2 cert, AdapterError error)> Connect(
+        Task<(ConnectResult result, AdapterError error)> Connect(
             string deviceId,
             IPEndPoint endpoint,
             byte[] pkcs12Data,
@@ -77,14 +74,37 @@ namespace TRuDI.HanAdapter.Interface
         /// <param name="progressCallback">This callback must be called regularly.</param>
         /// <returns></returns>
         Task<(XDocument trudiXml, AdapterError error)> LoadData(
-            AdapterContext ctx, 
+            AdapterContext ctx,
             CancellationToken ct,
             Action<ProgressInfo> progressCallback);
 
-        Task Disconnect();
-        
-        ViewComponent SmgwImageViewComponent { get; }
+        /// <summary>
+        /// Loads the current register values of the specified contract.
+        /// </summary>
+        /// <param name="contract">The contract to .</param>
+        /// <param name="ct">Token for user initiated cancellation.</param>
+        /// <param name="progressCallback">This callback must be called regularly.</param>
+        /// <returns>
+        /// On success, a XML document containing a meter reading with the current tariff registers. 
+        /// </returns>
+        Task<(XDocument trudiXml, AdapterError error)> GetCurrentRegisterValues(
+            ContractInfo contract,
+            CancellationToken ct,
+            Action<ProgressInfo> progressCallback);
 
-        ViewComponent ManufacturerParametersViewComponent { get; }
+        /// <summary>
+        /// Closes the connection to the gateway.
+        /// </summary>
+        Task Disconnect();
+
+        /// <summary>
+        /// Gets the type of the view component that shows an image of the SMGW.
+        /// </summary>
+        Type SmgwImageViewComponent { get; }
+
+        /// <summary>
+        /// Gets the type of the view component that is used to enter additional parameters needed to connect to the SMGW.
+        /// </summary>
+        Type ManufacturerParametersViewComponent { get; }
     }
 }

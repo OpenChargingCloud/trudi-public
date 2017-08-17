@@ -8,17 +8,13 @@
     using System.Threading.Tasks;
     using System.Xml.Linq;
 
-    using IVU.Http;
-    using IVU.Http.Http;
-
-    using Microsoft.AspNetCore.Mvc;
-
     using TRuDI.HanAdapter.Example.Logging;
     using TRuDI.HanAdapter.Interface;
     using TRuDI.HanAdapter.Example.Components;
 
     /// <summary>
     /// This isn't a really running example! It should serve as a starting point only.
+    /// It's just simulating a communication with a SMGW and generats dummy data.
     /// </summary>
     /// <seealso cref="TRuDI.HanAdapter.Interface.IHanAdapter" />
     public class HanAdapterExample : IHanAdapter
@@ -28,17 +24,7 @@
         /// </summary>
         private readonly ILog logger = LogProvider.For<HanAdapterExample>();
 
-        /// <summary>
-        /// This is the IVU.Http.HttpClient. It's a modified version with a fully managed TLS implementation.
-        /// </summary>
-        private HttpClient client;
-
-        /// <summary>
-        /// The base URI: filled by Connect()
-        /// </summary>
-        private string baseUri;
-
-        public async Task<(X509Certificate2 cert, AdapterError error)> Connect(
+        public async Task<(ConnectResult result, AdapterError error)> Connect(
             string deviceId,
             IPEndPoint endpoint,
             string user,
@@ -49,56 +35,10 @@
             Action<ProgressInfo> progressCallback)
         {
             this.logger.Info("Connecting to {0} using user/password authentication", endpoint);
-
-            this.baseUri = $"https://{endpoint.Address}:{endpoint.Port}/base/path/to/data";
-
-            var clientHandler = new IVU.Http.HttpClientHandler
-                                    {
-                                        AutomaticDecompression = DecompressionMethods.GZip
-                                    };
-
-            X509Certificate2 serverCert = null;
-            clientHandler.ServerCertificateCustomValidationCallback += (message, cert, chain, policyErrors) =>
-                {
-                    // Important: chain an policyErrors are currently not filled
-                    serverCert = new X509Certificate2(cert);
-
-                    // accept the server certificate and continue with TLS handshake
-                    return true;
-                };
-
-            // This example gateway uses Digest Access Authentication: add the DigestAuthMessageHandler to the client handler chain:
-            var digestAuthMessageHandler = new DigestAuthMessageHandler(clientHandler, user, password);
-
-            // Create the HttpClient instance
-            this.client = new IVU.Http.HttpClient(digestAuthMessageHandler);
-
-            // Set headers common for all calls
-            this.client.DefaultRequestHeaders.Add("SMGW-ID", deviceId);
-
-            // If there's a header value that changes with every request, create a HttpRequestMessage...
-            var req = new IVU.Http.HttpRequestMessage(HttpMethod.Get, this.baseUri + "/login");
-            req.Headers.Add("Request-GUID", Guid.NewGuid().ToString());
-
-            try
-            {
-                // ... and call client.SendAsync with it. Otherwise client.GetAsync() can also be used.
-                var loginResult = await this.client.SendAsync(req, ct);
-                if (!loginResult.IsSuccessStatusCode)
-                {
-                    return (null, new AdapterError(ErrorType.AuthenticationFailed));
-                }
-            }
-            catch (Exception ex)
-            {
-                this.logger.ErrorException("Connect failed to {0}", ex, endpoint);
-                return (null, new AdapterError(ErrorType.AuthenticationFailed));
-            }
-
-            return (serverCert, null);
+            return await CommonConnect(deviceId, ct, progressCallback);
         }
 
-        public async Task<(X509Certificate2 cert, AdapterError error)> Connect(
+        public async Task<(ConnectResult result, AdapterError error)> Connect(
             string deviceId,
             IPEndPoint endpoint,
             byte[] pkcs12Data,
@@ -109,84 +49,88 @@
             Action<ProgressInfo> progressCallback)
         {
             this.logger.Info("Connecting to {0} using a client certificate", endpoint);
+            return await CommonConnect(deviceId, ct, progressCallback);
+        }
 
-            this.baseUri = $"https://{endpoint.Address}:{endpoint.Port}/base/path/to/data";
+        private async Task<(ConnectResult connectResult, AdapterError error)> CommonConnect(string deviceId, CancellationToken ct, Action<ProgressInfo> progressCallback)
+        {
+            progressCallback(new ProgressInfo("Anmeldung am Gateway..."));
 
-            var clientHandler = new IVU.Http.HttpClientHandler
-                                    {
-                                        AutomaticDecompression = DecompressionMethods.GZip 
-                                    };
-            
-            // Load the client certificate
-            clientHandler.ClientCertificate = new ClientCertificateWithKey(pkcs12Data, password);
+            await Task.Delay(1000);
 
-            X509Certificate2 serverCert = null;
-            clientHandler.ServerCertificateCustomValidationCallback += (message, cert, chain, policyErrors) =>
+            progressCallback(new ProgressInfo(100, "Anmeldung am Gateway erfolgreich"));
+
+            return (
+                new ConnectResult(
+                    new X509Certificate2(),
+                    new FirmwareVersion[]
+                    {
+                        new FirmwareVersion { Component = "System", Version = "1.0.0", Hash = "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08" }
+                    }),
+                null);
+        }
+
+        public async Task<(IReadOnlyList<ContractInfo> contracts, AdapterError error)> LoadAvailableContracts(CancellationToken ct, Action<ProgressInfo> progressCallback)
+        {
+            var contracts = new List<ContractInfo>();
+
+            for (int i = 0; i < 5; i++)
+            {
+                progressCallback(new ProgressInfo(i * 20, $"Vertrag {0} von 5..."));
+
+                await Task.Delay(1000);
+
+                contracts.Add(new ContractInfo()
                 {
-                    // Important: chain an policyErrors are currently not filled
-                    serverCert = new X509Certificate2(cert);
-
-                    // accept the server certificate and continue with TLS handshake
-                    return true;
-                };
-
-            // Create the HttpClient instance
-            this.client = new IVU.Http.HttpClient(clientHandler);
-
-            // Set headers common for all calls
-            this.client.DefaultRequestHeaders.Add("SMGW-ID", deviceId);
-
-            // If there's a header value that changes with every request, create a HttpRequestMessage...
-            var req = new IVU.Http.HttpRequestMessage(HttpMethod.Get, this.baseUri + "/login");
-            req.Headers.Add("Request-GUID", Guid.NewGuid().ToString());
-
-            try
-            {
-                // ... and call client.SendAsync with it. Otherwise client.GetAsync() can also be used.
-                var loginResult = await this.client.SendAsync(req, ct);
-                if (!loginResult.IsSuccessStatusCode)
-                {
-                    return (null, new AdapterError(ErrorType.AuthenticationFailed));
-                }
-            }
-            catch (Exception ex)
-            {
-                this.logger.ErrorException("Connect failed to {0}", ex, endpoint);
-                return (null, new AdapterError(ErrorType.AuthenticationFailed));
+                    Begin = new DateTime(2017, 1, 1),
+                    End = null,
+                    ConsumerId = "consumer-01",
+                    Description = $"Vertrag {i}",
+                });
             }
 
-            return (serverCert, null);
+            progressCallback(new ProgressInfo(100, $"Alle Verträge geladen."));
+            return (contracts, null);
         }
 
-        public Task<(IReadOnlyList<ContractInfo> contracts, AdapterError error)> LoadAvailableContracts(CancellationToken ct, Action<ProgressInfo> progressCallback)
+        public async Task<(XDocument trudiXml, AdapterError error)> LoadData(AdapterContext ctx, CancellationToken ct, Action<ProgressInfo> progressCallback)
         {
             throw new NotImplementedException();
         }
 
-        public Task<(XDocument trudiXml, AdapterError error)> LoadData(AdapterContext ctx, CancellationToken ct, Action<ProgressInfo> progressCallback)
+        /// <summary>
+        /// Loads the current register values of the specified contract.
+        /// </summary>
+        /// <param name="contract">The contract to .</param>
+        /// <param name="ct">Token for user initiated cancellation.</param>
+        /// <param name="progressCallback">This callback must be called regularly.</param>
+        /// <returns>
+        /// On success, a XML document containing a meter reading with the current tariff registers. 
+        /// </returns>
+        public async Task<(XDocument trudiXml, AdapterError error)> GetCurrentRegisterValues(
+            ContractInfo contract,
+            CancellationToken ct,
+            Action<ProgressInfo> progressCallback)
         {
-            throw new NotImplementedException();
+            return (null, null);
         }
 
-        public Task Disconnect()
+        /// <summary>
+        /// Closes the connection to the gateway.
+        /// </summary>
+        /// <returns></returns>
+        public async Task Disconnect()
         {
-            throw new NotImplementedException();
         }
 
-        public ViewComponent SmgwImageViewComponent
-        {
-            get
-            {
-                return new GatewayImageExampleView();
-            }
-        }
+        /// <summary>
+        /// Gets the type of the view component that shows an image of the SMGW.
+        /// </summary>
+        public Type SmgwImageViewComponent => typeof(GatewayImageExampleView);
 
-        public ViewComponent ManufacturerParametersViewComponent
-        {
-            get
-            {
-                return new ManufacturerParametersExampleView();
-            }
-        }
+        /// <summary>
+        /// Gets the manufacturer parameters view component.
+        /// </summary>
+        public Type ManufacturerParametersViewComponent => typeof(ManufacturerParametersExampleView);
     }
 }
