@@ -19,19 +19,15 @@ namespace TRuDI.HanAdapter.Interface
         public string TafName { get; set; }
 
         /// <summary>
-        /// Contract description if available.
+        /// Contract description if available (tag TariffName).
         /// </summary>
         public string Description { get; set; }
 
         /// <summary>
-        /// The "Herstellerübergreifende Identifikationsnummer" (DIN 43863-5, e.g. "1XXX0012345678") of the meter associated with this billing period.
+        /// Gets or sets a list with the meters associated with this contract.
+        /// The IDs must have the format of "Herstellerübergreifende Identifikationsnummer" (DIN 43863-5, e.g. "1XXX0012345678")
         /// </summary>
-        public string MeterId { get; set; }
-
-        /// <summary>
-        /// Gets or sets the metering point identifier (Zählpunktbezeichnung).
-        /// </summary>
-        public string MeteringPointId { get; set; }
+        public IReadOnlyList<string> Meters { get; set; }
 
         /// <summary>
         /// Gets or sets the supplier identifier.

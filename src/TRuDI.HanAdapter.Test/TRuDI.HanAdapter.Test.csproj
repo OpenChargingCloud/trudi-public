@@ -12,7 +12,7 @@
   
   <ItemGroup>
     <PackageReference Include="Serilog.Sinks.ColoredConsole" Version="3.0.1" />
-    <PackageReference Include="TRuDI.HanAdapter.Interface" Version="1.0.5" />
+    <PackageReference Include="TRuDI.HanAdapter.Interface" Version="1.0.6" />
   </ItemGroup>
 
   <ItemGroup>

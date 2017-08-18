@@ -86,6 +86,7 @@
                     End = null,
                     ConsumerId = "consumer-01",
                     Description = $"Vertrag {i}",
+                    Meters = new string[] { "1DZG0012345678" }
                 });
             }
 
