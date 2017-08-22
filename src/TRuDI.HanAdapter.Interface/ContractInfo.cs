@@ -1,4 +1,4 @@
-namespace TRuDI.HanAdapter.Interface
+﻿namespace TRuDI.HanAdapter.Interface
 {
     using System;
     using System.Collections.Generic;
@@ -25,9 +25,14 @@ namespace TRuDI.HanAdapter.Interface
 
         /// <summary>
         /// Gets or sets a list with the meters associated with this contract.
-        /// The IDs must have the format of "Hersteller�bergreifende Identifikationsnummer" (DIN 43863-5, e.g. "1XXX0012345678")
+        /// The IDs must have the format of "Herstellerübergreifende Identifikationsnummer" (DIN 43863-5, e.g. "1XXX0012345678")
         /// </summary>
         public IReadOnlyList<string> Meters { get; set; }
+
+        /// <summary>
+        /// Gets or sets the metering point identifier (Zählpunktbezeichnung).
+        /// </summary>
+        public string MeteringPointId { get; set; }
 
         /// <summary>
         /// Gets or sets the supplier identifier.
