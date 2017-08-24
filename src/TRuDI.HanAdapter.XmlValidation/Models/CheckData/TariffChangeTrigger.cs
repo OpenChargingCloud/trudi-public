@@ -23,7 +23,7 @@
         ///  
         /// eine TriggerInstanz ist in jeder Instanz der Klasse TariffChangeTrigger zu finden.
         /// </summary>
-        public Trigger Trigger
+        public TimeTrigger TimeTrigger
         {
             get; set;
         }

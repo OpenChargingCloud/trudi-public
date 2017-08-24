@@ -29,9 +29,20 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="IVU.Http" Version="1.0.6" />
+    <PackageReference Include="IVU.Http" Version="1.0.7" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.0" />
-    <PackageReference Include="TRuDI.HanAdapter.Interface" Version="1.0.6" />
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+    <PackageReference Include="TRuDI.HanAdapter.Interface" Version="1.0.7" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\TRuDI.HanAdapter.XmlValidation\TRuDI.HanAdapter.XmlValidation.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <None Update="Data\config.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

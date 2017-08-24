@@ -1,0 +1,21 @@
+﻿@using TRuDI.Backend.HanAdapter
+@inject ApplicationState StateService
+@{
+    ViewData["Title"] = "Verträge";
+}
+
+@foreach (var contract in StateService.Contracts)
+{
+    <div class="panel panel-primary">
+        <div class="panel-heading">Zählpunkt @contract.MeteringPointId</div>
+        <div class="panel-body">
+            <div>@contract.ConsumerId</div>
+            <div>@contract.TafId</div>
+            <div>@contract.TafName</div>
+            <div>@contract.Description</div>
+            <div>@contract.MeteringPointId</div>
+            <div>@contract.SupplierId</div>
+
+        </div>
+    </div>
+}

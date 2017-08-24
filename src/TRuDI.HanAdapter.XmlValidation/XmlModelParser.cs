@@ -7,6 +7,7 @@
 
     using TRuDI.HanAdapter.XmlValidation.Models;
     using TRuDI.HanAdapter.XmlValidation.Models.BasicData;
+    using TRuDI.HanAdapter.XmlValidation.Models.CheckData;
 
     public class XmlModelParser
     {
@@ -94,7 +95,7 @@
                     case "LogEvent":
                         if (logEventAlreadyExists)
                         {
-                            exceptions.Add(new InvalidOperationException($"Only one LogEvent element is allowed."));
+                            exceptions.Add(new InvalidOperationException("The current LogEntry has already a LogEvent instance"));
                         }
                         else
                         {
@@ -223,9 +224,16 @@
                                   .IntervalReadings.LastOrDefault().TimePeriod = new Interval();
                         break;
                     case "statusFNN":
-                        usagePoint.MeterReadings.LastOrDefault()
+                        if (e.Value.ValidateHexString())
+                        {
+                            usagePoint.MeterReadings.LastOrDefault()
                                   .IntervalBlocks.LastOrDefault()
-                                  .IntervalReadings.LastOrDefault().StatusFNN = e.Value;
+                                  .IntervalReadings.LastOrDefault().StatusFNN = new StatusFNN(e.Value);
+                        }
+                        else
+                        {
+                            exceptions.Add(new InvalidOperationException("statusFNN is an invalid hex string."));
+                        }
                         break;
                     case "statusPTB":
                         usagePoint.MeterReadings.LastOrDefault()
@@ -240,15 +248,227 @@
 
             if (exceptions.Any())
             {
-                throw new AggregateException("Parsing error:>", exceptions);
+                throw new AggregateException("Han Adapter Parsing error:>", exceptions);
             }
 
             return usagePoint;
         }
 
-        public static UsagePoint ParseSupplierModel(IEnumerable<XElement> elements)
+        public static UsagePointLieferant ParseSupplierModel(IEnumerable<XElement> elements)
         {
-            throw new NotImplementedException();
+            UsagePointLieferant usagePoint = null;
+            var exceptions = new List<Exception>();
+            var dayIdAlreadyExists = false;
+
+            foreach(XElement e in elements)
+            {
+                switch (e.Name.LocalName)
+                {
+                    case "UsagePoint":
+                        usagePoint = new UsagePointLieferant();
+                        break;
+                    case "usagePointId":
+                        usagePoint.UsagePointId = e.Value;
+                        break;
+                    case "tariffName":
+                        usagePoint.TariffName = e.Value;
+                        break;
+                    case "Customer":
+                        usagePoint.Customer = new Customer();
+                        break;
+                    case "customerId":
+                        usagePoint.Customer.CustomerId = e.Value;
+                        break;
+                    case "InvoicingParty":
+                        usagePoint.InvoicingParty = new InvoicingParty();
+                        break;
+                    case "invoicingPartyId":
+                        usagePoint.InvoicingParty.InvoicingPartyId = e.Value;
+                        break;
+                    case "ServiceCategory":
+                        usagePoint.ServiceCategory = new ServiceCategory();
+                        break;
+                    case "kind":
+                        usagePoint.ServiceCategory.Kind = (Kind)Convert.ToInt32(e.Value);
+                        break;
+                    case "SMGW":
+                        usagePoint.Smgw = new SMGW();
+                        break;
+                    case "certId":
+                        if (e.Parent.Name.LocalName == "SMGW")
+                        {
+                            usagePoint.Smgw.CertIds.Add(Convert.ToByte(e.Value));
+                        }
+                        else if (e.Parent.Name.LocalName == "Certificate")
+                        {
+                            usagePoint.Certificates.LastOrDefault().CertId = Convert.ToByte(e.Value);
+                        }
+
+                        break;
+                    case "smgwId":
+                        usagePoint.Smgw.SmgwId = e.Value;
+                        break;
+                    case "Certificate":
+                        usagePoint.Certificates.Add(new Certificate());
+                        break;
+                    case "certType":
+                        usagePoint.Certificates.LastOrDefault().CertType = (CertType)Convert.ToByte(e.Value);
+                        break;
+                    case "parentCertId":
+                        usagePoint.Certificates.LastOrDefault().ParentCertId = Convert.ToByte(e.Value);
+                        break;
+                    case "certContent":
+                        if (e.Value.ValidateHexString())
+                        {
+                            usagePoint.Certificates.LastOrDefault().HexStringToByteArray(e.Value);
+                        }
+                        else
+                        {
+                            exceptions.Add(new InvalidOperationException("certContent is an invalid hex string."));
+                        }
+
+                        break;
+                    case "AnalysisProfile":
+                        usagePoint.AnalysisProfile = new AnalysisProfile();
+                        break;
+                    case "tariffUseCase":
+                        usagePoint.AnalysisProfile.TariffUseCase = (TariffUseCase)Convert.ToUInt16(e.Value);
+                        break;
+                    case "tariffId":
+                        usagePoint.AnalysisProfile.TariffId = e.Value;
+                        break;
+                    case "defaultTariffNumber":
+                        usagePoint.AnalysisProfile.DefaultTariffNumber = Convert.ToUInt16(e.Value);
+                        break;
+                    case "billingPeriod":
+                        usagePoint.AnalysisProfile.BillingPeriod = new Interval();
+                        break;
+                    case "duration":
+                        usagePoint.AnalysisProfile.BillingPeriod.Duration = Convert.ToUInt32(e.Value);
+                        break;
+                    case "start":
+                        usagePoint.AnalysisProfile.BillingPeriod.Start = Convert.ToDateTime(e.Value);
+                        break;
+                    case "TariffStage":
+                        usagePoint.AnalysisProfile.TariffStages.Add(new TariffStage());
+                        break;
+                    case "tariffNumber":
+                        if (e.Parent.Name.LocalName == "TariffStage")
+                        {
+                            usagePoint.AnalysisProfile.TariffStages.LastOrDefault().TariffNumber = Convert.ToUInt16(e.Value);
+                        }
+                        else if (e.Parent.Name.LocalName == "DayTimeProfile")
+                        {
+                            usagePoint.AnalysisProfile.TariffChangeTrigger.TimeTrigger.DayProfiles.LastOrDefault()
+                                      .DayTimeProfiles.LastOrDefault().TariffNumber = Convert.ToUInt16(e.Value);
+                        }
+
+                        break;
+                    case "description":
+                        usagePoint.AnalysisProfile.TariffStages.LastOrDefault().Description = e.Value;
+                        break;
+                    case "obisCode":
+                        usagePoint.AnalysisProfile.TariffStages.LastOrDefault().ObisCode = e.Value;
+                        break;
+                    case "TariffChangeTrigger":
+                        usagePoint.AnalysisProfile.TariffChangeTrigger = new TariffChangeTrigger();
+                        break;
+                    case "TimeTrigger":
+                        usagePoint.AnalysisProfile.TariffChangeTrigger.TimeTrigger = new TimeTrigger();
+                        break;
+                    case "DayProfile":
+                        usagePoint.AnalysisProfile.TariffChangeTrigger.TimeTrigger.DayProfiles.Add(new DayProfile());
+                        dayIdAlreadyExists = false;
+                        break;
+                    case "dayId":
+                        if (e.Parent.Name.LocalName == "DayProfile")
+                        {
+                            if (dayIdAlreadyExists)
+                            {
+                                exceptions.Add(new InvalidOperationException("Only one dayId element in DayProfile is allowed."));
+                            }
+                            else
+                            {
+                                usagePoint.AnalysisProfile.TariffChangeTrigger.TimeTrigger.DayProfiles.LastOrDefault()
+                                .DayId = Convert.ToUInt16(e.Value);
+                                dayIdAlreadyExists = true;
+                            }
+                        }
+                        else if (e.Parent.Name.LocalName == "SpecialDayProfile")
+                        {
+                            var id = Convert.ToUInt16(e.Value);
+                            usagePoint.AnalysisProfile.TariffChangeTrigger.TimeTrigger.SpecialDayProfiles
+                                .LastOrDefault().DayId = id;
+                            try
+                            {
+                                usagePoint.AnalysisProfile.TariffChangeTrigger.TimeTrigger.SpecialDayProfiles
+                                    .LastOrDefault().DayProfile = usagePoint.AnalysisProfile.TariffChangeTrigger.TimeTrigger
+                                    .DayProfiles.Single(dp => dp.DayId == id);
+                            }
+                            catch (Exception ex)
+                            {
+                                exceptions.Add(ex);
+                            }
+                        }
+                        break;
+                    case "DayTimeProfile":
+                        usagePoint.AnalysisProfile.TariffChangeTrigger.TimeTrigger.DayProfiles.LastOrDefault()
+                            .DayTimeProfiles.Add(new DayTimeProfile());
+                        usagePoint.AnalysisProfile.TariffChangeTrigger.TimeTrigger.DayProfiles.LastOrDefault()
+                            .DayTimeProfiles.LastOrDefault().DayProfile = usagePoint.AnalysisProfile
+                            .TariffChangeTrigger.TimeTrigger.DayProfiles.LastOrDefault();
+                        break;
+                    case "startTime":
+                        usagePoint.AnalysisProfile.TariffChangeTrigger.TimeTrigger.DayProfiles.LastOrDefault()
+                            .DayTimeProfiles.LastOrDefault().StartTime = new TimeVarType();
+                        break;
+                    case "hour":
+                        usagePoint.AnalysisProfile.TariffChangeTrigger.TimeTrigger.DayProfiles.LastOrDefault()
+                            .DayTimeProfiles.LastOrDefault().StartTime.Hour = Convert.ToByte(e.Value);
+                        break;
+                    case "minute":
+                        usagePoint.AnalysisProfile.TariffChangeTrigger.TimeTrigger.DayProfiles.LastOrDefault()
+                           .DayTimeProfiles.LastOrDefault().StartTime.Minute = Convert.ToByte(e.Value);
+                        break;
+                    case "second":
+                        usagePoint.AnalysisProfile.TariffChangeTrigger.TimeTrigger.DayProfiles.LastOrDefault()
+                           .DayTimeProfiles.LastOrDefault().StartTime.Second = Convert.ToByte(e.Value);
+                        break;
+                    case "hundreds":
+                        usagePoint.AnalysisProfile.TariffChangeTrigger.TimeTrigger.DayProfiles.LastOrDefault()
+                           .DayTimeProfiles.LastOrDefault().StartTime.Hundreds = Convert.ToByte(e.Value);
+                        break;
+                    case "SpecialDayProfile":
+                        usagePoint.AnalysisProfile.TariffChangeTrigger.TimeTrigger.SpecialDayProfiles.Add(new SpecialDayProfile());
+                        break;
+                    case "specialDayDate":
+                        usagePoint.AnalysisProfile.TariffChangeTrigger.TimeTrigger.SpecialDayProfiles.LastOrDefault()
+                            .SpecialDayDate = new DayVarType();
+                        break;
+                    case "year":
+                        usagePoint.AnalysisProfile.TariffChangeTrigger.TimeTrigger.SpecialDayProfiles.LastOrDefault()
+                           .SpecialDayDate.Year = Convert.ToUInt16(e.Value);
+                        break;
+                    case "month":
+                        usagePoint.AnalysisProfile.TariffChangeTrigger.TimeTrigger.SpecialDayProfiles.LastOrDefault()
+                          .SpecialDayDate.Month = Convert.ToByte(e.Value);
+                        break;
+                    case "day_of_month":
+                        usagePoint.AnalysisProfile.TariffChangeTrigger.TimeTrigger.SpecialDayProfiles.LastOrDefault()
+                          .SpecialDayDate.DayOfMonth = Convert.ToByte(e.Value);
+                        break;
+                    default:
+                        exceptions.Add(new InvalidOperationException($"The element {e.Name.LocalName} could not be mapped."));
+                        break;
+                }
+            }
+
+            if (exceptions.Any())
+            {
+                throw new AggregateException("Supplier Parsing error:>", exceptions);
+            }
+
+            return usagePoint;
         }
     }
 }

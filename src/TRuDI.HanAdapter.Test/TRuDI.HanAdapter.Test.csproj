@@ -12,11 +12,12 @@
   
   <ItemGroup>
     <PackageReference Include="Serilog.Sinks.ColoredConsole" Version="3.0.1" />
-    <PackageReference Include="TRuDI.HanAdapter.Interface" Version="1.0.6" />
+    <PackageReference Include="TRuDI.HanAdapter.Interface" Version="1.0.7" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\TRuDI.HanAdapter.Example\TRuDI.HanAdapter.Example.csproj" />
+    <ProjectReference Include="..\TRuDI.HanAdapter.LandisGyr\TRuDI.HanAdapter.LandisGyr.csproj" />
     <ProjectReference Include="..\TRuDI.HanAdapter.XmlValidation\TRuDI.HanAdapter.XmlValidation.csproj" />
   </ItemGroup>
 

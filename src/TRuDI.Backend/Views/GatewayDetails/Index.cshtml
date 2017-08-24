@@ -1,0 +1,108 @@
+﻿@using System.Security.Cryptography.X509Certificates
+@using TRuDI.Backend.HanAdapter
+@using TRuDI.Backend.Utils;
+@inject ApplicationState StateService
+@{
+    ViewData["Title"] = "Details zum Smart Meter Gateway";
+}
+
+
+<div class="panel panel-primary">
+    <div class="panel-heading">Firmware-Version</div>
+    <div class="panel-body">
+
+
+        @if (StateService.LastConnectResult?.FirmwareVersions != null)
+            {
+            <table class="table">
+                @foreach (var versionItem in StateService.LastConnectResult.FirmwareVersions)
+                {
+                    <tr>
+                        <td>
+                            @versionItem.Component
+                        </td>
+                        <td>
+                            <div>
+                                @versionItem.Version
+                            </div>
+                            @if (!string.IsNullOrWhiteSpace(versionItem.Hash))
+                    {
+                                <div>
+                                    @versionItem.Hash
+                                </div>
+                            }
+                        </td>
+                    </tr>
+                }
+
+            </table>
+        }
+
+    </div>
+</div>
+
+<div class="panel panel-primary">
+    <div class="panel-heading">Zertifikat der TLS-Verbindung</div>
+    <div class="panel-body">
+
+        @if (StateService.LastConnectResult?.Certificate != null)
+        {
+            var cert = StateService.LastConnectResult?.Certificate;
+
+            <table class="table">
+                <tr>
+                    <td>Ausgestellt für</td>
+                    <td>@cert.GetNameInfo(X509NameType.SimpleName, true)</td>
+                </tr>
+
+                <tr>
+                    <td>Ausgestellt von</td>
+                    <td>@cert.GetNameInfo(X509NameType.SimpleName, false)</td>
+                </tr>
+
+                <tr>
+                    <td>Gültigkeit</td>
+                    <td>@cert.NotBefore bis @cert.NotAfter</td>
+                </tr>
+
+                <tr>
+                    <td>Format</td>
+                    <td>@cert.GetFormat()</td>
+                </tr>
+
+                <tr>
+                    <td>Version</td>
+                    <td>@cert.Version</td>
+                </tr>
+
+                <tr>
+                    <td>Öffentlicher Schlüssel</td>
+                    <td style="font-family: monospace;">@cert.GetPublicKeyString().AddLineBreak(32)</td>
+                </tr>
+
+                <tr>
+                    <td>Serial Number</td>
+                    <td>@cert.GetSerialNumberString()</td>
+                </tr>
+
+                <tr>
+                    <td>Key Algorithm</td>
+                    <td>@cert.GetKeyAlgorithm().OidToFriendlyName()</td>
+                </tr>
+                <tr>
+                    <td>Hash</td>
+                    <td style="font-family: monospace;">@cert.GetCertHashString().AddLineBreak(32)</td>
+                </tr>
+
+                <tr>
+                    <td>Signature Algorithm</td>
+                    <td>@cert.SignatureAlgorithm.FriendlyName</td>
+                </tr>
+            </table>
+        }
+
+    </div>
+</div>
+
+<a asp-action="Back">Zurück</a>
+

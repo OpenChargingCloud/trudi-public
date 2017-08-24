@@ -1,0 +1,62 @@
+﻿@{
+    ViewData["Title"] = "Betriebsart";
+}
+
+
+<div class="panel panel-default">
+    <div class="panel-heading">Transparenz- und Display-Software (TRuDI)</div>
+    <div class="panel-body">
+        <p>
+            Mit TRuDI (Transparenz- und Display-Software) stellt die Intitiative Bundesdisplay eine 
+            herstellerübergreifende, standardisierte Visualisierungslösung bereit, die die Anforderungen 
+            des MsbG (insbesondere §35, §62), der PTB-A50.8 erfüllt und die im Rahmen der Vorgaben des 
+            Bundesamts für Sicherheit in der Informationstechnik nutzbar ist. 
+        </p>
+        <p>
+            TRuDI bietet dabei eine Display Funktion, mit der Messwerte, die im SMGW vorhanden sind für den
+            Letztverbraucher angezeigt werden. Darüber hinaus steht eine sogenannte Transpa-renz Funktion zur Verfügung.
+            Im Rahmen dieses funktionalen Merkmals ist der Letztverbrau-cher mit Hilfe der Software in der Lage, Tarifrechnungen,
+            die auf Basis der Messwerte des SMGWs in der Systemlandschaft des Lieferanten durchgeführt hat lokal nachzuvollziehen
+            und damit seine Rechnung zu überprüfen.
+        </p>
+    </div>
+</div>
+
+
+<div class="row">
+
+    <div class="col-sm-6">
+        <div class="panel panel-primary">
+            <div class="panel-heading">Anzeigefunktion</div>
+            <div class="panel-body">
+                <p>
+                    Für TAF-1/2/6 stellt TRuDI eine Anzeige-Funktion (gemäß PTB-A50.8) zur Verfügung, d.h. die Messwerte, 
+                    die vom SMGW bereitgestellt werden, werden lediglich visualisiert. Eine Kontrolle oder weiterführende 
+                    Verrechnung dieser Werte findet nicht statt.
+                </p>
+                <p>
+                    <a class="btn btn-primary btn-lg" asp-controller="OperatingModeSelection" asp-action="StartDisplayFunction" role="button">Weiter</a>
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="col-sm-6">
+        <div class="panel panel-primary">
+            <div class="panel-heading">Transparenzfunktion</div>
+            <div class="panel-body">
+                <p>
+                    Für TAF-7 und eine nachgelagerte Tarifierung beim Lieferanten stellt TRuDI eine 
+                    Transparenz-Funktion (gemäß PTB-A50.8) zur Verfügung, d.h. die vom SMGW bereitgestellten 
+                    Messwerte werden mit einer vom Lieferanten bereitgestellten Tarifierungsinformation verrechnet. 
+                    Das Ergebnis wird dem Letztverbraucher zur Rechnungsprüfung angezeigt.
+                </p>
+                <p>
+                    <a class="btn btn-primary btn-lg" asp-controller="OperatingModeSelection" asp-action="StartTransparencyFunction" role="button">Weiter</a>
+                </p>
+            </div>
+        </div>
+
+    </div>
+</div>

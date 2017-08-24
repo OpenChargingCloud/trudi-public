@@ -112,5 +112,57 @@
 
             return true;
         }
+
+        /// <summary>
+        /// Die Funktion kürzt mögliche Sekundenwerte eines DateTime Objekts
+        /// </summary>
+        /// <param name="dateTime">Das zu kürzende DateTime Objekt</param>
+        /// <returns>Das gekürzute DateTime Objekt</returns>
+        public static DateTime GetDateWithoutSeconds(this DateTime dateTime)
+        {
+            return new DateTime(dateTime.Year, dateTime.Month, dateTime.Day, dateTime.Hour, dateTime.Minute, 0);
+        }
+
+        /// <summary>
+        /// Teilt den FNN Status hex String in die beiden Enumerationen SmgwStatusWord und BzStatusWord auf
+        /// </summary>
+        /// <param name="statusFNN"></param>
+        public static void SplitStringToEnums(this StatusFNN statusFNN)
+        {
+            var smgwStat = Convert.ToInt64(statusFNN.Status.Substring(0, 8), 16);
+            var bzStat = Convert.ToInt64(statusFNN.Status.Substring(8), 16);
+            statusFNN.SmgwStatusWord = (SmgwStatusWord)smgwStat;
+            statusFNN.BzStatusWord = (BzStatusWord)bzStat;
+        }
+
+        /// <summary>
+        /// Validiert den FNNStatus 
+        /// </summary>
+        /// <param name="statusFNN"></param>
+        /// <returns>True wenn der FNN Status gültig ist, False falls nicht</returns>
+        public static bool ValidateFNNStatus(this StatusFNN statusFNN)
+        {
+            var binaryString = Convert.ToString(Convert.ToInt64(statusFNN.Status, 16), 2).PadLeft(64, '0');
+            var mask = StatusFNN.SMGWMASK + StatusFNN.BZMASK;
+
+            for (int index = 0; index < 64; index++)
+            {
+                if (mask[index] == 'x')
+                {
+                    continue;
+                }
+                else if (binaryString[index] == mask[index])
+                {
+                    continue;
+                }
+                else
+                {
+                    return false;
+                }
+
+            }
+
+            return true;
+        }
     }
 }

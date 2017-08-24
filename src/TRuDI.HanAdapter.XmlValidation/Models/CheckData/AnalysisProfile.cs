@@ -23,14 +23,14 @@
         /// </summary>
         public AnalysisProfile()
         {
-            this.TariffStage = new List<TariffStage>();
+            this.TariffStages = new List<TariffStage>();
         }
 
         /// <summary>
         /// Die Klasse TariffStage spezifiziert einzelne Tarifstufen des Auswerteprofils.
         /// Ein Auswerteprofil muss mindestens eine Instanz der Klasse TariffStage enthalten.
         /// </summary>
-        public List<TariffStage> TariffStage
+        public List<TariffStage> TariffStages
         {
             get; set;
         }
@@ -61,7 +61,7 @@
         /// Die angegebene Nummer entspricht dabei dem Anwendungsfall wie er in der TR-03109-1 des BSI definiert wurde.
         /// Eine Instanz der Klasse AnalysisProfile muss genau ein Datenelement der Klasse tariffUseCase beinhalten.
         /// </summary>
-        public ushort TariffUseCase
+        public TariffUseCase TariffUseCase
         {
             get; set;
         }

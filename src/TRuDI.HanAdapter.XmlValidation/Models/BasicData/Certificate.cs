@@ -18,7 +18,7 @@
         /// Default die ID mit der Nummer 1. Jede Instanz der Klasse Certificate muss ein Datenelement vom Typ
         /// CertId enthalten.
         /// </summary>
-        public byte CertId
+        public byte? CertId
         {
             get; set;
         }
@@ -43,7 +43,7 @@
         ///
         /// Jede Instanz der Klasse Certificate kann ein Datenelement vom Typ parentCertId enthalten.
         /// </summary>
-        public byte ParentCertId
+        public byte? ParentCertId
         {
             get; set;
         }

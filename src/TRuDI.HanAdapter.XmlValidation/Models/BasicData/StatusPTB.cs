@@ -15,7 +15,7 @@
         Warning,
 
         //Temporärer Fehler, gesendeter Messwert wird als ungültig gekennzeichnet, 
-        //der Wert im Messwertfeld kann entsprechend den Regeln [VDE4400] bzw. [G685] im Backend als Er-satzwert verwendet werden.
+        //der Wert im Messwertfeld kann entsprechend den Regeln [VDE4400] bzw. [G685] im Backend als Ersatzwert verwendet werden.
         Temp_Error_signed_invalid,
 
         //Temporärer Fehler, gesendeter Messwert ist ungültig, der im Messwertfeld enthaltene Wert kann im Backend nicht als Ersatzwert verwendet werden.

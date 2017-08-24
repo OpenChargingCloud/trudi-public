@@ -7,10 +7,15 @@
     using System.Threading;
     using System.Threading.Tasks;
     using System.Xml.Linq;
+    using Newtonsoft.Json;
 
     using TRuDI.HanAdapter.Example.Logging;
     using TRuDI.HanAdapter.Interface;
     using TRuDI.HanAdapter.Example.Components;
+    using TRuDI.HanAdapter.XmlValidation.Models;
+    using TRuDI.HanAdapter.XmlValidation.Models.BasicData;
+    using TRuDI.HanAdapter.Example.ConfigModel;
+
 
     /// <summary>
     /// This isn't a really running example! It should serve as a starting point only.
@@ -24,6 +29,25 @@
         /// </summary>
         private readonly ILog logger = LogProvider.For<HanAdapterExample>();
 
+        private HanAdapterExampleConfig config;
+        private Certificate certificate;
+
+
+        public HanAdapterExample()
+        {
+            try
+            {
+                var json = System.IO.File.ReadAllText("../TRuDI.HanAdapter.Example/Data/ConfigTaf7UseCase.json");
+                this.config = JsonConvert.DeserializeObject<HanAdapterExampleConfig>(json);
+                certificate = new Certificate();
+                certificate.HexStringToByteArray(config.Cert);
+            }
+            catch (Exception ex)
+            {
+                this.logger.ErrorException("Failed to read configuration.", ex);
+            }
+        }
+
         public async Task<(ConnectResult result, AdapterError error)> Connect(
             string deviceId,
             IPEndPoint endpoint,
@@ -35,7 +59,25 @@
             Action<ProgressInfo> progressCallback)
         {
             this.logger.Info("Connecting to {0} using user/password authentication", endpoint);
-            return await CommonConnect(deviceId, ct, progressCallback);
+            var realEndpoint = new IPEndPoint(IPAddress.Parse(config.IPAddress), config.IPPort);
+            if (!endpoint.Address.Equals(realEndpoint.Address) || endpoint.Port != realEndpoint.Port)
+            {
+                return (null, new AdapterError(ErrorType.TcpConnectFailed, $"{endpoint} could not be found."));
+            }
+            
+            if(deviceId != config.DeviceId)
+            {
+                return(null, new AdapterError(ErrorType.TcpConnectFailed, $"{deviceId} could not be found."));
+            }
+            
+            if (user == config.User && password == config.Password)
+            {
+                return await this.CommonConnect(deviceId, timeout, ct, progressCallback);
+            }
+            else
+            {
+                return (null, new AdapterError(ErrorType.AuthenticationFailed, "user or password are invalid."));
+            }
         }
 
         public async Task<(ConnectResult result, AdapterError error)> Connect(
@@ -49,45 +91,50 @@
             Action<ProgressInfo> progressCallback)
         {
             this.logger.Info("Connecting to {0} using a client certificate", endpoint);
-            return await CommonConnect(deviceId, ct, progressCallback);
+            return await this.CommonConnect(deviceId, timeout, ct, progressCallback);
         }
 
-        private async Task<(ConnectResult connectResult, AdapterError error)> CommonConnect(string deviceId, CancellationToken ct, Action<ProgressInfo> progressCallback)
+        private async Task<(ConnectResult connectResult, AdapterError error)> CommonConnect(
+            string deviceId, 
+            TimeSpan timeout, 
+            CancellationToken ct, 
+            Action<ProgressInfo> progressCallback)
         {
             progressCallback(new ProgressInfo("Anmeldung am Gateway..."));
 
-            await Task.Delay(1000);
+            await Task.Delay(config.TimeToConnect);
+
+            if(config.TimeToConnect > timeout)
+            {
+                return (null, new AdapterError(ErrorType.Other, "Request timeout"));
+            }
 
             progressCallback(new ProgressInfo(100, "Anmeldung am Gateway erfolgreich"));
 
-            return (
-                new ConnectResult(
-                    new X509Certificate2(),
-                    new FirmwareVersion[]
-                    {
-                        new FirmwareVersion { Component = "System", Version = "1.0.0", Hash = "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08" }
-                    }),
-                null);
+            return (new ConnectResult(certificate.GetCert(), new FirmwareVersion[] { config.Version }), null);
         }
 
         public async Task<(IReadOnlyList<ContractInfo> contracts, AdapterError error)> LoadAvailableContracts(CancellationToken ct, Action<ProgressInfo> progressCallback)
         {
             var contracts = new List<ContractInfo>();
+            var dataForContractExists = false;
 
-            for (int i = 0; i < 5; i++)
+            for(int i = 0; i < config.Contracts.Count; i++)
             {
-                progressCallback(new ProgressInfo(i * 20, $"Vertrag {0} von 5..."));
+                progressCallback(new ProgressInfo(i * (100/config.Contracts.Count), $"Vertrag {i+1} von {config.Contracts.Count}..."));
 
-                await Task.Delay(1000);
-
-                contracts.Add(new ContractInfo()
+                if(config.Contracts[i].TafName == config.XmlConfig.TariffName)
                 {
-                    Begin = new DateTime(2017, 1, 1),
-                    End = null,
-                    ConsumerId = "consumer-01",
-                    Description = $"Vertrag {i}",
-                    Meters = new string[] { "1DZG0012345678" }
-                });
+                    dataForContractExists = true;
+                    progressCallback(new ProgressInfo((i *(100 / config.Contracts.Count)), $"Abrufbare Daten für Vertrag {i+1} vorhanden."));
+                    contracts.Add(config.Contracts[i]);
+                }
+                await Task.Delay(1000);
+            }
+
+            if (!dataForContractExists)
+            {
+                return (null, new AdapterError(ErrorType.Other, "No Data found for the available contracts."));
             }
 
             progressCallback(new ProgressInfo(100, $"Alle Verträge geladen."));
@@ -96,7 +143,24 @@
 
         public async Task<(XDocument trudiXml, AdapterError error)> LoadData(AdapterContext ctx, CancellationToken ct, Action<ProgressInfo> progressCallback)
         {
-            throw new NotImplementedException();
+            progressCallback(new ProgressInfo(0, $"Daten werden abgerufen."));
+
+            await Task.Delay(1000);
+
+            if(ctx.WithLogdata != config.WithLogData)
+            {
+                config.WithLogData = ctx.WithLogdata;
+            }
+
+            config.BillingPeriod = ctx.BillingPeriod;
+
+            config.Contract = ctx.Contract;
+
+            var trudiXml = XmlFactory.FabricateHanAdapterContent(config);
+
+            progressCallback(new ProgressInfo(100, $"Alle Daten erfolgreich geladen."));
+
+            return (trudiXml, null);
         }
 
         /// <summary>
@@ -113,6 +177,8 @@
             CancellationToken ct,
             Action<ProgressInfo> progressCallback)
         {
+            await Task.Delay(500);
+
             return (null, null);
         }
 
@@ -122,6 +188,8 @@
         /// <returns></returns>
         public async Task Disconnect()
         {
+            await Task.Delay(1000);
+
         }
 
         /// <summary>

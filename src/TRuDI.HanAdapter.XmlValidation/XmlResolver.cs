@@ -41,7 +41,7 @@
 
         private Stream ReadFromResource(string filename)
         {
-            return Assembly.GetExecutingAssembly().GetManifestResourceStream($"TRuDI.HanAdapter.XmlValidation.{filename}");
+            return Assembly.GetExecutingAssembly().GetManifestResourceStream($"TRuDI.HanAdapter.XmlValidation.Schemata.{filename}");
         }
     }
 }

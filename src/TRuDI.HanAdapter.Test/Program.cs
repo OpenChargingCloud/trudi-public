@@ -10,7 +10,10 @@
 
     using TRuDI.HanAdapter.Example;
     using TRuDI.HanAdapter.Interface;
+    using TRuDI.HanAdapter.LandisGyr;
     using TRuDI.HanAdapter.XmlValidation;
+    using System.Collections.Generic;
+    using System.Xml.Linq;
 
     class Program
     {
@@ -23,21 +26,28 @@
 
             Log.Information("Starting test");
 
+            //TestLieferantenXml();
             RunTest().Wait();
 
             Log.Information("Finished test");
+            Console.ReadKey();
         }
 
         static async Task RunTest()
         {
             var cts = new CancellationTokenSource();
             var adapter = new HanAdapterExample();
+            //var adapter = new HanAdapterLandisGyr();
 
             var connectResult = await adapter.Connect(
-                "Exxx0012345678",
+                "eivu0012345678",
                 new IPEndPoint(IPAddress.Parse("1.2.3.4"), 443),
-                "user",
-                "password",
+                "Ivu",
+                "123456",
+                ////"ELGZ0012345678",
+                ////new IPEndPoint(IPAddress.Parse("192.168.188.30"), 443),
+                ////"consumer",
+                ////"consumer",
                 null,
                 TimeSpan.FromSeconds(30),
                 cts.Token,
@@ -77,19 +87,48 @@
             {
                 Ar2418Validation.ValidateSchema(dataResult.trudiXml);
                 var model = XmlModelParser.ParseHanAdapterModel(dataResult.trudiXml.Root.Descendants());
-                model = ModelValidation.ValidateModel(model);
+                model = ModelValidation.ValidateHanAdapterModel(model);
                 ContextValidation.ValidateContext(model, ctx);
+                // Wenn es gewünscht ist die erzeugte Xml Datei abzuspeichern, muss die nächte Zeile auskommentiert werden. 
+                dataResult.trudiXml.Save($"trudiXml{ctx.Contract.TafId}.xml");
             }
             catch (AggregateException ae)
             {
                 Log.Error(ae.Message.Split(">")[0]);
                 ae.Flatten()?.InnerExceptions?.ToList().ForEach(ie => Log.Error(ie.Message));
                 Log.Error("Validation failed.");
+                Console.ReadKey();
             }
             catch (Exception ex)
             {
                 Log.Error(ex.Message);
             }
+        }
+
+        static void TestLieferantenXml()
+        {
+            var xdoc = XDocument.Load("IF_Lieferant_TRuDI_example.xml");
+
+            try
+            {
+                Ar2418Validation.ValidateSchema(xdoc);
+                var model = XmlModelParser.ParseSupplierModel(xdoc.Root.Descendants());
+                model = ModelValidation.ValidateSupplierModel(model);
+                //ContextValidation.ValidateContext(model, ctx);
+                Console.WriteLine("Validierung erfolgreich.");
+            }
+            catch (AggregateException ae)
+            {
+                Log.Error(ae.Message.Split(">")[0]);
+                ae.Flatten()?.InnerExceptions?.ToList().ForEach(ie => Log.Error(ie.Message));
+                Log.Error("Validation failed.");
+                Console.ReadKey();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
+            }
+
         }
 
         private static void ProgressCallback(ProgressInfo progressInfo)

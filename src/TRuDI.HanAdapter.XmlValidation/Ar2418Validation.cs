@@ -18,7 +18,7 @@
         {
             var schemas = new XmlSchemaSet();
             schemas.XmlResolver = new XmlResolver();
-            schemas.Add("http://vde.de/AR_2418-6.xsd", XmlReader.Create(Assembly.GetExecutingAssembly().GetManifestResourceStream($"TRuDI.HanAdapter.XmlValidation.AR_2418-6.xsd"), new XmlReaderSettings() { DtdProcessing = DtdProcessing.Parse }));
+            schemas.Add("http://vde.de/AR_2418-6.xsd", XmlReader.Create(Assembly.GetExecutingAssembly().GetManifestResourceStream($"TRuDI.HanAdapter.XmlValidation.Schemata.AR_2418-6.xsd"), new XmlReaderSettings() { DtdProcessing = DtdProcessing.Parse }));
             var exceptions = new List<Exception>();
 
             document.Validate(

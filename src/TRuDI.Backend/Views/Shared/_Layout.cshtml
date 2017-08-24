@@ -1,0 +1,71 @@
+﻿@using TRuDI.Backend.HanAdapter
+@inject ApplicationState StateService
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TRuDI - @ViewData["Title"]</title>
+
+    <environment>
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+        <link rel="stylesheet" href="~/css/site.css" />
+    </environment>
+</head>
+<body>
+    <nav class="navbar navbar-trudi navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a asp-area="" asp-controller="OperatingModeSelection" asp-action="Index" class="navbar-brand">TRuDI</a>
+            </div>
+        </div>
+    </nav>
+
+    <script>if (typeof module === 'object') { window.module = module; module = undefined; }</script>
+
+    <environment>
+        <script src="~/lib/jquery/dist/jquery.js"></script>
+        <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+        <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+        <script src="~/js/site.js"></script>
+    </environment>
+
+    <script>if (window.module) module = window.module;</script>
+
+    @RenderSection("Scripts", required: false)
+
+    <div class="container body-content">
+        <div class="row">
+            <div class="col-md-8">
+                <h2>@ViewData["Title"]</h2>
+            </div>
+
+            <div class="col-md-8">
+                @await Html.PartialAsync("_ErrorMessage", null, ViewData)
+                @RenderBody()
+            </div>
+            @if (StateService.ActiveHanAdapter?.GatewayImageView != null)
+            {
+                <div class="col-md-4">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">@StateService.ActiveHanAdapter.DeviceId</div>
+                        <div class="panel-body" style="overflow: hidden;">
+                            @await Component.InvokeAsync(StateService.ActiveHanAdapter.GatewayImageView, new { deviceId = StateService.ActiveHanAdapter.DeviceId })
+                            @if (!ViewData.ContainsKey("IsGatewayDetails"))
+                            {
+                                <a asp-controller="GatewayDetails">Details zum Smart Meter Gateway</a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</body>
+</html>

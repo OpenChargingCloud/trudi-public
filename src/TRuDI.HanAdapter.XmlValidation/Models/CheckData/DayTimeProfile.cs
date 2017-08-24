@@ -29,7 +29,7 @@
         /// 
         /// Jede Instanz der Klasse DayTimeProfile muss ein Datenelement vom Typ startTime enthalten.
         /// </summary>
-        public TimeVarType StartTime //Mandatory
+        public TimeVarType StartTime 
         {
             get; set;
         }

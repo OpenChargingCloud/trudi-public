@@ -56,7 +56,7 @@
         /// Eine Instanz der Klasse IntervalReading muss ein Datenelement statusFNN oder statusPTB beinhalten. Wenn 
         /// eine Prüfung der Signatur durchgeführt werden soll, muss das Datenelement zwingend enthalten sein.
         /// </summary>
-        public string StatusFNN
+        public StatusFNN StatusFNN
         {
             //TODO StatusFNN Enum erstellen (FLAGS)
             get; set;

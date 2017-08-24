@@ -12,7 +12,7 @@
 	///     - kann auf Instanzen der Klasse SpecialDayProfile verweisen
     ///
     /// </summary>
-    public class TimeTrigger : Trigger
+    public class TimeTrigger
     {
         /// <summary>
         /// Im Konstruktor wird sichergestellt, dass alle vorhandenen Listen 

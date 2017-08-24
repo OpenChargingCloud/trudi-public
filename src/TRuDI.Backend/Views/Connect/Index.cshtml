@@ -1,0 +1,196 @@
+﻿@using System
+@using Microsoft.AspNetCore.Mvc.ViewFeatures
+@using TRuDI.Backend.HanAdapter
+@model ConnectDataViewModel
+@inject ApplicationState StateService
+@{
+    ViewData["Title"] = "Verbindung zum Gerät herstellen";
+}
+
+<form id="connectForm" enctype="multipart/form-data" method="post" asp-controller="Connect" asp-action="Connect">
+    <div class="panel panel-primary">
+        <div class="panel-heading">Anmeldung am Smart Meter Gateway</div>
+        <div class="panel-body">
+
+            <div class="form-group">
+                <label>
+                    <input type="radio" asp-for="AuthMode" value="UserPassword" id="user-auth"> Benutzername und Passwort
+                </label>
+            </div>
+
+            <div id="panel-user-auth" style="display: none;">
+                <div class="form-group">
+                    <label for="DeviceId">Benutzername:</label>
+                    <input class="form-control" asp-for="Username" />
+                </div>
+
+                <div class="form-group">
+                    <label for="DeviceId">Passwort:</label>
+                    <input class="form-control" asp-for="Password" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>
+                    <input type="radio" asp-for="AuthMode" value="ClientCertificate" id="cert-auth"> Zertifikat
+                </label>
+            </div>
+
+            <div id="panel-cert-auth" style="display: none;">
+
+                <div class="form-group">
+                    <label>Client-Zertifikat:</label>
+                    <input type="file" id="certFileLoader" accept="application/x-pkcs12" style="display:none" onchange="onCertSelected();" />
+
+                    <div>
+                        <button type="button" class="btn btn-default" id="btnUpload" onclick="openfileDialog();">Zertifikat auswählen...</button>
+
+                        <div id="cert-details">
+                            @if (Model.AuthMode == AuthMode.ClientCertificate && StateService.ClientCert != null)
+                            {
+                                switch (StateService.ClientCert.PasswordState)
+                                {
+                                    case CertPasswordState.PasswordValid:
+                                    case CertPasswordState.WithoutPassword:
+                                        @await Html.PartialAsync("_CertWithoutPasswordPartial", StateService.ClientCert, new ViewDataDictionary(ViewData));
+                                        break;
+
+                                    case CertPasswordState.InvalidPassword:
+                                        @await Html.PartialAsync("_CertPasswordInputPartial", StateService.ClientCert, new ViewDataDictionary(ViewData));
+                                        break;
+
+                                    case CertPasswordState.InvalidCertFile:
+                                        @await Html.PartialAsync("_CertInvalidFilePartial", StateService.ClientCert, new ViewDataDictionary(ViewData));
+                                        break;
+
+                                    case CertPasswordState.NoCertSelected:
+                                        break;
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-primary">
+        <div class="panel-heading">Verbindungsparameter</div>
+        <div class="panel-body">
+            <div class="form-group">
+                <label asp-for="DeviceId">Identifikationsnummer:</label>
+                <input class="form-control" asp-for="DeviceId" />
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Address">IP-Adresse:</label>
+                <input class="form-control" asp-for="Address" />
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Port">Port:</label>
+                <input class="form-control" asp-for="Port" />
+            </div>
+        </div>
+
+
+        <div id="manufacturer-parameters">
+            @if (StateService?.ActiveHanAdapter?.ManufacturerParametersView != null)
+            {
+                @await Html.PartialAsync("_ManufacturerParametersFormPartial", Model.DeviceId, new ViewDataDictionary(ViewData) { { "ManufacturerParametersViewName", StateService?.ActiveHanAdapter?.ManufacturerParametersView } });
+            }
+            else
+            {
+                @await Html.PartialAsync("_ManufacturerParametersFormEmptyPartial", Model.DeviceId, new ViewDataDictionary(ViewData) { { "ManufacturerParametersViewName", string.Empty } });
+            }
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Verbinden</button>
+
+</form>
+
+
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        $.validator.addMethod(
+            "dinDeviceId",
+            function (value, element) {
+
+                if (/^([0-9E]{1})([A-Z]{3})([0-9]{2})([0-9]{8})$/.test(value)) {
+                    $('#manufacturer-parameters').load('@Url.Action("ManufacturerConnectForm", "Connect")', { deviceId: value});
+                    return true;
+                }
+
+                return false;
+            },
+            "Ungültie Geräte-ID"
+        );
+
+
+        $("#connectForm").validate({
+            rules: {
+                DeviceId: {
+                    dinDeviceId: true,
+                }
+
+            }
+        });
+
+        $("#user-auth").change(function (data) {
+            console.log("user-auth: " + data);
+            $("#panel-user-auth").show();
+            $("#panel-cert-auth").hide();
+        });
+
+        $("#cert-auth").change(function (data) {
+            console.log("cert-auth: " + data);
+            $("#panel-cert-auth").show();
+            $("#panel-user-auth").hide();
+        });
+
+        $("#panel-user-auth").hide();
+        $("#panel-cert-auth").hide();
+
+        if ($("#user-auth").prop("checked")) {
+            $("#panel-user-auth").show();
+        }
+
+        if ($("#cert-auth").prop("checked")) {
+            $("#panel-cert-auth").show();
+        }
+    });
+
+    function onCertSelected()
+    {
+        var fileUpload = $("#certFileLoader").get(0);
+        var files = fileUpload.files;
+        var fileData = new FormData();
+
+        for (var i = 0; i < files.length; i++)
+        {
+            fileData.append(files[i].name, files[i]);
+        }
+
+        $.ajax({
+            url: '/Connect/UploadClientCert',
+            type: "POST",
+            contentType: false,
+            processData: false,
+            data: fileData,
+            success: function (result) {
+                $("#cert-details").html(result);
+                $("#cert-password-input").focus();
+            },
+            error: function (err) {
+                alert(err.statusText);
+            }
+        });
+    }
+
+    function openfileDialog() {
+        $("#certFileLoader").click();
+    }
+
+
+</script>

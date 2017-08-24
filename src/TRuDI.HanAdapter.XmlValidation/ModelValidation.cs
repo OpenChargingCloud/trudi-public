@@ -6,49 +6,18 @@
 
     using TRuDI.HanAdapter.XmlValidation.Models;
     using TRuDI.HanAdapter.XmlValidation.Models.BasicData;
+    using TRuDI.HanAdapter.XmlValidation.Models.CheckData;
 
     // In this class are all methods for the post-xml-schema-validation
     public static class ModelValidation
     {
 
-        // The public method for the validation of the model
-        public static UsagePointAdapterTRuDI ValidateModel(UsagePointAdapterTRuDI usagePoint)
+        // The public method for the validation of the  han adapter model
+        public static UsagePointAdapterTRuDI ValidateHanAdapterModel(UsagePointAdapterTRuDI usagePoint)
         {
+            var exceptions = new List<Exception>();
 
-            List<Exception> exceptions = new List<Exception>();
-
-            if (string.IsNullOrWhiteSpace(usagePoint.UsagePointId))
-            {
-                exceptions.Add(new InvalidOperationException("The element UsagePointId is invalid."));
-            }
-
-            if (string.IsNullOrWhiteSpace(usagePoint.TariffName))
-            {
-                exceptions.Add(new InvalidOperationException("The element TariffName is invalid."));
-            }
-
-            if (usagePoint.InvoicingParty == null)
-            {
-                exceptions.Add(new InvalidOperationException("UsagePoint does not contain an instance of InvoicingParty."));
-            }
-
-            if (usagePoint.Smgw == null)
-            {
-                exceptions.Add(new InvalidOperationException("UsagePoint does not contain an instance of SMGW."));
-            }
-            else
-            {
-                ValidateSMGW(usagePoint.Smgw, exceptions);
-            }
-
-            if (usagePoint.ServiceCategory == null)
-            {
-                exceptions.Add(new InvalidOperationException("UsagePoint does not contain an instance of ServiceCategory."));
-            }
-            else
-            {
-                ValidateServiceCategoryKind(usagePoint.ServiceCategory.Kind, exceptions);
-            }
+            CommonModelValidation(usagePoint, exceptions);
 
             if (usagePoint.Customer == null)
             {
@@ -63,7 +32,7 @@
             {
                 foreach (Certificate cert in usagePoint.Certificates)
                 {
-                   ValidateCertificate(cert, exceptions);
+                    ValidateCertificate(cert, exceptions);
                 }
             }
 
@@ -89,12 +58,75 @@
 
             if (exceptions.Any())
             {
-                throw new AggregateException("Model error:>", exceptions);
+                throw new AggregateException("Han Adapter Model error:>", exceptions);
             }
 
             return usagePoint;
         }
 
+        // The public method for the validation of the supplier model
+        public static UsagePointLieferant ValidateSupplierModel(UsagePointLieferant usagePoint)
+        {
+            var exceptions = new List<Exception>();
+
+            CommonModelValidation(usagePoint, exceptions);
+
+            if (usagePoint.Certificates.Count >= 1)
+            {
+                foreach (Certificate cert in usagePoint.Certificates)
+                {
+                    ValidateCertificate(cert, exceptions);
+                }
+            }
+
+            ValidateAnalysisProfile(usagePoint.AnalysisProfile, exceptions);
+
+            if (exceptions.Any())
+            {
+                throw new AggregateException("Supplier Model error:>", exceptions);
+            }
+
+            return usagePoint;
+
+        }
+
+        private static void CommonModelValidation(UsagePoint usagePoint, List<Exception> exceptions)
+        {
+            if (string.IsNullOrWhiteSpace(usagePoint.UsagePointId))
+            {
+                exceptions.Add(new InvalidOperationException("The element UsagePointId is invalid."));
+            }
+
+            if (string.IsNullOrWhiteSpace(usagePoint.TariffName))
+            {
+                exceptions.Add(new InvalidOperationException("The element TariffName is invalid."));
+            }
+
+            if (usagePoint.InvoicingParty == null)
+            {
+                exceptions.Add(new InvalidOperationException("UsagePoint does not contain an instance of InvoicingParty."));
+            }
+
+            if (usagePoint.Smgw == null)
+            {
+                exceptions.Add(new InvalidOperationException("UsagePoint does not contain an instance of SMGW."));
+            }
+            else if(usagePoint.GetType() == typeof(UsagePointAdapterTRuDI))
+            {
+                ValidateSMGW(usagePoint.Smgw, exceptions);
+            }
+
+            if (usagePoint.ServiceCategory == null)
+            {
+                exceptions.Add(new InvalidOperationException("UsagePoint does not contain an instance of ServiceCategory."));
+            }
+            else
+            {
+                ValidateServiceCategoryKind(usagePoint.ServiceCategory.Kind, exceptions);
+            }
+
+        }
+        
         // Validation of the Certificate instance
         private static void ValidateCertificate(Certificate cert, List<Exception> exceptions)
         {
@@ -437,7 +469,7 @@
                 exceptions.Add(new InvalidOperationException("The element value in intervalReading is null."));
             }
 
-            if (string.IsNullOrWhiteSpace(intervalReading.StatusFNN))
+            if (string.IsNullOrWhiteSpace(intervalReading.StatusFNN.Status))
             {
                 if (intervalReading.StatusPTB.HasValue)
                 {
@@ -450,19 +482,19 @@
             }
             else
             {
-                var isValidHex = intervalReading.StatusFNN.ValidateHexString();
-                if (isValidHex && intervalReading.StatusPTB.HasValue && !(intervalReading.StatusPTB == StatusPTB.No_Error))
+                var fnnStatusIsValid = intervalReading.StatusFNN.ValidateFNNStatus();
+                if (fnnStatusIsValid && intervalReading.StatusPTB.HasValue && !(intervalReading.StatusPTB == StatusPTB.No_Error))
                 {
                     exceptions.Add(new InvalidOperationException("In IntervalReading StatusFNN and StatusPTB have both a value. Only one is permitted."));
                 }
-                else if (!isValidHex && !intervalReading.StatusPTB.HasValue)
+                else if (!fnnStatusIsValid && !intervalReading.StatusPTB.HasValue)
                 {
-                    exceptions.Add(new InvalidOperationException("In IntervalReading StatusFNN is not a valid hex value and StatusPTB is null."));
+                    exceptions.Add(new InvalidOperationException("In IntervalReading StatusFNN is invalid and StatusPTB is null."));
                 }
             }
         }
 
-        // Validate if the StatusPTB of the ReadingType is valid
+        // Validate if the StatusPTB of ReadingType is valid
         private static void ValidateIntervalReadingStatusPTB(StatusPTB? statusPtb, List<Exception> exceptions)
         {
             switch (statusPtb)
@@ -480,6 +512,163 @@
                 default:
                     exceptions.Add(new InvalidOperationException($"Invalid IntervalReading StatusPTB {statusPtb}."));
                     break;
+            }
+        }
+
+        // Validation of an AnalysisProfile instance
+        private static void ValidateAnalysisProfile(AnalysisProfile analysisProfile, List<Exception> exceptions)
+        {
+            if(analysisProfile.TariffStages.Count < 1)
+            {
+                exceptions.Add(new InvalidOperationException("AnalysisProfile does not contain an instance of TariffStage."));
+            }
+            else
+            {
+                foreach(TariffStage tariffStage in analysisProfile.TariffStages)
+                {
+                    ValidateTariffStage(tariffStage, exceptions);
+                }
+            }
+
+            if(analysisProfile.TariffChangeTrigger == null)
+            {
+                exceptions.Add(new InvalidOperationException("AnalysisProfile does not contain an instance of TariffChangeTrigger."));
+            }
+            else
+            {
+                ValidateTariffChangeTrigger(analysisProfile.TariffChangeTrigger, exceptions);
+            }
+
+            ValidateInterval(analysisProfile.BillingPeriod, "Billing Period", exceptions);
+
+            ValidateAnalysisProfileTariffUseCase(analysisProfile.TariffUseCase, exceptions);
+
+        }
+
+        // Validate if the TariffUseCase of AnalysisProfile is valid
+        private static void ValidateAnalysisProfileTariffUseCase(TariffUseCase? tariffUseCase, List<Exception> exceptions)
+        {
+            switch (tariffUseCase)
+            {
+                case TariffUseCase.Taf1:
+                    break;
+                case TariffUseCase.Taf2:
+                    break;
+                case TariffUseCase.Taf6:
+                    break;
+                case TariffUseCase.Taf7:
+                    break;
+                case TariffUseCase.Taf9:
+                    break;
+                default:
+                    exceptions.Add(new InvalidOperationException($"Invalid AnalysisProfile TariffUseCase {tariffUseCase}."));
+                    break;
+            }
+        }
+        
+        // Validation of an TariffStage instance
+        private static void ValidateTariffStage(TariffStage tariffStage, List<Exception> exceptions)
+        {
+            if (!tariffStage.ObisCode.ValidateHexString())
+            {
+                exceptions.Add(new FormatException("TariffStage: ObisCode is an invalid hex string."));
+            }
+        }
+
+        // Validation of an TariffChangeTrigger instance
+        private static void ValidateTariffChangeTrigger(TariffChangeTrigger trigger, List<Exception> exceptions)
+        {
+           if(trigger.TimeTrigger == null)
+            {
+                exceptions.Add(new InvalidOperationException("TariffChangeTrigger does not contain an instance of TimeTrigger."));
+            }
+            else
+            {
+                ValidateTimeTrigger(trigger.TimeTrigger, exceptions);
+            }
+        }
+
+        // Validation of an TimeTrigger instance
+        private static void ValidateTimeTrigger(TimeTrigger trigger, List<Exception> exceptions)
+        {
+            if(trigger.DayProfiles.Count < 1)
+            {
+                exceptions.Add(new InvalidOperationException("TimeTrigger does not contain an instance of DayProfile."));
+            }
+            else
+            {
+                foreach(DayProfile profile in trigger.DayProfiles)
+                {
+                    ValidateDayProfile(profile, exceptions);
+                }
+            }
+
+            if(trigger.SpecialDayProfiles.Count < 1)
+            {
+                exceptions.Add(new InvalidOperationException("TimeTrigger does not contain an instance of SpecialDayProfile."));
+            }
+            else
+            {
+                foreach (SpecialDayProfile profile in trigger.SpecialDayProfiles)
+                {
+                    ValidateSpecialDayProfile(profile, exceptions);
+                }
+            }
+
+        }
+
+        // Validation of an DayProfile instance
+        private static void ValidateDayProfile(DayProfile dayProfile, List<Exception> exceptions)
+        {
+            if(dayProfile.DayTimeProfiles.Count < 1)
+            {
+                exceptions.Add(new InvalidOperationException("DayProfile does not contain an instance of DayTimeProfile."));
+            }
+            else
+            {
+                foreach (DayTimeProfile profile in dayProfile.DayTimeProfiles)
+                {
+                    ValidateDayTimeProfile(profile, exceptions);
+                }
+            }
+        }
+
+        // Validation of an SpecialDayProfile instance
+        private static void ValidateSpecialDayProfile(SpecialDayProfile profile, List<Exception> exceptions)
+        {
+            if(profile.DayProfile == null)
+            {
+                exceptions.Add(new InvalidOperationException("SpecialDayProfile does not reference to an instance of DayProfile."));
+            }
+
+            ValidateDayVarType(profile.SpecialDayDate, exceptions);
+        }
+
+        // Validation of an DayTimeProfile instance
+        private static void ValidateDayTimeProfile(DayTimeProfile profile, List<Exception> exceptions)
+        {
+            if(profile.StartTime == null)
+            {
+                exceptions.Add(new InvalidOperationException("DayTimeProfile does not contain an instance of StartTime."));
+            } 
+        }
+
+        // Validation of an DayVarType instance
+        private static void ValidateDayVarType(DayVarType day, List<Exception> exceptions)
+        {
+            if (!day.DayOfMonth.HasValue)
+            {
+                exceptions.Add(new InvalidOperationException("The element SpecialDayDate of SpecialDayProfile is invalid."));
+            }
+
+            if (!day.Month.HasValue)
+            {
+                day.Monthly = true;
+            }
+
+            if ((!day.Year.HasValue))
+            {
+                day.Yearly = true;
             }
         }
     }

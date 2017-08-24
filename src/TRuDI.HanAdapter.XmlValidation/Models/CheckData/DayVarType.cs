@@ -17,7 +17,7 @@
         /// innerhalb eines Monats zu spezifizieren. 
         /// Die Nutzung des Datenelements dayOfMonth ist optional.
         /// </summary>
-        public byte DayOfMonth 
+        public byte? DayOfMonth 
         {
             get; set;
         }
@@ -28,7 +28,7 @@
         /// entsprechend kalendarischer Reihenfolge.
         /// Die Nutzung des Datenelements month ist optional.
         /// </summary>
-        public byte Month 
+        public byte? Month 
         {
             get; set;
         }
@@ -39,8 +39,24 @@
         /// 
         /// Die Nutzung des Datenelements year ist optional.
         /// </summary>
-        public byte Year
+        public ushort? Year
         { 
+            get; set;
+        }
+
+        /// <summary>
+        /// Spezifiziert das Datum als jährlich, wenn Year nicht belegt ist
+        /// </summary>
+        public bool Yearly
+        {
+            get; set;
+        }
+
+        /// <summary>
+        /// Spezifiziert das Datum als monatlich, wenn Month nicht belegt ist
+        /// </summary>
+        public bool Monthly
+        {
             get; set;
         }
 

@@ -3,13 +3,17 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-
+    using System.Security.Cryptography.X509Certificates;
     using TRuDI.HanAdapter.Interface;
     using TRuDI.HanAdapter.XmlValidation.Models;
     using TRuDI.HanAdapter.XmlValidation.Models.BasicData;
 
     public static class ContextValidation
     {
+          
+        // TODO Überprüfungen die für TAF 1 und TAF 6 spezifisch sind. 
+        // TODO Methoden zur Validierung des geparsten SupplierModels (Lieferant Adapter)
+
         // Validation of additional requirements
         public static void ValidateContext(UsagePointAdapterTRuDI usagePoint, AdapterContext ctx)
         {
@@ -17,22 +21,28 @@
 
             CompareCertIds(usagePoint, exceptions);
 
+            ValidateQualifiedLogicalName(usagePoint, ctx, exceptions);
+
             ValidateCertificateRawData(usagePoint, exceptions);
 
-            //ValidateQualifiedLogicalName(usagePoint, ctx, exceptions);
+            ValidateSmgwId(usagePoint, exceptions);
 
             ValidateMeterReadingCount(usagePoint, ctx, exceptions);
 
             ValidateBillingPeriod(usagePoint, ctx, exceptions);
 
+            ValidateObisCodes(usagePoint, exceptions);
+
             if (ctx.Contract.TafId == TafId.Taf2)
             {
                 ValidateTaf2RegisterDurations(usagePoint, exceptions);
+                ValidateTaf2ObisCodeRegister(usagePoint, exceptions);
             }
 
             if (ctx.Contract.TafId == TafId.Taf7)
             {
                 ValidateTaf7minRegisterPeriod(usagePoint, exceptions);
+                ValidateTaf7PeriodsInBillingPeriod(usagePoint, ctx, exceptions);
             }
 
             if (exceptions.Any())
@@ -49,7 +59,7 @@
 
             foreach (Certificate cert in usagePoint.Certificates)
             {
-                certificateCertIds.Add(cert.CertId);
+                certificateCertIds.Add((byte)cert.CertId);
             }
 
             if (smgwCertIds.Count == certificateCertIds.Count)
@@ -81,7 +91,7 @@
         // Check whether the QualifiedLogicalName ist correct
         private static void ValidateQualifiedLogicalName(UsagePointAdapterTRuDI usagePoint, AdapterContext ctx, List<Exception> exceptions)
         {
-            throw new NotImplementedException();
+            // TODO den bzw. die qualifiedLogicalName prüfen ob Sie folgendem Schema entsprechen: <ObisCode>.<meterId || tafId?>.sm 
         }
 
         // Check if the raw data of the certificates are valid certificates
@@ -101,6 +111,12 @@
             }
         }
 
+        // Validate if the Smgwid is built correct
+        private static void ValidateSmgwId(UsagePointAdapterTRuDI usagePoint, List<Exception> exceptions)
+        {
+            // TODO Überprüfung der smgwId. Wurde Sie korrekt gebildet? 
+        }
+
         // Check if the count of MeterReadings are Valid due to the TAF
         private static void ValidateMeterReadingCount(UsagePointAdapterTRuDI usagePoint, AdapterContext ctx, List<Exception> exceptions)
         {
@@ -115,6 +131,12 @@
             {
                 exceptions.Add(new InvalidOperationException("TAF-2 needs at least 5 instances of MeterReading."));
             }
+        }
+        
+        // Check of the meterReadingIds are unique
+        private static void ValidateMeterReadingIds(UsagePointAdapterTRuDI usagePoint, AdapterContext ctx, List<Exception> exceptions)
+        {
+            // TODO Überprüfen ob die MeterReadingIds eindeutig sind.
         }
 
         // Validation of the correct billing period
@@ -140,6 +162,12 @@
             }
         }
 
+        // Validation of the obisCodes
+        private static void ValidateObisCodes(UsagePointAdapterTRuDI usagePoint, List<Exception> exceptions)
+        {
+            // TODO Handelt es sich bei den ObisCodes um gültige Werte? 
+        }
+
         // Taf-2: Validate if the durations in the different MeterReadings match
         private static void ValidateTaf2RegisterDurations(UsagePointAdapterTRuDI usagePoint, List<Exception> exceptions)
         {
@@ -156,6 +184,12 @@
             }
         }
 
+        // Taf-2: Validate of the obisCodes are correct and match the requirements
+        private static void ValidateTaf2ObisCodeRegister(UsagePointAdapterTRuDI usagePoint, List<Exception> exceptions)
+        {
+            // TODO: Taf-2: Die ObisCodes der Register im Hinblick auf Taf-2 prüfen. Ist mindestens eine originäre Messwertliste vorhanden? etc.
+        }
+
         // Taf-7: Validate if the periods between the IntervalReadings match with 15 minutes or a multiple of 15 minutes
         private static void ValidateTaf7minRegisterPeriod(UsagePointAdapterTRuDI usagePoint, List<Exception> exceptions)
         {
@@ -167,8 +201,10 @@
 
             for (int index = 0; index < intervalReadings.Count - 1; index++)
             {
-                var before = GetDateWithoutSeconds(intervalReadings[index].TimePeriod.Start);
-                var next = GetDateWithoutSeconds(intervalReadings[index + 1].TimePeriod.Start);
+                DateTime test = new DateTime();
+                
+                var before = intervalReadings[index].TimePeriod.Start.GetDateWithoutSeconds();
+                var next = intervalReadings[index + 1].TimePeriod.Start.GetDateWithoutSeconds();
 
                 var currentPeriod = next - before;
 
@@ -176,16 +212,17 @@
                 {
                     exceptions.Add(new InvalidOperationException("Taf-7: The period is invalid."));
                 }
-                else if (currentPeriod.Ticks % smallestPeriod.Ticks != 0)
+                else if ((long)currentPeriod.TotalSeconds % (long)smallestPeriod.TotalSeconds != 0)
                 {
                     exceptions.Add(new InvalidOperationException("Taf-7: The period is not a multiple of 15 minutes."));
                 }
             }
         }
 
-        private static DateTime GetDateWithoutSeconds(DateTime dateTime)
+        // Taf-7: Validate if all periods are within the valid billing period
+        private static void ValidateTaf7PeriodsInBillingPeriod(UsagePointAdapterTRuDI usagePoint, AdapterContext ctx, List<Exception> exceptions)
         {
-            return new DateTime(dateTime.Year, dateTime.Month, dateTime.Day, dateTime.Hour, dateTime.Minute, 0);
-        }
+            // TODO befinden sich alle Perioden im angegebenen Abrechnungszeitraum?
+        } 
     }
 }

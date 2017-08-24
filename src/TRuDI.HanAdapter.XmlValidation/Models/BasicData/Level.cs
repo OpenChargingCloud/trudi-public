@@ -14,7 +14,6 @@
     /// </summary>
     public enum Level : byte
     {
-        //NONE = 0,
         INFO = 1,
         WARNING,
         ERROR,

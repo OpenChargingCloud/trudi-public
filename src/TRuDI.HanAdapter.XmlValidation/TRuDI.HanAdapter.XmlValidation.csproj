@@ -4,10 +4,6 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <RestoreSources>$(RestoreSources);../../private-packages;https://api.nuget.org/v3/index.json</RestoreSources>
-  </PropertyGroup>
-  
   <ItemGroup>
     <None Remove="Schemata\AR_2418-6.xsd" />
     <None Remove="Schemata\atom.xsd" />
@@ -23,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="TRuDI.HanAdapter.Interface" Version="1.0.6" />
+    <PackageReference Include="TRuDI.HanAdapter.Interface" Version="1.0.7" />
   </ItemGroup>
 
 </Project>
