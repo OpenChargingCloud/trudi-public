@@ -7,6 +7,7 @@
     using TRuDI.HanAdapter.Interface;
     using TRuDI.HanAdapter.XmlValidation.Models;
     using TRuDI.HanAdapter.XmlValidation.Models.BasicData;
+    using TRuDI.HanAdapter.XmlValidation.Models.CheckData;
 
     public static class XmlFactory
     {
@@ -81,7 +82,7 @@
                 }
             }
 
-            List<MeterReading> meterReadings = MeterReadingCreator(hanConfig);
+            var meterReadings = MeterReadingCreator(hanConfig);
 
             foreach (MeterReading meterReading in meterReadings)
             {
@@ -141,9 +142,14 @@
 
             XDocument trudiXml = new XDocument(UsagePoints);
 
+            if(hanConfig.Contract.TafId == TafId.Taf7)
+            {
+                hanConfig.SupplierXml = FabricateLieferantXml(hanConfig);
+            }
+
             return trudiXml;
         }
-        // TODO FabricateLieferantXml fertig implementieren
+       
         private static XDocument FabricateLieferantXml(HanAdapterExampleConfig hanConfig)
         {
             XNamespace ar = XNamespace.Get("http://vde.de/AR_2418-6.xsd");
@@ -154,36 +160,97 @@
 
             XElement serviceCategory = new XElement(espi + "ServiceCategory", new XElement(espi + "kind", hanConfig.XmlConfig.ServiceCategoryKind));
 
-
-            XElement customer = new XElement(ar + "Customer", new XElement(ar + "customerId", hanConfig.XmlConfig.CustomerId));
-
             XElement invoicingParty = new XElement(ar + "InvoicingParty", new XElement(ar + "invoicingPartyId", hanConfig.XmlConfig.InvoicingPartyId));
 
             XElement smgw = new XElement(ar + "SMGW");
 
-            foreach (CertificateContainer cert in hanConfig.XmlConfig.Certificates)
-            {
-                smgw.Add(new XElement(ar + "certId", cert.Certificate.CertId));
-            }
-
             smgw.Add(new XElement(ar + "smgwId", hanConfig.XmlConfig.SmgwId));
-
-
-
-
-
 
             XElement usagePoint = new XElement(ar + "UsagePoint",
                                                serviceCategory,
-                                               new XElement(ar + "usagePointId", hanConfig.XmlConfig.UsagePointId),
-                                               customer,
-                                               invoicingParty,
-                                               smgw
-                                               );
+                                               new XElement(ar + "usagePointId", hanConfig.XmlConfig.UsagePointId));
 
+            if (hanConfig.XmlConfig.CustomerId != null)
+            {
+                XElement customer = new XElement(ar + "Customer", new XElement(ar + "customerId", hanConfig.XmlConfig.CustomerId));
+                usagePoint.Add(customer);
+            }
 
+            usagePoint.Add(invoicingParty, smgw);
 
+            usagePoint.Add(new XElement(ar + "tariffName", hanConfig.XmlConfig.TariffName));
 
+            XElement analysisProfile = new XElement(ar + "AnalysisProfile",
+                                                    new XElement(ar + "tariffUseCase", hanConfig.XmlConfig.TariffUseCase),
+                                                    new XElement(ar + "tariffId", hanConfig.XmlConfig.TariffName),
+                                                    new XElement(ar + "billingPeriod",
+                                                     new XElement(ar + "duration", (int)(hanConfig.BillingPeriod.End - hanConfig.BillingPeriod.Begin)?.TotalSeconds),
+                                                     new XElement(ar + "start", hanConfig.BillingPeriod.Begin) 
+                                                    ));
+
+            foreach (TariffStageConfig config in hanConfig.XmlConfig.TariffStageConfigs)
+            {
+                XElement tariffStage = new XElement(ar + "TariffStage", new XElement(ar + "tariffNumber", config.TariffNumber));
+
+                if(config.Description != null)
+                {
+                    tariffStage.Add(new XElement(ar + "description", config.Description));
+                }
+
+                tariffStage.Add(new XElement(ar + "obisCode", config.ObisCode));
+
+                analysisProfile.Add(tariffStage);
+            }
+
+            analysisProfile.Add(new XElement(ar + "defaultTariffNumber", hanConfig.XmlConfig.DefaultTariffNumber));
+
+            XElement tariffChangeTrigger = new XElement(ar + "TariffChangeTrigger");
+
+            XElement timeTrigger = new XElement(ar + "TimeTrigger");
+
+            var dayProfiles = DayProfileCreator(hanConfig);
+
+            foreach(DayProfile profile in dayProfiles)
+            {
+                XElement dayProfile = new XElement(ar + "DayProfile", new XElement(ar + "dayId", profile.DayId));
+
+                foreach(DayTimeProfile dtProfile in profile.DayTimeProfiles)
+                {
+                    XElement dayTimeProfile = new XElement(ar + "DayTimeProfile");
+
+                    XElement startTime = new XElement(ar + "startTime", 
+                        new XElement(ar + "hour", dtProfile.StartTime.Hour),
+                        new XElement(ar + "minute", dtProfile.StartTime.Minute));
+
+                    dayTimeProfile.Add(startTime, new XElement(ar + "tariffNumber", dtProfile.TariffNumber));
+
+                    dayProfile.Add(dayTimeProfile);
+                }
+
+                timeTrigger.Add(dayProfile);
+            }
+
+            var specialDayProfiles = SpecialDayProfileCreator(hanConfig);
+
+            foreach(SpecialDayProfile profile in specialDayProfiles)
+            {
+                XElement specialDayProfile = new XElement(ar + "SpecialDayProfile");
+
+                specialDayProfile.Add(new XElement(ar + "specialDayDate", 
+                                                    new XElement(ar + "year", profile.SpecialDayDate.Year),
+                                                    new XElement(ar + "month", profile.SpecialDayDate.Month),
+                                                    new XElement(ar + "day_of_month", profile.SpecialDayDate.DayOfMonth)));
+
+                specialDayProfile.Add(new XElement(ar + "dayId", profile.DayId));
+
+                timeTrigger.Add(specialDayProfile);  
+            }
+           
+            tariffChangeTrigger.Add(timeTrigger);
+
+            analysisProfile.Add(tariffChangeTrigger);
+
+            usagePoint.Add(analysisProfile);
 
             // Create root element
             XElement UsagePoints = new XElement(ar + "UsagePoints",
@@ -197,7 +264,6 @@
             XDocument lieferantXml = new XDocument(UsagePoints);
 
             return lieferantXml;
-
         }
 
         private static List<LogEntry> LogCreator(HanAdapterExampleConfig hanConfig)
@@ -243,7 +309,6 @@
             var meterReadings = new List<MeterReading>();
             var meterReadingConfigs = hanConfig.XmlConfig.MeterReadingConfigs;
             var tariffStageCounter = hanConfig.XmlConfig.TariffStageCount;
-            int[] taf1Reg = null;
             var usedValue = hanConfig.XmlConfig.ValueSummary;
             var rest = usedValue;
 
@@ -271,7 +336,7 @@
                     foreach (IntervalBlockConfig intervalBlockConfig in meterReadingConfig.IntervalBlocks)
                     {
 
-                        mr.IntervalBlocks.Add(CreateIntervalBlockOML(meterReadingConfig, intervalBlockConfig, hanConfig, taf1Reg));
+                        mr.IntervalBlocks.Add(CreateIntervalBlockOML(meterReadingConfig, intervalBlockConfig, hanConfig));
                     }
                 }
                 else
@@ -290,7 +355,7 @@
 
                     foreach (IntervalBlockConfig intervalBlockConfig in meterReadingConfig.IntervalBlocks)
                     {
-                        mr.IntervalBlocks.Add(CreateIntervalBlock(meterReadingConfig, intervalBlockConfig, hanConfig, usedValue, taf1Reg));
+                        mr.IntervalBlocks.Add(CreateIntervalBlock(meterReadingConfig, intervalBlockConfig, hanConfig, usedValue));
                     }
                     usedValue = rest;
                     rest = RandomNumber(0, usedValue);
@@ -306,8 +371,7 @@
         private static IntervalBlock CreateIntervalBlockOML(
             MeterReadingConfig meterReadingConfig,
             IntervalBlockConfig intervalBlockConfig,
-            HanAdapterExampleConfig hanConfig,
-            int[] taf1Reg)
+            HanAdapterExampleConfig hanConfig)
         {
             var intervalBlock = new IntervalBlock()
             {
@@ -325,9 +389,9 @@
             double consumption = (double)(hanConfig.XmlConfig.ValueSummary / denominator);
             var index = 0;
 
-            if (taf1Reg == null)
+            if (hanConfig.XmlConfig.Taf1Reg == null)
             {
-                taf1Reg = new int[(int)denominator + 1];
+                hanConfig.XmlConfig.Taf1Reg = new int[(int)denominator + 1];
             }
 
             while (timestamp <= intervalBlockConfig.Start.AddSeconds((uint)intervalBlockConfig.Duration).GetDateWithoutSeconds())
@@ -347,7 +411,7 @@
                     Value = value
                 };
 
-                taf1Reg[index] = taf1Reg[index] + value;
+                hanConfig.XmlConfig.Taf1Reg[index] = hanConfig.XmlConfig.Taf1Reg[index] + value;
 
                 SetStatusWord(ir, intervalBlockConfig);
                 timestamp = timestamp.AddSeconds((uint)meterReadingConfig.PeriodSeconds).GetDateWithoutSeconds();
@@ -362,8 +426,7 @@
             MeterReadingConfig meterReadingConfig,
             IntervalBlockConfig intervalBlockConfig,
             HanAdapterExampleConfig hanConfig,
-            int usedValue,
-            int[] taf1Reg)
+            int usedValue)
         {
             var intervalBlock = new IntervalBlock()
             {
@@ -376,14 +439,14 @@
 
             if (hanConfig.Contract.TafId == TafId.Taf1)
             {
-                if (taf1Reg == null)
+                if (hanConfig.XmlConfig.Taf1Reg == null)
                 {
                     throw new InvalidOperationException("Das abgeleitete Register für Taf-1 wurde nicht befüllt.");
                 }
 
                 var timestamp = intervalBlockConfig.Start.GetDateWithoutSeconds();
 
-                for (int i = 0; i < taf1Reg.Length; i++)
+                for (int i = 0; i < hanConfig.XmlConfig.Taf1Reg.Length; i++)
                 {
                     var ir = new IntervalReading()
                     {
@@ -393,7 +456,7 @@
                             Duration = 0,
                             Start = timestamp
                         },
-                        Value = taf1Reg[i]
+                        Value = hanConfig.XmlConfig.Taf1Reg[i]
                     };
                     SetStatusWord(ir, intervalBlockConfig);
                     timestamp = timestamp.AddSeconds((uint)meterReadingConfig.PeriodSeconds).GetDateWithoutSeconds();
@@ -417,6 +480,74 @@
             }
 
             return intervalBlock;
+        }
+
+        private static List<DayProfile> DayProfileCreator(HanAdapterExampleConfig hanConfig)
+        {
+            var dayProfiles = new List<DayProfile>();
+
+            foreach(DayProfileConfig config in hanConfig.XmlConfig.DayProfiles)
+            {
+                var dayProfile = new DayProfile();
+                var dayTimeProfiles = new List<DayTimeProfile>();
+
+                dayProfile.DayId = config.DayId;
+
+                foreach (DayTimeProfileConfig dayTimeConfig in config.DayTimeProfiles)
+                {
+                    var time = dayTimeConfig.Start;
+                    
+                    while(time <= dayTimeConfig.End)
+                    {
+                        var dayTimeProfile = new DayTimeProfile();
+                        dayTimeProfile.StartTime.Hour = (byte)time.Hour;
+                        dayTimeProfile.StartTime.Minute = (byte)time.Minute;
+                        dayTimeProfile.TariffNumber = dayTimeConfig.TariffNumber;
+                        time = time.AddSeconds(900);
+                        dayTimeProfiles.Add(dayTimeProfile);
+                    }
+
+                }
+
+                dayProfile.DayTimeProfiles = dayTimeProfiles;
+                dayProfiles.Add(dayProfile);
+            }
+
+            return dayProfiles;
+        }
+
+        private static List<SpecialDayProfile> SpecialDayProfileCreator(HanAdapterExampleConfig hanConfig)
+        {
+            var specialDayProfiles = new List<SpecialDayProfile>();
+
+            var date = hanConfig.BillingPeriod.Begin;
+
+            while(date <= hanConfig.BillingPeriod.End)
+            {
+                var specialDayProfile = new SpecialDayProfile();
+                specialDayProfile.SpecialDayDate = new DayVarType();
+                specialDayProfile.SpecialDayDate.Year = (ushort)date.Year;
+                specialDayProfile.SpecialDayDate.Month = (byte)date.Month;
+                specialDayProfile.SpecialDayDate.DayOfMonth = (byte)date.Day;
+                if(hanConfig.XmlConfig.DayIdCount == 2)
+                {
+                    if (date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday)
+                    {
+                        specialDayProfile.DayId = 2;
+                    }
+                    else
+                    {
+                        specialDayProfile.DayId = 1;
+                    }
+                }
+                else
+                {
+                    specialDayProfile.DayId = (ushort)RandomNumber(1, hanConfig.XmlConfig.DayIdCount);
+                }
+                date = date.AddDays(1);
+                specialDayProfiles.Add(specialDayProfile);
+            }
+            return specialDayProfiles;
         }
 
         private static void SetStatusWord(IntervalReading ir, IntervalBlockConfig ibConfig)

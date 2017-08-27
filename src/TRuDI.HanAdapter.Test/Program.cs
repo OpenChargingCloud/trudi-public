@@ -26,7 +26,6 @@
 
             Log.Information("Starting test");
 
-            //TestLieferantenXml();
             RunTest().Wait();
 
             Log.Information("Finished test");
@@ -77,20 +76,46 @@
             ctx.WithLogdata = true;
 
             var dataResult = await adapter.LoadData(ctx, cts.Token, ProgressCallback);
+            
             if (dataResult.error != null)
             {
                 Log.Error("Failed to get the data: {@error}", dataResult.error);
                 return;
             }
 
+
             try
             {
-                Ar2418Validation.ValidateSchema(dataResult.trudiXml);
-                var model = XmlModelParser.ParseHanAdapterModel(dataResult.trudiXml.Root.Descendants());
-                model = ModelValidation.ValidateHanAdapterModel(model);
-                ContextValidation.ValidateContext(model, ctx);
+                if (ctx.Contract.TafId == TafId.Taf7)
+                {
+                    var supplierResult = await adapter.LoadSupplierData(cts.Token, ProgressCallback);
+                    if (supplierResult.error != null)
+                    {
+                        Log.Error("Failed to get the supplier data: {@error}", supplierResult.error);
+                        return;
+                    }
+
+                    Ar2418Validation.ValidateSchema(dataResult.trudiXml);
+                    Ar2418Validation.ValidateSchema(supplierResult.supplierXml);
+                    var model = XmlModelParser.ParseHanAdapterModel(dataResult.trudiXml.Root.Descendants());
+                    model = ModelValidation.ValidateHanAdapterModel(model);
+                    var supplierModel = XmlModelParser.ParseSupplierModel(supplierResult.supplierXml.Root.Descendants());
+                    supplierModel = ModelValidation.ValidateSupplierModel(supplierModel);
+                    ContextValidation.ValidateContext(model, supplierModel, ctx);
+                    
+                    // Wenn es gewünscht ist die erzeugte Xml Datei abzuspeichern, muss die nächte Zeile auskommentiert werden. 
+                    ////supplierResult.supplierXml.Save("supplierXml.xml");
+                }
+                else
+                {
+                    Ar2418Validation.ValidateSchema(dataResult.trudiXml);
+                    var model = XmlModelParser.ParseHanAdapterModel(dataResult.trudiXml.Root.Descendants());
+                    model = ModelValidation.ValidateHanAdapterModel(model);
+                    ContextValidation.ValidateContext(model, ctx);  
+                }
+          
                 // Wenn es gewünscht ist die erzeugte Xml Datei abzuspeichern, muss die nächte Zeile auskommentiert werden. 
-                dataResult.trudiXml.Save($"trudiXml{ctx.Contract.TafId}.xml");
+                ////dataResult.trudiXml.Save($"trudiXml{ctx.Contract.TafId}.xml");
             }
             catch (AggregateException ae)
             {
@@ -103,32 +128,6 @@
             {
                 Log.Error(ex.Message);
             }
-        }
-
-        static void TestLieferantenXml()
-        {
-            var xdoc = XDocument.Load("IF_Lieferant_TRuDI_example.xml");
-
-            try
-            {
-                Ar2418Validation.ValidateSchema(xdoc);
-                var model = XmlModelParser.ParseSupplierModel(xdoc.Root.Descendants());
-                model = ModelValidation.ValidateSupplierModel(model);
-                //ContextValidation.ValidateContext(model, ctx);
-                Console.WriteLine("Validierung erfolgreich.");
-            }
-            catch (AggregateException ae)
-            {
-                Log.Error(ae.Message.Split(">")[0]);
-                ae.Flatten()?.InnerExceptions?.ToList().ForEach(ie => Log.Error(ie.Message));
-                Log.Error("Validation failed.");
-                Console.ReadKey();
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex.Message);
-            }
-
         }
 
         private static void ProgressCallback(ProgressInfo progressInfo)

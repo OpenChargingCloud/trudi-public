@@ -56,7 +56,10 @@
         "CertContent": ""
       }
     ],
+    "TariffUseCase":  "",
     "TariffStageCount": "",
+    "DefaultTariffNumber": "",
+    "DayIdCount": "",
     "ValueSummary": "",
     "MeterReadingConfigs": [
       {
@@ -74,6 +77,25 @@
             "Duration": "",
             "Start": "",
             "UsedStatus": ""
+          }
+        ]
+      }
+    ],
+    "TariffStageConfigs": [
+      {
+        "TariffNumber": "",
+        "Description": "",
+        "ObisCode": ""
+      }
+    ],
+    "DayProfiles": [
+      {
+        "DayId": "",
+        "DayTimeProfiles": [
+          {
+            "Start": "",
+            "End": "",
+            "TariffNumber":  ""
           }
         ]
       }

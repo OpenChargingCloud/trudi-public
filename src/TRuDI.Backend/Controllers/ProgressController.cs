@@ -2,7 +2,7 @@
 {
     using Microsoft.AspNetCore.Mvc;
 
-    using TRuDI.Backend.HanAdapter;
+    using TRuDI.Backend.Application;
     using TRuDI.Backend.Models;
 
     public class ProgressController : Controller

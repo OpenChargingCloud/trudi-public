@@ -1,48 +1,44 @@
-{
-  "name": "TRuDI",
-  "version": "1.0.0",
-  "description": "TRuDI - Transparenz- und Display-Software",
-  "author": "IVU Softwareentwicklung GmbH",
-  "repository": "",
-  "main": "main.js",
-  "devDependencies": {
-    "electron": "^1.7.5",
-    "electron-builder": "^19.24.1"
-  },
-  "scripts": {
-    "start": "electron .",
-    "dist": "build"
-  },
-  "build": {
-    "appId": "trudi",
-    "directories": {
-      "buildResources": "../../assets",
-      "output": "../../dist"
+{ 
+    "name" : "TRuDI",
+    "version" : "0.2.0",
+    "description" : "TRuDI - Transparenz- und Display-Software",
+    "author" : "IVU Softwareentwicklung GmbH",
+    "repository" : "",
+    "main" : "main.js",
+    "dependencies" : { 
+        "dirsum" : "^0.1.1"
     },
-    "extraResources": {
-      "from": "../TRuDI.Backend/bin/dist/",
-      "to": "TRuDI.Backend/bin/dist/",
-      "filter": [
-        "**/*"
-      ]
+    "devDependencies" : { 
+        "electron" : "^1.7.5",
+        "electron-builder" : "^19.24.1"
     },
-    "linux": {
-      "target": [
-        "AppImage",
-        "deb"
-      ]
+    "scripts" : { 
+        "start" : "electron .",
+        "dist" : "build"
     },
-    "mac": {
-      "category": "trudi"
-    },
-    "win": {
-      "target": [
-        "nsis"
-      ]
-    },
-    "nsis": {
-      "oneClick": false,
-      "allowElevation": false
+    "build" : { 
+        "appId" : "trudi",
+        "directories" : { 
+            "buildResources" : "../../assets",
+            "output" : "../../dist"
+        },
+        "extraResources" : { 
+            "from" : "../TRuDI.Backend/bin/dist/",
+            "to" : "TRuDI.Backend/bin/dist/",
+            "filter" : [ "**/*" ]
+        },
+        "linux" : { 
+            "target" : [ "AppImage", "deb" ]
+        },
+        "mac" : { 
+            "category" : "trudi"
+        },
+        "win" : { 
+            "target" : [ "nsis" ]
+        },
+        "nsis" : { 
+            "oneClick" : false,
+            "allowElevation" : false
+        }
     }
-  }
 }

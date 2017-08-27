@@ -41,7 +41,7 @@
         /// 
         /// Jede Instanz der Klasse DayTimeProfile muss ein Datenelement vom Typ tariffNumber enthalten.
         /// </summary>
-        public ushort TariffNumber
+        public ushort? TariffNumber
         {
             get; set;
         }

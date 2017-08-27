@@ -36,7 +36,7 @@
         /// Jede Instanz der Klasse dayProfile muss ein Datenelement vom Typ 
         /// dayId beinhalten.
         /// </summary>
-        public ushort DayId 
+        public ushort? DayId 
         {
             get; set;
         }

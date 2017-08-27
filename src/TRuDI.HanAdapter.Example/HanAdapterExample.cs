@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Generic;
     using System.Net;
-    using System.Security.Cryptography.X509Certificates;
     using System.Threading;
     using System.Threading.Tasks;
     using System.Xml.Linq;
@@ -16,12 +15,11 @@
     using TRuDI.HanAdapter.XmlValidation.Models.BasicData;
     using TRuDI.HanAdapter.Example.ConfigModel;
 
-
+    /// <inheritdoc />
     /// <summary>
-    /// This isn't a really running example! It should serve as a starting point only.
-    /// It's just simulating a communication with a SMGW and generats dummy data.
+    /// This isn't a real HAN adapter. It loads a configuration from a JSON file an simulates an adapter with dummy data.
     /// </summary>
-    /// <seealso cref="TRuDI.HanAdapter.Interface.IHanAdapter" />
+    /// <seealso cref="T:TRuDI.HanAdapter.Interface.IHanAdapter" />
     public class HanAdapterExample : IHanAdapter
     {
         /// <summary>
@@ -32,19 +30,23 @@
         private HanAdapterExampleConfig config;
         private Certificate certificate;
 
-
-        public HanAdapterExample()
+        /// <summary>
+        /// Initializes a new instance of the <see cref="HanAdapterExample"/> class.
+        /// </summary>
+        /// <param name="configFile">The configuration file or a directory that contains at least one configuration file.</param>
+        public HanAdapterExample(string configFile)
         {
             try
             {
-                var json = System.IO.File.ReadAllText("../TRuDI.HanAdapter.Example/Data/ConfigTaf7UseCase.json");
+                var json = System.IO.File.ReadAllText(configFile);
                 this.config = JsonConvert.DeserializeObject<HanAdapterExampleConfig>(json);
-                certificate = new Certificate();
-                certificate.HexStringToByteArray(config.Cert);
+                this.certificate = new Certificate();
+                this.certificate.HexStringToByteArray(config.Cert);
             }
             catch (Exception ex)
             {
-                this.logger.ErrorException("Failed to read configuration.", ex);
+                this.logger.ErrorException($"Failed to load test configuration from file {configFile}", ex);
+                throw;
             }
         }
 
@@ -162,6 +164,18 @@
 
             return (trudiXml, null);
         }
+
+        public async Task<(XDocument supplierXml, AdapterError error)> LoadSupplierData(CancellationToken ct, Action<ProgressInfo> progressCallback)
+        {
+            progressCallback(new ProgressInfo(0, $"Die Abrechnungsdaten werden abgerufen."));
+
+            await Task.Delay(1000);
+
+            progressCallback(new ProgressInfo(100, $"Abrechnungsdaten vollständig geladen."));
+
+            return (config.SupplierXml, null);
+        }
+
 
         /// <summary>
         /// Loads the current register values of the specified contract.

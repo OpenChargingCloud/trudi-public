@@ -7,6 +7,7 @@
     using TRuDI.HanAdapter.Interface;
     using TRuDI.HanAdapter.XmlValidation.Models;
     using TRuDI.HanAdapter.XmlValidation.Models.BasicData;
+    using TRuDI.HanAdapter.XmlValidation.Models.CheckData;
 
     public static class ContextValidation
     {
@@ -48,6 +49,22 @@
             if (exceptions.Any())
             {
                 throw new AggregateException("Context error:>", exceptions);
+            }
+        }
+
+        public static void ValidateContext(UsagePointAdapterTRuDI usagePoint, UsagePointLieferant supplierModel, AdapterContext ctx)
+        {
+            ValidateContext(usagePoint, ctx);
+
+            var exceptions = new List<Exception>();
+
+            ValidateTaf7SupplierBillingPeriod(usagePoint, supplierModel, exceptions);
+
+            ValidateTaf7SupplierDayProfiles(supplierModel, exceptions);
+
+            if (exceptions.Any())
+            {
+                throw new AggregateException("Taf-7 Context error:>", exceptions);
             }
         }
 
@@ -201,8 +218,6 @@
 
             for (int index = 0; index < intervalReadings.Count - 1; index++)
             {
-                DateTime test = new DateTime();
-                
                 var before = intervalReadings[index].TimePeriod.Start.GetDateWithoutSeconds();
                 var next = intervalReadings[index + 1].TimePeriod.Start.GetDateWithoutSeconds();
 
@@ -224,5 +239,65 @@
         {
             // TODO befinden sich alle Perioden im angegebenen Abrechnungszeitraum?
         } 
+
+        // Taf-7: Validate if the billing period of the model matches the billing period of the supplier data
+        private static void ValidateTaf7SupplierBillingPeriod(UsagePointAdapterTRuDI model, UsagePointLieferant supplier, List<Exception> exceptions)
+        {
+            var modelInterval = model.MeterReadings[0].IntervalBlocks[0].Interval;
+            var supplierInterval = supplier.AnalysisProfile.BillingPeriod;
+
+            if(modelInterval.Start != supplierInterval.Start)
+            {
+                exceptions.Add(new InvalidOperationException("Taf-7: The start timestamp of the model does not match the start timestamp of the supplier data."));
+            }
+
+            if(modelInterval.Duration != supplierInterval.Duration)
+            {
+                exceptions.Add(new InvalidOperationException("Taf-7: The billing period duration of the model and the supplier are different."));
+            }
+        }
+
+        // Taf-7: Validate if the supplier periods have a duration of 15 minutes
+        private static void ValidateTaf7SupplierDayProfiles(UsagePointLieferant supplier, List<Exception> exceptions)
+        {
+            var profiles = supplier.AnalysisProfile.TariffChangeTrigger.TimeTrigger.DayProfiles;
+
+            foreach(DayProfile profile in profiles)
+            {
+                var dtProfiles = profile.DayTimeProfiles;
+                for(int i = 0; i < dtProfiles.Count; i++)
+                {
+                    if(i+1 == dtProfiles.Count)
+                    {
+                        break;
+                    }
+
+                    var current = new TimeSpan((int)dtProfiles[i].StartTime.Hour, (int)dtProfiles[i].StartTime.Minute, 0);
+                    
+                    var next = new TimeSpan((int)dtProfiles[i+1].StartTime.Hour, (int)dtProfiles[i+1].StartTime.Minute, 0);
+
+                    if ((int)(next - current).TotalSeconds == 900)
+                    {
+                        continue;
+                    }
+                    else if (next == new TimeSpan(0,0,0) &&  current == new TimeSpan(23,45,00))
+                    {
+                        continue;    
+                    }
+                    else if (next == current && (i+2) < dtProfiles.Count)
+                    {
+                        var preCurrent = new TimeSpan((int)dtProfiles[i-1].StartTime.Hour, (int)dtProfiles[i-1].StartTime.Minute, 0);
+                        var postNext =   new TimeSpan((int)dtProfiles[i + 2].StartTime.Hour, (int)dtProfiles[i + 2].StartTime.Minute, 0);
+                        if ((int)(postNext - preCurrent).TotalSeconds == 1800)
+                        {
+                            continue;
+                        }
+                    }
+                    {
+                        exceptions.Add(new InvalidOperationException("Taf-7: The supplier calender periods are not 15 minutes."));
+                    }
+                }
+            }
+        }
     }
 }

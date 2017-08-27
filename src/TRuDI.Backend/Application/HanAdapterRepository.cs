@@ -1,6 +1,7 @@
-﻿namespace TRuDI.Backend.HanAdapter
+﻿namespace TRuDI.Backend.Application
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
 
     using TRuDI.HanAdapter.Example;
@@ -8,10 +9,17 @@
 
     public static class HanAdapterRepository
     {
-        public static HanAdapterInfo[] AvailableAdapters = new[]
+        public static IReadOnlyList<HanAdapterInfo> AvailableAdapters => availableAdapters;
+
+        private static List<HanAdapterInfo> availableAdapters = new List<HanAdapterInfo>
             {
-                new HanAdapterInfo("XXX", "Example GmbH", typeof(HanAdapterExample), ""),
             };
+
+
+        public static void ActivateExampleHanAdapter()
+        {
+           availableAdapters.Add(new HanAdapterInfo("XXX", "Example GmbH", typeof(HanAdapterExample), "")); 
+        }
 
         public static HanAdapterContainer LoadAdapter(string serverId)
         {

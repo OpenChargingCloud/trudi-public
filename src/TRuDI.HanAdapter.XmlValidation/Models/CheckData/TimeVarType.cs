@@ -26,7 +26,7 @@
         /// Wenn das Datenelement nicht in einer Instanz der Klasse TimeVarType vorhanden ist, 
         /// so wird der Wert „0“ als gesetzt angesehen.
         /// </summary>
-        public byte Hour
+        public byte? Hour
         {
             get; set;
         }
@@ -37,7 +37,7 @@
         /// Wenn das Datenelement nicht in einer Instanz der Klasse TimeVarType vorhanden ist, 
         /// so wird der Wert „0“ als gesetzt angesehen.
         /// </summary>
-        public byte Minute
+        public byte? Minute
         {
             get; set;
         }
@@ -47,7 +47,7 @@
         /// Die Nutzung des Datenelements second ist optional. Wenn das Datenelement nicht in einer Instanz der Klasse 
         /// TimeVarType vorhanden ist, so wird der Wert „0“ als gesetzt angesehen.
         /// </summary>
-        public byte Second
+        public byte? Second
         {
             get; set;
         }
@@ -58,7 +58,7 @@
         /// Die Nutzung des Datenelements hundreds ist optional. Wenn das Datenelement nicht in einer 
         /// Instanz der Klasse TimeVarType vorhanden ist, so wird der Wert „0“ als gesetzt angesehen.
         /// </summary>
-        public byte Hundreds
+        public byte? Hundreds
         {
             get; set;
         }

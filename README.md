@@ -114,6 +114,8 @@ Benutzer über den aktuellen Fortschritt der jeweiligen Operation informieren.
 
 5. ``Disconnect()``
 
+    Wird aufgerufen, um die aktive Verbindung zu beenden. Z.B. wenn der Benutzer sich an einem anderen SMGW anmelden möchte.
+
 
 ### 1. Verbindungsaufbau zum Gateway mittels ``Connect``
 
@@ -265,8 +267,17 @@ public async Task<(ConnectResult result, AdapterError error)> Connect(
 
 ### 2. Laden der zum Verbraucher gehörenden Verträge mittels ``LoadAvailableContracts``
 
+Direkt nach dem Verbindungsaufbau wird ``LoadAvailableContracts`` aufgerufen um eine Liste der für den 
+Benutzer relevanten Verträge zu erhalten.
+
 ### 3. Laden der Daten zum vom Verbraucher ausgewählten Vertrag mittels ``LoadData``
 
 ### 4. Abruf der aktuellen Registerwerte durch ``GetCurrentRegisterValues``
 
+Wird zum abrufen der TAF-6-Werte verwendet. 
 
+## Test-HAN-Adapter ``TRuDI.HanAdapter.Example``
+
+Dieser Adapter dient zum Simulieren eines SMGWs und ist wärend der normalen Progammausführung nicht aktiv.
+
+Um diesen zu aktivieren, muss das Programm mit dem Paramter ``--test=<Konfigurations-Datei>`` aufgerufen werden.

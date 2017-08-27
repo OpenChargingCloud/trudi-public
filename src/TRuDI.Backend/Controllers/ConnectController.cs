@@ -10,7 +10,7 @@
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Http;
 
-    using TRuDI.Backend.HanAdapter;
+    using TRuDI.Backend.Application;
     using TRuDI.Backend.Models;
 
     public class ConnectController : Controller

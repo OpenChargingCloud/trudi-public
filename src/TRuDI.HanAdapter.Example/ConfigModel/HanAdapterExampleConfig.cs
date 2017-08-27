@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading;
-using System.Xml.Linq;
-using TRuDI.HanAdapter.Interface;
-
-namespace TRuDI.HanAdapter.Example.ConfigModel
+﻿namespace TRuDI.HanAdapter.Example.ConfigModel
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Xml.Linq;
+    using TRuDI.HanAdapter.Interface;
+
     public class HanAdapterExampleConfig
     {
         
@@ -79,7 +75,7 @@ namespace TRuDI.HanAdapter.Example.ConfigModel
         }
 
         // If Taf7 is configured 
-        public XDocument LieferantenXml
+        public XDocument SupplierXml
         {
             get; set;
         }
@@ -89,6 +85,5 @@ namespace TRuDI.HanAdapter.Example.ConfigModel
         {
             get; set;
         }
-
     }
 }

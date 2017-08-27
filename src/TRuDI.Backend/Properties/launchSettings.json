@@ -10,6 +10,7 @@
   "profiles": {
     "IIS Express": {
       "commandName": "IISExpress",
+      "commandLineArgs": "--test=xxx",
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
@@ -17,6 +18,7 @@
     },
     "TRuDI.HanAdapter.UiTest": {
       "commandName": "Project",
+      "commandLineArgs": "--test=D:\\Projekte\\DZG\\TRuDI\\bitbucket-trudi-han-adapter\\doc\\HAN-Test-Adapter\\ConfigTaf2UseCase.json",
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"

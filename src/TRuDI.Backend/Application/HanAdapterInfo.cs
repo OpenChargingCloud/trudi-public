@@ -1,7 +1,9 @@
-﻿namespace TRuDI.Backend.HanAdapter
+﻿namespace TRuDI.Backend.Application
 {
     using System;
     using System.Reflection;
+
+    using TRuDI.HanAdapter.Example;
     using TRuDI.HanAdapter.Interface;
 
     public class HanAdapterInfo
@@ -28,6 +30,11 @@
 
         public IHanAdapter CreateInstance()
         {
+            if (this.adapterType.Name == nameof(HanAdapterExample))
+            {
+                return new HanAdapterExample(Program.CommandLineArguments.TestConfiguration);
+            }
+
             return Activator.CreateInstance(this.adapterType) as IHanAdapter;
         }
     }

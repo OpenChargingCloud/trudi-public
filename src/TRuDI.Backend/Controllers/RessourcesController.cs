@@ -4,7 +4,7 @@
 
     using Microsoft.AspNetCore.Mvc;
 
-    using TRuDI.Backend.HanAdapter;
+    using TRuDI.Backend.Application;
 
     /// <summary>
     /// This controller is used to get resources like images, css, or javascript files from the adapter. 

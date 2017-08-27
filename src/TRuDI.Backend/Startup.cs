@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.FileProviders;
 
 using System.Reflection;
-using TRuDI.Backend.HanAdapter;
+using TRuDI.Backend.Application;
 using Microsoft.Extensions.Logging;
 using WebSocketManager;
 using System;
@@ -14,7 +14,7 @@ using TRuDI.Backend.MessageHandlers;
 
 namespace TRuDI.Backend
 {
-    using TRuDI.Backend.HanAdapter;
+    using TRuDI.Backend.Application;
     using TRuDI.Backend.MessageHandlers;
 
     public class Startup

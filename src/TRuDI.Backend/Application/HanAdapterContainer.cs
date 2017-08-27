@@ -1,4 +1,4 @@
-﻿namespace TRuDI.Backend.HanAdapter
+﻿namespace TRuDI.Backend.Application
 {
     using System;
     using System.Collections.Generic;

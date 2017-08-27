@@ -1,0 +1,66 @@
+﻿@using System.Reflection
+@using TRuDI.Backend.Application
+@inject ApplicationState StateService
+@{
+    ViewData["Title"] = "Über TRuDI";
+}
+
+<div class="panel panel-primary">
+    <div class="panel-heading">TRuDI</div>
+    <div class="panel-body">
+        <div>Version</div>
+        <div>@Microsoft.Extensions.PlatformAbstractions.PlatformServices.Default.Application.ApplicationVersion</div>
+    </div>
+</div>
+
+<div class="panel panel-primary">
+    <div class="panel-heading">HAN Adapter</div>
+    <div class="panel-body">
+
+        <table class="table">
+            <tr>
+                <th>Hersteller</th>
+                <th>FLAG-Id</th>
+                <th>Adapter</th>
+                <th>Version</th>
+                <th>Hash</th>
+            </tr>
+
+            @foreach (var adapter in HanAdapterRepository.AvailableAdapters)
+            {
+                <tr>
+                    <td>
+                        @adapter.ManufacturerName
+                    </td>
+                    
+                    <td>
+                        @adapter.FlagId
+                    </td>
+                    
+                    <td>
+                        @adapter.Assembly.GetName().Name
+                    </td>
+                    
+                    <td>
+                        @adapter.Assembly.GetName().Version
+                    </td>
+                    
+                    <td>
+                        @adapter.Hash
+                    </td>
+                </tr>
+            }
+
+        </table>
+
+    </div>
+</div>
+
+<div class="panel panel-primary">
+    <div class="panel-heading">TAF Adapter</div>
+    <div class="panel-body">
+    </div>
+</div>
+
+<a asp-action="Back">Zurück</a>
+

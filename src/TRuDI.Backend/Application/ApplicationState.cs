@@ -1,13 +1,13 @@
-﻿namespace TRuDI.Backend.HanAdapter
+﻿namespace TRuDI.Backend.Application
 {
     using System;
     using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
 
-    using TRuDI.HanAdapter.Interface;
     using TRuDI.Backend.MessageHandlers;
     using TRuDI.Backend.Models;
+    using TRuDI.HanAdapter.Interface;
 
     public class ApplicationState
     {
@@ -20,7 +20,7 @@
 
         public string LastErrorMessage { get; set; }
 
-        public string LastUrl { get; set; }
+        public Stack<string> LastUrl { get; } = new Stack<string>();
 
         public HanAdapterContainer ActiveHanAdapter => this.activeHanAdapter;
 
