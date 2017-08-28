@@ -35,11 +35,12 @@
         static async Task RunTest()
         {
             var cts = new CancellationTokenSource();
-            var adapter = new HanAdapterExample();
+            var configFile = string.Empty;
+            var adapter = new HanAdapterExample(configFile);
             //var adapter = new HanAdapterLandisGyr();
 
             var connectResult = await adapter.Connect(
-                "eivu0012345678",
+                "EXXX0012345678",
                 new IPEndPoint(IPAddress.Parse("1.2.3.4"), 443),
                 "Ivu",
                 "123456",

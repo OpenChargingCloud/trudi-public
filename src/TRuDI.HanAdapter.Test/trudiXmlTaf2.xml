@@ -26,7 +26,7 @@
       <LogEvent>
         <level>1</level>
         <text>Das Smart Meter Gateway wurde neu gestartet.</text>
-        <outcome>2</outcome>
+        <outcome>1</outcome>
         <timestamp>2016-07-04T02:24:00</timestamp>
       </LogEvent>
     </LogEntry>
@@ -34,7 +34,7 @@
       <recordNumber>2</recordNumber>
       <LogEvent>
         <level>2</level>
-        <text>Das Smart Meter Gateway wurde neu gestartet.</text>
+        <text>Tarifumschaltung war erfolgreich.</text>
         <outcome>2</outcome>
         <timestamp>2016-07-07T04:48:00</timestamp>
       </LogEvent>
@@ -42,8 +42,8 @@
     <LogEntry>
       <recordNumber>3</recordNumber>
       <LogEvent>
-        <level>2</level>
-        <text>Gerät wurde gewartet.</text>
+        <level>1</level>
+        <text>Tarifumschaltung war erfolgreich.</text>
         <outcome>1</outcome>
         <timestamp>2016-07-10T07:12:00</timestamp>
       </LogEvent>
@@ -52,7 +52,7 @@
       <recordNumber>4</recordNumber>
       <LogEvent>
         <level>2</level>
-        <text>Gerät wurde gewartet.</text>
+        <text>Tarifumschaltung war erfolgreich.</text>
         <outcome>2</outcome>
         <timestamp>2016-07-13T09:36:00</timestamp>
       </LogEvent>
@@ -62,7 +62,7 @@
       <LogEvent>
         <level>1</level>
         <text>Das Smart Meter Gateway wurde neu gestartet.</text>
-        <outcome>0</outcome>
+        <outcome>1</outcome>
         <timestamp>2016-07-16T12:00:00</timestamp>
       </LogEvent>
     </LogEntry>
@@ -70,7 +70,7 @@
       <recordNumber>6</recordNumber>
       <LogEvent>
         <level>2</level>
-        <text>Ein neuer Wert wurde abgelesen.</text>
+        <text>Tarifumschaltung war erfolgreich.</text>
         <outcome>2</outcome>
         <timestamp>2016-07-19T14:24:00</timestamp>
       </LogEvent>
@@ -79,8 +79,8 @@
       <recordNumber>7</recordNumber>
       <LogEvent>
         <level>1</level>
-        <text>Das Smart Meter Gateway wurde neu gestartet.</text>
-        <outcome>0</outcome>
+        <text>Gerät wurde gewartet.</text>
+        <outcome>2</outcome>
         <timestamp>2016-07-22T16:48:00</timestamp>
       </LogEvent>
     </LogEntry>
@@ -88,35 +88,35 @@
       <recordNumber>8</recordNumber>
       <LogEvent>
         <level>1</level>
-        <text>Ein neuer Wert wurde abgelesen.</text>
-        <outcome>1</outcome>
+        <text>Gerät wurde gewartet.</text>
+        <outcome>2</outcome>
         <timestamp>2016-07-25T19:12:00</timestamp>
       </LogEvent>
     </LogEntry>
     <LogEntry>
       <recordNumber>9</recordNumber>
       <LogEvent>
-        <level>1</level>
-        <text>Ein neuer Wert wurde abgelesen.</text>
-        <outcome>0</outcome>
+        <level>2</level>
+        <text>Das Smart Meter Gateway wurde neu gestartet.</text>
+        <outcome>1</outcome>
         <timestamp>2016-07-28T21:36:00</timestamp>
       </LogEvent>
     </LogEntry>
     <LogEntry>
       <recordNumber>10</recordNumber>
       <LogEvent>
-        <level>2</level>
+        <level>1</level>
         <text>Gerät wurde gewartet.</text>
-        <outcome>2</outcome>
+        <outcome>0</outcome>
         <timestamp>2016-08-01T00:00:00</timestamp>
       </LogEvent>
     </LogEntry>
     <LogEntry>
       <recordNumber>11</recordNumber>
       <LogEvent>
-        <level>1</level>
-        <text>Tarifumschaltung war erfolgreich.</text>
-        <outcome>2</outcome>
+        <level>2</level>
+        <text>Ein neuer Wert wurde abgelesen.</text>
+        <outcome>1</outcome>
         <timestamp>2016-08-04T02:24:00</timestamp>
       </LogEvent>
     </LogEntry>
@@ -124,16 +124,16 @@
       <recordNumber>12</recordNumber>
       <LogEvent>
         <level>2</level>
-        <text>Ein neuer Wert wurde abgelesen.</text>
-        <outcome>2</outcome>
+        <text>Gerät wurde gewartet.</text>
+        <outcome>1</outcome>
         <timestamp>2016-08-07T04:48:00</timestamp>
       </LogEvent>
     </LogEntry>
     <LogEntry>
       <recordNumber>13</recordNumber>
       <LogEvent>
-        <level>1</level>
-        <text>Ein neuer Wert wurde abgelesen.</text>
+        <level>2</level>
+        <text>Das Smart Meter Gateway wurde neu gestartet.</text>
         <outcome>0</outcome>
         <timestamp>2016-08-10T07:12:00</timestamp>
       </LogEvent>
@@ -142,34 +142,34 @@
       <recordNumber>14</recordNumber>
       <LogEvent>
         <level>1</level>
-        <text>Ein neuer Wert wurde abgelesen.</text>
-        <outcome>0</outcome>
+        <text>Gerät wurde gewartet.</text>
+        <outcome>2</outcome>
         <timestamp>2016-08-13T09:36:00</timestamp>
       </LogEvent>
     </LogEntry>
     <LogEntry>
       <recordNumber>15</recordNumber>
       <LogEvent>
-        <level>2</level>
-        <text>Tarifumschaltung war erfolgreich.</text>
-        <outcome>2</outcome>
+        <level>1</level>
+        <text>Ein neuer Wert wurde abgelesen.</text>
+        <outcome>0</outcome>
         <timestamp>2016-08-16T12:00:00</timestamp>
       </LogEvent>
     </LogEntry>
     <LogEntry>
       <recordNumber>16</recordNumber>
       <LogEvent>
-        <level>2</level>
+        <level>1</level>
         <text>Gerät wurde gewartet.</text>
-        <outcome>2</outcome>
+        <outcome>0</outcome>
         <timestamp>2016-08-19T14:24:00</timestamp>
       </LogEvent>
     </LogEntry>
     <LogEntry>
       <recordNumber>17</recordNumber>
       <LogEvent>
-        <level>2</level>
-        <text>Ein neuer Wert wurde abgelesen.</text>
+        <level>1</level>
+        <text>Gerät wurde gewartet.</text>
         <outcome>2</outcome>
         <timestamp>2016-08-22T16:48:00</timestamp>
       </LogEvent>
@@ -179,7 +179,7 @@
       <LogEvent>
         <level>2</level>
         <text>Das Smart Meter Gateway wurde neu gestartet.</text>
-        <outcome>0</outcome>
+        <outcome>2</outcome>
         <timestamp>2016-08-25T19:12:00</timestamp>
       </LogEvent>
     </LogEntry>
@@ -187,7 +187,7 @@
       <recordNumber>19</recordNumber>
       <LogEvent>
         <level>2</level>
-        <text>Das Smart Meter Gateway wurde neu gestartet.</text>
+        <text>Tarifumschaltung war erfolgreich.</text>
         <outcome>1</outcome>
         <timestamp>2016-08-28T21:36:00</timestamp>
       </LogEvent>
@@ -196,8 +196,8 @@
       <recordNumber>20</recordNumber>
       <LogEvent>
         <level>1</level>
-        <text>Tarifumschaltung war erfolgreich.</text>
-        <outcome>0</outcome>
+        <text>Ein neuer Wert wurde abgelesen.</text>
+        <outcome>2</outcome>
         <timestamp>2016-09-01T00:00:00</timestamp>
       </LogEvent>
     </LogEntry>
@@ -24027,7 +24027,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>105952</espi:value>
+          <espi:value>106000</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2016-09-01T00:00:00</start>
@@ -24081,7 +24081,7 @@
           <start>2016-07-01T00:00:00</start>
         </interval>
         <IntervalReading>
-          <espi:value>3240</espi:value>
+          <espi:value>4799</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2016-07-01T00:00:00</start>
@@ -24108,7 +24108,7 @@
           <start>2016-07-01T00:00:00</start>
         </interval>
         <IntervalReading>
-          <espi:value>1234</espi:value>
+          <espi:value>239</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2016-07-01T00:00:00</start>
@@ -24135,7 +24135,7 @@
           <start>2016-07-01T00:00:00</start>
         </interval>
         <IntervalReading>
-          <espi:value>1526</espi:value>
+          <espi:value>962</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2016-07-01T00:00:00</start>

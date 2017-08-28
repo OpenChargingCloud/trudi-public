@@ -18,15 +18,15 @@
                 @foreach (var versionItem in StateService.LastConnectResult.FirmwareVersions)
                 {
                     <tr>
-                        <td>
+                        <th>
                             @versionItem.Component
-                        </td>
+                        </th>
                         <td>
                             <div>
                                 @versionItem.Version
                             </div>
                             @if (!string.IsNullOrWhiteSpace(versionItem.Hash))
-                    {
+                            {
                                 <div>
                                     @versionItem.Hash
                                 </div>
@@ -51,51 +51,51 @@
 
             <table class="table">
                 <tr>
-                    <td>Ausgestellt für</td>
+                    <th>Ausgestellt für</th>
                     <td>@cert.GetNameInfo(X509NameType.SimpleName, true)</td>
                 </tr>
 
                 <tr>
-                    <td>Ausgestellt von</td>
+                    <th>Ausgestellt von</th>
                     <td>@cert.GetNameInfo(X509NameType.SimpleName, false)</td>
                 </tr>
 
                 <tr>
-                    <td>Gültigkeit</td>
+                    <th>Gültigkeit</th>
                     <td>@cert.NotBefore bis @cert.NotAfter</td>
                 </tr>
 
                 <tr>
-                    <td>Format</td>
+                    <th>Format</th>
                     <td>@cert.GetFormat()</td>
                 </tr>
 
                 <tr>
-                    <td>Version</td>
+                    <th>Version</th>
                     <td>@cert.Version</td>
                 </tr>
 
                 <tr>
-                    <td>Öffentlicher Schlüssel</td>
+                    <th>Öffentlicher Schlüssel</th>
                     <td style="font-family: monospace;">@cert.GetPublicKeyString().AddLineBreak(32)</td>
                 </tr>
 
                 <tr>
-                    <td>Serial Number</td>
+                    <th>Serial Number</th>
                     <td>@cert.GetSerialNumberString()</td>
                 </tr>
 
                 <tr>
-                    <td>Key Algorithm</td>
+                    <th>Key Algorithm</th>
                     <td>@cert.GetKeyAlgorithm().OidToFriendlyName()</td>
                 </tr>
                 <tr>
-                    <td>Hash</td>
+                    <th>Hash</th>
                     <td style="font-family: monospace;">@cert.GetCertHashString().AddLineBreak(32)</td>
                 </tr>
 
                 <tr>
-                    <td>Signature Algorithm</td>
+                    <th>Signature Algorithm</th>
                     <td>@cert.SignatureAlgorithm.FriendlyName</td>
                 </tr>
             </table>

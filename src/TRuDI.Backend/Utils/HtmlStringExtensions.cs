@@ -1,8 +1,14 @@
 ﻿namespace TRuDI.Backend.Utils
 {
+    using System;
+
     using Microsoft.AspNetCore.Html;
     using System.Security.Cryptography;
     using System.Text;
+
+    using Microsoft.Net.Http.Headers;
+
+    using TRuDI.HanAdapter.Interface;
 
     public static class HtmlStringExtensions
     {
@@ -26,6 +32,50 @@
         {
             var o = new Oid(oid);
             return o.FriendlyName;
+        }
+
+        public static string TafToFriendlyName(this TafId id)
+        {
+            switch (id)
+            {
+                case TafId.Taf1:
+                    return "TAF-1: Datensparsamer Tarif";
+
+                case TafId.Taf2:
+                    return "TAF-2: Zeitvariabler Tarif";
+
+                case TafId.Taf6:
+                    return "TAF-6: Ablesung von Messwerten im Bedarfsfall";
+
+                case TafId.Taf7:
+                    return "TAF-7: Zählerstandgangmessung";
+
+                case TafId.Taf9:
+                    return "TAF-9: Abruf der IST-Einspeisung";
+
+                default:
+                    return id.ToString().ToUpperInvariant();
+            }
+        }
+
+        public static string ToFormatedString(this DateTime timestamp)
+        {
+            return timestamp.ToString("dd.MM.yyyy hh:mm");
+        }
+
+        public static string ToFormatedString(this DateTime? timestamp)
+        {
+            if (timestamp == null)
+            {
+                return string.Empty;
+            }
+
+            return timestamp.Value.ToFormatedString();
+        }
+
+        public static string IsCompleted(this BillingPeriod billingPeriod)
+        {
+            return billingPeriod.End == null ? "nein" : "ja";
         }
     }
 }

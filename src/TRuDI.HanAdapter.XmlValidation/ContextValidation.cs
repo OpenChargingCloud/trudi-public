@@ -280,19 +280,7 @@
                     {
                         continue;
                     }
-                    else if (next == new TimeSpan(0,0,0) &&  current == new TimeSpan(23,45,00))
-                    {
-                        continue;    
-                    }
-                    else if (next == current && (i+2) < dtProfiles.Count)
-                    {
-                        var preCurrent = new TimeSpan((int)dtProfiles[i-1].StartTime.Hour, (int)dtProfiles[i-1].StartTime.Minute, 0);
-                        var postNext =   new TimeSpan((int)dtProfiles[i + 2].StartTime.Hour, (int)dtProfiles[i + 2].StartTime.Minute, 0);
-                        if ((int)(postNext - preCurrent).TotalSeconds == 1800)
-                        {
-                            continue;
-                        }
-                    }
+
                     {
                         exceptions.Add(new InvalidOperationException("Taf-7: The supplier calender periods are not 15 minutes."));
                     }

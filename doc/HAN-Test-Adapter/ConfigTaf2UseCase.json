@@ -10,6 +10,7 @@
   "Contracts": [
     {
       "TafId": "1",
+	  "MeteringPointId": "DE00056266802AO6G56M11SN51G21M555",
       "TafName": "Datensparsamer Tarif IVU",
       "Description": "Taf1 wird für die Verbrauchsabrechnungen herangezogen, bei denen ein hohes Interesse an Datensparsamkeit besteht.",
       "Meters": [
@@ -33,6 +34,7 @@
     },
     {
       "TafId": "7",
+	  "MeteringPointId": "DE00056266802AO6G56M11SN51G21M444",
       "TafName": "Zählerstandsgangmessung IVU",
       "Description": "Dieser Anwendungsfall erlaubt die Erfassung und Versendung von Zählerstandsgängen.",
       "Meters": [
@@ -51,6 +53,7 @@
     },
     {
       "TafId": "2",
+	  "MeteringPointId": "DE00056266802AO6G56M11SN51G21M24S",
       "TafName": "Zeitvariabler Tarif IVU",
       "Description": "Dem Letztverbraucher werden für unterschiedliche Zeiträume verschiedene Preise für die in den jeweiligen Zeiträumen angefallenen Energiemengen in Rechnungen stellt",
       "Meters": [
@@ -63,7 +66,11 @@
       "BillingPeriods": [
         {
           "Begin": "2016-07-01T00:00:00",
-          "End": "2016-09-01T00:00:00"
+          "End": "2016-08-01T00:00:00"
+        },
+        {
+          "Begin": "2016-09-01T00:00:00",
+          "End": "2016-10-01T00:00:00"
         }
       ]
     }

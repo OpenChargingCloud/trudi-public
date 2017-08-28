@@ -1,4 +1,5 @@
 ﻿@using TRuDI.Backend.Application
+@using TRuDI.Backend.Utils
 @inject ApplicationState StateService
 @{
     ViewData["Title"] = "Verträge";
@@ -9,13 +10,138 @@
     <div class="panel panel-primary">
         <div class="panel-heading">Zählpunkt @contract.MeteringPointId</div>
         <div class="panel-body">
-            <div>@contract.ConsumerId</div>
-            <div>@contract.TafId</div>
-            <div>@contract.TafName</div>
-            <div>@contract.Description</div>
-            <div>@contract.MeteringPointId</div>
-            <div>@contract.SupplierId</div>
+
+            <table class="table">
+
+                <tr>
+                    <th>TAF Name</th>
+                    <td>@contract.TafName</td>
+                </tr>
+
+                <tr>
+                    <th>Tarifanwendungsfall</th>
+                    <td>@contract.TafId.TafToFriendlyName()</td>
+                </tr>
+
+                @if (!string.IsNullOrWhiteSpace(contract.Description))
+                {
+                    <tr>
+                        <th>Beschreibung</th>
+                        <td>@contract.Description</td>
+                    </tr>
+                }
+
+                <tr>
+                    <th>ID des Kunden</th>
+                    <td>@contract.ConsumerId</td>
+                </tr>
+
+                <tr>
+                    <th>ID des Rechnungsstellers</th>
+                    <td>@contract.SupplierId</td>
+                </tr>
+
+                <tr>
+                    <th>ID des Kunden</th>
+                    <td>@contract.ConsumerId</td>
+                </tr>
+
+                <tr>
+                    <th>
+                        Zähler
+                    </th>
+
+                    <td>
+                        @foreach (var meter in contract.Meters)
+                        {
+                            @meter<br />
+                        }
+                    </td>
+                </tr>
+
+            </table>
+
+
+            <h3>Verfügbare Abrechnungsperioden</h3>
+            <table class="table">
+
+                <tr>
+                    <th></th>
+                    <th>Von</th>
+                    <th>Bis</th>
+                    <th>Abgeschlossen</th>
+                </tr>
+
+                @{
+                    int billingPeriodIndex = 0;
+                }
+
+                @foreach (var period in contract.BillingPeriods)
+                {
+                    <tr>
+                        <td><input type="radio" name="@billingPeriodIndex.ToString()"></td>
+                        <td>@period.Begin.ToFormatedString()</td>
+                        <td>@period.End.ToFormatedString()</td>
+                        <td>@period.IsCompleted()</td>
+                    </tr>
+                }
+            </table>
+            
+            <table class="table">
+                <tr>
+                    <th>Startzeitpunkt</th>
+                    <th>Endzeitpunkt</th>
+                    <th></th>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="form-group">
+                            <div class='input-group date' id='datetimepicker6'>
+                                <input type='text' class="form-control"/>
+                                <span class="input-group-addon">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </span>
+                            </div>
+                        </div>
+                    </td>
+
+                    <td>
+                        <div class="form-group">
+                            <div class='input-group date' id='datetimepicker7'>
+                                <input type='text' class="form-control"/>
+                                <span class="input-group-addon">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-default" id="btnRead">Auslesung starten...</button>
+                    </td>
+                </tr>
+            </table>
+
+            <script type="text/javascript">
+                $(function () {
+                    $('#datetimepicker6').datetimepicker({
+                        viewMode: 'days',
+                        format: 'DD.MM.YYYY'
+                    });
+                    $('#datetimepicker7').datetimepicker({
+                        useCurrent: false, 
+                        viewMode: 'days',
+                        format: 'DD.MM.YYYY'
+                    });
+                    $("#datetimepicker6").on("dp.change", function (e) {
+                        $('#datetimepicker7').data("DateTimePicker").minDate(e.date);
+                    });
+                    $("#datetimepicker7").on("dp.change", function (e) {
+                        $('#datetimepicker6').data("DateTimePicker").maxDate(e.date);
+                    });
+                });
+            </script>
+
 
         </div>
     </div>
-}
+                    }

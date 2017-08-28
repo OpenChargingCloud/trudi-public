@@ -391,7 +391,7 @@
 
             if (hanConfig.XmlConfig.Taf1Reg == null)
             {
-                hanConfig.XmlConfig.Taf1Reg = new int[(int)denominator + 1];
+                hanConfig.XmlConfig.Taf1Reg = new int[(int)denominator];
             }
 
             while (timestamp <= intervalBlockConfig.Start.AddSeconds((uint)intervalBlockConfig.Duration).GetDateWithoutSeconds())
@@ -411,8 +411,10 @@
                     Value = value
                 };
 
-                hanConfig.XmlConfig.Taf1Reg[index] = hanConfig.XmlConfig.Taf1Reg[index] + value;
-
+                if (index < denominator)
+                {
+                    hanConfig.XmlConfig.Taf1Reg[index] = hanConfig.XmlConfig.Taf1Reg[index] + (int)consumption;
+                }
                 SetStatusWord(ir, intervalBlockConfig);
                 timestamp = timestamp.AddSeconds((uint)meterReadingConfig.PeriodSeconds).GetDateWithoutSeconds();
                 value = value + (int)consumption;
@@ -444,7 +446,7 @@
                     throw new InvalidOperationException("Das abgeleitete Register für Taf-1 wurde nicht befüllt.");
                 }
 
-                var timestamp = intervalBlockConfig.Start.GetDateWithoutSeconds();
+                var timestamp = intervalBlockConfig.Start.GetDateWithoutSeconds().AddMonths(1);
 
                 for (int i = 0; i < hanConfig.XmlConfig.Taf1Reg.Length; i++)
                 {
@@ -459,7 +461,8 @@
                         Value = hanConfig.XmlConfig.Taf1Reg[i]
                     };
                     SetStatusWord(ir, intervalBlockConfig);
-                    timestamp = timestamp.AddSeconds((uint)meterReadingConfig.PeriodSeconds).GetDateWithoutSeconds();
+                    timestamp = timestamp.AddMonths(1);
+                        //AddSeconds((uint)meterReadingConfig.PeriodSeconds).GetDateWithoutSeconds();
                     intervalBlock.IntervalReadings.Add(ir);
                 }
             }
@@ -522,7 +525,7 @@
 
             var date = hanConfig.BillingPeriod.Begin;
 
-            while(date <= hanConfig.BillingPeriod.End)
+            while(date < hanConfig.BillingPeriod.End)
             {
                 var specialDayProfile = new SpecialDayProfile();
                 specialDayProfile.SpecialDayDate = new DayVarType();
