@@ -44,7 +44,7 @@
             {
                 foreach (MeterReading meterReading in usagePoint.MeterReadings)
                 {
-                  ValidateMeterReading(meterReading, exceptions);
+                    ValidateMeterReading(meterReading, exceptions);
                 }
             }
 
@@ -111,7 +111,7 @@
             {
                 exceptions.Add(new InvalidOperationException("UsagePoint does not contain an instance of SMGW."));
             }
-            else if(usagePoint.GetType() == typeof(UsagePointAdapterTRuDI))
+            else if (usagePoint.GetType() == typeof(UsagePointAdapterTRuDI))
             {
                 ValidateSMGW(usagePoint.Smgw, exceptions);
             }
@@ -126,7 +126,7 @@
             }
 
         }
-        
+
         // Validation of the Certificate instance
         private static void ValidateCertificate(Certificate cert, List<Exception> exceptions)
         {
@@ -228,7 +228,7 @@
             {
                 foreach (IntervalBlock intervalBlock in meterReading.IntervalBlocks)
                 {
-                 ValidateIntervalBlock(intervalBlock, exceptions);
+                    ValidateIntervalBlock(intervalBlock, exceptions);
                 }
             }
         }
@@ -469,30 +469,41 @@
                 exceptions.Add(new InvalidOperationException("The element value in intervalReading is null."));
             }
 
-            if (string.IsNullOrWhiteSpace(intervalReading.StatusFNN.Status))
+            ValidateSetStatus(intervalReading, exceptions);
+        }
+
+        private static void ValidateSetStatus(IntervalReading intervalReading, List<Exception> exceptions)
+        {
+
+            if (intervalReading.StatusFNN == null && !intervalReading.StatusPTB.HasValue)
             {
-                if (intervalReading.StatusPTB.HasValue)
-                {
-                    ValidateIntervalReadingStatusPTB(intervalReading.StatusPTB, exceptions);
-                }
-                else
+                exceptions.Add(new InvalidOperationException("In IntervalReading StatusFNN and StatusPTB have no value."));
+                return;
+            }
+            else if (intervalReading.StatusFNN != null && !intervalReading.StatusPTB.HasValue)
+            {
+                if (string.IsNullOrWhiteSpace(intervalReading.StatusFNN.Status))
                 {
                     exceptions.Add(new InvalidOperationException("In IntervalReading StatusFNN and StatusPTB have no value."));
                 }
+                else
+                {
+                    if (!intervalReading.StatusFNN.ValidateFNNStatus())
+                    {
+                        exceptions.Add(new InvalidOperationException("In IntervalReading StatusFNN is invalid and StatusPTB is null."));
+                    }
+                }
+            }
+            else if (intervalReading.StatusFNN == null && intervalReading.StatusPTB.HasValue)
+            {
+                ValidateIntervalReadingStatusPTB(intervalReading.StatusPTB, exceptions);
             }
             else
             {
-                var fnnStatusIsValid = intervalReading.StatusFNN.ValidateFNNStatus();
-                if (fnnStatusIsValid && intervalReading.StatusPTB.HasValue && !(intervalReading.StatusPTB == StatusPTB.No_Error))
-                {
-                    exceptions.Add(new InvalidOperationException("In IntervalReading StatusFNN and StatusPTB have both a value. Only one is permitted."));
-                }
-                else if (!fnnStatusIsValid && !intervalReading.StatusPTB.HasValue)
-                {
-                    exceptions.Add(new InvalidOperationException("In IntervalReading StatusFNN is invalid and StatusPTB is null."));
-                }
+                exceptions.Add(new InvalidOperationException("In IntervalReading StatusFNN and StatusPTB have both a value. Only one is permitted."));
             }
         }
+
 
         // Validate if the StatusPTB of ReadingType is valid
         private static void ValidateIntervalReadingStatusPTB(StatusPTB? statusPtb, List<Exception> exceptions)
@@ -518,19 +529,19 @@
         // Validation of an AnalysisProfile instance
         private static void ValidateAnalysisProfile(AnalysisProfile analysisProfile, List<Exception> exceptions)
         {
-            if(analysisProfile.TariffStages.Count < 1)
+            if (analysisProfile.TariffStages.Count < 1)
             {
                 exceptions.Add(new InvalidOperationException("AnalysisProfile does not contain an instance of TariffStage."));
             }
             else
             {
-                foreach(TariffStage tariffStage in analysisProfile.TariffStages)
+                foreach (TariffStage tariffStage in analysisProfile.TariffStages)
                 {
                     ValidateTariffStage(tariffStage, exceptions);
                 }
             }
 
-            if(analysisProfile.TariffChangeTrigger == null)
+            if (analysisProfile.TariffChangeTrigger == null)
             {
                 exceptions.Add(new InvalidOperationException("AnalysisProfile does not contain an instance of TariffChangeTrigger."));
             }
@@ -565,7 +576,7 @@
                     break;
             }
         }
-        
+
         // Validation of an TariffStage instance
         private static void ValidateTariffStage(TariffStage tariffStage, List<Exception> exceptions)
         {
@@ -578,7 +589,7 @@
         // Validation of an TariffChangeTrigger instance
         private static void ValidateTariffChangeTrigger(TariffChangeTrigger trigger, List<Exception> exceptions)
         {
-           if(trigger.TimeTrigger == null)
+            if (trigger.TimeTrigger == null)
             {
                 exceptions.Add(new InvalidOperationException("TariffChangeTrigger does not contain an instance of TimeTrigger."));
             }
@@ -591,19 +602,19 @@
         // Validation of an TimeTrigger instance
         private static void ValidateTimeTrigger(TimeTrigger trigger, List<Exception> exceptions)
         {
-            if(trigger.DayProfiles.Count < 1)
+            if (trigger.DayProfiles.Count < 1)
             {
                 exceptions.Add(new InvalidOperationException("TimeTrigger does not contain an instance of DayProfile."));
             }
             else
             {
-                foreach(DayProfile profile in trigger.DayProfiles)
+                foreach (DayProfile profile in trigger.DayProfiles)
                 {
                     ValidateDayProfile(profile, exceptions);
                 }
             }
 
-            if(trigger.SpecialDayProfiles.Count < 1)
+            if (trigger.SpecialDayProfiles.Count < 1)
             {
                 exceptions.Add(new InvalidOperationException("TimeTrigger does not contain an instance of SpecialDayProfile."));
             }
@@ -620,7 +631,7 @@
         // Validation of an DayProfile instance
         private static void ValidateDayProfile(DayProfile dayProfile, List<Exception> exceptions)
         {
-            if(dayProfile.DayTimeProfiles.Count < 1)
+            if (dayProfile.DayTimeProfiles.Count < 1)
             {
                 exceptions.Add(new InvalidOperationException("DayProfile does not contain an instance of DayTimeProfile."));
             }
@@ -636,7 +647,7 @@
         // Validation of an SpecialDayProfile instance
         private static void ValidateSpecialDayProfile(SpecialDayProfile profile, List<Exception> exceptions)
         {
-            if(profile.DayProfile == null)
+            if (profile.DayProfile == null)
             {
                 exceptions.Add(new InvalidOperationException("SpecialDayProfile does not reference to an instance of DayProfile."));
             }
@@ -647,10 +658,10 @@
         // Validation of an DayTimeProfile instance
         private static void ValidateDayTimeProfile(DayTimeProfile profile, List<Exception> exceptions)
         {
-            if(profile.StartTime == null)
+            if (profile.StartTime == null)
             {
                 exceptions.Add(new InvalidOperationException("DayTimeProfile does not contain an instance of StartTime."));
-            } 
+            }
         }
 
         // Validation of an DayVarType instance

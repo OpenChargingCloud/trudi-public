@@ -10,6 +10,7 @@
     using TRuDI.Backend.Exceptions;
     using TRuDI.Backend.Models;
     using TRuDI.HanAdapter.Interface;
+    using TRuDI.HanAdapter.XmlValidation;
 
     public class HanAdapterContainer
     {
@@ -100,6 +101,25 @@
             }
 
             return connectResult.result;
+        }
+
+        public async Task<XmlDataResult> LoadData(AdapterContext ctx, CancellationToken ct, Action<ProgressInfo> progressCallback)
+        {
+            var result = await this.Adapter.LoadData(ctx, ct, progressCallback);
+
+            if (result.error != null)
+            {
+                throw new HanAdapterException(result.error);
+            }
+
+            var xmlDataResult = new XmlDataResult();
+            xmlDataResult.Raw = result.trudiXml;
+
+            Ar2418Validation.ValidateSchema(result.trudiXml);
+            xmlDataResult.Model = XmlModelParser.ParseHanAdapterModel(result.trudiXml.Root.Descendants());
+            ModelValidation.ValidateHanAdapterModel(xmlDataResult.Model);
+            ContextValidation.ValidateContext(xmlDataResult.Model, ctx);
+            return xmlDataResult;
         }
 
         public async Task<IReadOnlyList<ContractInfo>> LoadAvailableContracts(CancellationToken ct, Action<ProgressInfo> progressCallback)

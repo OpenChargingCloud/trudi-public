@@ -1,0 +1,73 @@
+﻿@using TRuDI.Backend.Application
+@using TRuDI.Backend.Utils
+@inject ApplicationState StateService
+    
+    @{
+        var contract = StateService.CurrentAdapterContext.Contract;
+    }
+
+<div class="panel panel-primary">
+    <div class="panel-heading">Zählpunkt @contract.MeteringPointId</div>
+    <div class="panel-body">
+
+        <table class="table">
+
+            <tr>
+                <th>TAF Name</th>
+                <td>@contract.TafName</td>
+            </tr>
+
+            <tr>
+                <th>Tarifanwendungsfall</th>
+                <td>@contract.TafId.TafToFriendlyName()</td>
+            </tr>
+
+            @if (!string.IsNullOrWhiteSpace(contract.Description))
+        {
+                <tr>
+                    <th>Beschreibung</th>
+                    <td>@contract.Description</td>
+                </tr>
+        }
+
+            <tr>
+                <th>ID des Kunden</th>
+                <td>@contract.ConsumerId</td>
+            </tr>
+
+            <tr>
+                <th>ID des Rechnungsstellers</th>
+                <td>@contract.SupplierId</td>
+            </tr>
+
+            <tr>
+                <th>ID des Kunden</th>
+                <td>@contract.ConsumerId</td>
+            </tr>
+
+            <tr>
+                <th>Gültig ab</th>
+                <td>@contract.Begin.ToFormatedString()</td>
+            </tr>
+
+            <tr>
+                <th>Gültig bis</th>
+                <td>@contract.End.ToFormatedString()</td>
+            </tr>
+
+            <tr>
+                <th>
+                    Zähler
+                </th>
+
+                <td>
+                    @foreach (var meter in contract.Meters)
+                {
+                        @meter<br />
+                }
+                </td>
+            </tr>
+
+        </table>
+    </div>
+</div>

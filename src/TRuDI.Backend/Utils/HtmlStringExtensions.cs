@@ -6,8 +6,6 @@
     using System.Security.Cryptography;
     using System.Text;
 
-    using Microsoft.Net.Http.Headers;
-
     using TRuDI.HanAdapter.Interface;
 
     public static class HtmlStringExtensions
@@ -76,6 +74,21 @@
         public static string IsCompleted(this BillingPeriod billingPeriod)
         {
             return billingPeriod.End == null ? "nein" : "ja";
+        }
+
+        public static string ToIso8601(this DateTime timestamp)
+        {
+            return timestamp.ToString("s");
+        }
+
+        public static string ToIso8601(this DateTime? timestamp)
+        {
+            if (timestamp == null)
+            {
+                return string.Empty;
+            }
+
+            return timestamp.Value.ToIso8601();
         }
     }
 }

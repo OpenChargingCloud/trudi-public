@@ -115,7 +115,7 @@
                                                                 );
                         if (iReading.StatusPTB.HasValue)
                         {
-                            intervalReading.Add(new XElement(ar + "statusPTB", iReading.StatusPTB));
+                            intervalReading.Add(new XElement(ar + "statusPTB", (byte)iReading.StatusPTB));
                         }
                         else
                         {

@@ -3,7 +3,6 @@
     using Microsoft.AspNetCore.Mvc;
 
     using TRuDI.Backend.Application;
-    using TRuDI.Backend.Models;
 
     public class ProgressController : Controller
     {
@@ -18,24 +17,24 @@
             this.applicationState = applicationState;
         }
 
-        public IActionResult Index(ProgressDataViewModel model)
+        public IActionResult Index()
         {
-            return this.View(model);
+            return this.View(this.applicationState.CurrentProgressState);
         }
 
         [HttpPost]
         public IActionResult CancelOperation()
         {
             this.applicationState.CancelOperation();
-            return Ok();
+            return this.Ok();
         }
 
         [HttpGet]
         public IActionResult GetNextPageToLoad()
         {
-            if (this.applicationState.NextPageAfterProgress != null)
+            if (this.applicationState.CurrentProgressState.NextPageAfterProgress != null)
             {
-                return this.Ok(this.applicationState.NextPageAfterProgress);
+                return this.Ok(this.applicationState.CurrentProgressState.NextPageAfterProgress);
             }
 
             return this.NotFound();

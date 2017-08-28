@@ -3,6 +3,7 @@
 @inject ApplicationState StateService
 @{
     ViewData["Title"] = "Verträge";
+    int contractIndex = 0;
 }
 
 @foreach (var contract in StateService.Contracts)
@@ -45,6 +46,16 @@
                     <th>ID des Kunden</th>
                     <td>@contract.ConsumerId</td>
                 </tr>
+                
+                <tr>
+                    <th>Gültig ab</th>
+                    <td>@contract.Begin.ToFormatedString()</td>
+                </tr>
+
+                <tr>
+                    <th>Gültig bis</th>
+                    <td>@contract.End.ToFormatedString()</td>
+                </tr>
 
                 <tr>
                     <th>
@@ -63,30 +74,40 @@
 
 
             <h3>Verfügbare Abrechnungsperioden</h3>
-            <table class="table">
-
-                <tr>
-                    <th></th>
-                    <th>Von</th>
-                    <th>Bis</th>
-                    <th>Abgeschlossen</th>
-                </tr>
-
-                @{
-                    int billingPeriodIndex = 0;
-                }
-
-                @foreach (var period in contract.BillingPeriods)
-                {
-                    <tr>
-                        <td><input type="radio" name="@billingPeriodIndex.ToString()"></td>
-                        <td>@period.Begin.ToFormatedString()</td>
-                        <td>@period.End.ToFormatedString()</td>
-                        <td>@period.IsCompleted()</td>
-                    </tr>
-                }
-            </table>
             
+            @{
+                int billingPeriodIndex = 0;
+                var dtpIdStart = $"dtp_start_{contractIndex}";
+                var dtpIdEnd = $"dtp_end_{contractIndex}";
+            }
+
+            <form>
+                <table class="table">
+
+                    <tr>
+                        <th></th>
+                        <th>Von</th>
+                        <th>Bis</th>
+                        <th>Abgeschlossen</th>
+                    </tr>
+
+
+
+                    @foreach (var period in contract.BillingPeriods)
+                {
+                        <tr>
+                            <td><input type="radio" name='@string.Format("{0}", contractIndex)' value='@string.Format("{0}_{1}", contractIndex, billingPeriodIndex)' onclick="selectBillingPeriod(@contractIndex, @billingPeriodIndex, '@period.Begin.ToIso8601()', '@period.End.ToIso8601()');"></td>
+                            <td>@period.Begin.ToFormatedString()</td>
+                            <td>@period.End.ToFormatedString()</td>
+                            <td>@period.IsCompleted()</td>
+                        </tr>
+
+                        billingPeriodIndex++;
+                    }
+                </table>
+
+            </form>
+
             <table class="table">
                 <tr>
                     <th>Startzeitpunkt</th>
@@ -96,8 +117,8 @@
                 <tr>
                     <td>
                         <div class="form-group">
-                            <div class='input-group date' id='datetimepicker6'>
-                                <input type='text' class="form-control"/>
+                            <div class='input-group date' id="@dtpIdStart">
+                                <input type='text' class="form-control" />
                                 <span class="input-group-addon">
                                     <span class="glyphicon glyphicon-calendar"></span>
                                 </span>
@@ -107,8 +128,8 @@
 
                     <td>
                         <div class="form-group">
-                            <div class='input-group date' id='datetimepicker7'>
-                                <input type='text' class="form-control"/>
+                            <div class='input-group date' id="@dtpIdEnd">
+                                <input type='text' class="form-control" />
                                 <span class="input-group-addon">
                                     <span class="glyphicon glyphicon-calendar"></span>
                                 </span>
@@ -116,32 +137,70 @@
                         </div>
                     </td>
                     <td>
-                        <button type="button" class="btn btn-default" id="btnRead">Auslesung starten...</button>
+                        <button type="button" class="btn btn-default" id="btnRead" onclick="startReading();">Auslesung starten...</button>
                     </td>
                 </tr>
             </table>
 
             <script type="text/javascript">
                 $(function () {
-                    $('#datetimepicker6').datetimepicker({
+                    $("#@dtpIdStart").datetimepicker({
                         viewMode: 'days',
                         format: 'DD.MM.YYYY'
                     });
-                    $('#datetimepicker7').datetimepicker({
-                        useCurrent: false, 
+                    $("#@dtpIdEnd").datetimepicker({
+                        useCurrent: false,
                         viewMode: 'days',
                         format: 'DD.MM.YYYY'
-                    });
-                    $("#datetimepicker6").on("dp.change", function (e) {
-                        $('#datetimepicker7').data("DateTimePicker").minDate(e.date);
-                    });
-                    $("#datetimepicker7").on("dp.change", function (e) {
-                        $('#datetimepicker6').data("DateTimePicker").maxDate(e.date);
                     });
                 });
             </script>
 
-
         </div>
     </div>
-                    }
+
+                            contractIndex++;
+                        }
+
+<script type="text/javascript">
+
+    var selectedContract = -1;
+    var selectedBillingPeriod = -1;
+
+    function selectBillingPeriod(contractIndex, billingPeriodIndex, startTime, endTime) {
+        console.log(contractIndex, billingPeriodIndex, startTime, endTime);
+
+        selectedContract = contractIndex;
+        selectedBillingPeriod = billingPeriodIndex;
+
+        $("#dtp_start_" + contractIndex).data("DateTimePicker").maxDate(false);
+        $("#dtp_start_" + contractIndex).data("DateTimePicker").minDate(false);
+        $("#dtp_start_" + contractIndex).data("DateTimePicker").maxDate(moment(startTime));
+
+        $("#dtp_end_" + contractIndex).data("DateTimePicker").minDate(false);
+        $("#dtp_end_" + contractIndex).data("DateTimePicker").maxDate(false);
+        $("#dtp_end_" + contractIndex).data("DateTimePicker").minDate(moment(endTime));
+
+        $("#dtp_start_" + contractIndex).data("DateTimePicker").date(moment(startTime));
+        $("#dtp_end_" + contractIndex).data("DateTimePicker").date(moment(endTime));
+    }
+
+    function startReading() {
+        if (selectedBillingPeriod == -1 || selectedContract == -1) {
+            return;
+        }
+
+        $.ajax({
+            url: '/Contracts/StartReadout',
+            type: "POST",
+            data: "contractIndex=" + selectedContract + "&billingPeriodIndex=" + selectedBillingPeriod + "&startTime=" + encodeURIComponent($("#dtp_start_" + selectedContract).data("DateTimePicker").date().toISOString()) + "&endTime=" + encodeURIComponent($("#dtp_end_" + selectedContract).data("DateTimePicker").date().toISOString()),
+            contentType: 'application/x-www-form-urlencoded',
+            processData: false,
+            success: function(result) {
+                window.location.href = "/Progress";
+            },
+            error: function (err) { }
+        });
+    }
+
+</script>

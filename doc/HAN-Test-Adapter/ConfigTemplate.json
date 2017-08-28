@@ -2,7 +2,7 @@
   "DeviceId": "",
   "User": "",
   "Password": "",
-  "IPAddresss": "",
+  "IPAddress": "",
   "IPPort": "",
   "TimeToConnect": "",
   "Cert": "",
@@ -19,6 +19,7 @@
       "Meters": [
         ""
       ],
+      "MeteringPointId": "",
       "SupplierId": "",
       "ConsumerId": "",
       "Begin": "",

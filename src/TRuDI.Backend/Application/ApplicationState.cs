@@ -40,9 +40,15 @@
 
         public IReadOnlyList<ContractInfo> Contracts { get; set; }
 
-        public ConnectResult LastConnectResult { get; set; }
+        public ConnectResult LastConnectResult { get; private set; }
 
         public Dictionary<string, string> ManufacturerParameters { get; set; }
+
+        public AdapterContext CurrentAdapterContext { get; private set; }
+
+        public ProgressData CurrentProgressState { get; } = new ProgressData();
+
+        public XmlDataResult CurrentDataResult { get; private set; }
 
         public (byte[] data, string contentType) GetResourceFile(string path)
         {
@@ -56,7 +62,7 @@
 
         public void ConnectAndLoadContracts()
         {
-            this.NextPageAfterProgress = null;
+            this.CurrentProgressState.Reset("Verbindungsaufbau", "_ConnectingPartial");
             this.cts = new CancellationTokenSource();
             var ct = this.cts.Token;
 
@@ -85,9 +91,38 @@
                 });
         }
 
+        public void LoadData(AdapterContext ctx)
+        {
+            this.CurrentAdapterContext = ctx;
+
+            this.CurrentProgressState.Reset("Daten laden", "_LoadingDataPartial");
+            this.cts = new CancellationTokenSource();
+            var ct = this.cts.Token;
+
+            Task.Run(async () =>
+                {
+                    this.LastErrorMessage = null;
+
+                    try
+                    {
+                        this.CurrentDataResult = await this.activeHanAdapter.LoadData(ctx, ct, this.ProgressCallback);
+
+                        await this.LoadNextPageAfterProgress("/DataView");
+                    }
+                    catch (Exception ex)
+                    {
+                        this.LastErrorMessage = ex.Message;
+                        await this.LoadNextPageAfterProgress("/Contracts");
+                    }
+                });
+        }
+
 
         private void ProgressCallback(ProgressInfo progressInfo)
         {
+            this.CurrentProgressState.StatusText = progressInfo.Message;
+            this.CurrentProgressState.Progress = progressInfo.Progress;
+
             this.notificationsMessageHandler.ProgressUpdate(progressInfo.Message, progressInfo.Progress);
         }
 
@@ -98,10 +133,10 @@
 
         public async Task LoadNextPageAfterProgress(string page)
         {
-            this.NextPageAfterProgress = page;
+            this.CurrentProgressState.NextPageAfterProgress = page;
             await this.notificationsMessageHandler.LoadNextPage(page);
         }
 
-        public string NextPageAfterProgress { get; set; }
+        
     }
 }

@@ -11,6 +11,7 @@
     using Microsoft.AspNetCore.Http;
 
     using TRuDI.Backend.Application;
+    using TRuDI.Backend.Exceptions;
     using TRuDI.Backend.Models;
 
     public class ConnectController : Controller
@@ -28,7 +29,7 @@
             return this.View(this.applicationState.ConnectData);
         }
 
-        public ActionResult ManufacturerConnectForm(string deviceId)
+        public IActionResult ManufacturerConnectForm(string deviceId)
         {
             try
             {
@@ -40,6 +41,10 @@
                     this.ViewData["ManufacturerParametersViewName"] = manufacturerParametersView;
                     return this.PartialView("_ManufacturerParametersFormPartial", deviceId);
                 }
+            }
+            catch (UnknownManufacturerException ex)
+            {
+                return this.NotFound($"Es wurde kein Smart Meter Gateway-Hersteller mit der ID \"{ex.FlagId}\" gefunden.");
             }
             catch (Exception)
             {
@@ -135,15 +140,7 @@
 
             this.applicationState.ConnectAndLoadContracts();
 
-            return this.RedirectToAction(
-                "Index", 
-                "Progress", 
-                new ProgressDataViewModel
-                {
-                    Title = "Verbindungsaufbau",
-                    GatewayImageViewName = this.applicationState.ActiveHanAdapter.GatewayImageView,
-                    DeviceId = this.applicationState.ConnectData.DeviceId,
-                });
+            return this.RedirectToAction("Index", "Progress");
         }
 
         public IActionResult Error()

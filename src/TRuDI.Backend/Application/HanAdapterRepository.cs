@@ -1,9 +1,9 @@
 ﻿namespace TRuDI.Backend.Application
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
 
+    using TRuDI.Backend.Exceptions;
     using TRuDI.HanAdapter.Example;
     using TRuDI.HanAdapter.Interface;
 
@@ -28,7 +28,7 @@
             var adapterInfo = AvailableAdapters.FirstOrDefault(a => a.FlagId == id.FlagId);
             if(adapterInfo == null)
             {
-                throw new Exception($"Unknown manufacturer: {id.FlagId}");
+                throw new UnknownManufacturerException { FlagId = id.FlagId };
             }
 
             return new HanAdapterContainer(adapterInfo, serverId);
