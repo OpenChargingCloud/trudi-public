@@ -12,19 +12,23 @@
   
   <PropertyGroup>
     <RestoreSources>$(RestoreSources);../../private-packages;https://api.nuget.org/v3/index.json</RestoreSources>
-    <AssemblyVersion>0.4.0.0</AssemblyVersion>
-    <FileVersion>0.4.0.0</FileVersion>
+    <AssemblyVersion>0.5.0.0</AssemblyVersion>
+    <FileVersion>0.5.0.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.0" />
     <PackageReference Include="TRuDI.HanAdapter.Interface" Version="1.0.7" />
     <PackageReference Include="WebSocketManager" Version="1.0.1" />
-    <PackageReference Include="IVU.Http" Version="1.0.7" />
+    <PackageReference Include="IVU.Http" Version="1.0.8" />
   </ItemGroup>
 
   <ItemGroup>
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Views\Shared\Components\LogItemsView\Default.cshtml" />
   </ItemGroup>
 
   <ItemGroup>

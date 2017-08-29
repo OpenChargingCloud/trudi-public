@@ -4,7 +4,7 @@
     using System.Collections.Generic;
 
     /// <summary>
-    /// Contains data about a tariff contract.
+    /// Represents the data of a tariff contract (corresponds to a TAF).
     /// </summary>
     public class ContractInfo
     {
@@ -50,7 +50,7 @@
         public DateTime Begin { get; set; }
 
         /// <summary>
-        /// End of contrac. <c>null</c> if still active.
+        /// End of contract. <c>null</c> if still active and there is no end configured.
         /// </summary>
         public DateTime? End { get; set; }
 

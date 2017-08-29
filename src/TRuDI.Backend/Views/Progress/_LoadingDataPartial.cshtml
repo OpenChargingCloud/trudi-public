@@ -1,10 +1,10 @@
 ﻿@using TRuDI.Backend.Application
 @using TRuDI.Backend.Utils
 @inject ApplicationState StateService
-    
-    @{
-        var contract = StateService.CurrentAdapterContext.Contract;
-    }
+
+@{
+    var contract = StateService.CurrentAdapterContext.Contract;
+}
 
 <div class="panel panel-primary">
     <div class="panel-heading">Zählpunkt @contract.MeteringPointId</div>
@@ -23,12 +23,12 @@
             </tr>
 
             @if (!string.IsNullOrWhiteSpace(contract.Description))
-        {
+            {
                 <tr>
                     <th>Beschreibung</th>
                     <td>@contract.Description</td>
                 </tr>
-        }
+            }
 
             <tr>
                 <th>ID des Kunden</th>
@@ -62,9 +62,9 @@
 
                 <td>
                     @foreach (var meter in contract.Meters)
-                {
+                    {
                         @meter<br />
-                }
+                    }
                 </td>
             </tr>
 

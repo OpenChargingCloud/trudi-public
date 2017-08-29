@@ -251,6 +251,16 @@
                 throw new AggregateException("Han Adapter Parsing error:>", exceptions);
             }
 
+            foreach (var meterReading in usagePoint.MeterReadings)
+            {
+                meterReading.IntervalBlocks.Sort((a, b) => a.Interval.Start.CompareTo(b.Interval.Start));
+
+                foreach (var block in meterReading.IntervalBlocks)
+                {
+                    block.IntervalReadings.Sort((a, b) => a.TimePeriod.Start.CompareTo(b.TimePeriod.Start));
+                }
+            }
+
             return usagePoint;
         }
 

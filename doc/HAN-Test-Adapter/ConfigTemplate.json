@@ -61,7 +61,7 @@
     "TariffStageCount": "",
     "DefaultTariffNumber": "",
     "DayIdCount": "",
-    "ValueSummary": "",
+    "MaxPeriodValue": "",
     "MeterReadingConfigs": [
       {
         "MeterId": "",
@@ -73,13 +73,7 @@
         "Uom": "",
         "Scaler": "",
         "ObisCode": "",
-        "IntervalBlocks": [
-          {
-            "Duration": "",
-            "Start": "",
-            "UsedStatus": ""
-          }
-        ]
+        "UsedStatus":  ""
       }
     ],
     "TariffStageConfigs": [

@@ -5,6 +5,7 @@
     using System.Security.Cryptography.X509Certificates;
 
     using TRuDI.HanAdapter.XmlValidation.Models.BasicData;
+    using TRuDI.HanAdapter.XmlValidation.Models.CheckData;
 
     public static class ModelExtensions
     {
@@ -163,6 +164,16 @@
             }
 
             return true;
+        }
+
+        public static DateTime GetDateTimeFromSpecialDayProfile(this DateTime dt, SpecialDayProfile sdp, DayTimeProfile dtp)
+        {
+            return new DateTime((int)sdp.SpecialDayDate.Year,
+                                (int)sdp.SpecialDayDate.Month,
+                                (int)sdp.SpecialDayDate.DayOfMonth,
+                                (int)dtp.StartTime.Hour,
+                                (int)dtp.StartTime.Minute,
+                                (int)dtp.StartTime.Second);
         }
     }
 }

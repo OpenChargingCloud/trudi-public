@@ -158,6 +158,15 @@
 
             config.Contract = ctx.Contract;
 
+            config.Start = ctx.Start != null ? ctx.Start : ctx.BillingPeriod.Begin;
+
+            config.End = ctx.End != null ? ctx.End : ctx.BillingPeriod.End;
+
+            if (!config.End.HasValue)
+            {
+                config.End = DateTime.Now.GetDateWithoutSeconds();
+            }
+
             var trudiXml = XmlFactory.FabricateHanAdapterContent(config);
 
             progressCallback(new ProgressInfo(100, $"Alle Daten erfolgreich geladen."));

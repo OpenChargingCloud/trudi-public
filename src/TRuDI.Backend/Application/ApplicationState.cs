@@ -2,12 +2,15 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
 
     using TRuDI.Backend.MessageHandlers;
     using TRuDI.Backend.Models;
     using TRuDI.HanAdapter.Interface;
+    using TRuDI.HanAdapter.XmlValidation;
+    using TRuDI.HanAdapter.XmlValidation.Models;
 
     public class ApplicationState
     {
@@ -18,7 +21,7 @@
 
         public OperationMode OperationMode { get; set; }
 
-        public string LastErrorMessage { get; set; }
+        public List<string> LastErrorMessages { get; } = new List<string>();
 
         public Stack<string> LastUrl { get; } = new Stack<string>();
 
@@ -68,7 +71,7 @@
 
             Task.Run(async () =>
                 {
-                    this.LastErrorMessage = null;
+                    this.LastErrorMessages.Clear();
 
                     try
                     {
@@ -85,7 +88,7 @@
                     }
                     catch (Exception ex)
                     {
-                        this.LastErrorMessage = ex.Message;
+                        this.LastErrorMessages.Add(ex.Message);
                         await this.LoadNextPageAfterProgress("/Connect");
                     }
                 });
@@ -101,17 +104,50 @@
 
             Task.Run(async () =>
                 {
-                    this.LastErrorMessage = null;
+                    this.LastErrorMessages.Clear();
 
                     try
                     {
                         this.CurrentDataResult = await this.activeHanAdapter.LoadData(ctx, ct, this.ProgressCallback);
 
+                        try
+                        {
+                            Ar2418Validation.ValidateSchema(this.CurrentDataResult.Raw);
+                            this.CurrentDataResult.Model = XmlModelParser.ParseHanAdapterModel(this.CurrentDataResult?.Raw?.Root?.Descendants());
+                            ModelValidation.ValidateHanAdapterModel(this.CurrentDataResult.Model);
+                            ContextValidation.ValidateContext(this.CurrentDataResult.Model, ctx);
+                        }
+                        catch (AggregateException ex)
+                        {
+                            foreach (var err in ex.InnerExceptions)
+                            {
+                                this.LastErrorMessages.Add(err.Message);
+                            }
+
+                            await this.LoadNextPageAfterProgress("/DataView/ValidationError");
+                            return;
+                        }
+                        catch (Exception ex)
+                        {
+                            this.LastErrorMessages.Add(ex.Message);
+
+                            await this.LoadNextPageAfterProgress("/DataView/ValidationError");
+                            return;
+                        }
+
+                        this.CurrentDataResult.OriginalValueLists = 
+                            this.CurrentDataResult.Model.MeterReadings.Where(mr => mr.IsOriginalValueList()).Select(mr => new OriginalValueList(mr)).ToList();
+
+                        var meterReadings = this.CurrentDataResult.Model.MeterReadings.Where(mr => !mr.IsOriginalValueList()).ToList();
+
+                        meterReadings.Sort((a, b) => String.Compare(a.ReadingType.ObisCode, b.ReadingType.ObisCode, StringComparison.InvariantCultureIgnoreCase));
+                        this.CurrentDataResult.MeterReadings = meterReadings;
+
                         await this.LoadNextPageAfterProgress("/DataView");
                     }
                     catch (Exception ex)
                     {
-                        this.LastErrorMessage = ex.Message;
+                        this.LastErrorMessages.Add(ex.Message);
                         await this.LoadNextPageAfterProgress("/Contracts");
                     }
                 });
@@ -137,6 +173,6 @@
             await this.notificationsMessageHandler.LoadNextPage(page);
         }
 
-        
+
     }
 }

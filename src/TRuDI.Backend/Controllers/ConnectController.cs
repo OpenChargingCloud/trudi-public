@@ -25,7 +25,7 @@
 
         public IActionResult Index()
         {
-            this.ViewData["ErrorMessage"] = this.applicationState.LastErrorMessage;
+            this.ViewData["ErrorMessage"] = this.applicationState.LastErrorMessages.FirstOrDefault();
             return this.View(this.applicationState.ConnectData);
         }
 
@@ -133,7 +133,8 @@
                     || this.applicationState.ClientCert.PasswordState == CertPasswordState.InvalidPassword
                     || this.applicationState.ClientCert.PasswordState == CertPasswordState.NoCertSelected)
                 {
-                    this.applicationState.LastErrorMessage = "Kein gültiges Zertifikat angegeben.";
+                    this.applicationState.LastErrorMessages.Clear();
+                    this.applicationState.LastErrorMessages.Add("Kein gültiges Zertifikat angegeben.");
                     return this.RedirectToAction("Index");
                 }
             }

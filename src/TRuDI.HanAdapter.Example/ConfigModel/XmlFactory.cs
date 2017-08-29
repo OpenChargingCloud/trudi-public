@@ -273,16 +273,16 @@
 
             if (hanConfig.XmlConfig.RandomLogCount)
             {
-                var max = (hanConfig.BillingPeriod.End - hanConfig.BillingPeriod.Begin)?.TotalSeconds / minPeriod.TotalSeconds * 3;
+                var max = (hanConfig.End - hanConfig.Start)?.TotalSeconds / minPeriod.TotalSeconds * 3;
                 hanConfig.XmlConfig.LogCount = RandomNumber(1, (int)max);
             }
 
-            var lastLogTime = hanConfig.BillingPeriod.Begin;
+            var lastLogTime = hanConfig.Start;
             if (!hanConfig.XmlConfig.LogCount.HasValue)
             {
-                hanConfig.XmlConfig.LogCount = 3;
+                hanConfig.XmlConfig.LogCount = 10;
             }
-            var period = (hanConfig.BillingPeriod.End - lastLogTime) / hanConfig.XmlConfig.LogCount;
+            var period = (hanConfig.End - lastLogTime) / hanConfig.XmlConfig.LogCount;
 
             for (int i = 0; i < hanConfig.XmlConfig.LogCount; i++)
             {
@@ -294,7 +294,7 @@
                         Level = (Level)RandomNumber(1, 2),
                         Outcome = (Outcome)RandomNumber(0, 2),
                         Text = hanConfig.XmlConfig.PossibleLogMessages[RandomNumber(0, hanConfig.XmlConfig.PossibleLogMessages.Count - 1)],
-                        Timestamp = lastLogTime.AddMinutes((double)period?.TotalMinutes)
+                        Timestamp = (DateTime)lastLogTime?.AddMinutes((double)period?.TotalMinutes)
                     }
                 });
                 lastLogTime = logs.LastOrDefault().LogEvent.Timestamp;
@@ -308,16 +308,14 @@
         {
             var meterReadings = new List<MeterReading>();
             var meterReadingConfigs = hanConfig.XmlConfig.MeterReadingConfigs;
-            var tariffStageCounter = hanConfig.XmlConfig.TariffStageCount;
-            var usedValue = hanConfig.XmlConfig.ValueSummary;
-            var rest = usedValue;
+            var registers = hanConfig.Contract.TafId == TafId.Taf2 ? new int[hanConfig.XmlConfig.TariffStageCount + 2] : new int[hanConfig.XmlConfig.TariffStageCount];
+            var tariffStageCounter = 0;
 
             foreach (MeterReadingConfig meterReadingConfig in meterReadingConfigs)
             {
                 var mr = new MeterReading();
 
                 mr.Meters.Add(new Meter() { MeterId = meterReadingConfig.MeterId });
-
                 mr.MeterReadingId = meterReadingConfig.MeterReadingId;
 
                 mr.ReadingType = new ReadingType()
@@ -332,35 +330,18 @@
                 if (meterReadingConfig.IsOML)
                 {
                     mr.ReadingType.QualifiedLogicalName = BuildQualifiedLogicalName(meterReadingConfig.MeterId, mr.ReadingType.ObisCode);
-
-                    foreach (IntervalBlockConfig intervalBlockConfig in meterReadingConfig.IntervalBlocks)
-                    {
-
-                        mr.IntervalBlocks.Add(CreateIntervalBlockOML(meterReadingConfig, intervalBlockConfig, hanConfig));
-                    }
+                    mr.IntervalBlocks.Add(CreateIntervalBlockOML(meterReadingConfig, hanConfig, registers));
                 }
                 else
                 {
-                    var tarifStage = hanConfig.XmlConfig.TariffStageCount - tariffStageCounter;
-                    if (tariffStageCounter == -1)
-                    {
-                        tarifStage = -1;
-                    }
                     mr.ReadingType.QualifiedLogicalName = BuildQualifiedLogicalName(hanConfig.XmlConfig.TariffId, mr.ReadingType.ObisCode);
-
-                    if (meterReadingConfig == meterReadingConfigs.LastOrDefault())
+                    var tariffStages = hanConfig.XmlConfig.TariffStageCount;
+                    var condition = hanConfig.Contract.TafId == TafId.Taf2 ? tariffStageCounter < tariffStages + 2 : tariffStageCounter < tariffStages;
+                    if (condition)
                     {
-                        usedValue = usedValue + rest;
+                        mr.IntervalBlocks.Add(CreateIntervalBlock(meterReadingConfig, hanConfig, registers, tariffStageCounter));
+                        tariffStageCounter++;
                     }
-
-                    foreach (IntervalBlockConfig intervalBlockConfig in meterReadingConfig.IntervalBlocks)
-                    {
-                        mr.IntervalBlocks.Add(CreateIntervalBlock(meterReadingConfig, intervalBlockConfig, hanConfig, usedValue));
-                    }
-                    usedValue = rest;
-                    rest = RandomNumber(0, usedValue);
-                    usedValue = usedValue - rest;
-                    tariffStageCounter--;
                 }
 
                 meterReadings.Add(mr);
@@ -368,39 +349,45 @@
             return meterReadings;
         }
 
-        private static IntervalBlock CreateIntervalBlockOML(
-            MeterReadingConfig meterReadingConfig,
-            IntervalBlockConfig intervalBlockConfig,
-            HanAdapterExampleConfig hanConfig)
+        private static IntervalBlock CreateIntervalBlockOML( MeterReadingConfig meterReadingConfig, HanAdapterExampleConfig hanConfig, int[] registers)
         {
             var intervalBlock = new IntervalBlock()
             {
                 Interval = new Interval()
                 {
-                    Duration = intervalBlockConfig.Duration,
-                    Start = intervalBlockConfig.Start.GetDateWithoutSeconds()
+                    Duration = (uint)(hanConfig.End - hanConfig.Start)?.TotalSeconds,
+                    Start = (DateTime)hanConfig.Start
                 }
 
             };
 
-            int value = meterReadingConfig.OMLInitValue;
-            var timestamp = intervalBlockConfig.Start;
-            var denominator = intervalBlockConfig.Duration / meterReadingConfig.PeriodSeconds;
-            double consumption = (double)(hanConfig.XmlConfig.ValueSummary / denominator);
+            if(hanConfig.BillingPeriod == null)
+            {
+                hanConfig.BillingPeriod = new BillingPeriod()
+                {
+                    Begin = (DateTime)hanConfig.Start,
+                    End = hanConfig.End
+                };
+            }
+
+            var value = meterReadingConfig.OMLInitValue;
+            var usage = 0;
+            var timestamp = (DateTime)hanConfig.Start;
             var index = 0;
 
             if (hanConfig.XmlConfig.Taf1Reg == null)
             {
+                uint? denominator = 0;
+                if (hanConfig.Contract.TafId == TafId.Taf1)
+                {
+                    denominator = (uint)(hanConfig.BillingPeriod.End - hanConfig.BillingPeriod.Begin)?.TotalSeconds / meterReadingConfig.PeriodSeconds;
+                }
                 hanConfig.XmlConfig.Taf1Reg = new int[(int)denominator];
             }
 
-            while (timestamp <= intervalBlockConfig.Start.AddSeconds((uint)intervalBlockConfig.Duration).GetDateWithoutSeconds())
+            while (timestamp <= hanConfig.Start?.AddSeconds((uint)(hanConfig.End - hanConfig.Start)?.TotalSeconds).GetDateWithoutSeconds())
             {
-                if(index == denominator)
-                {
-                    value = meterReadingConfig.OMLInitValue + hanConfig.XmlConfig.ValueSummary;
-                }
-
+                
                 var ir = new IntervalReading()
                 {
                     TimePeriod = new Interval()
@@ -411,31 +398,38 @@
                     Value = value
                 };
 
-                if (index < denominator)
-                {
-                    hanConfig.XmlConfig.Taf1Reg[index] = hanConfig.XmlConfig.Taf1Reg[index] + (int)consumption;
-                }
-                SetStatusWord(ir, intervalBlockConfig);
                 timestamp = timestamp.AddSeconds((uint)meterReadingConfig.PeriodSeconds).GetDateWithoutSeconds();
-                value = value + (int)consumption;
+                
+                usage = RandomNumber(1, hanConfig.XmlConfig.MaxPeriodUsage);
+                value = value + usage;
+
+                if (timestamp >= hanConfig.BillingPeriod.Begin && timestamp <= hanConfig.BillingPeriod.End)
+                {
+                    if(index < hanConfig.XmlConfig.Taf1Reg.Length)
+                    {
+                        hanConfig.XmlConfig.Taf1Reg[index] = hanConfig.XmlConfig.Taf1Reg[index] + usage;
+                        index++;
+                    }
+                    var slot = RandomNumber(0, registers.Length - 1);
+                    registers[slot] = registers[slot] + usage;
+                }
+                SetStatusWord(ir, meterReadingConfig);
                 intervalBlock.IntervalReadings.Add(ir);
-                index++;
             }
             return intervalBlock;
         }
 
         private static IntervalBlock CreateIntervalBlock(
             MeterReadingConfig meterReadingConfig,
-            IntervalBlockConfig intervalBlockConfig,
             HanAdapterExampleConfig hanConfig,
-            int usedValue)
+            int[] registers, int regCounter)
         {
             var intervalBlock = new IntervalBlock()
             {
                 Interval = new Interval()
                 {
-                    Duration = intervalBlockConfig.Duration,
-                    Start = intervalBlockConfig.Start.GetDateWithoutSeconds()
+                    Duration = (uint)(hanConfig.BillingPeriod.Begin - hanConfig.BillingPeriod.End)?.TotalSeconds,
+                    Start = hanConfig.BillingPeriod.Begin
                 }
             };
 
@@ -446,7 +440,7 @@
                     throw new InvalidOperationException("Das abgeleitete Register für Taf-1 wurde nicht befüllt.");
                 }
 
-                var timestamp = intervalBlockConfig.Start.GetDateWithoutSeconds().AddMonths(1);
+                var timestamp = hanConfig.BillingPeriod.Begin.GetDateWithoutSeconds().AddMonths(1);
 
                 for (int i = 0; i < hanConfig.XmlConfig.Taf1Reg.Length; i++)
                 {
@@ -460,9 +454,8 @@
                         },
                         Value = hanConfig.XmlConfig.Taf1Reg[i]
                     };
-                    SetStatusWord(ir, intervalBlockConfig);
+                    SetStatusWord(ir, meterReadingConfig);
                     timestamp = timestamp.AddMonths(1);
-                        //AddSeconds((uint)meterReadingConfig.PeriodSeconds).GetDateWithoutSeconds();
                     intervalBlock.IntervalReadings.Add(ir);
                 }
             }
@@ -473,12 +466,25 @@
                     TimePeriod = new Interval()
                     {
                         Duration = 0,
-                        Start = intervalBlockConfig.Start.GetDateWithoutSeconds()
-                    },
-                    Value = usedValue
+                        Start = hanConfig.BillingPeriod.Begin.GetDateWithoutSeconds()
+                    } 
                 };
 
-                SetStatusWord(ir, intervalBlockConfig);
+                if(regCounter == 0)
+                {
+                    var summary = 0;
+                    foreach (int register in registers)
+                    {
+                        summary = summary + register;
+                    }
+                    ir.Value = summary;
+                }
+                else
+                {
+                    ir.Value = registers[regCounter];
+                }
+
+                SetStatusWord(ir, meterReadingConfig);
                 intervalBlock.IntervalReadings.Add(ir);
             }
 
@@ -553,13 +559,13 @@
             return specialDayProfiles;
         }
 
-        private static void SetStatusWord(IntervalReading ir, IntervalBlockConfig ibConfig)
+        private static void SetStatusWord(IntervalReading ir, MeterReadingConfig config)
         {
-            if (ibConfig.UsedStatus == "FNN")
+            if (config.UsedStatus == "FNN")
             {
                 ir.StatusFNN = new StatusFNN(GetStatusFNN());
             }
-            else if (ibConfig.UsedStatus == "PTB")
+            else if (config.UsedStatus == "PTB")
             {
                 ir.StatusPTB = (StatusPTB)RandomNumber(0, 4);
             }

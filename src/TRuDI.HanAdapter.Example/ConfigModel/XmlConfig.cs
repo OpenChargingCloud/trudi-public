@@ -78,7 +78,7 @@ namespace TRuDI.HanAdapter.Example.ConfigModel
             get; set;
         }
 
-        public int ValueSummary
+        public int MaxPeriodUsage
         {
             get; set;
         }
@@ -167,24 +167,6 @@ namespace TRuDI.HanAdapter.Example.ConfigModel
         }
 
         public string ObisCode
-        {
-            get; set;
-        }
-
-        public List<IntervalBlockConfig> IntervalBlocks
-        {
-            get; set;
-        }
-    }
-
-    public class IntervalBlockConfig
-    {
-        public uint? Duration
-        {
-            get; set;
-        }
-
-        public DateTime Start
         {
             get; set;
         }

@@ -1,14 +1,238 @@
 ﻿@using TRuDI.Backend.Application
+@using TRuDI.Backend.Utils
 @inject ApplicationState StateService
 @{
     ViewData["Title"] = "Abrechnungsdaten";
+    var data = StateService.CurrentDataResult.Model;
+    var originalValueLists = StateService.CurrentDataResult.OriginalValueLists;
+    var meterReadings = StateService.CurrentDataResult;
 }
 
 <div class="panel panel-primary">
-    <div class="panel-heading">Zählpunkt</div>
+    <div class="panel-heading">Zählpunkt @data.UsagePointId</div>
     <div class="panel-body">
+        <table class="table">
+            <tr>
+                <th>Kunden ID</th>
+                <th>Rechnungssteller ID</th>
+                <th>Tarifbezeichnung</th>
+            </tr>
+
+            <tr>
+                <td>
+                    @data.Customer.CustomerId
+                </td>
+
+                <td>
+                    @data.InvoicingParty.InvoicingPartyId
+                </td>
+
+                <td>
+                    @data.TariffName
+                </td>
+            </tr>
+            
+            <table class="table">
+                <tr>
+                    <th>Register</th>
+                    <th>Wert</th>
+                    <th>Einheit</th>
+                    <th>Status</th>
+                    <th>Beschreibung</th>
+                </tr>
+                
+                @foreach (var reading in meterReadings.MeterReadings)
+                {
+                    <tr>
+                        <td>@reading.ReadingType.ObisCode</td>
+                        <td>@reading.IntervalBlocks.FirstOrDefault()?.IntervalReadings.FirstOrDefault()?.Value</td>
+                        <td>@reading.ReadingType.Uom</td>
+                        <td>@reading.IntervalBlocks.FirstOrDefault()?.IntervalReadings.FirstOrDefault()?.ToStatusString()</td>
+                        <td></td>
+                    </tr>
+                }
+
+            </table>
+            
+
+        </table>
     </div>
 </div>
 
 
+<div>
+
+    <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="active"><a href="#tab_logdata" aria-controls="tab_logdata" role="tab" data-toggle="tab">Logbuchdaten</a></li>
+        <li role="presentation" class="dropdown">
+            <a href="#" class="dropdown-toggle" id="tab-dropdown" data-toggle="dropdown" aria-controls="tab-dropdown-contents" aria-expanded="false">Originäre Messwertliste<span class="caret"></span></a>
+            <ul class="dropdown-menu" aria-labelledby="tab-dropdown" id="tab-dropdown-contents">
+                @foreach (var ovl in originalValueLists)
+                {
+                    <li class=""><a href="#tab_@ovl.GetOriginalValueListIdent()" id="#tab_@ovl.GetOriginalValueListIdent()-tab" aria-expanded="false" aria-controls="tab_@ovl.GetOriginalValueListIdent()" role="tab" data-toggle="tab">@ovl.Meter (@ovl.Obis.ToString())</a></li>
+                }
+            </ul>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+
+        <div role="tabpanel" class="tab-pane active" id="tab_logdata">
+            <div class="panel panel-primary">
+                <div class="panel-heading">Logbuchdaten</div>
+                <div class="panel-body">
+
+                    <table class="table-condensed">
+                        <tr>
+                            <th>
+                                Startzeitpunkt
+                            </th>
+
+                            <th>
+                                Endzeitpunkt
+                            </th>
+
+                            <th></th>
+                            <th></th>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                <div class="form-group">
+                                    <div class='input-group date' id="logStart">
+                                        <input type='text' class="form-control" />
+                                        <span class="input-group-addon">
+                                            <span class="glyphicon glyphicon-calendar"></span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="form-group">
+                                    <div class='input-group date' id="logEnd">
+                                        <input type='text' class="form-control" />
+                                        <span class="input-group-addon">
+                                            <span class="glyphicon glyphicon-calendar"></span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="form-group">
+                                    <div class='input-group date'>
+                                        <input type='text' id="logFilterText" class="form-control" />
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="form-group">
+                                    <button type="button" class="btn btn-default" id="btnRead" onclick="filterLog();">Filtern</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <div id="log-table">
+                        @await Component.InvokeAsync("LogItemsView")
+                    </div>
+
+                    <script type="text/javascript">
+                        $(function () {
+                            $("#logStart").datetimepicker({
+                                viewMode: 'days',
+                                format: 'DD.MM.YYYY'
+                            });
+                            $("#logEnd").datetimepicker({
+                                useCurrent: false,
+                                viewMode: 'days',
+                                format: 'DD.MM.YYYY'
+                            });
+                        });
+
+                        function filterLog() {
+
+                            $.ajax({
+                                url: '/DataView/FilterLog',
+                                type: "POST",
+                                data: "startTime=" + encodeURIComponent($("#logStart").data("DateTimePicker").date().toISOString()) + "&endTime=" + encodeURIComponent($("#logEnd").data("DateTimePicker").date().toISOString()) + "&filterText=" + encodeURIComponent($("#logFilterText").val()),
+                                contentType: 'application/x-www-form-urlencoded',
+                                processData: false,
+                                success: function (result) {
+                                    $("#log-table").html(result);
+                                },
+                                error: function (err) { }
+                            });
+                        };
+                    </script>
+                </div>
+            </div>
+        </div>
+
+
+
+        @foreach (var ovl in originalValueLists)
+            {
+            <div role="tabpanel" class="tab-pane" id="tab_@ovl.GetOriginalValueListIdent()">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">Originäre Messwertliste @ovl.Meter (@ovl.Obis.ToString())</div>
+                    <div class="panel-body">
+
+                        <table class="table-condensed">
+                            <tr>
+                                <th>Zähler</th>
+                                <th>Messperiode</th>
+                                <th>OBIS</th>
+                            </tr>
+                            <tr>
+                                <td>@ovl.Meter</td>
+                                <td>@ovl.MeasurementPeriod.TotalSeconds Sekunden</td>
+                                <td>@ovl.Obis.ToString()</td>
+                            </tr>
+                        </table>
+                        <table class="table-condensed">
+                            <tr>
+                                <th>Startzeitpunkt</th>
+                                <th>Endzeitpunkt</th>
+                                <th>Lücken</th>
+                            </tr>
+
+                            <tr>
+                                <td>@ovl.Start.ToFormatedString()</td>
+                                <td>@ovl.End.ToFormatedString()</td>
+                                <td>
+                                    @if (ovl.GapCount == 0)
+                                    {
+                                        <span>
+                                            keine Lücken vorhanden
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span>
+                                            <i class="fa fa-warning"></i>
+                                            @ovl.GapCount Lücken gefunden
+                                        </span>
+                                    }
+                                </td>
+
+                            </tr>
+                        </table>
+
+                        <div id="ovl_@ovl.Meter">
+                            @await Component.InvokeAsync("OriginalValueListView", new { ovl })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
 <a asp-action="DownloadXml">XML-Datei speichern</a>
+
+<script type="text/javascript">
+
+</script>

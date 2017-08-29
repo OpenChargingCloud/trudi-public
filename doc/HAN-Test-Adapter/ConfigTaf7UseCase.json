@@ -102,7 +102,7 @@
     "TariffStageCount": "2",
     "DefaultTariffNumber": "1",
     "DayIdCount": "2",
-    "ValueSummary": "15325",
+    "MaxPeriodUsage": "500",
     "MeterReadingConfigs": [
       {
         "MeterId": "DE01234567890000000003",
@@ -114,13 +114,7 @@
         "Uom": "72",
         "Scaler": "-1",
         "ObisCode": "0100010800ff",
-        "IntervalBlocks": [
-          {
-            "Duration": "13219200",
-            "Start": "2017-03-01T00:00:00",
-            "UsedStatus": "FNN"
-          }
-        ]
+		"UsedStatus": "FNN"
       }
     ],
     "TariffStageConfigs": [

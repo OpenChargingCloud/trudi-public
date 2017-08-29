@@ -62,6 +62,11 @@
 
             ValidateTaf7SupplierDayProfiles(supplierModel, exceptions);
 
+            ValidateTarifStageOccurence(supplierModel, exceptions);
+
+            ValidateDayProfileOccurence(supplierModel, exceptions);
+
+
             if (exceptions.Any())
             {
                 throw new AggregateException("Taf-7 Context error:>", exceptions);
@@ -159,24 +164,30 @@
         // Validation of the correct billing period
         private static void ValidateBillingPeriod(UsagePointAdapterTRuDI usagePoint, AdapterContext ctx, List<Exception> exceptions)
         {
+            // TODO Funktion weiter ausarbeiten und verbessern!
+
             var interval = usagePoint.MeterReadings[0].IntervalBlocks[0].Interval;
             var billingPeriod = ctx.BillingPeriod;
+            var queryStart = ctx.Start;
+            var queryEnd = ctx.End;
 
-            // 3 years have 94694400 seconds
-            if (interval.Duration > 94694400)
-            {
-                exceptions.Add(new InvalidOperationException("The maximum billing period of 3 years was exceeded."));
-            }
+                // 3 years have 94694400 seconds
+                if ((queryEnd - queryStart).TotalSeconds > 94694400)
+                {
+                    exceptions.Add(new InvalidOperationException("The maximum time span of 3 years was exceeded."));
+                }
 
-            if (billingPeriod.Begin != interval.Start)
-            {
-                exceptions.Add(new InvalidOperationException("Invalid billing period (Begin)"));
-            }
+                if (interval.Start <= billingPeriod.Begin && interval.GetEnd() >= billingPeriod.End)
+                {
+                return;
+                }
+                else
+                {
+                    exceptions.Add(new InvalidOperationException("The period of the delivered data is invalid."));   
+                }
 
-            if (billingPeriod.End != interval.GetEnd())
-            {
-                exceptions.Add(new InvalidOperationException("Invalid billing period (End)"));
-            }
+
+
         }
 
         // Validation of the obisCodes
@@ -188,12 +199,21 @@
         // Taf-2: Validate if the durations in the different MeterReadings match
         private static void ValidateTaf2RegisterDurations(UsagePointAdapterTRuDI usagePoint, List<Exception> exceptions)
         {
-            uint? duration = usagePoint.MeterReadings[0].IntervalBlocks[0].Interval.Duration;
+            uint? duration = 0;
+
+            foreach(MeterReading reading in usagePoint.MeterReadings)
+            {
+                if (!reading.IsOriginalValueList())
+                {
+                    duration = reading.IntervalBlocks[0].Interval.Duration;
+                }
+            }
+
             foreach (MeterReading reading in usagePoint.MeterReadings)
             {
                 foreach (IntervalBlock block in reading.IntervalBlocks)
                 {
-                    if (duration != block.Interval.Duration)
+                    if (!reading.IsOriginalValueList() && duration != block.Interval.Duration)
                     {
                         exceptions.Add(new InvalidOperationException("Taf-2: The Durations do not match."));
                     }
@@ -246,14 +266,18 @@
             var modelInterval = model.MeterReadings[0].IntervalBlocks[0].Interval;
             var supplierInterval = supplier.AnalysisProfile.BillingPeriod;
 
-            if(modelInterval.Start != supplierInterval.Start)
+            if(modelInterval.Duration < supplierInterval.Duration)
+
+
+
+            if(modelInterval.Start > supplierInterval.Start || modelInterval.GetEnd() < supplierInterval.GetEnd())
             {
-                exceptions.Add(new InvalidOperationException("Taf-7: The start timestamp of the model does not match the start timestamp of the supplier data."));
+                exceptions.Add(new InvalidOperationException("Taf-7: The model does not match with the billing period of the supplier data."));
             }
 
-            if(modelInterval.Duration != supplierInterval.Duration)
+            if(modelInterval.Duration < supplierInterval.Duration)
             {
-                exceptions.Add(new InvalidOperationException("Taf-7: The billing period duration of the model and the supplier are different."));
+                exceptions.Add(new InvalidOperationException("Taf-7: The billing period duration of the model is to small."));
             }
         }
 
@@ -284,6 +308,70 @@
                     {
                         exceptions.Add(new InvalidOperationException("Taf-7: The supplier calender periods are not 15 minutes."));
                     }
+                }
+            }
+        }
+
+        private static void ValidateSpecialDayProfileBillingPeriod(UsagePointLieferant supplier, List<Exception> exceptions)
+        {
+
+        }
+
+        // Check whether all referenced tarif stages which are used in the DayTimeProfiles are valid
+        private static void ValidateTarifStageOccurence(UsagePointLieferant supplier, List<Exception> exceptions)
+        {
+            var tarifStages = new List<ushort>();
+
+            foreach(TariffStage stage in supplier.AnalysisProfile.TariffStages)
+            {
+                tarifStages.Add(stage.TariffNumber);
+            }
+
+            foreach(DayProfile dayProfile in supplier.AnalysisProfile.TariffChangeTrigger.TimeTrigger.DayProfiles)
+            {
+                foreach(DayTimeProfile dtProfile in dayProfile.DayTimeProfiles)
+                {
+                    bool match = false;
+                    foreach (int stage in tarifStages)
+                    {
+                        if(stage == dtProfile.TariffNumber)
+                        {
+                            match = true;
+                            break;
+                        }
+                    }
+                    if (!match)
+                    {
+                        exceptions.Add(new InvalidOperationException("Taf-7: The used tariffNumber in an DayTimeProfile is invalid."));
+                    }
+                }
+            }
+        }
+
+        // Check whether all referenced DayIds in SpecialDayProfiles are valid DayIds
+        private static void ValidateDayProfileOccurence(UsagePointLieferant supplier, List<Exception> exceptions)
+        {
+            var dayProfileIds = new List<ushort?>();
+
+            foreach(DayProfile profile in supplier.AnalysisProfile.TariffChangeTrigger.TimeTrigger.DayProfiles)
+            {
+                dayProfileIds.Add(profile.DayId);
+            }
+
+            foreach (SpecialDayProfile spProfile in supplier.AnalysisProfile.TariffChangeTrigger.TimeTrigger.SpecialDayProfiles)
+            {
+                bool match = false;
+                foreach (int id in dayProfileIds)
+                {
+                    if (id == spProfile.DayId)
+                    {
+                        match = true;
+                        break;
+                    }
+                }
+                if (!match)
+                {
+                    exceptions.Add(new InvalidOperationException("Taf-7: The used DayProfile in SpecialDayProfile is invalid."));
                 }
             }
         }

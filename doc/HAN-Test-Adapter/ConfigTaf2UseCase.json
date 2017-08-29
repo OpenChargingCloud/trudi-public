@@ -62,11 +62,11 @@
       "SupplierId": "IVU Imag Strom",
       "ConsumerId": "User01",
       "Begin": "2014-01-01T00:00:00",
-      "End": "2018-01-01T00:00:00",
+      "End": "2019-01-01T00:00:00",
       "BillingPeriods": [
         {
-          "Begin": "2016-07-01T00:00:00",
-          "End": "2016-08-01T00:00:00"
+          "Begin": "2017-04-01T00:00:00",
+          "End": "2017-08-01T00:00:00"
         },
         {
           "Begin": "2016-09-01T00:00:00",
@@ -102,7 +102,7 @@
       }
     ],
     "TariffStageCount": "2",
-    "ValueSummary": "6000",
+    "MaxPeriodUsage": "500",
     "MeterReadingConfigs": [
       {
         "MeterId": "DE01234567890000000004",
@@ -114,13 +114,7 @@
         "Uom": "72",
         "Scaler": "-1",
         "ObisCode": "0100010800ff",
-        "IntervalBlocks": [
-          {
-            "Duration": "5356800",
-            "Start": "2016-07-01T00:00:00",
-            "UsedStatus": "FNN"
-          }
-        ]
+		"UsedStatus": "FNN"
       },
       {
         "MeterId": "DE01234567890000000004",
@@ -130,13 +124,7 @@
         "Uom": "72",
         "Scaler": "-1",
         "ObisCode": "0100010800ff",
-        "IntervalBlocks": [
-          {
-            "Duration": "5356800",
-            "Start": "2016-07-01T00:00:00",
-            "UsedStatus": "FNN"
-          }
-        ]
+		"UsedStatus": "FNN"
       },
       {
         "MeterId": "DE01234567890000000004",
@@ -146,13 +134,7 @@
         "Uom": "72",
         "Scaler": "-1",
         "ObisCode": "0100010801ff",
-        "IntervalBlocks": [
-          {
-            "Duration": "5356800",
-            "Start": "2016-07-01T00:00:00",
-            "UsedStatus": "FNN"
-          }
-        ]
+		"UsedStatus": "FNN"
       },
       {
         "MeterId": "DE01234567890000000004",
@@ -162,13 +144,7 @@
         "Uom": "72",
         "Scaler": "-1",
         "ObisCode": "0100010802ff",
-        "IntervalBlocks": [
-          {
-            "Duration": "5356800",
-            "Start": "2016-07-01T00:00:00",
-            "UsedStatus": "FNN"
-          }
-        ]
+		"UsedStatus": "FNN"
       },
       {
         "MeterId": "DE01234567890000000004",
@@ -178,16 +154,9 @@
         "Uom": "72",
         "Scaler": "-1",
         "ObisCode": "010001083fff",
-        "IntervalBlocks": [
-          {
-            "Duration": "5356800",
-            "Start": "2016-07-01T00:00:00",
-            "UsedStatus": "FNN"
-          }
-        ]
+		"UsedStatus": "FNN"
       }
 
     ]
-
   }
 }

@@ -2,6 +2,7 @@
 {
     using System.IO;
     using System.Linq;
+    using System.Net;
 
     using Microsoft.AspNetCore;
     using Microsoft.AspNetCore.Hosting;
@@ -27,6 +28,14 @@
 
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+/*                .UseKestrel(
+                    options =>
+                        {
+                            options.Listen(IPAddress.Loopback, 5001, listenOptions =>
+                                {
+                                    listenOptions.UseHttps("testCert.pfx", "testPassword");
+                                });
+                        })*/
                 .UseStartup<Startup>()
                 .Build();
     }

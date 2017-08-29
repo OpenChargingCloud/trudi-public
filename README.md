@@ -270,6 +270,10 @@ public async Task<(ConnectResult result, AdapterError error)> Connect(
 Direkt nach dem Verbindungsaufbau wird ``LoadAvailableContracts`` aufgerufen um eine Liste der für den 
 Benutzer relevanten Verträge zu erhalten.
 
+```csharp
+
+```
+
 ### 3. Laden der Daten zum vom Verbraucher ausgewählten Vertrag mittels ``LoadData``
 
 ### 4. Abruf der aktuellen Registerwerte durch ``GetCurrentRegisterValues``

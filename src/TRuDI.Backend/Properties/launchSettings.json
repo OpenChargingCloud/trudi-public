@@ -18,7 +18,7 @@
     },
     "TRuDI.HanAdapter.UiTest": {
       "commandName": "Project",
-      "commandLineArgs": "--test=D:\\Projekte\\DZG\\TRuDI\\bitbucket-trudi-han-adapter\\doc\\HAN-Test-Adapter\\ConfigTaf7UseCase.json",
+      "commandLineArgs": "--test=D:\\Projekte\\DZG\\TRuDI\\bitbucket-trudi-han-adapter\\doc\\HAN-Test-Adapter\\ConfigTaf2UseCase.json",
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"

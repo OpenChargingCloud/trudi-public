@@ -7,6 +7,8 @@
     using System.Text;
 
     using TRuDI.HanAdapter.Interface;
+    using TRuDI.HanAdapter.XmlValidation.Models;
+    using TRuDI.HanAdapter.XmlValidation.Models.BasicData;
 
     public static class HtmlStringExtensions
     {
@@ -89,6 +91,22 @@
             }
 
             return timestamp.Value.ToIso8601();
+        }
+
+        public static string ToStatusString(this IntervalReading reading)
+        {
+            if (reading.StatusPTB == null)
+            {
+                var x = reading.StatusFNN.SmgwStatusWord + " " + reading.StatusFNN.BzStatusWord;
+                return x;
+            }
+
+            return reading.StatusPTB.ToString();
+        }
+
+        public static string GetOriginalValueListIdent(this OriginalValueList ovl)
+        {
+            return $"ovl_{ovl.Meter}_{ovl.Obis.ToHexString()}_{ovl.MeasurementPeriod.TotalSeconds}";
         }
     }
 }

@@ -71,8 +71,10 @@
             // Query the first billing period of the first contract.
             var ctx = new AdapterContext();
             ctx.Contract = contractsResult.contracts.First();
-            ctx.Start = ctx.Contract.Begin;
-            ctx.End = ctx.Contract.End ?? DateTime.Now;
+            //ctx.Start = ctx.Contract.Begin;
+            //ctx.End = ctx.Contract.End ?? DateTime.Now;
+            ctx.Start = new DateTime(2017, 1, 1);
+            ctx.End = new DateTime(2017, 8, 25);
             ctx.BillingPeriod = ctx.Contract.BillingPeriods.First();
             ctx.WithLogdata = true;
 

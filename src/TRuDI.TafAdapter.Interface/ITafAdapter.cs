@@ -7,6 +7,6 @@ namespace TRuDI.TafAdapter.Interface
     /// </summary>
     public interface ITafAdapter
     {
-        object Calculate(UsagePointAdapterTRuDI device, UsagePointLieferant supplier);
+        AccountingPeriod Calculate(UsagePointAdapterTRuDI device, UsagePointLieferant supplier);
     }
 }

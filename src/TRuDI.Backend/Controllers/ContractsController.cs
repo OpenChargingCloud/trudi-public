@@ -1,6 +1,7 @@
 ﻿namespace TRuDI.Backend.Controllers
 {
     using System;
+    using System.Linq;
 
     using Microsoft.AspNetCore.Mvc;
 
@@ -18,7 +19,7 @@
 
         public IActionResult Index()
         {
-            this.ViewData["ErrorMessage"] = this.applicationState.LastErrorMessage;
+            this.ViewData["ErrorMessage"] = this.applicationState.LastErrorMessages.FirstOrDefault();
             return this.View();
         }
 

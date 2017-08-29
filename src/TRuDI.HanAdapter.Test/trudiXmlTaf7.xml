@@ -24,19 +24,19 @@
     <LogEntry>
       <recordNumber>1</recordNumber>
       <LogEvent>
-        <level>1</level>
-        <text>Ein neuer Wert wurde abgelesen.</text>
-        <outcome>1</outcome>
-        <timestamp>2017-03-08T15:36:00</timestamp>
+        <level>2</level>
+        <text>Tarifumschaltung war erfolgreich.</text>
+        <outcome>2</outcome>
+        <timestamp>2017-01-12T19:12:00</timestamp>
       </LogEvent>
     </LogEntry>
     <LogEntry>
       <recordNumber>2</recordNumber>
       <LogEvent>
         <level>2</level>
-        <text>Das Smart Meter Gateway wurde neu gestartet.</text>
-        <outcome>1</outcome>
-        <timestamp>2017-03-16T07:12:00</timestamp>
+        <text>Ein neuer Wert wurde abgelesen.</text>
+        <outcome>2</outcome>
+        <timestamp>2017-01-24T14:24:00</timestamp>
       </LogEvent>
     </LogEntry>
     <LogEntry>
@@ -44,44 +44,44 @@
       <LogEvent>
         <level>2</level>
         <text>Gerät wurde gewartet.</text>
-        <outcome>2</outcome>
-        <timestamp>2017-03-23T22:48:00</timestamp>
+        <outcome>1</outcome>
+        <timestamp>2017-02-05T09:36:00</timestamp>
       </LogEvent>
     </LogEntry>
     <LogEntry>
       <recordNumber>4</recordNumber>
       <LogEvent>
-        <level>2</level>
-        <text>Das Smart Meter Gateway wurde neu gestartet.</text>
-        <outcome>2</outcome>
-        <timestamp>2017-03-31T14:24:00</timestamp>
+        <level>1</level>
+        <text>Gerät wurde gewartet.</text>
+        <outcome>1</outcome>
+        <timestamp>2017-02-17T04:48:00</timestamp>
       </LogEvent>
     </LogEntry>
     <LogEntry>
       <recordNumber>5</recordNumber>
       <LogEvent>
-        <level>2</level>
+        <level>1</level>
         <text>Gerät wurde gewartet.</text>
         <outcome>0</outcome>
-        <timestamp>2017-04-08T06:00:00</timestamp>
+        <timestamp>2017-03-01T00:00:00</timestamp>
       </LogEvent>
     </LogEntry>
     <LogEntry>
       <recordNumber>6</recordNumber>
       <LogEvent>
-        <level>2</level>
-        <text>Tarifumschaltung war erfolgreich.</text>
+        <level>1</level>
+        <text>Das Smart Meter Gateway wurde neu gestartet.</text>
         <outcome>2</outcome>
-        <timestamp>2017-04-15T21:36:00</timestamp>
+        <timestamp>2017-03-12T19:12:00</timestamp>
       </LogEvent>
     </LogEntry>
     <LogEntry>
       <recordNumber>7</recordNumber>
       <LogEvent>
-        <level>1</level>
+        <level>2</level>
         <text>Das Smart Meter Gateway wurde neu gestartet.</text>
-        <outcome>2</outcome>
-        <timestamp>2017-04-23T13:12:00</timestamp>
+        <outcome>0</outcome>
+        <timestamp>2017-03-24T14:24:00</timestamp>
       </LogEvent>
     </LogEntry>
     <LogEntry>
@@ -90,25 +90,25 @@
         <level>1</level>
         <text>Ein neuer Wert wurde abgelesen.</text>
         <outcome>1</outcome>
-        <timestamp>2017-05-01T04:48:00</timestamp>
+        <timestamp>2017-04-05T09:36:00</timestamp>
       </LogEvent>
     </LogEntry>
     <LogEntry>
       <recordNumber>9</recordNumber>
       <LogEvent>
-        <level>2</level>
-        <text>Ein neuer Wert wurde abgelesen.</text>
-        <outcome>0</outcome>
-        <timestamp>2017-05-08T20:24:00</timestamp>
+        <level>1</level>
+        <text>Tarifumschaltung war erfolgreich.</text>
+        <outcome>1</outcome>
+        <timestamp>2017-04-17T04:48:00</timestamp>
       </LogEvent>
     </LogEntry>
     <LogEntry>
       <recordNumber>10</recordNumber>
       <LogEvent>
-        <level>2</level>
-        <text>Gerät wurde gewartet.</text>
-        <outcome>0</outcome>
-        <timestamp>2017-05-16T12:00:00</timestamp>
+        <level>1</level>
+        <text>Tarifumschaltung war erfolgreich.</text>
+        <outcome>2</outcome>
+        <timestamp>2017-04-29T00:00:00</timestamp>
       </LogEvent>
     </LogEntry>
     <LogEntry>
@@ -116,44 +116,44 @@
       <LogEvent>
         <level>1</level>
         <text>Tarifumschaltung war erfolgreich.</text>
-        <outcome>2</outcome>
-        <timestamp>2017-05-24T03:36:00</timestamp>
+        <outcome>0</outcome>
+        <timestamp>2017-05-10T19:12:00</timestamp>
       </LogEvent>
     </LogEntry>
     <LogEntry>
       <recordNumber>12</recordNumber>
       <LogEvent>
-        <level>1</level>
+        <level>2</level>
         <text>Ein neuer Wert wurde abgelesen.</text>
-        <outcome>0</outcome>
-        <timestamp>2017-05-31T19:12:00</timestamp>
+        <outcome>2</outcome>
+        <timestamp>2017-05-22T14:24:00</timestamp>
       </LogEvent>
     </LogEntry>
     <LogEntry>
       <recordNumber>13</recordNumber>
       <LogEvent>
         <level>1</level>
-        <text>Ein neuer Wert wurde abgelesen.</text>
-        <outcome>2</outcome>
-        <timestamp>2017-06-08T10:48:00</timestamp>
+        <text>Gerät wurde gewartet.</text>
+        <outcome>0</outcome>
+        <timestamp>2017-06-03T09:36:00</timestamp>
       </LogEvent>
     </LogEntry>
     <LogEntry>
       <recordNumber>14</recordNumber>
       <LogEvent>
-        <level>1</level>
-        <text>Gerät wurde gewartet.</text>
+        <level>2</level>
+        <text>Das Smart Meter Gateway wurde neu gestartet.</text>
         <outcome>1</outcome>
-        <timestamp>2017-06-16T02:24:00</timestamp>
+        <timestamp>2017-06-15T04:48:00</timestamp>
       </LogEvent>
     </LogEntry>
     <LogEntry>
       <recordNumber>15</recordNumber>
       <LogEvent>
-        <level>1</level>
-        <text>Ein neuer Wert wurde abgelesen.</text>
+        <level>2</level>
+        <text>Das Smart Meter Gateway wurde neu gestartet.</text>
         <outcome>2</outcome>
-        <timestamp>2017-06-23T18:00:00</timestamp>
+        <timestamp>2017-06-27T00:00:00</timestamp>
       </LogEvent>
     </LogEntry>
     <LogEntry>
@@ -161,35 +161,35 @@
       <LogEvent>
         <level>1</level>
         <text>Das Smart Meter Gateway wurde neu gestartet.</text>
-        <outcome>1</outcome>
-        <timestamp>2017-07-01T09:36:00</timestamp>
+        <outcome>2</outcome>
+        <timestamp>2017-07-08T19:12:00</timestamp>
       </LogEvent>
     </LogEntry>
     <LogEntry>
       <recordNumber>17</recordNumber>
       <LogEvent>
         <level>2</level>
-        <text>Tarifumschaltung war erfolgreich.</text>
+        <text>Ein neuer Wert wurde abgelesen.</text>
         <outcome>1</outcome>
-        <timestamp>2017-07-09T01:12:00</timestamp>
+        <timestamp>2017-07-20T14:24:00</timestamp>
       </LogEvent>
     </LogEntry>
     <LogEntry>
       <recordNumber>18</recordNumber>
       <LogEvent>
         <level>2</level>
-        <text>Tarifumschaltung war erfolgreich.</text>
-        <outcome>0</outcome>
-        <timestamp>2017-07-16T16:48:00</timestamp>
+        <text>Ein neuer Wert wurde abgelesen.</text>
+        <outcome>2</outcome>
+        <timestamp>2017-08-01T09:36:00</timestamp>
       </LogEvent>
     </LogEntry>
     <LogEntry>
       <recordNumber>19</recordNumber>
       <LogEvent>
-        <level>1</level>
-        <text>Das Smart Meter Gateway wurde neu gestartet.</text>
-        <outcome>2</outcome>
-        <timestamp>2017-07-24T08:24:00</timestamp>
+        <level>2</level>
+        <text>Ein neuer Wert wurde abgelesen.</text>
+        <outcome>0</outcome>
+        <timestamp>2017-08-13T04:48:00</timestamp>
       </LogEvent>
     </LogEntry>
     <LogEntry>
@@ -198,7 +198,7 @@
         <level>2</level>
         <text>Ein neuer Wert wurde abgelesen.</text>
         <outcome>2</outcome>
-        <timestamp>2017-08-01T00:00:00</timestamp>
+        <timestamp>2017-08-25T00:00:00</timestamp>
       </LogEvent>
     </LogEntry>
     <MeterReading>
@@ -215,198 +215,86 @@
       </ReadingType>
       <IntervalBlock>
         <interval>
-          <duration>13219200</duration>
-          <start>2017-03-01T00:00:00</start>
+          <duration>20390400</duration>
+          <start>2017-01-01T00:00:00</start>
         </interval>
         <IntervalReading>
           <espi:value>240000</espi:value>
           <timePeriod>
             <duration>0</duration>
-            <start>2017-03-01T00:00:00</start>
+            <start>2017-01-01T00:00:00</start>
           </timePeriod>
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>240100</espi:value>
+          <espi:value>240188</espi:value>
           <timePeriod>
             <duration>0</duration>
-            <start>2017-03-02T00:00:00</start>
+            <start>2017-01-02T00:00:00</start>
           </timePeriod>
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>240200</espi:value>
+          <espi:value>240534</espi:value>
           <timePeriod>
             <duration>0</duration>
-            <start>2017-03-03T00:00:00</start>
+            <start>2017-01-03T00:00:00</start>
           </timePeriod>
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>240300</espi:value>
+          <espi:value>240691</espi:value>
           <timePeriod>
             <duration>0</duration>
-            <start>2017-03-04T00:00:00</start>
+            <start>2017-01-04T00:00:00</start>
           </timePeriod>
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>240400</espi:value>
+          <espi:value>240722</espi:value>
           <timePeriod>
             <duration>0</duration>
-            <start>2017-03-05T00:00:00</start>
+            <start>2017-01-05T00:00:00</start>
           </timePeriod>
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>240500</espi:value>
+          <espi:value>241068</espi:value>
           <timePeriod>
             <duration>0</duration>
-            <start>2017-03-06T00:00:00</start>
+            <start>2017-01-06T00:00:00</start>
           </timePeriod>
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>240600</espi:value>
+          <espi:value>241157</espi:value>
           <timePeriod>
             <duration>0</duration>
-            <start>2017-03-07T00:00:00</start>
+            <start>2017-01-07T00:00:00</start>
           </timePeriod>
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>240700</espi:value>
+          <espi:value>241634</espi:value>
           <timePeriod>
             <duration>0</duration>
-            <start>2017-03-08T00:00:00</start>
+            <start>2017-01-08T00:00:00</start>
           </timePeriod>
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>240800</espi:value>
+          <espi:value>241740</espi:value>
           <timePeriod>
             <duration>0</duration>
-            <start>2017-03-09T00:00:00</start>
+            <start>2017-01-09T00:00:00</start>
           </timePeriod>
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>240900</espi:value>
+          <espi:value>242225</espi:value>
           <timePeriod>
             <duration>0</duration>
-            <start>2017-03-10T00:00:00</start>
-          </timePeriod>
-          <statusFNN>0000010500100504</statusFNN>
-        </IntervalReading>
-        <IntervalReading>
-          <espi:value>241000</espi:value>
-          <timePeriod>
-            <duration>0</duration>
-            <start>2017-03-11T00:00:00</start>
-          </timePeriod>
-          <statusFNN>0000010500100504</statusFNN>
-        </IntervalReading>
-        <IntervalReading>
-          <espi:value>241100</espi:value>
-          <timePeriod>
-            <duration>0</duration>
-            <start>2017-03-12T00:00:00</start>
-          </timePeriod>
-          <statusFNN>0000010500100504</statusFNN>
-        </IntervalReading>
-        <IntervalReading>
-          <espi:value>241200</espi:value>
-          <timePeriod>
-            <duration>0</duration>
-            <start>2017-03-13T00:00:00</start>
-          </timePeriod>
-          <statusFNN>0000010500100504</statusFNN>
-        </IntervalReading>
-        <IntervalReading>
-          <espi:value>241300</espi:value>
-          <timePeriod>
-            <duration>0</duration>
-            <start>2017-03-14T00:00:00</start>
-          </timePeriod>
-          <statusFNN>0000010500100504</statusFNN>
-        </IntervalReading>
-        <IntervalReading>
-          <espi:value>241400</espi:value>
-          <timePeriod>
-            <duration>0</duration>
-            <start>2017-03-15T00:00:00</start>
-          </timePeriod>
-          <statusFNN>0000010500100504</statusFNN>
-        </IntervalReading>
-        <IntervalReading>
-          <espi:value>241500</espi:value>
-          <timePeriod>
-            <duration>0</duration>
-            <start>2017-03-16T00:00:00</start>
-          </timePeriod>
-          <statusFNN>0000010500100504</statusFNN>
-        </IntervalReading>
-        <IntervalReading>
-          <espi:value>241600</espi:value>
-          <timePeriod>
-            <duration>0</duration>
-            <start>2017-03-17T00:00:00</start>
-          </timePeriod>
-          <statusFNN>0000010500100504</statusFNN>
-        </IntervalReading>
-        <IntervalReading>
-          <espi:value>241700</espi:value>
-          <timePeriod>
-            <duration>0</duration>
-            <start>2017-03-18T00:00:00</start>
-          </timePeriod>
-          <statusFNN>0000010500100504</statusFNN>
-        </IntervalReading>
-        <IntervalReading>
-          <espi:value>241800</espi:value>
-          <timePeriod>
-            <duration>0</duration>
-            <start>2017-03-19T00:00:00</start>
-          </timePeriod>
-          <statusFNN>0000010500100504</statusFNN>
-        </IntervalReading>
-        <IntervalReading>
-          <espi:value>241900</espi:value>
-          <timePeriod>
-            <duration>0</duration>
-            <start>2017-03-20T00:00:00</start>
-          </timePeriod>
-          <statusFNN>0000010500100504</statusFNN>
-        </IntervalReading>
-        <IntervalReading>
-          <espi:value>242000</espi:value>
-          <timePeriod>
-            <duration>0</duration>
-            <start>2017-03-21T00:00:00</start>
-          </timePeriod>
-          <statusFNN>0000010500100504</statusFNN>
-        </IntervalReading>
-        <IntervalReading>
-          <espi:value>242100</espi:value>
-          <timePeriod>
-            <duration>0</duration>
-            <start>2017-03-22T00:00:00</start>
-          </timePeriod>
-          <statusFNN>0000010500100504</statusFNN>
-        </IntervalReading>
-        <IntervalReading>
-          <espi:value>242200</espi:value>
-          <timePeriod>
-            <duration>0</duration>
-            <start>2017-03-23T00:00:00</start>
-          </timePeriod>
-          <statusFNN>0000010500100504</statusFNN>
-        </IntervalReading>
-        <IntervalReading>
-          <espi:value>242300</espi:value>
-          <timePeriod>
-            <duration>0</duration>
-            <start>2017-03-24T00:00:00</start>
+            <start>2017-01-10T00:00:00</start>
           </timePeriod>
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
@@ -414,12 +302,596 @@
           <espi:value>242400</espi:value>
           <timePeriod>
             <duration>0</duration>
+            <start>2017-01-11T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>242661</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-01-12T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>242923</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-01-13T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>243353</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-01-14T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>243410</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-01-15T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>243630</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-01-16T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>244082</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-01-17T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>244218</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-01-18T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>244499</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-01-19T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>244937</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-01-20T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>245411</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-01-21T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>245674</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-01-22T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>245825</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-01-23T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>245857</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-01-24T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>246325</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-01-25T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>246816</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-01-26T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>246843</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-01-27T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>247309</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-01-28T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>247723</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-01-29T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>247980</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-01-30T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>248249</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-01-31T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>248608</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-02-01T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>248763</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-02-02T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>249208</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-02-03T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>249401</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-02-04T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>249860</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-02-05T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>250146</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-02-06T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>250252</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-02-07T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>250438</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-02-08T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>250831</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-02-09T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>251102</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-02-10T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>251592</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-02-11T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>251725</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-02-12T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>252046</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-02-13T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>252083</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-02-14T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>252480</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-02-15T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>252635</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-02-16T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>252976</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-02-17T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>253220</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-02-18T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>253469</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-02-19T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>253817</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-02-20T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>254110</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-02-21T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>254218</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-02-22T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>254582</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-02-23T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>254946</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-02-24T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>255047</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-02-25T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>255448</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-02-26T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>255626</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-02-27T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>255678</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-02-28T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>256082</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-03-01T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>256569</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-03-02T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>256781</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-03-03T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>256961</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-03-04T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>257142</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-03-05T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>257604</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-03-06T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>257814</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-03-07T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>258066</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-03-08T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>258414</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-03-09T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>258607</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-03-10T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>259042</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-03-11T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>259092</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-03-12T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>259120</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-03-13T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>259460</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-03-14T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>259614</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-03-15T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>260070</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-03-16T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>260542</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-03-17T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>260688</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-03-18T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>260836</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-03-19T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>261120</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-03-20T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>261341</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-03-21T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>261679</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-03-22T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>261825</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-03-23T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>261827</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-03-24T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>262046</espi:value>
+          <timePeriod>
+            <duration>0</duration>
             <start>2017-03-25T00:00:00</start>
           </timePeriod>
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>242500</espi:value>
+          <espi:value>262426</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-03-26T00:00:00</start>
@@ -427,7 +899,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>242600</espi:value>
+          <espi:value>262498</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-03-27T00:00:00</start>
@@ -435,7 +907,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>242700</espi:value>
+          <espi:value>262978</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-03-28T00:00:00</start>
@@ -443,7 +915,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>242800</espi:value>
+          <espi:value>263474</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-03-29T00:00:00</start>
@@ -451,7 +923,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>242900</espi:value>
+          <espi:value>263736</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-03-30T00:00:00</start>
@@ -459,7 +931,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>243000</espi:value>
+          <espi:value>263839</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-03-31T00:00:00</start>
@@ -467,7 +939,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>243100</espi:value>
+          <espi:value>264019</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-04-01T00:00:00</start>
@@ -475,7 +947,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>243200</espi:value>
+          <espi:value>264027</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-04-02T00:00:00</start>
@@ -483,7 +955,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>243300</espi:value>
+          <espi:value>264216</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-04-03T00:00:00</start>
@@ -491,7 +963,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>243400</espi:value>
+          <espi:value>264247</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-04-04T00:00:00</start>
@@ -499,7 +971,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>243500</espi:value>
+          <espi:value>264493</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-04-05T00:00:00</start>
@@ -507,7 +979,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>243600</espi:value>
+          <espi:value>264566</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-04-06T00:00:00</start>
@@ -515,7 +987,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>243700</espi:value>
+          <espi:value>264567</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-04-07T00:00:00</start>
@@ -523,7 +995,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>243800</espi:value>
+          <espi:value>264792</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-04-08T00:00:00</start>
@@ -531,7 +1003,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>243900</espi:value>
+          <espi:value>265095</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-04-09T00:00:00</start>
@@ -539,7 +1011,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>244000</espi:value>
+          <espi:value>265229</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-04-10T00:00:00</start>
@@ -547,7 +1019,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>244100</espi:value>
+          <espi:value>265488</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-04-11T00:00:00</start>
@@ -555,7 +1027,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>244200</espi:value>
+          <espi:value>265916</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-04-12T00:00:00</start>
@@ -563,7 +1035,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>244300</espi:value>
+          <espi:value>266128</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-04-13T00:00:00</start>
@@ -571,7 +1043,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>244400</espi:value>
+          <espi:value>266429</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-04-14T00:00:00</start>
@@ -579,7 +1051,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>244500</espi:value>
+          <espi:value>266871</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-04-15T00:00:00</start>
@@ -587,7 +1059,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>244600</espi:value>
+          <espi:value>266900</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-04-16T00:00:00</start>
@@ -595,7 +1067,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>244700</espi:value>
+          <espi:value>267265</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-04-17T00:00:00</start>
@@ -603,7 +1075,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>244800</espi:value>
+          <espi:value>267739</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-04-18T00:00:00</start>
@@ -611,7 +1083,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>244900</espi:value>
+          <espi:value>268199</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-04-19T00:00:00</start>
@@ -619,7 +1091,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>245000</espi:value>
+          <espi:value>268689</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-04-20T00:00:00</start>
@@ -627,7 +1099,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>245100</espi:value>
+          <espi:value>268864</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-04-21T00:00:00</start>
@@ -635,7 +1107,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>245200</espi:value>
+          <espi:value>269178</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-04-22T00:00:00</start>
@@ -643,7 +1115,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>245300</espi:value>
+          <espi:value>269439</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-04-23T00:00:00</start>
@@ -651,7 +1123,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>245400</espi:value>
+          <espi:value>269485</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-04-24T00:00:00</start>
@@ -659,7 +1131,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>245500</espi:value>
+          <espi:value>269692</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-04-25T00:00:00</start>
@@ -667,7 +1139,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>245600</espi:value>
+          <espi:value>270018</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-04-26T00:00:00</start>
@@ -675,7 +1147,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>245700</espi:value>
+          <espi:value>270050</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-04-27T00:00:00</start>
@@ -683,7 +1155,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>245800</espi:value>
+          <espi:value>270083</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-04-28T00:00:00</start>
@@ -691,7 +1163,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>245900</espi:value>
+          <espi:value>270118</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-04-29T00:00:00</start>
@@ -699,7 +1171,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>246000</espi:value>
+          <espi:value>270174</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-04-30T00:00:00</start>
@@ -707,7 +1179,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>246100</espi:value>
+          <espi:value>270393</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-05-01T00:00:00</start>
@@ -715,7 +1187,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>246200</espi:value>
+          <espi:value>270855</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-05-02T00:00:00</start>
@@ -723,7 +1195,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>246300</espi:value>
+          <espi:value>270974</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-05-03T00:00:00</start>
@@ -731,7 +1203,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>246400</espi:value>
+          <espi:value>271424</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-05-04T00:00:00</start>
@@ -739,7 +1211,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>246500</espi:value>
+          <espi:value>271822</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-05-05T00:00:00</start>
@@ -747,7 +1219,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>246600</espi:value>
+          <espi:value>272034</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-05-06T00:00:00</start>
@@ -755,7 +1227,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>246700</espi:value>
+          <espi:value>272485</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-05-07T00:00:00</start>
@@ -763,7 +1235,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>246800</espi:value>
+          <espi:value>272535</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-05-08T00:00:00</start>
@@ -771,7 +1243,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>246900</espi:value>
+          <espi:value>272904</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-05-09T00:00:00</start>
@@ -779,7 +1251,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>247000</espi:value>
+          <espi:value>273355</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-05-10T00:00:00</start>
@@ -787,7 +1259,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>247100</espi:value>
+          <espi:value>273826</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-05-11T00:00:00</start>
@@ -795,7 +1267,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>247200</espi:value>
+          <espi:value>273925</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-05-12T00:00:00</start>
@@ -803,7 +1275,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>247300</espi:value>
+          <espi:value>274210</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-05-13T00:00:00</start>
@@ -811,7 +1283,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>247400</espi:value>
+          <espi:value>274386</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-05-14T00:00:00</start>
@@ -819,7 +1291,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>247500</espi:value>
+          <espi:value>274872</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-05-15T00:00:00</start>
@@ -827,7 +1299,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>247600</espi:value>
+          <espi:value>275301</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-05-16T00:00:00</start>
@@ -835,7 +1307,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>247700</espi:value>
+          <espi:value>275713</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-05-17T00:00:00</start>
@@ -843,7 +1315,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>247800</espi:value>
+          <espi:value>276068</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-05-18T00:00:00</start>
@@ -851,7 +1323,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>247900</espi:value>
+          <espi:value>276511</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-05-19T00:00:00</start>
@@ -859,7 +1331,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>248000</espi:value>
+          <espi:value>276715</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-05-20T00:00:00</start>
@@ -867,7 +1339,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>248100</espi:value>
+          <espi:value>277112</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-05-21T00:00:00</start>
@@ -875,7 +1347,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>248200</espi:value>
+          <espi:value>277414</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-05-22T00:00:00</start>
@@ -883,7 +1355,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>248300</espi:value>
+          <espi:value>277617</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-05-23T00:00:00</start>
@@ -891,7 +1363,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>248400</espi:value>
+          <espi:value>278079</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-05-24T00:00:00</start>
@@ -899,7 +1371,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>248500</espi:value>
+          <espi:value>278498</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-05-25T00:00:00</start>
@@ -907,7 +1379,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>248600</espi:value>
+          <espi:value>278715</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-05-26T00:00:00</start>
@@ -915,7 +1387,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>248700</espi:value>
+          <espi:value>279151</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-05-27T00:00:00</start>
@@ -923,7 +1395,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>248800</espi:value>
+          <espi:value>279444</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-05-28T00:00:00</start>
@@ -931,7 +1403,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>248900</espi:value>
+          <espi:value>279662</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-05-29T00:00:00</start>
@@ -939,7 +1411,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>249000</espi:value>
+          <espi:value>280104</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-05-30T00:00:00</start>
@@ -947,7 +1419,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>249100</espi:value>
+          <espi:value>280383</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-05-31T00:00:00</start>
@@ -955,7 +1427,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>249200</espi:value>
+          <espi:value>280470</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-06-01T00:00:00</start>
@@ -963,7 +1435,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>249300</espi:value>
+          <espi:value>280892</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-06-02T00:00:00</start>
@@ -971,7 +1443,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>249400</espi:value>
+          <espi:value>280906</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-06-03T00:00:00</start>
@@ -979,7 +1451,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>249500</espi:value>
+          <espi:value>281202</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-06-04T00:00:00</start>
@@ -987,7 +1459,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>249600</espi:value>
+          <espi:value>281203</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-06-05T00:00:00</start>
@@ -995,7 +1467,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>249700</espi:value>
+          <espi:value>281695</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-06-06T00:00:00</start>
@@ -1003,7 +1475,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>249800</espi:value>
+          <espi:value>281753</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-06-07T00:00:00</start>
@@ -1011,7 +1483,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>249900</espi:value>
+          <espi:value>282144</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-06-08T00:00:00</start>
@@ -1019,7 +1491,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>250000</espi:value>
+          <espi:value>282560</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-06-09T00:00:00</start>
@@ -1027,7 +1499,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>250100</espi:value>
+          <espi:value>282806</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-06-10T00:00:00</start>
@@ -1035,7 +1507,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>250200</espi:value>
+          <espi:value>282873</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-06-11T00:00:00</start>
@@ -1043,7 +1515,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>250300</espi:value>
+          <espi:value>283134</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-06-12T00:00:00</start>
@@ -1051,7 +1523,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>250400</espi:value>
+          <espi:value>283363</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-06-13T00:00:00</start>
@@ -1059,7 +1531,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>250500</espi:value>
+          <espi:value>283388</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-06-14T00:00:00</start>
@@ -1067,7 +1539,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>250600</espi:value>
+          <espi:value>283619</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-06-15T00:00:00</start>
@@ -1075,7 +1547,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>250700</espi:value>
+          <espi:value>283855</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-06-16T00:00:00</start>
@@ -1083,7 +1555,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>250800</espi:value>
+          <espi:value>283972</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-06-17T00:00:00</start>
@@ -1091,7 +1563,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>250900</espi:value>
+          <espi:value>284449</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-06-18T00:00:00</start>
@@ -1099,7 +1571,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>251000</espi:value>
+          <espi:value>284472</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-06-19T00:00:00</start>
@@ -1107,7 +1579,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>251100</espi:value>
+          <espi:value>284948</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-06-20T00:00:00</start>
@@ -1115,7 +1587,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>251200</espi:value>
+          <espi:value>285124</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-06-21T00:00:00</start>
@@ -1123,7 +1595,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>251300</espi:value>
+          <espi:value>285303</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-06-22T00:00:00</start>
@@ -1131,7 +1603,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>251400</espi:value>
+          <espi:value>285741</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-06-23T00:00:00</start>
@@ -1139,7 +1611,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>251500</espi:value>
+          <espi:value>285874</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-06-24T00:00:00</start>
@@ -1147,7 +1619,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>251600</espi:value>
+          <espi:value>286101</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-06-25T00:00:00</start>
@@ -1155,7 +1627,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>251700</espi:value>
+          <espi:value>286120</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-06-26T00:00:00</start>
@@ -1163,7 +1635,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>251800</espi:value>
+          <espi:value>286377</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-06-27T00:00:00</start>
@@ -1171,7 +1643,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>251900</espi:value>
+          <espi:value>286864</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-06-28T00:00:00</start>
@@ -1179,7 +1651,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>252000</espi:value>
+          <espi:value>287113</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-06-29T00:00:00</start>
@@ -1187,7 +1659,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>252100</espi:value>
+          <espi:value>287523</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-06-30T00:00:00</start>
@@ -1195,7 +1667,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>252200</espi:value>
+          <espi:value>287722</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-07-01T00:00:00</start>
@@ -1203,7 +1675,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>252300</espi:value>
+          <espi:value>288184</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-07-02T00:00:00</start>
@@ -1211,7 +1683,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>252400</espi:value>
+          <espi:value>288230</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-07-03T00:00:00</start>
@@ -1219,7 +1691,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>252500</espi:value>
+          <espi:value>288259</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-07-04T00:00:00</start>
@@ -1227,7 +1699,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>252600</espi:value>
+          <espi:value>288280</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-07-05T00:00:00</start>
@@ -1235,7 +1707,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>252700</espi:value>
+          <espi:value>288500</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-07-06T00:00:00</start>
@@ -1243,7 +1715,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>252800</espi:value>
+          <espi:value>288909</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-07-07T00:00:00</start>
@@ -1251,7 +1723,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>252900</espi:value>
+          <espi:value>289028</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-07-08T00:00:00</start>
@@ -1259,7 +1731,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>253000</espi:value>
+          <espi:value>289245</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-07-09T00:00:00</start>
@@ -1267,7 +1739,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>253100</espi:value>
+          <espi:value>289397</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-07-10T00:00:00</start>
@@ -1275,7 +1747,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>253200</espi:value>
+          <espi:value>289576</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-07-11T00:00:00</start>
@@ -1283,7 +1755,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>253300</espi:value>
+          <espi:value>289678</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-07-12T00:00:00</start>
@@ -1291,7 +1763,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>253400</espi:value>
+          <espi:value>289759</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-07-13T00:00:00</start>
@@ -1299,7 +1771,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>253500</espi:value>
+          <espi:value>289795</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-07-14T00:00:00</start>
@@ -1307,7 +1779,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>253600</espi:value>
+          <espi:value>290242</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-07-15T00:00:00</start>
@@ -1315,7 +1787,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>253700</espi:value>
+          <espi:value>290376</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-07-16T00:00:00</start>
@@ -1323,7 +1795,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>253800</espi:value>
+          <espi:value>290621</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-07-17T00:00:00</start>
@@ -1331,7 +1803,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>253900</espi:value>
+          <espi:value>290750</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-07-18T00:00:00</start>
@@ -1339,7 +1811,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>254000</espi:value>
+          <espi:value>291107</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-07-19T00:00:00</start>
@@ -1347,7 +1819,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>254100</espi:value>
+          <espi:value>291587</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-07-20T00:00:00</start>
@@ -1355,7 +1827,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>254200</espi:value>
+          <espi:value>291939</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-07-21T00:00:00</start>
@@ -1363,7 +1835,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>254300</espi:value>
+          <espi:value>292304</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-07-22T00:00:00</start>
@@ -1371,7 +1843,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>254400</espi:value>
+          <espi:value>292649</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-07-23T00:00:00</start>
@@ -1379,7 +1851,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>254500</espi:value>
+          <espi:value>292889</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-07-24T00:00:00</start>
@@ -1387,7 +1859,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>254600</espi:value>
+          <espi:value>293345</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-07-25T00:00:00</start>
@@ -1395,7 +1867,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>254700</espi:value>
+          <espi:value>293409</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-07-26T00:00:00</start>
@@ -1403,7 +1875,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>254800</espi:value>
+          <espi:value>293680</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-07-27T00:00:00</start>
@@ -1411,7 +1883,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>254900</espi:value>
+          <espi:value>293795</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-07-28T00:00:00</start>
@@ -1419,7 +1891,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>255000</espi:value>
+          <espi:value>294252</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-07-29T00:00:00</start>
@@ -1427,7 +1899,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>255100</espi:value>
+          <espi:value>294664</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-07-30T00:00:00</start>
@@ -1435,7 +1907,7 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>255200</espi:value>
+          <espi:value>294918</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-07-31T00:00:00</start>
@@ -1443,10 +1915,202 @@
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>255325</espi:value>
+          <espi:value>295186</espi:value>
           <timePeriod>
             <duration>0</duration>
             <start>2017-08-01T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>295651</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-08-02T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>295907</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-08-03T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>296014</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-08-04T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>296376</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-08-05T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>296755</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-08-06T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>296893</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-08-07T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>297377</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-08-08T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>297544</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-08-09T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>297889</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-08-10T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>298030</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-08-11T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>298117</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-08-12T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>298514</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-08-13T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>298879</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-08-14T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>298989</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-08-15T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>299400</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-08-16T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>299450</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-08-17T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>299889</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-08-18T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>300313</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-08-19T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>300490</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-08-20T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>300927</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-08-21T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>301150</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-08-22T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>301497</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-08-23T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>301917</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-08-24T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>302328</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-08-25T00:00:00</start>
           </timePeriod>
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>

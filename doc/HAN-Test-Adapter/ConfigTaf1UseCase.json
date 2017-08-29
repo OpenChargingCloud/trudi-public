@@ -22,8 +22,8 @@
       "End": "2018-01-01T00:00:00",
       "BillingPeriods": [
         {
-          "Begin": "2015-01-01T00:00:00",
-          "End": "2015-07-01T00:00:00"
+          "Begin": "2017-02-01T00:00:00",
+          "End": "2017-07-01T00:00:00"
         },
         {
           "Begin": "2017-01-01T00:00:00",
@@ -95,7 +95,7 @@
       }
     ],
     "TariffStageCount": "1",
-    "ValueSummary": "13000",
+    "MaxPeriodUsage": "300",
     "MeterReadingConfigs": [
       {
         "MeterId": "DE01234567890000000001",
@@ -107,13 +107,7 @@
         "Uom": "72",
         "Scaler": "-1",
         "ObisCode": "0100010800ff",
-        "IntervalBlocks": [
-          {
-            "Duration": "15638400",
-            "Start": "2015-01-01T00:00:00",
-            "UsedStatus": "FNN"
-          }
-        ]
+		"UsedStatus": "FNN"
       },
       {
         "MeterId": "DE01234567890000000002",
@@ -125,13 +119,7 @@
         "Uom": "72",
         "Scaler": "-1",
         "ObisCode": "0100010800ff",
-        "IntervalBlocks": [
-          {
-            "Duration": "15638400",
-            "Start": "2015-01-01T00:00:00",
-            "UsedStatus": "FNN"
-          }
-        ]
+		"UsedStatus": "FNN"
       },
       {
         "MeterId": "DE01234567890000000001",
@@ -142,13 +130,7 @@
         "Uom": "72",
         "Scaler": "-1",
         "ObisCode": "0100010801ff",
-        "IntervalBlocks": [
-          {
-            "Duration": "15638400",
-            "Start": "2015-01-01T00:00:00",
-            "UsedStatus": "FNN"
-          }
-        ]
+		"UsedStatus": "FNN"
       }
     ]
   }

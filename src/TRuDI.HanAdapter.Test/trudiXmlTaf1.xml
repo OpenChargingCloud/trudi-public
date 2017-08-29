@@ -25,27 +25,27 @@
       <recordNumber>1</recordNumber>
       <LogEvent>
         <level>2</level>
-        <text>Ein neuer Wert wurde abgelesen.</text>
+        <text>Das Smart Meter Gateway wurde neu gestartet.</text>
         <outcome>2</outcome>
-        <timestamp>2015-01-08T05:45:36</timestamp>
+        <timestamp>2017-01-10T10:33:36</timestamp>
       </LogEvent>
     </LogEntry>
     <LogEntry>
       <recordNumber>2</recordNumber>
       <LogEvent>
         <level>1</level>
-        <text>Gerät wurde gewartet.</text>
-        <outcome>2</outcome>
-        <timestamp>2015-01-15T11:31:12</timestamp>
+        <text>Ein neuer Wert wurde abgelesen.</text>
+        <outcome>0</outcome>
+        <timestamp>2017-01-19T21:07:12</timestamp>
       </LogEvent>
     </LogEntry>
     <LogEntry>
       <recordNumber>3</recordNumber>
       <LogEvent>
         <level>2</level>
-        <text>Ein neuer Wert wurde abgelesen.</text>
-        <outcome>0</outcome>
-        <timestamp>2015-01-22T17:16:48</timestamp>
+        <text>Gerät wurde gewartet.</text>
+        <outcome>1</outcome>
+        <timestamp>2017-01-29T07:40:48</timestamp>
       </LogEvent>
     </LogEntry>
     <LogEntry>
@@ -54,25 +54,25 @@
         <level>1</level>
         <text>Gerät wurde gewartet.</text>
         <outcome>2</outcome>
-        <timestamp>2015-01-29T23:02:24</timestamp>
+        <timestamp>2017-02-07T18:14:24</timestamp>
       </LogEvent>
     </LogEntry>
     <LogEntry>
       <recordNumber>5</recordNumber>
       <LogEvent>
         <level>1</level>
-        <text>Gerät wurde gewartet.</text>
+        <text>Ein neuer Wert wurde abgelesen.</text>
         <outcome>1</outcome>
-        <timestamp>2015-02-06T04:48:00</timestamp>
+        <timestamp>2017-02-17T04:48:00</timestamp>
       </LogEvent>
     </LogEntry>
     <LogEntry>
       <recordNumber>6</recordNumber>
       <LogEvent>
         <level>2</level>
-        <text>Ein neuer Wert wurde abgelesen.</text>
+        <text>Tarifumschaltung war erfolgreich.</text>
         <outcome>1</outcome>
-        <timestamp>2015-02-13T10:33:36</timestamp>
+        <timestamp>2017-02-26T15:21:36</timestamp>
       </LogEvent>
     </LogEntry>
     <LogEntry>
@@ -81,133 +81,133 @@
         <level>2</level>
         <text>Gerät wurde gewartet.</text>
         <outcome>0</outcome>
-        <timestamp>2015-02-20T16:19:12</timestamp>
+        <timestamp>2017-03-08T01:55:12</timestamp>
       </LogEvent>
     </LogEntry>
     <LogEntry>
       <recordNumber>8</recordNumber>
       <LogEvent>
         <level>1</level>
-        <text>Das Smart Meter Gateway wurde neu gestartet.</text>
-        <outcome>1</outcome>
-        <timestamp>2015-02-27T22:04:48</timestamp>
+        <text>Gerät wurde gewartet.</text>
+        <outcome>0</outcome>
+        <timestamp>2017-03-17T12:28:48</timestamp>
       </LogEvent>
     </LogEntry>
     <LogEntry>
       <recordNumber>9</recordNumber>
       <LogEvent>
-        <level>1</level>
+        <level>2</level>
         <text>Tarifumschaltung war erfolgreich.</text>
-        <outcome>0</outcome>
-        <timestamp>2015-03-07T03:50:24</timestamp>
+        <outcome>1</outcome>
+        <timestamp>2017-03-26T23:02:24</timestamp>
       </LogEvent>
     </LogEntry>
     <LogEntry>
       <recordNumber>10</recordNumber>
       <LogEvent>
-        <level>2</level>
-        <text>Ein neuer Wert wurde abgelesen.</text>
-        <outcome>1</outcome>
-        <timestamp>2015-03-14T09:36:00</timestamp>
+        <level>1</level>
+        <text>Das Smart Meter Gateway wurde neu gestartet.</text>
+        <outcome>2</outcome>
+        <timestamp>2017-04-05T09:36:00</timestamp>
       </LogEvent>
     </LogEntry>
     <LogEntry>
       <recordNumber>11</recordNumber>
       <LogEvent>
-        <level>2</level>
+        <level>1</level>
         <text>Ein neuer Wert wurde abgelesen.</text>
         <outcome>1</outcome>
-        <timestamp>2015-03-21T15:21:36</timestamp>
+        <timestamp>2017-04-14T20:09:36</timestamp>
       </LogEvent>
     </LogEntry>
     <LogEntry>
       <recordNumber>12</recordNumber>
       <LogEvent>
-        <level>2</level>
-        <text>Ein neuer Wert wurde abgelesen.</text>
-        <outcome>2</outcome>
-        <timestamp>2015-03-28T21:07:12</timestamp>
+        <level>1</level>
+        <text>Gerät wurde gewartet.</text>
+        <outcome>1</outcome>
+        <timestamp>2017-04-24T06:43:12</timestamp>
       </LogEvent>
     </LogEntry>
     <LogEntry>
       <recordNumber>13</recordNumber>
       <LogEvent>
         <level>2</level>
-        <text>Tarifumschaltung war erfolgreich.</text>
-        <outcome>2</outcome>
-        <timestamp>2015-04-05T02:52:48</timestamp>
+        <text>Das Smart Meter Gateway wurde neu gestartet.</text>
+        <outcome>0</outcome>
+        <timestamp>2017-05-03T17:16:48</timestamp>
       </LogEvent>
     </LogEntry>
     <LogEntry>
       <recordNumber>14</recordNumber>
       <LogEvent>
-        <level>1</level>
+        <level>2</level>
         <text>Das Smart Meter Gateway wurde neu gestartet.</text>
         <outcome>2</outcome>
-        <timestamp>2015-04-12T08:38:24</timestamp>
+        <timestamp>2017-05-13T03:50:24</timestamp>
       </LogEvent>
     </LogEntry>
     <LogEntry>
       <recordNumber>15</recordNumber>
       <LogEvent>
         <level>2</level>
-        <text>Das Smart Meter Gateway wurde neu gestartet.</text>
-        <outcome>2</outcome>
-        <timestamp>2015-04-19T14:24:00</timestamp>
+        <text>Tarifumschaltung war erfolgreich.</text>
+        <outcome>1</outcome>
+        <timestamp>2017-05-22T14:24:00</timestamp>
       </LogEvent>
     </LogEntry>
     <LogEntry>
       <recordNumber>16</recordNumber>
       <LogEvent>
         <level>1</level>
-        <text>Tarifumschaltung war erfolgreich.</text>
-        <outcome>1</outcome>
-        <timestamp>2015-04-26T20:09:36</timestamp>
+        <text>Das Smart Meter Gateway wurde neu gestartet.</text>
+        <outcome>0</outcome>
+        <timestamp>2017-06-01T00:57:36</timestamp>
       </LogEvent>
     </LogEntry>
     <LogEntry>
       <recordNumber>17</recordNumber>
       <LogEvent>
-        <level>2</level>
-        <text>Das Smart Meter Gateway wurde neu gestartet.</text>
-        <outcome>0</outcome>
-        <timestamp>2015-05-04T01:55:12</timestamp>
+        <level>1</level>
+        <text>Ein neuer Wert wurde abgelesen.</text>
+        <outcome>2</outcome>
+        <timestamp>2017-06-10T11:31:12</timestamp>
       </LogEvent>
     </LogEntry>
     <LogEntry>
       <recordNumber>18</recordNumber>
       <LogEvent>
         <level>1</level>
-        <text>Ein neuer Wert wurde abgelesen.</text>
-        <outcome>1</outcome>
-        <timestamp>2015-05-11T07:40:48</timestamp>
+        <text>Tarifumschaltung war erfolgreich.</text>
+        <outcome>2</outcome>
+        <timestamp>2017-06-19T22:04:48</timestamp>
       </LogEvent>
     </LogEntry>
     <LogEntry>
       <recordNumber>19</recordNumber>
       <LogEvent>
         <level>2</level>
-        <text>Ein neuer Wert wurde abgelesen.</text>
+        <text>Gerät wurde gewartet.</text>
         <outcome>0</outcome>
-        <timestamp>2015-05-18T13:26:24</timestamp>
+        <timestamp>2017-06-29T08:38:24</timestamp>
       </LogEvent>
     </LogEntry>
     <LogEntry>
       <recordNumber>20</recordNumber>
       <LogEvent>
-        <level>1</level>
-        <text>Tarifumschaltung war erfolgreich.</text>
-        <outcome>2</outcome>
-        <timestamp>2015-05-25T19:12:00</timestamp>
+        <level>2</level>
+        <text>Ein neuer Wert wurde abgelesen.</text>
+        <outcome>1</outcome>
+        <timestamp>2017-07-08T19:12:00</timestamp>
       </LogEvent>
     </LogEntry>
     <LogEntry>
       <recordNumber>21</recordNumber>
       <LogEvent>
-        <level>1</level>
-        <text>Tarifumschaltung war erfolgreich.</text>
-        <outcome>1</outcome>
-        <timestamp>2015-06-02T00:57:36</timestamp>
+        <level>2</level>
+        <text>Ein neuer Wert wurde abgelesen.</text>
+        <outcome>2</outcome>
+        <timestamp>2017-07-18T05:45:36</timestamp>
       </LogEvent>
     </LogEntry>
     <LogEntry>
@@ -215,26 +215,26 @@
       <LogEvent>
         <level>2</level>
         <text>Ein neuer Wert wurde abgelesen.</text>
-        <outcome>2</outcome>
-        <timestamp>2015-06-09T06:43:12</timestamp>
+        <outcome>1</outcome>
+        <timestamp>2017-07-27T16:19:12</timestamp>
       </LogEvent>
     </LogEntry>
     <LogEntry>
       <recordNumber>23</recordNumber>
       <LogEvent>
         <level>1</level>
-        <text>Tarifumschaltung war erfolgreich.</text>
-        <outcome>2</outcome>
-        <timestamp>2015-06-16T12:28:48</timestamp>
+        <text>Das Smart Meter Gateway wurde neu gestartet.</text>
+        <outcome>1</outcome>
+        <timestamp>2017-08-06T02:52:48</timestamp>
       </LogEvent>
     </LogEntry>
     <LogEntry>
       <recordNumber>24</recordNumber>
       <LogEvent>
         <level>1</level>
-        <text>Gerät wurde gewartet.</text>
-        <outcome>1</outcome>
-        <timestamp>2015-06-23T18:14:24</timestamp>
+        <text>Ein neuer Wert wurde abgelesen.</text>
+        <outcome>2</outcome>
+        <timestamp>2017-08-15T13:26:24</timestamp>
       </LogEvent>
     </LogEntry>
     <LogEntry>
@@ -242,8 +242,8 @@
       <LogEvent>
         <level>1</level>
         <text>Ein neuer Wert wurde abgelesen.</text>
-        <outcome>0</outcome>
-        <timestamp>2015-07-01T00:00:00</timestamp>
+        <outcome>2</outcome>
+        <timestamp>2017-08-25T00:00:00</timestamp>
       </LogEvent>
     </LogEntry>
     <MeterReading>
@@ -260,62 +260,70 @@
       </ReadingType>
       <IntervalBlock>
         <interval>
-          <duration>15638400</duration>
-          <start>2015-01-01T00:00:00</start>
+          <duration>20390400</duration>
+          <start>2017-01-01T00:00:00</start>
         </interval>
         <IntervalReading>
           <espi:value>100000</espi:value>
           <timePeriod>
             <duration>0</duration>
-            <start>2015-01-01T00:00:00</start>
+            <start>2017-01-01T00:00:00</start>
           </timePeriod>
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>102166</espi:value>
+          <espi:value>100191</espi:value>
           <timePeriod>
             <duration>0</duration>
-            <start>2015-01-31T00:00:00</start>
+            <start>2017-01-31T00:00:00</start>
           </timePeriod>
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>104332</espi:value>
+          <espi:value>100485</espi:value>
           <timePeriod>
             <duration>0</duration>
-            <start>2015-03-02T00:00:00</start>
+            <start>2017-03-02T00:00:00</start>
           </timePeriod>
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>106498</espi:value>
+          <espi:value>100497</espi:value>
           <timePeriod>
             <duration>0</duration>
-            <start>2015-04-01T00:00:00</start>
+            <start>2017-04-01T00:00:00</start>
           </timePeriod>
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>108664</espi:value>
+          <espi:value>100588</espi:value>
           <timePeriod>
             <duration>0</duration>
-            <start>2015-05-01T00:00:00</start>
+            <start>2017-05-01T00:00:00</start>
           </timePeriod>
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>110830</espi:value>
+          <espi:value>100874</espi:value>
           <timePeriod>
             <duration>0</duration>
-            <start>2015-05-31T00:00:00</start>
+            <start>2017-05-31T00:00:00</start>
           </timePeriod>
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>113000</espi:value>
+          <espi:value>101023</espi:value>
           <timePeriod>
             <duration>0</duration>
-            <start>2015-06-30T00:00:00</start>
+            <start>2017-06-30T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>101212</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-07-30T00:00:00</start>
           </timePeriod>
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
@@ -335,62 +343,70 @@
       </ReadingType>
       <IntervalBlock>
         <interval>
-          <duration>15638400</duration>
-          <start>2015-01-01T00:00:00</start>
+          <duration>20390400</duration>
+          <start>2017-01-01T00:00:00</start>
         </interval>
         <IntervalReading>
           <espi:value>150000</espi:value>
           <timePeriod>
             <duration>0</duration>
-            <start>2015-01-01T00:00:00</start>
+            <start>2017-01-01T00:00:00</start>
           </timePeriod>
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>152166</espi:value>
+          <espi:value>150018</espi:value>
           <timePeriod>
             <duration>0</duration>
-            <start>2015-01-31T00:00:00</start>
+            <start>2017-01-31T00:00:00</start>
           </timePeriod>
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>154332</espi:value>
+          <espi:value>150294</espi:value>
           <timePeriod>
             <duration>0</duration>
-            <start>2015-03-02T00:00:00</start>
+            <start>2017-03-02T00:00:00</start>
           </timePeriod>
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>156498</espi:value>
+          <espi:value>150447</espi:value>
           <timePeriod>
             <duration>0</duration>
-            <start>2015-04-01T00:00:00</start>
+            <start>2017-04-01T00:00:00</start>
           </timePeriod>
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>158664</espi:value>
+          <espi:value>150629</espi:value>
           <timePeriod>
             <duration>0</duration>
-            <start>2015-05-01T00:00:00</start>
+            <start>2017-05-01T00:00:00</start>
           </timePeriod>
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>160830</espi:value>
+          <espi:value>150782</espi:value>
           <timePeriod>
             <duration>0</duration>
-            <start>2015-05-31T00:00:00</start>
+            <start>2017-05-31T00:00:00</start>
           </timePeriod>
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>163000</espi:value>
+          <espi:value>151047</espi:value>
           <timePeriod>
             <duration>0</duration>
-            <start>2015-06-30T00:00:00</start>
+            <start>2017-06-30T00:00:00</start>
+          </timePeriod>
+          <statusFNN>0000010500100504</statusFNN>
+        </IntervalReading>
+        <IntervalReading>
+          <espi:value>151083</espi:value>
+          <timePeriod>
+            <duration>0</duration>
+            <start>2017-07-30T00:00:00</start>
           </timePeriod>
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
@@ -410,54 +426,46 @@
       </ReadingType>
       <IntervalBlock>
         <interval>
-          <duration>15638400</duration>
-          <start>2015-01-01T00:00:00</start>
+          <duration>4282007296</duration>
+          <start>2017-02-01T00:00:00</start>
         </interval>
         <IntervalReading>
-          <espi:value>4332</espi:value>
+          <espi:value>570</espi:value>
           <timePeriod>
             <duration>0</duration>
-            <start>2015-02-01T00:00:00</start>
+            <start>2017-03-01T00:00:00</start>
           </timePeriod>
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>4332</espi:value>
+          <espi:value>165</espi:value>
           <timePeriod>
             <duration>0</duration>
-            <start>2015-03-01T00:00:00</start>
+            <start>2017-04-01T00:00:00</start>
           </timePeriod>
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>4332</espi:value>
+          <espi:value>273</espi:value>
           <timePeriod>
             <duration>0</duration>
-            <start>2015-04-01T00:00:00</start>
+            <start>2017-05-01T00:00:00</start>
           </timePeriod>
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>4332</espi:value>
+          <espi:value>439</espi:value>
           <timePeriod>
             <duration>0</duration>
-            <start>2015-05-01T00:00:00</start>
+            <start>2017-06-01T00:00:00</start>
           </timePeriod>
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>
         <IntervalReading>
-          <espi:value>4332</espi:value>
+          <espi:value>414</espi:value>
           <timePeriod>
             <duration>0</duration>
-            <start>2015-06-01T00:00:00</start>
-          </timePeriod>
-          <statusFNN>0000010500100504</statusFNN>
-        </IntervalReading>
-        <IntervalReading>
-          <espi:value>4332</espi:value>
-          <timePeriod>
-            <duration>0</duration>
-            <start>2015-07-01T00:00:00</start>
+            <start>2017-07-01T00:00:00</start>
           </timePeriod>
           <statusFNN>0000010500100504</statusFNN>
         </IntervalReading>

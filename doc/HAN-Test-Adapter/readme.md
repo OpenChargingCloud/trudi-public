@@ -158,9 +158,8 @@ Legt die Standardtarifstufe fest. Wurde zum Beispiel bei *TariffStageCount* 2 an
 ### DayIdCount (Nur bei Taf7)
 Legt die Anzhal der unterschiedlichen Tagesprofile fest.
 
-### ValueSummary
-Die Energie, die während des angegebenen Zeitraums verbraucht wurde. Der Wert wird gleichmäßig auf die einzelnen Einträge in der 
-originären Messwertliste verteilt.
+### MaxPeriodUsage
+Der maximal mögliche Verbrauch zwischen zwei Messwerten. Er tatsächliche eingetragene Wert wird dann per Zufall berechnet.
 
 ### MeterReadingConfigs
 Parameter für die generierung eines MeterReading Objekts.
@@ -191,15 +190,6 @@ Anhand dieses Parameters lässt sich der Skalierungsfaktor der ganzzahligen Messw
 
 ### ObisCode
 Der entsprechende ObisCode
-
-### IntervalBlocks
-Hier werden die einzelnen IntervalBlocks konfiguriert.
-
-### Duration 
-Die Dauer des Intervalblocks. In der Regel wird ein IntervalBlock verwendet und umfasst damit den gesamten Abrechnungszeitraum. Die Angabe erfolgt in Sekunden.
-
-### Start
-Der Startzeitpunkt des Intervalblocks. Die Angabe der Startzeit erfolgt nach folgendem Schema: YYYY-MM-DDThh:mm:ss Beispiel: 2017-07-01T12:00:00
 
 ### UsedStatus 
 Hier wird der gewünschte Status angegeben. "FNN" für StatusFNN und "PTB" für StatusPTB. Andere Werte sind nicht gültig.
@@ -266,7 +256,7 @@ Die Nummer des zu diesen DayTimeProfile gehörigem Tarifs.
 		"TariffStageCount": "2",
 		"DefaultTariffNumber": "1",
 		"DayIdCount": "1",
-		"ValueSummary": "15325",
+		"MaxPeriodUsage": "300",
 		"MeterReadingConfigs": 
 		[
 			{
@@ -279,14 +269,7 @@ Die Nummer des zu diesen DayTimeProfile gehörigem Tarifs.
 				"Uom": "72",
 				"Scaler": "-1",
 				"ObisCode": "0100010800ff",
-				"IntervalBlocks":
-				[
-					{
-						"Duration": "18316800",
-						"Start": "2017-01-01T00:00:00"
-					}
-				]
-
+				"UsedStatus:" "FNN"
 			}
 		],
 		"TariffStageConfigs": 

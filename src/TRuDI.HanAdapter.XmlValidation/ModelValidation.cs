@@ -569,8 +569,8 @@
                     break;
                 case TariffUseCase.Taf7:
                     break;
+
                 case TariffUseCase.Taf9:
-                    break;
                 default:
                     exceptions.Add(new InvalidOperationException($"Invalid AnalysisProfile TariffUseCase {tariffUseCase}."));
                     break;

@@ -115,10 +115,6 @@
             var xmlDataResult = new XmlDataResult();
             xmlDataResult.Raw = result.trudiXml;
 
-            Ar2418Validation.ValidateSchema(result.trudiXml);
-            xmlDataResult.Model = XmlModelParser.ParseHanAdapterModel(result.trudiXml.Root.Descendants());
-            ModelValidation.ValidateHanAdapterModel(xmlDataResult.Model);
-            ContextValidation.ValidateContext(xmlDataResult.Model, ctx);
             return xmlDataResult;
         }
 
