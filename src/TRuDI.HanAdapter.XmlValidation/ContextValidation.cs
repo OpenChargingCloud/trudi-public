@@ -11,7 +11,7 @@
 
     public static class ContextValidation
     {
-          
+
         // TODO Überprüfungen die für TAF 1 und TAF 6 spezifisch sind. 
         // TODO Methoden zur Validierung des geparsten SupplierModels (Lieferant Adapter)
 
@@ -154,7 +154,7 @@
                 exceptions.Add(new InvalidOperationException("TAF-2 needs at least 5 instances of MeterReading."));
             }
         }
-        
+
         // Check of the meterReadingIds are unique
         private static void ValidateMeterReadingIds(UsagePointAdapterTRuDI usagePoint, AdapterContext ctx, List<Exception> exceptions)
         {
@@ -171,23 +171,26 @@
             var queryStart = ctx.Start;
             var queryEnd = ctx.End;
 
-                // 3 years have 94694400 seconds
-                if ((queryEnd - queryStart).TotalSeconds > 94694400)
-                {
-                    exceptions.Add(new InvalidOperationException("The maximum time span of 3 years was exceeded."));
-                }
+            // 3 years have 94694400 seconds
+            if ((queryEnd - queryStart).TotalSeconds > 94694400)
+            {
+                exceptions.Add(new InvalidOperationException("The maximum time span of 3 years was exceeded."));
+            }
 
-                if (interval.Start <= billingPeriod.Begin && interval.GetEnd() >= billingPeriod.End)
-                {
+            // TAF-7: there is no billing period
+            if (billingPeriod == null)
+            {
                 return;
-                }
-                else
-                {
-                    exceptions.Add(new InvalidOperationException("The period of the delivered data is invalid."));   
-                }
+            }
 
-
-
+            if (interval.Start <= billingPeriod.Begin && interval.GetEnd() >= billingPeriod.End)
+            {
+                return;
+            }
+            else
+            {
+                exceptions.Add(new InvalidOperationException("The period of the delivered data is invalid."));
+            }
         }
 
         // Validation of the obisCodes
@@ -201,7 +204,7 @@
         {
             uint? duration = 0;
 
-            foreach(MeterReading reading in usagePoint.MeterReadings)
+            foreach (MeterReading reading in usagePoint.MeterReadings)
             {
                 if (!reading.IsOriginalValueList())
                 {
@@ -258,7 +261,7 @@
         private static void ValidateTaf7PeriodsInBillingPeriod(UsagePointAdapterTRuDI usagePoint, AdapterContext ctx, List<Exception> exceptions)
         {
             // TODO befinden sich alle Perioden im angegebenen Abrechnungszeitraum?
-        } 
+        }
 
         // Taf-7: Validate if the billing period of the model matches the billing period of the supplier data
         private static void ValidateTaf7SupplierBillingPeriod(UsagePointAdapterTRuDI model, UsagePointLieferant supplier, List<Exception> exceptions)
@@ -266,16 +269,16 @@
             var modelInterval = model.MeterReadings[0].IntervalBlocks[0].Interval;
             var supplierInterval = supplier.AnalysisProfile.BillingPeriod;
 
-            if(modelInterval.Duration < supplierInterval.Duration)
+            if (modelInterval.Duration < supplierInterval.Duration)
 
 
 
-            if(modelInterval.Start > supplierInterval.Start || modelInterval.GetEnd() < supplierInterval.GetEnd())
-            {
-                exceptions.Add(new InvalidOperationException("Taf-7: The model does not match with the billing period of the supplier data."));
-            }
+                if (modelInterval.Start > supplierInterval.Start || modelInterval.GetEnd() < supplierInterval.GetEnd())
+                {
+                    exceptions.Add(new InvalidOperationException("Taf-7: The model does not match with the billing period of the supplier data."));
+                }
 
-            if(modelInterval.Duration < supplierInterval.Duration)
+            if (modelInterval.Duration < supplierInterval.Duration)
             {
                 exceptions.Add(new InvalidOperationException("Taf-7: The billing period duration of the model is to small."));
             }
@@ -286,19 +289,19 @@
         {
             var profiles = supplier.AnalysisProfile.TariffChangeTrigger.TimeTrigger.DayProfiles;
 
-            foreach(DayProfile profile in profiles)
+            foreach (DayProfile profile in profiles)
             {
                 var dtProfiles = profile.DayTimeProfiles;
-                for(int i = 0; i < dtProfiles.Count; i++)
+                for (int i = 0; i < dtProfiles.Count; i++)
                 {
-                    if(i+1 == dtProfiles.Count)
+                    if (i + 1 == dtProfiles.Count)
                     {
                         break;
                     }
 
                     var current = new TimeSpan((int)dtProfiles[i].StartTime.Hour, (int)dtProfiles[i].StartTime.Minute, 0);
-                    
-                    var next = new TimeSpan((int)dtProfiles[i+1].StartTime.Hour, (int)dtProfiles[i+1].StartTime.Minute, 0);
+
+                    var next = new TimeSpan((int)dtProfiles[i + 1].StartTime.Hour, (int)dtProfiles[i + 1].StartTime.Minute, 0);
 
                     if ((int)(next - current).TotalSeconds == 900)
                     {
@@ -322,19 +325,19 @@
         {
             var tarifStages = new List<ushort>();
 
-            foreach(TariffStage stage in supplier.AnalysisProfile.TariffStages)
+            foreach (TariffStage stage in supplier.AnalysisProfile.TariffStages)
             {
                 tarifStages.Add(stage.TariffNumber);
             }
 
-            foreach(DayProfile dayProfile in supplier.AnalysisProfile.TariffChangeTrigger.TimeTrigger.DayProfiles)
+            foreach (DayProfile dayProfile in supplier.AnalysisProfile.TariffChangeTrigger.TimeTrigger.DayProfiles)
             {
-                foreach(DayTimeProfile dtProfile in dayProfile.DayTimeProfiles)
+                foreach (DayTimeProfile dtProfile in dayProfile.DayTimeProfiles)
                 {
                     bool match = false;
                     foreach (int stage in tarifStages)
                     {
-                        if(stage == dtProfile.TariffNumber)
+                        if (stage == dtProfile.TariffNumber)
                         {
                             match = true;
                             break;
@@ -353,7 +356,7 @@
         {
             var dayProfileIds = new List<ushort?>();
 
-            foreach(DayProfile profile in supplier.AnalysisProfile.TariffChangeTrigger.TimeTrigger.DayProfiles)
+            foreach (DayProfile profile in supplier.AnalysisProfile.TariffChangeTrigger.TimeTrigger.DayProfiles)
             {
                 dayProfileIds.Add(profile.DayId);
             }

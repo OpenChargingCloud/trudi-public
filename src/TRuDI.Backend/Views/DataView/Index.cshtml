@@ -1,5 +1,7 @@
 ﻿@using TRuDI.Backend.Application
 @using TRuDI.Backend.Utils
+@using TRuDI.HanAdapter.XmlValidation.Models
+@using TRuDI.HanAdapter.XmlValidation.Models.BasicData
 @inject ApplicationState StateService
 @{
     ViewData["Title"] = "Abrechnungsdaten";
@@ -31,29 +33,34 @@
                     @data.TariffName
                 </td>
             </tr>
-            
-            <table class="table">
-                <tr>
-                    <th>Register</th>
-                    <th>Wert</th>
-                    <th>Einheit</th>
-                    <th>Status</th>
-                    <th>Beschreibung</th>
-                </tr>
-                
-                @foreach (var reading in meterReadings.MeterReadings)
-                {
-                    <tr>
-                        <td>@reading.ReadingType.ObisCode</td>
-                        <td>@reading.IntervalBlocks.FirstOrDefault()?.IntervalReadings.FirstOrDefault()?.Value</td>
-                        <td>@reading.ReadingType.Uom</td>
-                        <td>@reading.IntervalBlocks.FirstOrDefault()?.IntervalReadings.FirstOrDefault()?.ToStatusString()</td>
-                        <td></td>
-                    </tr>
-                }
+        </table>
 
-            </table>
-            
+        <table class="table">
+            <tr>
+                <th>Register</th>
+                <th>Wert</th>
+                <th>Einheit</th>
+                <th>Status</th>
+                <th>Beschreibung</th>
+            </tr>
+
+            @foreach (var reading in meterReadings.MeterReadings)
+            {
+                var obisId = new ObisId(reading.ReadingType.ObisCode);
+
+                <tr>
+                    <td>@obisId.ToString()</td>
+                    <td>
+                        @reading.IntervalBlocks.FirstOrDefault()?.IntervalReadings.FirstOrDefault()?.Value.GetDisplayValue(
+                            reading.ReadingType.Uom ?? Uom.Not_Applicable,
+                            reading.ReadingType.PowerOfTenMultiplier ?? PowerOfTenMultiplier.None,
+                            reading.ReadingType.Scaler)
+                    </td>
+                    <td>@reading.ReadingType.Uom.GetDisplayUnit(@reading.ReadingType.PowerOfTenMultiplier ?? PowerOfTenMultiplier.None)</td>
+                    <td>@reading.IntervalBlocks.FirstOrDefault()?.IntervalReadings.FirstOrDefault()?.ToStatusString()</td>
+                    <td>@obisId.GetLabel()</td>
+                </tr>
+            }
 
         </table>
     </div>
@@ -142,13 +149,11 @@
                     <script type="text/javascript">
                         $(function () {
                             $("#logStart").datetimepicker({
-                                viewMode: 'days',
-                                format: 'DD.MM.YYYY'
+                                locale: 'de'
                             });
                             $("#logEnd").datetimepicker({
                                 useCurrent: false,
-                                viewMode: 'days',
-                                format: 'DD.MM.YYYY'
+                                locale: 'de',
                             });
                         });
 

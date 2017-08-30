@@ -15,7 +15,7 @@
             this.meterReading = meterReading;
 
             this.Obis = new ObisId(this.meterReading.ReadingType.ObisCode);
-            this.Unit = this.meterReading.ReadingType.Uom?.ToString();
+            this.DisplayUnit = this.meterReading.ReadingType.Uom.GetDisplayUnit(this.meterReading.ReadingType.PowerOfTenMultiplier ?? PowerOfTenMultiplier.None);
 
             this.MeasurementPeriod = meterReading.GetMeasurementPeriod();
             foreach (var block in this.meterReading.IntervalBlocks)
@@ -35,7 +35,13 @@
 
         public ObisId Obis { get; }
 
-        public string Unit { get; }
+        public string DisplayUnit { get; }
+
+        public Uom Uom => this.meterReading.ReadingType.Uom ?? Uom.Not_Applicable;
+
+        public PowerOfTenMultiplier PowerOfTenMultiplier => this.meterReading.ReadingType.PowerOfTenMultiplier ?? PowerOfTenMultiplier.None;
+
+        public short Scaler => this.meterReading.ReadingType.Scaler;
 
         public string Meter { get; }
 

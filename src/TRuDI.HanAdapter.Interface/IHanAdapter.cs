@@ -57,7 +57,7 @@ namespace TRuDI.HanAdapter.Interface
             Action<ProgressInfo> progressCallback);
 
         /// <summary>
-        /// Read contract information from SMGW.
+        /// Read contract information from the SMGW. This method is called after the successfull connect to the device.
         /// </summary>
         /// <param name="ct">Token for user initiated cancellation.</param>
         /// <param name="progressCallback">This callback must be called regularly.</param>
@@ -67,7 +67,7 @@ namespace TRuDI.HanAdapter.Interface
             Action<ProgressInfo> progressCallback);
 
         /// <summary>
-        /// Loads the data.
+        /// Loads the data of the specified contract and billing period from the SMGW.
         /// </summary>
         /// <param name="ctx">A set of parameters which specifies what exactly is to be read out.</param>
         /// <param name="ct">Token for user initiated cancellation.</param>
@@ -79,13 +79,14 @@ namespace TRuDI.HanAdapter.Interface
             Action<ProgressInfo> progressCallback);
 
         /// <summary>
-        /// Loads the current register values of the specified contract.
+        /// Loads the current derived register values of the specified contract.
         /// </summary>
-        /// <param name="contract">The contract to .</param>
+        /// <param name="contract">The contract to load the registers from.</param>
         /// <param name="ct">Token for user initiated cancellation.</param>
         /// <param name="progressCallback">This callback must be called regularly.</param>
         /// <returns>
-        /// On success, a XML document containing a meter reading with the current tariff registers. 
+        /// On success, a XML document containing a meter reading with the current tariff registers 
+        /// (just like <see cref="LoadData"/>, but without original value list and log data).
         /// </returns>
         Task<(XDocument trudiXml, AdapterError error)> GetCurrentRegisterValues(
             ContractInfo contract,

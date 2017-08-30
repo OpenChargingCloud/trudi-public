@@ -11,10 +11,17 @@
   <PropertyGroup>
     <RestoreSources>$(RestoreSources);../../private-packages;https://api.nuget.org/v3/index.json</RestoreSources>
     <Version>1.0.0</Version>
+    <ApplicationIcon />
+    <OutputType>Library</OutputType>
+    <StartupObject />
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\TRuDI.TafAdapter.Interface\TRuDI.TafAdapter.Interface.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Data\" />
   </ItemGroup>
 
 </Project>

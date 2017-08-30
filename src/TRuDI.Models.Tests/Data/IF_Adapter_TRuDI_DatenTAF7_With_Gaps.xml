@@ -187,7 +187,7 @@
           <espi:value>639118</espi:value>
           <timePeriod>
             <duration>0</duration>
-            <start>2017-06-26T11:45:00+02:00</start>
+            <start>2017-06-26T09:45:00Z</start>
           </timePeriod>
           <statusFNN>0000010500100504</statusFNN>
           <statusPTB>0</statusPTB>

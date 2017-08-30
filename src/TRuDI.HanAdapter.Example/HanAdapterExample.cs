@@ -30,24 +30,15 @@
         private HanAdapterExampleConfig config;
         private Certificate certificate;
 
+        private string configFile;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="HanAdapterExample"/> class.
         /// </summary>
         /// <param name="configFile">The configuration file or a directory that contains at least one configuration file.</param>
         public HanAdapterExample(string configFile)
         {
-            try
-            {
-                var json = System.IO.File.ReadAllText(configFile);
-                this.config = JsonConvert.DeserializeObject<HanAdapterExampleConfig>(json);
-                this.certificate = new Certificate();
-                this.certificate.HexStringToByteArray(config.Cert);
-            }
-            catch (Exception ex)
-            {
-                this.logger.ErrorException($"Failed to load test configuration from file {configFile}", ex);
-                throw;
-            }
+            this.configFile = configFile;
         }
 
         public async Task<(ConnectResult result, AdapterError error)> Connect(
@@ -60,6 +51,8 @@
             CancellationToken ct,
             Action<ProgressInfo> progressCallback)
         {
+            this.LoadConfigFile();
+            
             this.logger.Info("Connecting to {0} using user/password authentication", endpoint);
             var realEndpoint = new IPEndPoint(IPAddress.Parse(config.IPAddress), config.IPPort);
             if (!endpoint.Address.Equals(realEndpoint.Address) || endpoint.Port != realEndpoint.Port)
@@ -82,6 +75,22 @@
             }
         }
 
+        private void LoadConfigFile()
+        {
+            try
+            {
+                var json = System.IO.File.ReadAllText(this.configFile);
+                this.config = JsonConvert.DeserializeObject<HanAdapterExampleConfig>(json);
+                this.certificate = new Certificate();
+                this.certificate.HexStringToByteArray(this.config.Cert);
+            }
+            catch (Exception ex)
+            {
+                this.logger.ErrorException($"Failed to load test configuration from file {this.configFile}", ex);
+                throw;
+            }
+        }
+
         public async Task<(ConnectResult result, AdapterError error)> Connect(
             string deviceId,
             IPEndPoint endpoint,
@@ -92,6 +101,8 @@
             CancellationToken ct,
             Action<ProgressInfo> progressCallback)
         {
+            this.LoadConfigFile();
+
             this.logger.Info("Connecting to {0} using a client certificate", endpoint);
             return await this.CommonConnect(deviceId, timeout, ct, progressCallback);
         }
@@ -131,6 +142,7 @@
                     progressCallback(new ProgressInfo((i *(100 / config.Contracts.Count)), $"Abrufbare Daten für Vertrag {i+1} vorhanden."));
                     contracts.Add(config.Contracts[i]);
                 }
+
                 await Task.Delay(1000);
             }
 

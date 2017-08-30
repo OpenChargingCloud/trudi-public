@@ -1,0 +1,41 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using TRuDI.TafAdapter.Interface;
+
+namespace TRuDI.TafAdapter.Taf2
+{
+    public class AccountingDay : IAccountingDay
+    {
+        private List<MeasuringRange> measuringRanges = new List<MeasuringRange>();
+        private List<Register> summaryRegister;
+
+        public AccountingDay(IList<Register> register)
+        {
+            this.summaryRegister = new List<Register>(register);
+        }
+
+        public DateTime Date
+        {
+            get; set;
+        }
+
+        public long? Reading
+        {
+            get; set;
+        }
+
+        public void Add(MeasuringRange range)
+        {
+            this.measuringRanges.Add(range);
+
+            this.summaryRegister.FirstOrDefault(r => r.TariffId == range.TariffId).Amount =
+                       summaryRegister.FirstOrDefault(r => r.TariffId == range.TariffId).Amount + range.Amount;
+        }
+
+        public IReadOnlyList<IMeasuringRange> MeasuringRanges => this.measuringRanges;
+
+        public IReadOnlyList<Register> SummaryRegister => this.summaryRegister;
+    }
+}

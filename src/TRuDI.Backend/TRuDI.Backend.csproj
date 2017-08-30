@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <MvcRazorCompileOnPublish>true</MvcRazorCompileOnPublish>
-    <RuntimeIdentifiers>win10-x64;ubuntu.16.10-x64</RuntimeIdentifiers>
+    <RuntimeIdentifiers>win-x64;win7-x64;win10-x64;ubuntu.16.10-x64</RuntimeIdentifiers>
     <AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
     <UserSecretsId>aspnet-TRuDI.HanAdapter.UiTest-49A490D1-55E7-44CF-93EE-45F9EBEA9A38</UserSecretsId>
     <AssemblyName>TRuDI.Backend</AssemblyName>
@@ -32,7 +32,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\TRuDI.HanAdapter.DrNeuhaus\TRuDI.HanAdapter.DrNeuhaus.csproj" />
     <ProjectReference Include="..\TRuDI.HanAdapter.Example\TRuDI.HanAdapter.Example.csproj" />
+    <ProjectReference Include="..\TRuDI.HanAdapter.LandisGyr\TRuDI.HanAdapter.LandisGyr.csproj" />
+    <ProjectReference Include="..\TRuDI.HanAdapter.Ppc\TRuDI.HanAdapter.Ppc.csproj" />
     <ProjectReference Include="..\TRuDI.TafAdapter.Interface\TRuDI.TafAdapter.Interface.csproj" />
     <ProjectReference Include="..\TRuDI.TafAdapter.Taf2\TRuDI.TafAdapter.Taf2.csproj" />
   </ItemGroup>

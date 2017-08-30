@@ -25,6 +25,8 @@
             this.F = (byte)(value & 0xFF);
         }
 
+        public ObisMedium Medium => (ObisMedium)this.A;
+
         public byte A { get; set; }
         public byte B { get; set; }
         public byte C { get; set; }

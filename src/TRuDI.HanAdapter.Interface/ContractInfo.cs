@@ -9,12 +9,12 @@
     public class ContractInfo
     {
         /// <summary>
-        /// BSI TAF ID.
+        /// BSI TAF ID (TAF-1, TAF-2, TAF-6, TAF-7, ...)
         /// </summary>
         public TafId TafId { get; set; }
 
         /// <summary>
-        /// Logical name of the TAF profile.
+        /// Logical name of the TAF profile (uniqe identification of the TAF profile).
         /// </summary>
         public string TafName { get; set; }
 

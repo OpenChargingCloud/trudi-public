@@ -175,5 +175,15 @@
                                 (int)dtp.StartTime.Minute,
                                 (int)dtp.StartTime.Second);
         }
+
+        public static bool IsDateInIntervalBlock(this Interval interval, DateTime date)
+        {
+            if(date >= interval.Start && date <= interval.GetEnd())
+            {
+                return true;
+            }
+
+            return false;
+        }
     }
 }

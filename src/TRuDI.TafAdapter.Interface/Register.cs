@@ -1,18 +1,20 @@
 ﻿namespace TRuDI.TafAdapter.Interface
 {
+    using TRuDI.HanAdapter.XmlValidation.Models;
+
     public class Register
     {
-        public string ObisCode
+        public ObisId ObisCode
         {
             get; set;
         }
 
-        public string TariffId
+        public ushort TariffId
         {
             get; set;
         }
 
-        public decimal Amount
+        public long? Amount
         {
             get; set;
         }

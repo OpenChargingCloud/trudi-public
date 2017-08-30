@@ -28,22 +28,51 @@
             int contractIndex,
             int billingPeriodIndex,
             DateTime startTime,
+            DateTime endTime,
+            string mode)
+        {
+            var contractContainer = this.applicationState.Contracts[contractIndex];
+            var contract = mode == "BP" ? contractContainer.Contract : contractContainer.Taf6;
+
+            if (contract == null)
+            {
+                return this.NotFound();
+            }
+
+            var ctx = new AdapterContext
+            {
+                Contract = contract,
+                BillingPeriod = contract.BillingPeriods[billingPeriodIndex],
+                Start = startTime,
+                End = endTime,
+            };
+
+            ctx.WithLogdata = true;
+            this.applicationState.LoadData(ctx);
+
+            return this.Ok();
+        }
+
+        public IActionResult StartReadoutTaf7(
+            int contractIndex,
+            DateTime startTime,
             DateTime endTime)
         {
-            var contract = this.applicationState.Contracts[contractIndex];
+            var contractContainer = this.applicationState.Contracts[contractIndex];
 
             var ctx = new AdapterContext
                           {
-                              Contract = contract,
-                              BillingPeriod = contract.BillingPeriods[billingPeriodIndex],
+                              Contract = contractContainer.Contract,
+                              BillingPeriod = null,
                               Start = startTime,
                               End = endTime,
                           };
 
-            this.applicationState.LoadData(ctx);
             ctx.WithLogdata = true;
+            this.applicationState.LoadData(ctx);
 
             return this.Ok();
         }
+
     }
 }

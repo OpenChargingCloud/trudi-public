@@ -41,7 +41,7 @@
         public ConnectDataViewModel ConnectData { get; set; }
         public CertData ClientCert { get; set; }
 
-        public IReadOnlyList<ContractInfo> Contracts { get; set; }
+        public IReadOnlyList<ContractContainer> Contracts { get; set; }
 
         public ConnectResult LastConnectResult { get; private set; }
 
@@ -82,7 +82,29 @@
                             ct,
                             this.ProgressCallback);
 
-                        this.Contracts = await this.activeHanAdapter.LoadAvailableContracts(ct, this.ProgressCallback);
+                        var contracts = await this.activeHanAdapter.LoadAvailableContracts(ct, this.ProgressCallback);
+                        var containers = contracts.Where(c => c.TafId != TafId.Taf6).Select(c => new ContractContainer() { Contract = c }).ToList();
+
+                        foreach (var taf6Contract in contracts.Where(c => c.TafId == TafId.Taf6))
+                        {
+                            var cnt = containers.FirstOrDefault(c =>
+                                taf6Contract.TafName == c.Contract.TafName &&
+                                taf6Contract.Begin == c.Contract.Begin &&
+                                taf6Contract.End == c.Contract.End &&
+                                taf6Contract.SupplierId == c.Contract.SupplierId &&
+                                taf6Contract.Meters.SequenceEqual(c.Contract.Meters));
+
+                            if (cnt != null)
+                            {
+                                cnt.Taf6 = taf6Contract;
+                            }
+                            else
+                            {
+                                containers.Add(new ContractContainer { Contract = taf6Contract });
+                            }
+                        }
+
+                        this.Contracts = containers;
 
                         await this.LoadNextPageAfterProgress("/Contracts");
                     }
@@ -135,7 +157,7 @@
                             return;
                         }
 
-                        this.CurrentDataResult.OriginalValueLists = 
+                        this.CurrentDataResult.OriginalValueLists =
                             this.CurrentDataResult.Model.MeterReadings.Where(mr => mr.IsOriginalValueList()).Select(mr => new OriginalValueList(mr)).ToList();
 
                         var meterReadings = this.CurrentDataResult.Model.MeterReadings.Where(mr => !mr.IsOriginalValueList()).ToList();

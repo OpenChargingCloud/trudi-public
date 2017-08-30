@@ -268,17 +268,43 @@ public async Task<(ConnectResult result, AdapterError error)> Connect(
 ### 2. Laden der zum Verbraucher gehörenden Verträge mittels ``LoadAvailableContracts``
 
 Direkt nach dem Verbindungsaufbau wird ``LoadAvailableContracts`` aufgerufen um eine Liste der für den 
-Benutzer relevanten Verträge zu erhalten.
+Verbraucher relevanten Verträge zu erhalten.
 
-```csharp
+``LoadAvailableContracts`` liefert eine Liste mit Instanzen der Klasse ``ContractInfo`` zurück.
 
-```
+Feld | Beschreibung|XML|Beispiel
+---  | --- | --- | ---
+TafId| Nummer des TAF | | TAF-1, TAF-2, TAF-6, TAF-7
+TafName|Eindeutige Identifikation des TAF | | TAF-2-ID
+Description|Kurze Beschreibung des TAF | tariffName |HT/NT Tarif
+Meters|Liste der mit dem TAF verbundenen Zähler | meterId
+MeteringPointId|Zählpunktbezeichnung | usagePointId | DE00000000000000000000000000000001
+SupplierId|ID des Lieferanten | invoicingPartyId | EMT-BDEW
+ConsumerId|ObjectID des Letztverbrauchers, dem die die Daten zugeordnet werden (Cosem Logical Device ohne .sm) | customerId | userID-001
+Begin|Startzeitpunkt des Vertrags|||
+End|Endzeitpunkt des Vertrags|||
+
+
+#### TAF-6
+
+TAF-6 wird als eigenes ``ContractInfo`` zurückgeliefert, welches sich nur druch die TAF-ID vom zugehörigen Vertrag unterscheidet.
+
 
 ### 3. Laden der Daten zum vom Verbraucher ausgewählten Vertrag mittels ``LoadData``
 
+Lädt die Ablesung für den in ``AdapterContext`` angegebenen Vertrag. 
+
+- Ist keine ``BillingPeriod`` angegeben, werden nur originären Meßwertlisten und ggf. die 
+  Logbuch-Einträge abgerufen. Dies kann z.B. bei TAF-7 der Fall sein.
+
+- Ist die Abrechnungsperiode noch nicht abgeschlossen, werden nur die originären Meßwertlisten und ggf. die 
+  Logbuch-Einträge abgerufen. Anschließend werden über ``GetCurrentRegisterValues`` die aktuellen 
+  Registerwerte abgerufen.
+
+
 ### 4. Abruf der aktuellen Registerwerte durch ``GetCurrentRegisterValues``
 
-Wird zum abrufen der TAF-6-Werte verwendet. 
+Lädt die aktuellen Registerwerte (Wichtig: die abgeleiteten Register!) des angegebenen Vertrags. 
 
 ## Test-HAN-Adapter ``TRuDI.HanAdapter.Example``
 
