@@ -129,5 +129,43 @@
         {
             return $"ovl_{ovl.Meter}_{ovl.Obis.ToHexString()}_{ovl.MeasurementPeriod.TotalSeconds}";
         }
+
+        public static string ToServiceCategoryString(this Kind? kind)
+        {
+            if (kind == null)
+            {
+                return string.Empty;
+            }
+
+            switch (kind.Value)
+            {
+                case Kind.electricity:
+                    return "Strom";
+
+                case Kind.gas:
+                    return "Gas";
+
+                case Kind.water:
+                    return "Wasser";
+
+                case Kind.pressure:
+                    return "Druck";
+
+                case Kind.heat:
+                    return "Wärme";
+
+                case Kind.cold:
+                    return "Kälte";
+
+                case Kind.communication:
+                    return "Kommunikation";
+
+                case Kind.time:
+                    return "Zeit";
+
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
     }
 }

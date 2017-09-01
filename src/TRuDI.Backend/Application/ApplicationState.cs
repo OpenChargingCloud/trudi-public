@@ -2,9 +2,11 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using System.Xml.Linq;
 
     using TRuDI.Backend.MessageHandlers;
     using TRuDI.Backend.Models;
@@ -21,9 +23,9 @@
 
         public OperationMode OperationMode { get; set; }
 
-        public List<string> LastErrorMessages { get; } = new List<string>();
+        public BreadCrumbTrail BreadCrumbTrail { get; } = new BreadCrumbTrail();
 
-        public Stack<string> LastUrl { get; } = new Stack<string>();
+        public List<string> LastErrorMessages { get; } = new List<string>();
 
         public HanAdapterContainer ActiveHanAdapter => this.activeHanAdapter;
 
@@ -31,6 +33,7 @@
         {
             this.notificationsMessageHandler = notificationsMessageHandler;
             this.ConnectData = new ConnectDataViewModel();
+            this.BreadCrumbTrail.Add("Start", "/OperatingModeSelection");
         }
 
         public void LoadAdapter(string serverId)
@@ -52,6 +55,8 @@
         public ProgressData CurrentProgressState { get; } = new ProgressData();
 
         public XmlDataResult CurrentDataResult { get; private set; }
+
+        public SupplierFile CurrentSupplierFile { get; set; }
 
         public (byte[] data, string contentType) GetResourceFile(string path)
         {
@@ -106,7 +111,17 @@
 
                         this.Contracts = containers;
 
-                        await this.LoadNextPageAfterProgress("/Contracts");
+                        if (this.OperationMode == OperationMode.DisplayFunction)
+                        {
+                            await this.LoadNextPageAfterProgress("/Contracts");
+                        }
+                        else
+                        {
+                            var tariffContract = this.Contracts.Select(c => c.Contract).FirstOrDefault(c => c.TafId == TafId.Taf7 && c.MeteringPointId == this.CurrentSupplierFile.Model.UsagePointId && c.TafName == this.CurrentSupplierFile.Model.AnalysisProfile.TariffId);
+
+
+
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -114,6 +129,12 @@
                         await this.LoadNextPageAfterProgress("/Connect");
                     }
                 });
+        }
+
+        public void LoadData(XDocument raw)
+        {
+            this.LastErrorMessages.Clear();
+            this.LoadDataFromXml(raw, null);
         }
 
         public void LoadData(AdapterContext ctx)
@@ -130,40 +151,18 @@
 
                     try
                     {
-                        this.CurrentDataResult = await this.activeHanAdapter.LoadData(ctx, ct, this.ProgressCallback);
+                        var raw = await this.activeHanAdapter.LoadData(ctx, ct, this.ProgressCallback);
 
                         try
                         {
-                            Ar2418Validation.ValidateSchema(this.CurrentDataResult.Raw);
-                            this.CurrentDataResult.Model = XmlModelParser.ParseHanAdapterModel(this.CurrentDataResult?.Raw?.Root?.Descendants());
-                            ModelValidation.ValidateHanAdapterModel(this.CurrentDataResult.Model);
-                            ContextValidation.ValidateContext(this.CurrentDataResult.Model, ctx);
+                            this.LoadDataFromXml(raw, ctx);
                         }
-                        catch (AggregateException ex)
+                        catch
                         {
-                            foreach (var err in ex.InnerExceptions)
-                            {
-                                this.LastErrorMessages.Add(err.Message);
-                            }
-
+                            // Errors are collected by LoadDataFromXml, just go to the error page now
                             await this.LoadNextPageAfterProgress("/DataView/ValidationError");
                             return;
                         }
-                        catch (Exception ex)
-                        {
-                            this.LastErrorMessages.Add(ex.Message);
-
-                            await this.LoadNextPageAfterProgress("/DataView/ValidationError");
-                            return;
-                        }
-
-                        this.CurrentDataResult.OriginalValueLists =
-                            this.CurrentDataResult.Model.MeterReadings.Where(mr => mr.IsOriginalValueList()).Select(mr => new OriginalValueList(mr)).ToList();
-
-                        var meterReadings = this.CurrentDataResult.Model.MeterReadings.Where(mr => !mr.IsOriginalValueList()).ToList();
-
-                        meterReadings.Sort((a, b) => String.Compare(a.ReadingType.ObisCode, b.ReadingType.ObisCode, StringComparison.InvariantCultureIgnoreCase));
-                        this.CurrentDataResult.MeterReadings = meterReadings;
 
                         await this.LoadNextPageAfterProgress("/DataView");
                     }
@@ -175,6 +174,72 @@
                 });
         }
 
+        public void LoadSupplierXml()
+        {
+            this.LastErrorMessages.Clear();
+
+            try
+            {
+                this.CurrentSupplierFile.Model = XmlModelParser.ParseSupplierModel(this.CurrentSupplierFile.Xml.Root.Descendants());
+                ModelValidation.ValidateSupplierModel(this.CurrentSupplierFile.Model);
+            }
+            catch (AggregateException ex)
+            {
+                foreach (var err in ex.InnerExceptions)
+                {
+                    this.LastErrorMessages.Add(err.Message);
+                }
+
+                throw;
+            }
+            catch (Exception ex)
+            {
+                this.LastErrorMessages.Add(ex.Message);
+                throw;
+            }
+        }
+
+
+        private void LoadDataFromXml(XDocument raw, AdapterContext ctx)
+        {
+            this.LastErrorMessages.Clear();
+
+            try
+            {
+                this.CurrentDataResult = new XmlDataResult { Raw = raw };
+
+                Ar2418Validation.ValidateSchema(raw);
+                this.CurrentDataResult.Model = XmlModelParser.ParseHanAdapterModel(this.CurrentDataResult?.Raw?.Root?.Descendants());
+                ModelValidation.ValidateHanAdapterModel(this.CurrentDataResult.Model);
+
+                if (ctx != null)
+                {
+                    ContextValidation.ValidateContext(this.CurrentDataResult.Model, ctx);
+                }
+            }
+            catch (AggregateException ex)
+            {
+                foreach (var err in ex.InnerExceptions)
+                {
+                    this.LastErrorMessages.Add(err.Message);
+                }
+
+                throw;
+            }
+            catch (Exception ex)
+            {
+                this.LastErrorMessages.Add(ex.Message);
+                throw;
+            }
+
+            this.CurrentDataResult.OriginalValueLists =
+                this.CurrentDataResult.Model.MeterReadings.Where(mr => mr.IsOriginalValueList()).Select(mr => new OriginalValueList(mr)).ToList();
+
+            var meterReadings = this.CurrentDataResult.Model.MeterReadings.Where(mr => !mr.IsOriginalValueList()).ToList();
+
+            meterReadings.Sort((a, b) => string.Compare(a.ReadingType.ObisCode, b.ReadingType.ObisCode, StringComparison.InvariantCultureIgnoreCase));
+            this.CurrentDataResult.MeterReadings = meterReadings;
+        }
 
         private void ProgressCallback(ProgressInfo progressInfo)
         {
@@ -194,7 +259,5 @@
             this.CurrentProgressState.NextPageAfterProgress = page;
             await this.notificationsMessageHandler.LoadNextPage(page);
         }
-
-
     }
 }

@@ -5,9 +5,12 @@
     using System.Linq;
     using System.Xml.Linq;
 
+    using TRuDI.HanAdapter.Interface;
     using TRuDI.HanAdapter.XmlValidation.Models;
     using TRuDI.HanAdapter.XmlValidation.Models.BasicData;
     using TRuDI.HanAdapter.XmlValidation.Models.CheckData;
+
+    using AnalysisProfile = TRuDI.HanAdapter.XmlValidation.Models.CheckData.AnalysisProfile;
 
     public class XmlModelParser
     {
@@ -342,7 +345,7 @@
                         usagePoint.AnalysisProfile = new AnalysisProfile();
                         break;
                     case "tariffUseCase":
-                        usagePoint.AnalysisProfile.TariffUseCase = (TariffUseCase)Convert.ToUInt16(e.Value);
+                        usagePoint.AnalysisProfile.TariffUseCase = (TafId)Convert.ToUInt16(e.Value);
                         break;
                     case "tariffId":
                         usagePoint.AnalysisProfile.TariffId = e.Value;

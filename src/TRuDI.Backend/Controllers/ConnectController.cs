@@ -6,6 +6,7 @@
     using System.Diagnostics;
     using System.Threading.Tasks;
     using System.IO;
+    using System.Xml.Linq;
 
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Http;
@@ -25,6 +26,7 @@
 
         public IActionResult Index()
         {
+            this.applicationState.BreadCrumbTrail.Add("Verbinden", "/Connect");
             this.ViewData["ErrorMessage"] = this.applicationState.LastErrorMessages.FirstOrDefault();
             return this.View(this.applicationState.ConnectData);
         }
@@ -94,6 +96,42 @@
 
             return this.VerifyCertPassword(this.applicationState.ClientCert.Password);
         }
+
+
+        [HttpPost]
+        public async Task<IActionResult> UploadXmlFile(List<IFormFile> files)
+        {
+            var file = Request?.Form?.Files?.FirstOrDefault();
+            if (file == null)
+            {
+                return this.Error();
+            }
+
+            XDocument doc;
+            using (var stream = file.OpenReadStream())
+            {
+                try
+                {
+                    doc = XDocument.Load(stream);
+                }
+                catch (Exception ex)
+                {
+                    return this.BadRequest();
+                }
+            }
+
+            try
+            {
+                this.applicationState.LoadData(doc);
+            }
+            catch
+            {
+                return this.BadRequest();
+            }
+
+            return this.Ok();
+        }
+
 
         [HttpPost]
         public IActionResult ValidateClientCertPassword(string password)

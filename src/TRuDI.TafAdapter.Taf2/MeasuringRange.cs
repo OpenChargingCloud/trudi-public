@@ -8,6 +8,9 @@ namespace TRuDI.TafAdapter.Taf2
 
     public class MeasuringRange : IMeasuringRange
     {
+        public MeasuringRange()
+        {
+        }
 
         public MeasuringRange(DateTime Start, DateTime End, ushort TariffId, long Amount)
         {
@@ -20,7 +23,7 @@ namespace TRuDI.TafAdapter.Taf2
         public MeasuringRange(DateTime Start, DateTime End, MeterReading reading, long Amount)
         {
             var obisId = new ObisId(reading.ReadingType.ObisCode);
-            var TariffNumber = obisId.C == 1 ? 163 : 263;
+            var TariffNumber = obisId.C == 1 ? 163 : obisId.C == 2 ? 263 : 63;
 
             this.Start = Start;
             this.End = End;

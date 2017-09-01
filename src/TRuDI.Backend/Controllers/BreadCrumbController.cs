@@ -4,18 +4,18 @@
 
     using TRuDI.Backend.Application;
 
-    public class TariffFileSelectionController : Controller
+    public class BreadCrumbController : Controller
     {
         private readonly ApplicationState applicationState;
 
-        public TariffFileSelectionController(ApplicationState applicationState)
+        public BreadCrumbController(ApplicationState applicationState)
         {
             this.applicationState = applicationState;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(int id)
         {
-            return this.View();
+            return this.Redirect(this.applicationState.BreadCrumbTrail.BackTo(id));
         }
     }
 }

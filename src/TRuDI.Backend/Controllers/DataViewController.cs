@@ -19,6 +19,7 @@
 
         public IActionResult Index()
         {
+            this.applicationState.BreadCrumbTrail.Add("Abrechnungsdaten", "/DataView");
             return this.View();
         }
 

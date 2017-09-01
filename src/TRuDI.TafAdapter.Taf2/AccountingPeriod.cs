@@ -10,6 +10,7 @@ namespace TRuDI.TafAdapter.Taf2
     {
         private List<AccountingDay> accountingDays = new List<AccountingDay>();
         private List<Register> summaryRegister = new List<Register>();
+        private List<Reading> initialReadings = new List<Reading>();
 
         public AccountingPeriod(IList<Register> summaryRegister)
         {
@@ -26,11 +27,6 @@ namespace TRuDI.TafAdapter.Taf2
             get; set;
         }
 
-        public long? InitialReading
-        {
-            get; set;
-        }
-
         public void Add(AccountingDay day)
         {
             foreach (Register reg in this.summaryRegister)
@@ -41,7 +37,24 @@ namespace TRuDI.TafAdapter.Taf2
             this.accountingDays.Add(day);
         }
 
-        public IReadOnlyList<IAccountingDay> AccountingDays => this.accountingDays;
+        public void AddInitialReading(Reading reading)
+        {
+            if(this.initialReadings.Count < 1)
+            {
+                this.initialReadings.Add(reading);
+            }
+            else
+            {
+                if (initialReadings.FirstOrDefault(ir => ir.ObisCode == reading.ObisCode) == null)
+                {
+                    this.initialReadings.Add(reading);
+                }
+            }
+        }
+
+        public IReadOnlyList<Reading> InitialReadings => this.initialReadings;
+
+        public IReadOnlyList<IAccountingSection> AccountingDays => this.accountingDays;
 
         public IReadOnlyList<Register> SummaryRegister => this.summaryRegister;
     }

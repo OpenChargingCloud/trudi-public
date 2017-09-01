@@ -176,6 +176,11 @@
                                 (int)dtp.StartTime.Second);
         }
 
+        public static DateTime GetDate(this DayVarType date)
+        {
+            return new DateTime((int)date.Year, (int)date.Month, (int)date.DayOfMonth);
+        }
+
         public static bool IsDateInIntervalBlock(this Interval interval, DateTime date)
         {
             if(date >= interval.Start && date <= interval.GetEnd())

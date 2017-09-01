@@ -1,4 +1,4 @@
-# HanAdapter Example: Erstellen einer json Konfigurationsdatei
+# HanAdapter Example: Erstellen einer JSON Konfigurationsdatei
 
 Durch die Konfiguration können über den TRuDI.HanAdapter.Example die Verbindung zum SMGW und
 zurückgelieferte Daten simuliert werden. Nach jedem Block ist eine Beispielkonfiguration angefügt.
@@ -27,6 +27,7 @@ Die Firmwareversion des SMGW. Folgende Parameter können eingestellt werden: Comp
 
 #### Beispiel für eine Verbindungsaufbaukonfiguration
 
+```json
 	"DeviceId": "EXXX0012345678",
 	"User": "User01",
 	"Password": "123456",
@@ -40,7 +41,7 @@ Die Firmwareversion des SMGW. Folgende Parameter können eingestellt werden: Comp
 		"Version": "0.0.1",
 		"Hash": "c82cd3d3232d321a1123cd2214212bc21a2df3111a39b88e0c983"
 	}
-
+```
 
 ## Konfigurierbare Daten der im SMGW enthaltenen Verträge
 
@@ -76,6 +77,7 @@ Abrechnungsperioden des Vertrags. Die Angabe der Parameter erfolgt nach folgende
 
 #### Beispiel für einen Vertrag 
 
+```json
 	"Contracts":[
 		{
 			"TafId": "7",
@@ -97,7 +99,7 @@ Abrechnungsperioden des Vertrags. Die Angabe der Parameter erfolgt nach folgende
 			]
 		}	
 	]
-	
+```
 
 ## Daten zur Konfiguration der generierbaren Xml Datei
 
@@ -224,6 +226,7 @@ Die Nummer des zu diesen DayTimeProfile gehörigem Tarifs.
 
 #### Beispiel für ein vollständiges XmlConfig 
 
+```json
 	"WithLogData": "true",
 	"XmlConfig": 
 	{
@@ -310,5 +313,4 @@ Die Nummer des zu diesen DayTimeProfile gehörigem Tarifs.
 			}
 		]
 	}
-
-
+```

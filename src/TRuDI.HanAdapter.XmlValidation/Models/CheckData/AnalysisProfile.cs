@@ -2,6 +2,7 @@
 {
     using System.Collections.Generic;
 
+    using TRuDI.HanAdapter.Interface;
     using TRuDI.HanAdapter.XmlValidation.Models.BasicData;
 
     /// <summary>
@@ -61,7 +62,7 @@
         /// Die angegebene Nummer entspricht dabei dem Anwendungsfall wie er in der TR-03109-1 des BSI definiert wurde.
         /// Eine Instanz der Klasse AnalysisProfile muss genau ein Datenelement der Klasse tariffUseCase beinhalten.
         /// </summary>
-        public TariffUseCase TariffUseCase
+        public TafId TariffUseCase
         {
             get; set;
         }

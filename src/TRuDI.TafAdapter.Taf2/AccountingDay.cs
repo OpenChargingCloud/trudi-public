@@ -6,7 +6,7 @@ using TRuDI.TafAdapter.Interface;
 
 namespace TRuDI.TafAdapter.Taf2
 {
-    public class AccountingDay : IAccountingDay
+    public class AccountingDay : IAccountingSection
     {
         private List<MeasuringRange> measuringRanges = new List<MeasuringRange>();
         private List<Register> summaryRegister;
@@ -16,12 +16,12 @@ namespace TRuDI.TafAdapter.Taf2
             this.summaryRegister = new List<Register>(register);
         }
 
-        public DateTime Date
+        public DateTime Start
         {
             get; set;
         }
 
-        public long? Reading
+        public Reading Reading
         {
             get; set;
         }

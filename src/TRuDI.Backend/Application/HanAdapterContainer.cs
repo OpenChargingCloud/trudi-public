@@ -6,6 +6,7 @@
     using System.Net;
     using System.Threading;
     using System.Threading.Tasks;
+    using System.Xml.Linq;
 
     using TRuDI.Backend.Exceptions;
     using TRuDI.Backend.Models;
@@ -103,7 +104,7 @@
             return connectResult.result;
         }
 
-        public async Task<XmlDataResult> LoadData(AdapterContext ctx, CancellationToken ct, Action<ProgressInfo> progressCallback)
+        public async Task<XDocument> LoadData(AdapterContext ctx, CancellationToken ct, Action<ProgressInfo> progressCallback)
         {
             var result = await this.Adapter.LoadData(ctx, ct, progressCallback);
 
@@ -112,10 +113,7 @@
                 throw new HanAdapterException(result.error);
             }
 
-            var xmlDataResult = new XmlDataResult();
-            xmlDataResult.Raw = result.trudiXml;
-
-            return xmlDataResult;
+            return result.trudiXml;
         }
 
         public async Task<IReadOnlyList<ContractInfo>> LoadAvailableContracts(CancellationToken ct, Action<ProgressInfo> progressCallback)

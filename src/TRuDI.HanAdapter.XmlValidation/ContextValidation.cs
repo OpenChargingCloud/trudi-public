@@ -58,6 +58,8 @@
 
             var exceptions = new List<Exception>();
 
+            ValidateTaf7ModelSupplierCompatibility(usagePoint, supplierModel, exceptions);
+
             ValidateTaf7SupplierBillingPeriod(usagePoint, supplierModel, exceptions);
 
             ValidateTaf7SupplierDayProfiles(supplierModel, exceptions);
@@ -284,6 +286,36 @@
             }
         }
 
+        private static void ValidateTaf7ModelSupplierCompatibility(UsagePointAdapterTRuDI model,UsagePointLieferant supplier, List<Exception> exceptions)
+        {
+            if(model.UsagePointId != supplier.UsagePointId)
+            {
+                exceptions.Add(new InvalidOperationException("Taf-7: The UsagePointId of the model and the supplier do not match."));
+            }
+
+            if(model.InvoicingParty.InvoicingPartyId != supplier.InvoicingParty.InvoicingPartyId)
+            {
+                exceptions.Add(new InvalidOperationException("Taf-7: The InvoicingPartyId of the model and the supplier do not match."));
+            }
+
+            if(model.ServiceCategory.Kind != supplier.ServiceCategory.Kind)
+            {
+                exceptions.Add(new InvalidOperationException("Taf-7: The kind of th service category  of the model and the supplier do not match."));
+            }
+
+            if(model.Smgw.SmgwId != supplier.Smgw.SmgwId)
+            {
+                exceptions.Add(new InvalidOperationException("Taf-7: The Smgw id  of the model and the supplier do not match."));
+            }
+
+            if(model.TariffName != supplier.TariffName)
+            {
+                exceptions.Add(new InvalidOperationException("Taf-7: The tariff name  of the model and the supplier do not match."));
+            }
+        }
+        
+
+
         // Taf-7: Validate if the supplier periods have a duration of 15 minutes
         private static void ValidateTaf7SupplierDayProfiles(UsagePointLieferant supplier, List<Exception> exceptions)
         {
@@ -317,7 +349,7 @@
 
         private static void ValidateSpecialDayProfileBillingPeriod(UsagePointLieferant supplier, List<Exception> exceptions)
         {
-
+            
         }
 
         // Check whether all referenced tarif stages which are used in the DayTimeProfiles are valid

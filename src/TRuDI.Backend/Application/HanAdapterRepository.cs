@@ -18,7 +18,7 @@
 
         public static void ActivateExampleHanAdapter()
         {
-           availableAdapters.Add(new HanAdapterInfo("XXX", "Example GmbH", typeof(HanAdapterExample), "")); 
+           availableAdapters.Add(new HanAdapterInfo("XXX", "Example GmbH", typeof(HanAdapterExample))); 
         }
 
         public static HanAdapterContainer LoadAdapter(string serverId)

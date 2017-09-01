@@ -4,6 +4,8 @@
 
     using Microsoft.AspNetCore.Mvc;
 
+    using Serilog;
+
     using TRuDI.Backend.Application;
 
     /// <summary>
@@ -33,11 +35,12 @@
             try
             {
                 var resourceData = this.applicationState.GetResourceFile(path.Substring(10));
-                return File(resourceData.data, resourceData.contentType);
+                return this.File(resourceData.data, resourceData.contentType);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return NotFound();
+                Log.Error(ex, "Failed to loading resource file: {0}", path);
+                return this.NotFound();
             }
         }
     }

@@ -4,112 +4,143 @@
 @model ConnectDataViewModel
 @inject ApplicationState StateService
 @{
-    ViewData["Title"] = "Verbindung zum Gerät herstellen";
+    ViewData["Title"] = "Daten laden";
 }
 
-<form id="connectForm" enctype="multipart/form-data" method="post" asp-controller="Connect" asp-action="Connect">
-    <div class="panel panel-primary">
-        <div class="panel-heading">Anmeldung am Smart Meter Gateway</div>
-        <div class="panel-body">
+<div>
+    <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="active"><a href="#loadFromGateway" aria-controls="loadFromGateway" role="tab" data-toggle="tab">Aus Smart Meter Gateway laden</a></li>
+        <li role="presentation"><a href="#loadFromFile" aria-controls="loadFromFile" role="tab" data-toggle="tab">Aus Datei laden</a></li>
+    </ul>
 
-            <div class="form-group">
-                <label>
-                    <input type="radio" asp-for="AuthMode" value="UserPassword" id="user-auth"> Benutzername und Passwort
-                </label>
-            </div>
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active" id="loadFromGateway">
 
-            <div id="panel-user-auth" style="display: none;">
-                <div class="form-group">
-                    <label for="DeviceId">Benutzername:</label>
-                    <input class="form-control" asp-for="Username" />
-                </div>
+            <form id="connectForm" enctype="multipart/form-data" method="post" asp-controller="Connect" asp-action="Connect">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">Anmeldung am Smart Meter Gateway</div>
+                    <div class="panel-body">
 
-                <div class="form-group">
-                    <label for="DeviceId">Passwort:</label>
-                    <input class="form-control" asp-for="Password" />
-                </div>
-            </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="radio" asp-for="AuthMode" value="UserPassword" id="user-auth"> Benutzername und Passwort
+                            </label>
+                        </div>
 
-            <div class="form-group">
-                <label>
-                    <input type="radio" asp-for="AuthMode" value="ClientCertificate" id="cert-auth"> Zertifikat
-                </label>
-            </div>
+                        <div id="panel-user-auth" style="display: none;">
+                            <div class="form-group">
+                                <label for="Username">Benutzername:</label>
+                                <input class="form-control" asp-for="Username" />
+                            </div>
 
-            <div id="panel-cert-auth" style="display: none;">
+                            <div class="form-group">
+                                <label for="Password">Passwort:</label>
+                                <input class="form-control" asp-for="Password" />
+                            </div>
+                        </div>
 
-                <div class="form-group">
-                    <label>Client-Zertifikat:</label>
-                    <input type="file" id="certFileLoader" accept="application/x-pkcs12" style="display:none" onchange="onCertSelected();" />
+                        <div class="form-group">
+                            <label>
+                                <input type="radio" asp-for="AuthMode" value="ClientCertificate" id="cert-auth"> Zertifikat
+                            </label>
+                        </div>
 
-                    <div>
-                        <button type="button" class="btn btn-default" id="btnUpload" onclick="openfileDialog();">Zertifikat auswählen...</button>
+                        <div id="panel-cert-auth" style="display: none;">
 
-                        <div id="cert-details">
-                            @if (Model.AuthMode == AuthMode.ClientCertificate && StateService.ClientCert != null)
-                            {
-                                switch (StateService.ClientCert.PasswordState)
-                                {
-                                    case CertPasswordState.PasswordValid:
-                                    case CertPasswordState.WithoutPassword:
-                                        @await Html.PartialAsync("_CertWithoutPasswordPartial", StateService.ClientCert, new ViewDataDictionary(ViewData));
-                                        break;
+                            <div class="form-group">
+                                <label>Client-Zertifikat:</label>
+                                <input type="file" id="certFileLoader" accept="application/x-pkcs12" style="display:none" onchange="onCertSelected();" />
 
-                                    case CertPasswordState.InvalidPassword:
-                                        @await Html.PartialAsync("_CertPasswordInputPartial", StateService.ClientCert, new ViewDataDictionary(ViewData));
-                                        break;
+                                <div>
+                                    <button type="button" class="btn btn-default" id="btnUpload" onclick="openfileDialogCert();">Zertifikat auswählen...</button>
 
-                                    case CertPasswordState.InvalidCertFile:
-                                        @await Html.PartialAsync("_CertInvalidFilePartial", StateService.ClientCert, new ViewDataDictionary(ViewData));
-                                        break;
+                                    <div id="cert-details">
+                                        @if (Model.AuthMode == AuthMode.ClientCertificate && StateService.ClientCert != null)
+                                        {
+                                            switch (StateService.ClientCert.PasswordState)
+                                            {
+                                                case CertPasswordState.PasswordValid:
+                                                case CertPasswordState.WithoutPassword:
+                                                    @await Html.PartialAsync("_CertWithoutPasswordPartial", StateService.ClientCert, new ViewDataDictionary(ViewData));
+                                                    break;
 
-                                    case CertPasswordState.NoCertSelected:
-                                        break;
-                                }
-                            }
+                                                case CertPasswordState.InvalidPassword:
+                                                    @await Html.PartialAsync("_CertPasswordInputPartial", StateService.ClientCert, new ViewDataDictionary(ViewData));
+                                                    break;
+
+                                                case CertPasswordState.InvalidCertFile:
+                                                    @await Html.PartialAsync("_CertInvalidFilePartial", StateService.ClientCert, new ViewDataDictionary(ViewData));
+                                                    break;
+
+                                                case CertPasswordState.NoCertSelected:
+                                                    break;
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+
+                <div class="panel panel-primary">
+                    <div class="panel-heading">Verbindungsparameter</div>
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <label asp-for="DeviceId">Identifikationsnummer:</label>
+                            @if (StateService.OperationMode == OperationMode.DisplayFunction || string.IsNullOrWhiteSpace(Model.DeviceId))
+                            {
+                                <input class="form-control" asp-for="DeviceId"/>
+                            }
+                            else
+                            {
+                                <input class="form-control" asp-for="DeviceId" disabled />
+                            }
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Address">IP-Adresse:</label>
+                            <input class="form-control" asp-for="Address" />
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Port">Port:</label>
+                            <input class="form-control" asp-for="Port" />
+                        </div>
+                    </div>
+
+
+                    <div id="manufacturer-parameters">
+                        @if (StateService?.ActiveHanAdapter?.ManufacturerParametersView != null)
+                        {
+                            @await Html.PartialAsync("_ManufacturerParametersFormPartial", Model.DeviceId, new ViewDataDictionary(ViewData) { { "ManufacturerParametersViewName", StateService?.ActiveHanAdapter?.ManufacturerParametersView } });
+                        }
+                        else
+                        {
+                            @await Html.PartialAsync("_ManufacturerParametersFormEmptyPartial", Model.DeviceId, new ViewDataDictionary(ViewData) { { "ManufacturerParametersViewName", string.Empty } });
+                        }
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Verbinden</button>
+
+            </form>
+
         </div>
+
+        <div role="tabpanel" class="tab-pane" id="loadFromFile">
+            <form id="xmlFileForm">
+                <div class="form-group">
+
+                    <button type="button" class="btn btn-default" id="btnXmlUpload" onclick="openfileDialogXml();">Datei auswählen...</button>
+                    <input type="file" id="xmlFileLoader" accept="application/xml" style="display: none" onchange="onXmlSelected();" />
+                    <div id="xmlFileErrors"></div>
+                </div>
+            </form>
+        </div>
+
     </div>
-
-    <div class="panel panel-primary">
-        <div class="panel-heading">Verbindungsparameter</div>
-        <div class="panel-body">
-            <div class="form-group">
-                <label asp-for="DeviceId">Identifikationsnummer:</label>
-                <input class="form-control" asp-for="DeviceId" />
-            </div>
-
-            <div class="form-group">
-                <label asp-for="Address">IP-Adresse:</label>
-                <input class="form-control" asp-for="Address" />
-            </div>
-
-            <div class="form-group">
-                <label asp-for="Port">Port:</label>
-                <input class="form-control" asp-for="Port" />
-            </div>
-        </div>
-
-
-        <div id="manufacturer-parameters">
-            @if (StateService?.ActiveHanAdapter?.ManufacturerParametersView != null)
-            {
-                @await Html.PartialAsync("_ManufacturerParametersFormPartial", Model.DeviceId, new ViewDataDictionary(ViewData) { { "ManufacturerParametersViewName", StateService?.ActiveHanAdapter?.ManufacturerParametersView } });
-            }
-            else
-            {
-                @await Html.PartialAsync("_ManufacturerParametersFormEmptyPartial", Model.DeviceId, new ViewDataDictionary(ViewData) { { "ManufacturerParametersViewName", string.Empty } });
-            }
-        </div>
-    </div>
-
-    <button type="submit" class="btn btn-primary">Verbinden</button>
-
-</form>
-
+</div>
 
 <script language="javascript" type="text/javascript">
     $(document).ready(function () {
@@ -198,9 +229,36 @@
         });
     }
 
-    function openfileDialog() {
+    function openfileDialogCert() {
         $("#certFileLoader").click();
     }
 
+    function openfileDialogXml() {
+        $("#xmlFileLoader").click();
+    }
 
+    function onXmlSelected() {
+        var fileUpload = $("#xmlFileLoader").get(0);
+        var files = fileUpload.files;
+        var fileData = new FormData();
+
+        for (var i = 0; i < files.length; i++) {
+            fileData.append(files[i].name, files[i]);
+        }
+
+        $.ajax({
+            url: '/Connect/UploadXmlFile',
+            type: "POST",
+            contentType: false,
+            processData: false,
+            data: fileData,
+            success: function (result) {
+                // $("#xmlFileForm").reset();
+                window.location.href = "/DataView";
+            },
+            error: function (err) {
+                window.location.href = "/DataView/ValidationError";
+            }
+        });
+    }
 </script>

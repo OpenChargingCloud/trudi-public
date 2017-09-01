@@ -55,7 +55,7 @@
                         var oc = reg.ObisCode.ToHexString();
                         var errRegister = new Register()
                         {
-                            ObisCode = new ObisId(oc.Substring(0, 7) + "63" + oc.Substring(10)),
+                            ObisCode = new ObisId(oc.Substring(0, 4) + "63" + oc.Substring(6)),
                             TariffId = 163,
                             Amount = 0
                         };
@@ -68,7 +68,7 @@
                         var oc = reg.ObisCode.ToHexString();
                         var errRegister = new Register()
                         {
-                            ObisCode = new ObisId(oc.Substring(0, 7) + "63" + oc.Substring(10)),
+                            ObisCode = new ObisId(oc.Substring(0, 4) + "63" + oc.Substring(6)),
                             TariffId = 263,
                             Amount = 0
                         };
@@ -81,7 +81,7 @@
                         var oc = reg.ObisCode.ToHexString();
                         var errRegister = new Register()
                         {
-                            ObisCode = new ObisId(oc.Substring(0, 7) + "63" + oc.Substring(10)),
+                            ObisCode = new ObisId(oc.Substring(0, 4) + "63" + oc.Substring(6)),
                             TariffId = 63,
                             Amount = 0
                         };
@@ -93,6 +93,40 @@
             }
 
             return register;
+        }
+
+        public static List<ushort?> GetValidDayProfilesForMeterReading(this List<DayProfile> dayProfiles, ObisId mrObisId, List<TariffStage> tariffStages)
+        {
+            var validDayProfiles = new List<ushort?>();
+            var tariffIdList = new List<ushort?>();
+
+            foreach (TariffStage stage in tariffStages)
+            {
+                var obisId = new ObisId(stage.ObisCode);
+
+                if (mrObisId.C == obisId.C)
+                {
+                    tariffIdList.Add(stage.TariffNumber);
+                }
+            }
+
+            foreach (DayProfile dayProfile in dayProfiles)
+            {
+                var isValid = true;
+                foreach (DayTimeProfile dtp in dayProfile.DayTimeProfiles)
+                {
+                    if (!tariffIdList.Contains(dtp.TariffNumber))
+                    {
+                        isValid = false;
+                    }
+                }
+                if (isValid)
+                {
+                    validDayProfiles.Add(dayProfile.DayId);
+                }
+            }
+
+            return validDayProfiles;
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿@using System.Reflection
 @using TRuDI.Backend.Application
+@using TRuDI.Backend.Utils
 @inject ApplicationState StateService
 @{
     ViewData["Title"] = "Über TRuDI";
@@ -23,7 +24,7 @@
                 <th>FLAG-Id</th>
                 <th>Adapter</th>
                 <th>Version</th>
-                <th>Hash</th>
+                <th>RIPEMD160-Prüfsumme</th>
             </tr>
 
             @foreach (var adapter in HanAdapterRepository.AvailableAdapters)
@@ -45,8 +46,8 @@
                         @adapter.Assembly.GetName().Version
                     </td>
                     
-                    <td>
-                        @adapter.Hash
+                    <td style="font-family: monospace;">
+                        @adapter.Hash.AddLineBreak(20)
                     </td>
                 </tr>
             }

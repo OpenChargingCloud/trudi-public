@@ -15,19 +15,21 @@
 
         public IActionResult Index()
         {
+            this.applicationState.BreadCrumbTrail.Reset();
             return this.View();
         }
 
         public IActionResult StartDisplayFunction()
         {
             this.applicationState.OperationMode = OperationMode.DisplayFunction;
+            this.applicationState.CurrentSupplierFile = null;
             return this.RedirectToAction("Index", "Connect");
         }
 
         public IActionResult StartTransparencyFunction()
         {
             this.applicationState.OperationMode = OperationMode.TransparencyFunction;
-            return this.RedirectToAction("Index", "TariffFileSelection");
+            return this.RedirectToAction("Index", "SupplierFile");
         }
 
     }

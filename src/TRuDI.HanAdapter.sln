@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.10
+VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TRuDI.HanAdapter.Interface", "TRuDI.HanAdapter.Interface\TRuDI.HanAdapter.Interface.csproj", "{A8C045F9-D593-407B-8C6B-B528C48CF0B9}"
 EndProject
@@ -28,6 +28,12 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TRuDI.TafAdapter.Taf2.Tests", "TRuDI.TafAdapter.Taf2.Tests\TRuDI.TafAdapter.Taf2.Tests.csproj", "{16CFC1E1-1398-4965-A955-0DE069A5D84D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TRuDI.Models.Tests", "TRuDI.Models.Tests\TRuDI.Models.Tests.csproj", "{3600A934-B203-440E-A445-3479200867DA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TRuDI.TafAdapter.Interface.Tests", "TRuDI.TafAdapter.Interface.Tests\TRuDI.TafAdapter.Interface.Tests.csproj", "{CA8460BA-CA1D-4EC9-B902-F800A23FFF1F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TRuDI.TafAdapter.Taf1", "TRuDI.TafAdapter.Taf1\TRuDI.TafAdapter.Taf1.csproj", "{8538D9A5-A4CC-49C6-80F4-4E3DAF0B78A9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TRuDI.Backend.Tests", "TRuDI.Backend.Tests\TRuDI.Backend.Tests.csproj", "{5ED1362B-8242-484F-BAF1-CE80D40F63A8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -71,6 +77,18 @@ Global
 		{3600A934-B203-440E-A445-3479200867DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3600A934-B203-440E-A445-3479200867DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3600A934-B203-440E-A445-3479200867DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA8460BA-CA1D-4EC9-B902-F800A23FFF1F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA8460BA-CA1D-4EC9-B902-F800A23FFF1F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA8460BA-CA1D-4EC9-B902-F800A23FFF1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA8460BA-CA1D-4EC9-B902-F800A23FFF1F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8538D9A5-A4CC-49C6-80F4-4E3DAF0B78A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8538D9A5-A4CC-49C6-80F4-4E3DAF0B78A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8538D9A5-A4CC-49C6-80F4-4E3DAF0B78A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8538D9A5-A4CC-49C6-80F4-4E3DAF0B78A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5ED1362B-8242-484F-BAF1-CE80D40F63A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5ED1362B-8242-484F-BAF1-CE80D40F63A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5ED1362B-8242-484F-BAF1-CE80D40F63A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5ED1362B-8242-484F-BAF1-CE80D40F63A8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

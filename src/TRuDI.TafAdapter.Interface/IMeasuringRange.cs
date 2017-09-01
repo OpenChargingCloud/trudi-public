@@ -9,8 +9,4 @@
         ushort TariffId { get; }
         long Amount { get; }
     }
-
-
-
-   
 }

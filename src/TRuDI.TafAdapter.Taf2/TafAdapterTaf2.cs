@@ -8,7 +8,6 @@ namespace TRuDI.TafAdapter.Taf2
     using TRuDI.HanAdapter.XmlValidation.Models.CheckData;
     using TRuDI.TafAdapter.Interface;
 
-
     /// <summary>
     /// Default TAF-2 implementation.
     /// </summary>
@@ -18,18 +17,29 @@ namespace TRuDI.TafAdapter.Taf2
         {
             var accountingPeriod = new AccountingPeriod(supplier.GetRegister());
             var dayProfiles = supplier.AnalysisProfile.TariffChangeTrigger.TimeTrigger.DayProfiles;
+
+            accountingPeriod.Begin = supplier.AnalysisProfile.BillingPeriod.Start;
+            accountingPeriod.End = supplier.AnalysisProfile.BillingPeriod.GetEnd();
             
             foreach(MeterReading meterReading in device.MeterReadings)
             {
                 if (meterReading.IsOriginalValueList())
                 {
-                    var specialDayProfiles = supplier.AnalysisProfile.TariffChangeTrigger.TimeTrigger.SpecialDayProfiles;
+                    var validDayProfiles = dayProfiles.GetValidDayProfilesForMeterReading(new ObisId(meterReading.ReadingType.ObisCode), 
+                        supplier.AnalysisProfile.TariffStages);
+
+                    var specialDayProfiles = supplier.AnalysisProfile.TariffChangeTrigger.TimeTrigger.SpecialDayProfiles.Where(s => validDayProfiles.Contains(s.DayId));
                     foreach (SpecialDayProfile profile in specialDayProfiles)
                     {
                         var currentDay = GetDayData(profile, dayProfiles, meterReading, supplier);
 
                         accountingPeriod.Add(currentDay);
                     }
+
+                    accountingPeriod.AddInitialReading(new Reading()
+                    {   Amount = accountingPeriod.AccountingDays.FirstOrDefault().Reading.Amount,
+                        ObisCode = meterReading.ReadingType.ObisCode
+                    });
                 }
                 else
                 {
@@ -37,7 +47,6 @@ namespace TRuDI.TafAdapter.Taf2
                 }
             }
 
-            //accountingPeriod.InitialReading = accountingPeriod.AccountingDays.First().Reading;
             return accountingPeriod;
         }
 
@@ -51,8 +60,8 @@ namespace TRuDI.TafAdapter.Taf2
             var startReading = meterReading.IntervalBlocks.FirstOrDefault(ib => ib.Interval.IsDateInIntervalBlock(start))
                 .IntervalReadings.FirstOrDefault(ir => ir.TimePeriod.Start == start);
 
-            currentDay.Reading = startReading.Value;
-            currentDay.Date = new DateTime((int)profile.SpecialDayDate.Year,
+            currentDay.Reading =  new Reading() { Amount = startReading.Value, ObisCode = meterReading.ReadingType.ObisCode };
+            currentDay.Start = new DateTime((int)profile.SpecialDayDate.Year,
                                            (int)profile.SpecialDayDate.Month,
                                            (int)profile.SpecialDayDate.DayOfMonth);
 
@@ -126,16 +135,17 @@ namespace TRuDI.TafAdapter.Taf2
         public (DateTime end, int index) FindLastValidTime(DateTime start, DateTime end, SpecialDayProfile profile, 
             List<DayTimeProfile> dayTimeProfiles, MeterReading meterReading, int index)
         {
+            var result = end;
             var match = false;
             var helpindex = index;
 
             while (!match)
             {
-                end = new DateTime().GetDateTimeFromSpecialDayProfile(profile, dayTimeProfiles[helpindex]);
+                result = new DateTime().GetDateTimeFromSpecialDayProfile(profile, dayTimeProfiles[helpindex]);
 
-                if (end == start)
+                if (result == start)
                 {
-                    (end, helpindex) = FindNextValidTime(end, profile, dayTimeProfiles, meterReading, index);
+                    (result, helpindex) = FindNextValidTime(result, profile, dayTimeProfiles, meterReading, index);
 
                     if (helpindex + 1 == dayTimeProfiles.Count)
                     {
@@ -143,8 +153,8 @@ namespace TRuDI.TafAdapter.Taf2
                     }
                 }
 
-                var reading = meterReading.IntervalBlocks.FirstOrDefault(ib => ib.Interval.IsDateInIntervalBlock(end))?
-                     .IntervalReadings?.FirstOrDefault(ir => ir.TimePeriod.Start == end);
+                var reading = meterReading.IntervalBlocks.FirstOrDefault(ib => ib.Interval.IsDateInIntervalBlock(result))?
+                     .IntervalReadings?.FirstOrDefault(ir => ir.TimePeriod.Start == result);
 
                 if(reading != null)
                 {
@@ -156,7 +166,7 @@ namespace TRuDI.TafAdapter.Taf2
                 }
             }
 
-            return (end, helpindex);
+            return (result, helpindex);
         }
 
         public (DateTime end, int index) FindNextValidTime(DateTime end, SpecialDayProfile profile,
@@ -170,18 +180,16 @@ namespace TRuDI.TafAdapter.Taf2
                 if(helpindex >= dayTimeProfiles.Count)
                 {
                     helpindex = helpindex - 1;
-                    result = end;
                     break;
                 }
 
-                end = new DateTime().GetDateTimeFromSpecialDayProfile(profile, dayTimeProfiles[helpindex]);
+                result = new DateTime().GetDateTimeFromSpecialDayProfile(profile, dayTimeProfiles[helpindex]);
 
-                var reading = meterReading.IntervalBlocks.FirstOrDefault(ib => ib.Interval.IsDateInIntervalBlock(end))?
-                    .IntervalReadings?.FirstOrDefault(ir => ir.TimePeriod.Start == end);
+                var reading = meterReading.IntervalBlocks.FirstOrDefault(ib => ib.Interval.IsDateInIntervalBlock(result))?
+                    .IntervalReadings?.FirstOrDefault(ir => ir.TimePeriod.Start == result);
 
                 if (reading != null)
                 {
-                    result = end;
                     match = true;
                 }
                 else
@@ -192,20 +200,20 @@ namespace TRuDI.TafAdapter.Taf2
             return (result, helpindex);
         }
 
-        public DateTime SetLastReading(DateTime time, int index)
-        {
-            if(index == 95 && time.TimeOfDay == new TimeSpan(23,45,00))
-            {
-                return time.AddSeconds(900);
-            }
-            return time;
-        }
-
         public (IntervalReading reading, DateTime end) SetIntervalReading(MeterReading meterReading, DateTime end, int index)
         {
-            var date = SetLastReading(end, index);
+            var date = LocalSetLastReading(end, index);
             return (meterReading.IntervalBlocks.FirstOrDefault(ib => ib.Interval.IsDateInIntervalBlock(date))?
                           .IntervalReadings?.FirstOrDefault(ir => ir.TimePeriod.Start == date), date);
+
+            DateTime LocalSetLastReading(DateTime time, int idx)
+            {
+                if (idx == 95 && time.TimeOfDay == new TimeSpan(23, 45, 00))
+                {
+                    return time.AddSeconds(900);
+                }
+                return time;
+            }
         }
     }
 }

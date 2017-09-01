@@ -4,9 +4,12 @@
     using System.Collections.Generic;
     using System.Linq;
 
+    using TRuDI.HanAdapter.Interface;
     using TRuDI.HanAdapter.XmlValidation.Models;
     using TRuDI.HanAdapter.XmlValidation.Models.BasicData;
     using TRuDI.HanAdapter.XmlValidation.Models.CheckData;
+
+    using AnalysisProfile = TRuDI.HanAdapter.XmlValidation.Models.CheckData.AnalysisProfile;
 
     // In this class are all methods for the post-xml-schema-validation
     public static class ModelValidation
@@ -557,20 +560,20 @@
         }
 
         // Validate if the TariffUseCase of AnalysisProfile is valid
-        private static void ValidateAnalysisProfileTariffUseCase(TariffUseCase? tariffUseCase, List<Exception> exceptions)
+        private static void ValidateAnalysisProfileTariffUseCase(TafId? tariffUseCase, List<Exception> exceptions)
         {
             switch (tariffUseCase)
             {
-                case TariffUseCase.Taf1:
+                case TafId.Taf1:
                     break;
-                case TariffUseCase.Taf2:
+                case TafId.Taf2:
                     break;
-                case TariffUseCase.Taf6:
+                case TafId.Taf6:
                     break;
-                case TariffUseCase.Taf7:
+                case TafId.Taf7:
                     break;
 
-                case TariffUseCase.Taf9:
+                case TafId.Taf9:
                 default:
                     exceptions.Add(new InvalidOperationException($"Invalid AnalysisProfile TariffUseCase {tariffUseCase}."));
                     break;

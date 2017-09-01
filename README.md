@@ -1,4 +1,4 @@
-﻿# IF_Adapter_TRuDI
+﻿# TRuDI - Transparenz- und Display-Software
 
 Ansprechpartner:
 
@@ -12,6 +12,14 @@ Ansprechpartner:
 - Visual Studio 2017 15.3: https://www.visualstudio.com/de/vs/
 - .Net Core SDK 2.0: https://www.microsoft.com/net/core/
 - Alternativ zu Visual Studio kann auch Visual Studio Code verwendet werden: https://code.visualstudio.com/
+
+## Installations-Pakete
+
+System           | Download
+---              | ---
+Windows (64-Bit) | http://www.ivu-software.de/apps/TRuDI/TRuDI-Setup-0.8.0.exe
+Windows (32-Bit) | 
+Linux (64-Bit)   |
 
 ## Namenskonvention
 

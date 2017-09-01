@@ -4,10 +4,10 @@
     using System.Collections.Generic;
     using System.Linq;
 
-    public interface IAccountingDay
+    public interface IAccountingSection
     {
-        DateTime Date { get; }
-        long? Reading { get; }
+        DateTime Start { get; }
+        Reading Reading { get; }
 
         IReadOnlyList<IMeasuringRange> MeasuringRanges { get; }
         IReadOnlyList<Register> SummaryRegister { get; }

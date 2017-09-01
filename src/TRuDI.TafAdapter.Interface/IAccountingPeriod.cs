@@ -8,9 +8,9 @@
     {
         DateTime Begin { get; }
         DateTime End { get; }
-        long? InitialReading { get; }
 
-        IReadOnlyList<IAccountingDay> AccountingDays { get; }
+        IReadOnlyList<Reading> InitialReadings { get; }
+        IReadOnlyList<IAccountingSection> AccountingDays { get; }
         IReadOnlyList<Register> SummaryRegister { get; }
     }
 

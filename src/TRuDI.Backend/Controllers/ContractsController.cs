@@ -19,6 +19,7 @@
 
         public IActionResult Index()
         {
+            this.applicationState.BreadCrumbTrail.Add("Verträge", "/Contracts");
             this.ViewData["ErrorMessage"] = this.applicationState.LastErrorMessages.FirstOrDefault();
             return this.View();
         }
@@ -73,6 +74,5 @@
 
             return this.Ok();
         }
-
     }
 }

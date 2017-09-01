@@ -3,6 +3,7 @@
     using System;
     using System.Reflection;
 
+    using TRuDI.Backend.Utils;
     using TRuDI.HanAdapter.Example;
     using TRuDI.HanAdapter.Interface;
 
@@ -10,11 +11,12 @@
     {
         private readonly Type adapterType;
 
-        public HanAdapterInfo(string flagId, string manufacturerName, Type adapterType, string hash)
+        public HanAdapterInfo(string flagId, string manufacturerName, Type adapterType)
         {
             this.FlagId = flagId;
             this.ManufacturerName = manufacturerName;
-            this.Hash = hash;
+            this.Hash = DigestUtils.GetDigestFromAssembly(adapterType);
+            
 
             this.adapterType = adapterType;
         }

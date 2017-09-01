@@ -9,19 +9,29 @@ const url = require('url');
 const crypto = require('crypto');
 const os = require('os');
 
-const backendPathWindows = '../TRuDI.Backend/bin/dist/win10-x64';
+const backendPathWindows = '../TRuDI.Backend/bin/dist/win7-x64';
 const backendPathLinux = '../TRuDI.Backend/bin/dist/linux';
 
 // createBackendHash(backendPathWindows);
 
 // Parse command line options.
 const argv = process.argv.slice(1);
-const options = { testConfigFile: null };
+const options = [];
 for (let i = 0; i < argv.length; i++) {
 
     writeLog(`arg ${i}: ${argv[i]}`);
     if (argv[i].match(/^--test=/)) {
-        options.testConfigFile = argv[i].split('=')[1];
+        options.push(argv[i]);
+        break;
+    }
+
+    if (argv[i].match(/^--log=/)) {
+        options.push(argv[i]);
+        break;
+    }
+
+    if (argv[i].match(/^--loglevel=/)) {
+        options.push(argv[i]);
         break;
     }
 }
@@ -152,11 +162,7 @@ function startBackendService() {
         workpath = path.join(__dirname, backendPathWindows);
     }
 
-  if (options.testConfigFile == null) {
-      backendServiceProcess = proc(apipath, { cwd: workpath });
-  } else {
-      backendServiceProcess = proc(apipath, ['--test=' + options.testConfigFile], { cwd: workpath });
-  }
+  backendServiceProcess = proc(apipath, options, { cwd: workpath });
   
   backendServiceProcess.stdout.on('data', (data) => {
     writeLog(`stdout: ${data}`);

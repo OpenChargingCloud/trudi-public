@@ -14,12 +14,22 @@
     
     @foreach (var entry in Model.Items)
     {
-        <tr>
-            <td>@entry.TimePeriod.Start</td>
-            <td>@entry.Value.GetDisplayValue(Model.Source.Uom, Model.Source.PowerOfTenMultiplier, Model.Source.Scaler)</td>
-            <td>@Model.Source.DisplayUnit</td>
-            <td>@entry.ToStatusString()</td>
-        </tr>
+        @if (entry.Value != null)
+         {
+             <tr>
+                 <td>@entry.TimePeriod.Start</td>
+                 <td>@entry.Value.GetDisplayValue(Model.Source.Uom, Model.Source.PowerOfTenMultiplier, Model.Source.Scaler)</td>
+                 <td>@Model.Source.DisplayUnit</td>
+                 <td>@entry.ToStatusString()</td>
+             </tr>
+        }
+        else
+        {
+            <tr>
+                <td>@entry.TimePeriod.Start</td>
+                <td colspan="3"><span><i class="fa fa-warning"></i> kein Messwert vorhanden</span></td>
+            </tr>
+        }
     }
 
 </table>

@@ -25,7 +25,8 @@
 
             return this.View(
                 this.applicationState.CurrentDataResult.Model.LogEntries.Where(
-                    e => e.LogEvent.Timestamp >= startTime && e.LogEvent.Timestamp <= endTime
+                    e => e.LogEvent != null
+                         && e.LogEvent.Timestamp >= startTime && e.LogEvent.Timestamp <= endTime
                          && (string.IsNullOrWhiteSpace(filterText) || e.LogEvent.Text.Contains(filterText))));
         }
     }
