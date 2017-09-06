@@ -44,11 +44,6 @@
                 </tr>
 
                 <tr>
-                    <th>ID des Kunden</th>
-                    <td>@cnt.Contract.ConsumerId</td>
-                </tr>
-
-                <tr>
                     <th>Gültig ab</th>
                     <td>@cnt.Contract.Begin.ToFormatedString()</td>
                 </tr>
@@ -66,7 +61,7 @@
                     <td>
                         @foreach (var meter in cnt.Contract.Meters)
                         {
-                            @meter<br />
+                            @meter.ToFormattedDeviceId()<br />
                         }
                     </td>
                 </tr>
@@ -80,11 +75,11 @@
             }
 
             <form>
-                @if (cnt.Contract.BillingPeriods.Count > 0)
+                @if (cnt.Contract.BillingPeriods != null && cnt.Contract.BillingPeriods.Count > 0)
                 {
                     int billingPeriodIndex = 0;
 
-                    <h3>Verfügbare Abrechnungsperioden</h3>
+                    <h3>Abrechnungsperioden</h3>
 
                     <table class="table">
 
@@ -114,7 +109,7 @@
                     </table>
                 }
 
-                @if (cnt.Taf6 != null && cnt.Taf6.BillingPeriods.Count > 0)
+                @if (cnt.Taf6?.BillingPeriods != null && cnt.Taf6.BillingPeriods.Count > 0)
                 {
                     int billingPeriodIndex = 0;
 

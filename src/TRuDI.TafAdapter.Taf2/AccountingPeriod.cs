@@ -52,9 +52,17 @@ namespace TRuDI.TafAdapter.Taf2
             }
         }
 
+        public void OrderSections()
+        {
+            if(this.accountingDays.Count > 1)
+            {
+                this.accountingDays.OrderBy(day => day.Start);
+            }
+        }
+
         public IReadOnlyList<Reading> InitialReadings => this.initialReadings;
 
-        public IReadOnlyList<IAccountingSection> AccountingDays => this.accountingDays;
+        public IReadOnlyList<IAccountingSection> AccountingSections => this.accountingDays;
 
         public IReadOnlyList<Register> SummaryRegister => this.summaryRegister;
     }

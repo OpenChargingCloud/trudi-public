@@ -9,6 +9,6 @@
     {
         Signatur = 1,
         SubCA,
-        SBGW_HAN
+        SmgwHan
     }
 }

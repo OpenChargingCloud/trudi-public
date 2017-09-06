@@ -5,64 +5,171 @@
 @inject ApplicationState StateService
 @{
     ViewData["Title"] = "Abrechnungsdaten";
-    var data = StateService.CurrentDataResult.Model;
     var originalValueLists = StateService.CurrentDataResult.OriginalValueLists;
     var meterReadings = StateService.CurrentDataResult;
 }
 
 <div class="panel panel-primary">
-    <div class="panel-heading">Zählpunkt @data.UsagePointId (@data.ServiceCategory.Kind.ToServiceCategoryString())</div>
+    <div class="panel-heading">Zählpunkt @StateService.CurrentDataResult.Model.UsagePointId (@StateService.CurrentDataResult.Model.ServiceCategory.Kind.ToServiceCategoryString())</div>
     <div class="panel-body">
-        <table class="table">
-            <tr>
-                <th>Kunden ID</th>
-                <th>Rechnungssteller ID</th>
-                <th>Tarifbezeichnung</th>
-            </tr>
 
-            <tr>
-                <td>
-                    @data.Customer.CustomerId
-                </td>
+        @if (StateService.CurrentSupplierFile?.Model == null)
+        {
+            var data = StateService.CurrentDataResult.Model;
 
-                <td>
-                    @data.InvoicingParty.InvoicingPartyId
-                </td>
-
-                <td>
-                    @data.TariffName
-                </td>
-            </tr>
-        </table>
-
-        <table class="table">
-            <tr>
-                <th>Register</th>
-                <th>Wert</th>
-                <th>Einheit</th>
-                <th>Status</th>
-                <th>Beschreibung</th>
-            </tr>
-
-            @foreach (var reading in meterReadings.MeterReadings)
-            {
-                var obisId = new ObisId(reading.ReadingType.ObisCode);
+            <table class="table">
+                <tr>
+                    <th>Kunden ID</th>
+                    <th>Rechnungssteller ID</th>
+                    <th>Tarifbezeichnung</th>
+                </tr>
 
                 <tr>
-                    <td>@obisId.ToString()</td>
                     <td>
-                        @reading.IntervalBlocks.FirstOrDefault()?.IntervalReadings.FirstOrDefault()?.Value.GetDisplayValue(
-                            reading.ReadingType.Uom ?? Uom.Not_Applicable,
-                            reading.ReadingType.PowerOfTenMultiplier ?? PowerOfTenMultiplier.None,
-                            reading.ReadingType.Scaler)
+                        @data.Customer.CustomerId
                     </td>
-                    <td>@reading.ReadingType.Uom.GetDisplayUnit(@reading.ReadingType.PowerOfTenMultiplier ?? PowerOfTenMultiplier.None)</td>
-                    <td>@reading.IntervalBlocks.FirstOrDefault()?.IntervalReadings.FirstOrDefault()?.ToStatusString()</td>
-                    <td>@obisId.GetLabel()</td>
-                </tr>
-            }
 
-        </table>
+                    <td>
+                        @data.InvoicingParty.InvoicingPartyId
+                    </td>
+
+                    <td>
+                        @data.TariffName
+                    </td>
+                </tr>
+            </table>
+
+            if (meterReadings.MeterReadings != null && meterReadings.MeterReadings.Count > 0)
+            {
+                <table class="table">
+                    <tr>
+                        <th>Smart Meter Gateway</th>
+                        <th>Startzeitpunkt</th>
+                        <th>Endzeitpunkt</th>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            @StateService.CurrentDataResult.Model.Smgw.SmgwId.ToFormattedDeviceId()
+                        </td>
+                        <td>
+                            @StateService.CurrentDataResult.Begin.ToFormatedString()
+                        </td>
+
+                        <td>
+                            @StateService.CurrentDataResult.End.ToFormatedString()
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="table">
+                    <tr>
+                        <th>Register</th>
+                        <th>Wert</th>
+                        <th>Einheit</th>
+                        <th>Status</th>
+                        <th>Beschreibung</th>
+                    </tr>
+
+                    @foreach (var reading in meterReadings.MeterReadings)
+                    {
+                        var obisId = new ObisId(reading.ReadingType.ObisCode);
+                        var status = reading.IntervalBlocks.FirstOrDefault()?.IntervalReadings.FirstOrDefault();
+
+                        <tr class="@status.ToStatusBackground()">
+                            <td>@obisId.ToString()</td>
+                            <td>
+                                @reading.IntervalBlocks.FirstOrDefault()?.IntervalReadings.FirstOrDefault()?.Value.GetDisplayValue(reading.ReadingType.Uom ?? Uom.Not_Applicable, reading.ReadingType.PowerOfTenMultiplier ?? PowerOfTenMultiplier.None, reading.ReadingType.Scaler)
+                            </td>
+                            <td>@reading.ReadingType.Uom.GetDisplayUnit(@reading.ReadingType.PowerOfTenMultiplier ?? PowerOfTenMultiplier.None)</td>
+                            <td><i class="@status.ToStatusIcon()"></i> @status.ToStatusString()</td>
+                            <td>@obisId.GetLabel()</td>
+                        </tr>
+                    }
+
+                </table>
+            }
+        }
+        else
+        {
+            var data = StateService.CurrentSupplierFile.Model;
+            var tariffData = StateService.CurrentSupplierFile.AccountingPeriod;
+
+            <table class="table">
+                <tr>
+                    <th>Kunden ID</th>
+                    <th>Rechnungssteller ID</th>
+                    <th>Tarifbezeichnung</th>
+                </tr>
+
+                <tr>
+                    <td>
+                        @data.Customer.CustomerId
+                    </td>
+
+                    <td>
+                        @data.InvoicingParty.InvoicingPartyId
+                    </td>
+
+                    <td>
+                        @data.TariffName
+                    </td>
+                </tr>
+            </table>
+
+            <table class="table">
+                <tr>
+                    <th>Smart Meter Gateway</th>
+                    <th>Startzeitpunkt</th>
+                    <th>Endzeitpunkt</th>
+                </tr>
+
+                <tr>
+                    <td>
+                        @StateService.CurrentDataResult.Model.Smgw.SmgwId
+                    </td>
+                    <td>
+                        @StateService.CurrentSupplierFile?.AccountingPeriod.Begin.ToFormatedString()
+                    </td>
+
+                    <td>
+                        @StateService.CurrentSupplierFile?.AccountingPeriod.End.ToFormatedString()
+                    </td>
+                </tr>
+            </table>
+
+            <table class="table">
+                <tr>
+                    <th>Register</th>
+                    <th>Wert</th>
+                    <th>Einheit</th>
+                    <th>Beschreibung</th>
+                </tr>
+
+                @foreach (var register in tariffData.SummaryRegister)
+                {
+                    var ovl = StateService.CurrentDataResult.OriginalValueLists.FirstOrDefault(o => o.Obis.A == register.ObisCode.A && o.Obis.B == register.ObisCode.B && o.Obis.C == register.ObisCode.C && o.Obis.D == register.ObisCode.D && o.Obis.E == 0 && o.Obis.F == register.ObisCode.F);
+                    <tr>
+                        <td>@register.ObisCode.ToString()</td>
+
+                        @if (ovl != null)
+                        {
+                            <td>
+                                @register.Amount.GetDisplayValue(ovl.Uom, ovl.PowerOfTenMultiplier, ovl.Scaler)
+                            </td>
+                            <td>@ovl.Uom.GetDisplayUnit(ovl.PowerOfTenMultiplier)</td>
+                        }
+                        else
+                        {
+                            <td colspan="2">Wert kann nicht Formatiert werden: @register.Amount</td>
+                        }
+
+                        <td>@register.ObisCode.GetLabel()</td>
+                    </tr>
+                }
+
+            </table>
+        }
     </div>
 </div>
 
@@ -72,14 +179,29 @@
     <ul class="nav nav-tabs" role="tablist">
         <li role="presentation" class="active"><a href="#tab_logdata" aria-controls="tab_logdata" role="tab" data-toggle="tab">Logbuchdaten</a></li>
         <li role="presentation" class="dropdown">
-            <a href="#" class="dropdown-toggle" id="tab-dropdown" data-toggle="dropdown" aria-controls="tab-dropdown-contents" aria-expanded="false">Originäre Messwertliste<span class="caret"></span></a>
-            <ul class="dropdown-menu" aria-labelledby="tab-dropdown" id="tab-dropdown-contents">
+            <a href="#" class="dropdown-toggle" id="tab-dropdown-ovl" data-toggle="dropdown" aria-controls="tab-dropdown-contents" aria-expanded="false">Originäre Messwertliste<span class="caret"></span></a>
+            <ul class="dropdown-menu" aria-labelledby="tab-dropdown-ovl" id="tab-dropdown-ovl-contents">
                 @foreach (var ovl in originalValueLists)
                 {
-                    <li class=""><a href="#tab_@ovl.GetOriginalValueListIdent()" id="#tab_@ovl.GetOriginalValueListIdent()-tab" aria-expanded="false" aria-controls="tab_@ovl.GetOriginalValueListIdent()" role="tab" data-toggle="tab">@ovl.Meter (@ovl.Obis.ToString())</a></li>
+                    <li class=""><a href="#tab_@ovl.GetOriginalValueListIdent()" id="#tab_@ovl.GetOriginalValueListIdent()-tab" aria-expanded="false" aria-controls="tab_@ovl.GetOriginalValueListIdent()" role="tab" data-toggle="tab">@ovl.Meter.ToFormattedDeviceId() (@ovl.Obis.ToString())</a></li>
                 }
             </ul>
         </li>
+
+        <li role="presentation" class="dropdown">
+            <a href="#" class="dropdown-toggle" id="tab-dropdown-hvl" data-toggle="dropdown" aria-controls="tab-dropdown-contents" aria-expanded="false">Historische Messwerte<span class="caret"></span></a>
+            <ul class="dropdown-menu" aria-labelledby="tab-dropdown-hvl" id="tab-dropdown-hvl-contents">
+                @foreach (var ovl in originalValueLists)
+                {
+                    <li class=""><a href="#tab_hvl_@ovl.GetOriginalValueListIdent()" id="#tab_hvl_@ovl.GetOriginalValueListIdent()-tab" aria-expanded="false" aria-controls="tab_hvl_@ovl.GetOriginalValueListIdent()" role="tab" data-toggle="tab">@ovl.Meter.ToFormattedDeviceId() (@ovl.Obis.ToString())</a></li>
+                }
+            </ul>
+        </li>
+
+        @if (StateService.CurrentSupplierFile?.AccountingPeriod != null)
+        {
+            <li role="presentation"><a href="#tab_tariffdata" aria-controls="tab_tariffdata" role="tab" data-toggle="tab">Tarifdaten</a></li>
+        }
     </ul>
 
     <div class="tab-content">
@@ -89,89 +211,117 @@
                 <div class="panel-heading">Logbuchdaten</div>
                 <div class="panel-body">
 
-                    <table class="table-condensed">
-                        <tr>
-                            <th>
-                                Startzeitpunkt
-                            </th>
+                    @if (StateService.CurrentDataResult.Model.LogEntries.Any())
+                    {
+                        var logBegin = StateService.CurrentDataResult.Model.LogEntries.First().LogEvent.Timestamp;
+                        var logEnd = StateService.CurrentDataResult.Model.LogEntries.Last().LogEvent.Timestamp;
+                        var logSelectedEnd = logEnd;
+                        if ((logEnd - logBegin) > TimeSpan.FromDays(1))
+                        {
+                            logSelectedEnd = logBegin + TimeSpan.FromDays(1);
+                        }
 
-                            <th>
-                                Endzeitpunkt
-                            </th>
+                        <table class="table-condensed">
+                            <tr>
+                                <th>
+                                    Startzeitpunkt
+                                </th>
 
-                            <th></th>
-                            <th></th>
-                        </tr>
+                                <th>
+                                    Endzeitpunkt
+                                </th>
 
-                        <tr>
-                            <td>
-                                <div class="form-group">
-                                    <div class='input-group date' id="logStart">
-                                        <input type='text' class="form-control" />
-                                        <span class="input-group-addon">
-                                            <span class="glyphicon glyphicon-calendar"></span>
-                                        </span>
+                                <th></th>
+                                <th></th>
+                            </tr>
+
+                            <tr>
+                                <td>
+                                    <div class="form-group">
+                                        <div class='input-group date' id="logStart">
+                                            <input type='text' class="form-control" />
+                                            <span class="input-group-addon">
+                                                <span class="glyphicon glyphicon-calendar"></span>
+                                            </span>
+                                        </div>
                                     </div>
-                                </div>
-                            </td>
+                                </td>
 
-                            <td>
-                                <div class="form-group">
-                                    <div class='input-group date' id="logEnd">
-                                        <input type='text' class="form-control" />
-                                        <span class="input-group-addon">
-                                            <span class="glyphicon glyphicon-calendar"></span>
-                                        </span>
+                                <td>
+                                    <div class="form-group">
+                                        <div class='input-group date' id="logEnd">
+                                            <input type='text' class="form-control" />
+                                            <span class="input-group-addon">
+                                                <span class="glyphicon glyphicon-calendar"></span>
+                                            </span>
+                                        </div>
                                     </div>
-                                </div>
-                            </td>
+                                </td>
 
-                            <td>
-                                <div class="form-group">
-                                    <div class='input-group date'>
-                                        <input type='text' id="logFilterText" class="form-control" />
+                                <td>
+                                    <div class="form-group">
+                                        <div class='input-group date'>
+                                            <input type='text' id="logFilterText" class="form-control" />
+                                        </div>
                                     </div>
-                                </div>
-                            </td>
+                                </td>
 
-                            <td>
-                                <div class="form-group">
-                                    <button type="button" class="btn btn-default" id="btnRead" onclick="filterLog();">Filtern</button>
-                                </div>
-                            </td>
-                        </tr>
-                    </table>
+                                <td>
+                                    <div class="form-group">
+                                        <button type="button" class="btn btn-default" id="btnRead" onclick="filterLog();">Filtern</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
 
-                    <div id="log-table">
-                        @await Component.InvokeAsync("LogItemsView")
-                    </div>
+                        <div id="log-table">
+                            @await Component.InvokeAsync("LogItemsView", new { startTime = logBegin, endTime = logSelectedEnd })
+                        </div>
 
-                    <script type="text/javascript">
-                        $(function () {
-                            $("#logStart").datetimepicker({
-                                locale: 'de'
+                        <script type="text/javascript">
+                            $(function() {
+                                $("#logStart").datetimepicker({
+                                    locale: 'de'
+                                });
+                                $("#logEnd").datetimepicker({
+                                    useCurrent: false,
+                                    locale: 'de',
+                                });
+
+                                $("#logStart").data("DateTimePicker").minDate(moment('@logBegin.ToIso8601()'));
+                                $("#logStart").data("DateTimePicker").maxDate(moment('@logEnd.ToIso8601()'));
+                                $("#logStart").data("DateTimePicker").date(moment('@logBegin.ToIso8601()'));
+
+                                $("#logEnd").data("DateTimePicker").minDate(moment('@logBegin.ToIso8601()'));
+                                $("#logEnd").data("DateTimePicker").maxDate(moment('@logEnd.ToIso8601()'));
+                                $("#logEnd").data("DateTimePicker").date(moment('@logSelectedEnd.ToIso8601()'));
                             });
-                            $("#logEnd").datetimepicker({
-                                useCurrent: false,
-                                locale: 'de',
-                            });
-                        });
 
-                        function filterLog() {
+                            function filterLog() {
 
-                            $.ajax({
-                                url: '/DataView/FilterLog',
-                                type: "POST",
-                                data: "startTime=" + encodeURIComponent($("#logStart").data("DateTimePicker").date().toISOString()) + "&endTime=" + encodeURIComponent($("#logEnd").data("DateTimePicker").date().toISOString()) + "&filterText=" + encodeURIComponent($("#logFilterText").val()),
-                                contentType: 'application/x-www-form-urlencoded',
-                                processData: false,
-                                success: function (result) {
-                                    $("#log-table").html(result);
-                                },
-                                error: function (err) { }
-                            });
-                        };
-                    </script>
+                                $.ajax({
+                                    url: '/DataView/FilterLog',
+                                    type: "POST",
+                                    data: "startTime=" +
+                                        encodeURIComponent($("#logStart").data("DateTimePicker").date().toISOString()) +
+                                        "&endTime=" +
+                                        encodeURIComponent($("#logEnd").data("DateTimePicker").date().toISOString()) +
+                                        "&filterText=" +
+                                        encodeURIComponent($("#logFilterText").val()),
+                                    contentType: 'application/x-www-form-urlencoded',
+                                    processData: false,
+                                    success: function(result) {
+                                        $("#log-table").html(result);
+                                    },
+                                    error: function(err) {}
+                                });
+                            };
+                        </script>
+                    }
+                    else
+                    {
+                        <p>Keine Logbucheinträge verfügbar.</p>
+                    }
                 </div>
             </div>
         </div>
@@ -179,34 +329,44 @@
 
 
         @foreach (var ovl in originalValueLists)
+        {
+            var ovlBegin = ovl.Start;
+            var ovlEnd = ovl.End;
+
+            if (ovlBegin.Date == ovlEnd.Date)
             {
+                ovlEnd = ovlBegin + TimeSpan.FromDays(1);
+            }
+
             <div role="tabpanel" class="tab-pane" id="tab_@ovl.GetOriginalValueListIdent()">
                 <div class="panel panel-primary">
-                    <div class="panel-heading">Originäre Messwertliste @ovl.Meter (@ovl.Obis.ToString())</div>
+                    <div class="panel-heading">Originäre Messwertliste @ovl.Meter.ToFormattedDeviceId() (@ovl.Obis.ToString())</div>
                     <div class="panel-body">
 
-                        <table class="table-condensed">
+                        <table class="table">
                             <tr>
                                 <th>Zähler</th>
                                 <th>Messperiode</th>
                                 <th>OBIS</th>
                             </tr>
                             <tr>
-                                <td>@ovl.Meter</td>
+                                <td>@ovl.Meter.ToFormattedDeviceId()</td>
                                 <td>@ovl.MeasurementPeriod.TotalSeconds Sekunden</td>
                                 <td>@ovl.Obis.ToString()</td>
                             </tr>
                         </table>
-                        <table class="table-condensed">
+                        <table class="table">
                             <tr>
                                 <th>Startzeitpunkt</th>
                                 <th>Endzeitpunkt</th>
+                                <th>Werte</th>
                                 <th>Lücken</th>
                             </tr>
 
                             <tr>
                                 <td>@ovl.Start.ToFormatedString()</td>
                                 <td>@ovl.End.ToFormatedString()</td>
+                                <td>@ovl.ValueCount</td>
                                 <td>
                                     @if (ovl.GapCount == 0)
                                     {
@@ -226,18 +386,153 @@
                             </tr>
                         </table>
 
-                        <div id="ovl_@ovl.Meter">
-                            @await Component.InvokeAsync("OriginalValueListView", new { ovl })
+
+                        <table class="table-condensed">
+                            <tr>
+                                <th>
+                                    Startzeitpunkt
+                                </th>
+                            </tr>
+
+                            <tr>
+                                <td>
+                                    <div class="form-group">
+                                        <div class='input-group date' id="dp_start_@ovl.GetOriginalValueListIdent()">
+                                            <input type='text' class="form-control" />
+                                            <span class="input-group-addon">
+                                                <span class="glyphicon glyphicon-calendar"></span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <div id="ovl_@ovl.GetOriginalValueListIdent()">
+                            @await Component.InvokeAsync("OriginalValueListView", new { ovl, startTime = ovlBegin })
                         </div>
+
+                        <script type="text/javascript">
+                        $(function() {
+                            $("#dp_start_@ovl.GetOriginalValueListIdent()").datetimepicker({
+                                locale: 'de',
+                                format: 'DD.MM.YYYY'
+                            });
+
+                            $("#dp_start_@ovl.GetOriginalValueListIdent()").on("dp.change", function (e) {
+                                selectOvlDay("@ovl.GetOriginalValueListIdent()");
+                            });
+
+                            $("#dp_start_@ovl.GetOriginalValueListIdent()").data("DateTimePicker").minDate(moment('@ovlBegin.ToIso8601()'));
+                            $("#dp_start_@ovl.GetOriginalValueListIdent()").data("DateTimePicker").maxDate(moment('@ovlEnd.ToIso8601()'));
+                            $("#dp_start_@ovl.GetOriginalValueListIdent()").data("DateTimePicker").date(moment('@ovlBegin.ToIso8601()'));
+                        });
+                        </script>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <script type="text/javascript">
+
+                        function selectOvlDay(ovlId) {
+
+                            $.ajax({
+                                url: '/DataView/FilterOvl',
+                                type: "POST",
+                                data: "startTime=" +
+                                encodeURIComponent($("#dp_start_" + ovlId).data("DateTimePicker").date().toISOString()) +
+                                "&ovlId=" +
+                                encodeURIComponent(ovlId),
+                                contentType: 'application/x-www-form-urlencoded',
+                                processData: false,
+                                success: function (result) {
+                                    $("#ovl_" + ovlId).html(result);
+                                },
+                                error: function (err) { }
+                            });
+                        };
+        </script>
+
+
+
+        @foreach (var ovl in originalValueLists)
+            {
+            <div role="tabpanel" class="tab-pane" id="tab_hvl_@ovl.GetOriginalValueListIdent()">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">Historsiche Messwerte @ovl.Meter (@ovl.Obis.ToString())</div>
+                    <div class="panel-body">
+                        <div id="hvl_@ovl.Meter">
+                            @await Component.InvokeAsync("HistoricValueListView", new { ovl })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        @if (StateService.CurrentSupplierFile?.AccountingPeriod != null)
+        {
+            <div role="tabpanel" class="tab-pane" id="tab_tariffdata">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">Tarifdaten</div>
+                    <div class="panel-body">
+
+                        <table>
+                            <tr>
+                                <td></td>
+                                <td>
+                                    <div class="form-group">
+                                        <div class='input-group date' id="tariffDataViewDaySelection">
+                                            <input type='text' class="form-control" />
+                                            <span class="input-group-addon">
+                                                <span class="glyphicon glyphicon-calendar"></span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td></td>
+                            </tr>
+                        </table>
+
+                        <div id="tariff-day-view">
+                            @await Component.InvokeAsync("TariffDataView", new { timestamp = StateService.CurrentSupplierFile?.AccountingPeriod.Begin })
+                        </div>
+
+                        <script type="text/javascript">
+                            $(function () {
+                                $("#tariffDataViewDaySelection").datetimepicker({
+                                    locale: 'de',
+                                    format: 'DD.MM.YYYY'
+                                });
+
+                                $("#tariffDataViewDaySelection").data("DateTimePicker").minDate(moment('@StateService.CurrentSupplierFile?.AccountingPeriod.Begin.Date.ToIso8601()'));
+                                $("#tariffDataViewDaySelection").data("DateTimePicker").maxDate(moment('@StateService.CurrentSupplierFile?.AccountingPeriod.End.Date.ToIso8601()'));
+                                $("#tariffDataViewDaySelection").data("DateTimePicker").date(moment('@StateService.CurrentSupplierFile?.AccountingPeriod.Begin.Date.ToIso8601()'));
+
+                                $("#tariffDataViewDaySelection").on("dp.change", function (e) {
+                                    selectTariffViewDay();
+                                });
+                            });
+
+                            function selectTariffViewDay() {
+
+                                $.ajax({
+                                    url: '/DataView/SelectTariffViewDay',
+                                    type: "POST",
+                                    data: "timestamp=" + encodeURIComponent($("#tariffDataViewDaySelection").data("DateTimePicker").date().toISOString()),
+                                    contentType: 'application/x-www-form-urlencoded',
+                                    processData: false,
+                                    success: function (result) {
+                                        $("#tariff-day-view").html(result);
+                                    },
+                                    error: function (err) { }
+                                });
+                            };
+                        </script>
+
                     </div>
                 </div>
             </div>
         }
     </div>
 </div>
-
-<a asp-action="DownloadXml">XML-Datei speichern</a>
-
-<script type="text/javascript">
-
-</script>

@@ -153,7 +153,7 @@
         {
             switch (type)
             {
-                case CertType.SBGW_HAN:
+                case CertType.SmgwHan:
                     break;
                 case CertType.Signatur:
                     break;
@@ -168,6 +168,11 @@
         // Validation of the SMGW instance
         private static void ValidateSMGW(SMGW smgw, List<Exception> exceptions)
         {
+            if (string.IsNullOrWhiteSpace(smgw.SmgwId))
+            {
+                exceptions.Add(new InvalidOperationException("The Smgw Id is null."));
+            }
+
             if (smgw.CertIds.Count < 1)
             {
                 exceptions.Add(new InvalidOperationException("The SMGW instance does not contain any certIds."));

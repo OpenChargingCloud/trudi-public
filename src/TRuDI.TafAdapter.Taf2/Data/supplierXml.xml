@@ -12,7 +12,7 @@
       <invoicingPartyId>IVU Imag Strom</invoicingPartyId>
     </InvoicingParty>
     <SMGW>
-      <smgwId />
+      <smgwId>EDNT0012345678</smgwId>
     </SMGW>
     <tariffName>Zählerstandsgangmessung IVU</tariffName>
     <AnalysisProfile>

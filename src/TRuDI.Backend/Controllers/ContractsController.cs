@@ -20,11 +20,12 @@
         public IActionResult Index()
         {
             this.applicationState.BreadCrumbTrail.Add("Verträge", "/Contracts");
+            this.applicationState.SideBarMenu.Clear();
+
             this.ViewData["ErrorMessage"] = this.applicationState.LastErrorMessages.FirstOrDefault();
             return this.View();
         }
-
-
+        
         public IActionResult StartReadout(
             int contractIndex,
             int billingPeriodIndex,

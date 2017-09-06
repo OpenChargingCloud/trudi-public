@@ -116,6 +116,18 @@
             return result.trudiXml;
         }
 
+        public async Task<XDocument> GetCurrentRegisterValues(AdapterContext ctx, CancellationToken ct, Action<ProgressInfo> progressCallback)
+        {
+            var result = await this.Adapter.GetCurrentRegisterValues(ctx.Contract, ct, progressCallback);
+
+            if (result.error != null)
+            {
+                throw new HanAdapterException(result.error);
+            }
+
+            return result.trudiXml;
+        }
+
         public async Task<IReadOnlyList<ContractInfo>> LoadAvailableContracts(CancellationToken ct, Action<ProgressInfo> progressCallback)
         {
             var result = await this.Adapter.LoadAvailableContracts(ct, progressCallback);

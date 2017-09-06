@@ -13,6 +13,12 @@ namespace TRuDI.TafAdapter.Taf2
     /// </summary>
     public class TafAdapterTaf2 : ITafAdapter
     {
+        /// <summary>
+        /// Calculates the derived registers for Taf2.
+        /// </summary>
+        /// <param name="device">Data from the SMGW. There should be just original value lists.</param>
+        /// <param name="supplier">The calculation data from the supplier.</param>
+        /// <returns>An IAccountingPeriod instance. The object contains the calculated data.</returns>
         public IAccountingPeriod Calculate(UsagePointAdapterTRuDI device, UsagePointLieferant supplier)
         {
             var accountingPeriod = new AccountingPeriod(supplier.GetRegister());
@@ -20,15 +26,17 @@ namespace TRuDI.TafAdapter.Taf2
 
             accountingPeriod.Begin = supplier.AnalysisProfile.BillingPeriod.Start;
             accountingPeriod.End = supplier.AnalysisProfile.BillingPeriod.GetEnd();
-            
-            foreach(MeterReading meterReading in device.MeterReadings)
+
+
+            foreach (MeterReading meterReading in device.MeterReadings)
             {
                 if (meterReading.IsOriginalValueList())
                 {
                     var validDayProfiles = dayProfiles.GetValidDayProfilesForMeterReading(new ObisId(meterReading.ReadingType.ObisCode), 
                         supplier.AnalysisProfile.TariffStages);
 
-                    var specialDayProfiles = supplier.AnalysisProfile.TariffChangeTrigger.TimeTrigger.SpecialDayProfiles.Where(s => validDayProfiles.Contains(s.DayId));
+                    var specialDayProfiles = supplier.AnalysisProfile.TariffChangeTrigger.TimeTrigger.SpecialDayProfiles.Where(s => validDayProfiles.Contains(s.DayId)).ToList();
+
                     foreach (SpecialDayProfile profile in specialDayProfiles)
                     {
                         var currentDay = GetDayData(profile, dayProfiles, meterReading, supplier);
@@ -37,19 +45,29 @@ namespace TRuDI.TafAdapter.Taf2
                     }
 
                     accountingPeriod.AddInitialReading(new Reading()
-                    {   Amount = accountingPeriod.AccountingDays.FirstOrDefault().Reading.Amount,
+                    {   Amount = accountingPeriod.AccountingSections.FirstOrDefault().Reading.Amount,
                         ObisCode = meterReading.ReadingType.ObisCode
                     });
                 }
                 else
                 {
-                    continue;
+                    throw new InvalidOperationException("Taf7 calculation error: Invalid MeterReading instance. No original value list.");
                 }
             }
+
+            accountingPeriod.OrderSections();
 
             return accountingPeriod;
         }
 
+        /// <summary>
+        /// The main calculation method for every day in the billing period.
+        /// </summary>
+        /// <param name="profile">The current SpecialDayProfile</param>
+        /// <param name="dayProfiles">A List of all DayProfiles</param>
+        /// <param name="meterReading">The MeterReading instance with the raw data.</param>
+        /// <param name="supplier">Contains the calculation data.</param>
+        /// <returns>The calculated AccountingSection</returns>
         public AccountingDay GetDayData(SpecialDayProfile profile, List<DayProfile> dayProfiles, MeterReading meterReading, UsagePointLieferant supplier)
         {
             var currentDay = new AccountingDay(supplier.GetRegister());
@@ -132,6 +150,16 @@ namespace TRuDI.TafAdapter.Taf2
             return currentDay;
         }
 
+        /// <summary>
+        /// If no coresonding value to the tarffif change time is found this method will be called.
+        /// </summary>
+        /// <param name="start">The beginning of the tariff stage range.</param>
+        /// <param name="end">The current endpoint of the tariff stage range.</param>
+        /// <param name="profile">The used SpecialDayProfile instance.</param>
+        /// <param name="dayTimeProfiles">The used DayTime profile.</param>
+        /// <param name="meterReading">The raw data.</param>
+        /// <param name="index">For marking the parent loop index.</param>
+        /// <returns>The matching DateTime and the new index for the parent loop.</returns>
         public (DateTime end, int index) FindLastValidTime(DateTime start, DateTime end, SpecialDayProfile profile, 
             List<DayTimeProfile> dayTimeProfiles, MeterReading meterReading, int index)
         {
@@ -145,7 +173,7 @@ namespace TRuDI.TafAdapter.Taf2
 
                 if (result == start)
                 {
-                    (result, helpindex) = FindNextValidTime(result, profile, dayTimeProfiles, meterReading, index);
+                    (result, helpindex) = FindNextValidTime(end, profile, dayTimeProfiles, meterReading, index);
 
                     if (helpindex + 1 == dayTimeProfiles.Count)
                     {
@@ -165,10 +193,18 @@ namespace TRuDI.TafAdapter.Taf2
                     helpindex--;
                 }
             }
-
             return (result, helpindex);
         }
 
+        /// <summary>
+        /// Is called from FindLastValidTime when no matching vaule was found.
+        /// </summary>
+        /// <param name="end">The current endpoint of the tariff stage range.</param>
+        /// <param name="profile">The used SpecialDayProfile instance.</param>
+        /// <param name="dayTimeProfiles">The used DayTime profile.</param>
+        /// <param name="meterReading">The raw data.</param>
+        /// <param name="index">For marking the parent loop index.</param>
+        /// <returns>The matching DateTime and the new index for the parent loop.</returns>
         public (DateTime end, int index) FindNextValidTime(DateTime end, SpecialDayProfile profile,
             List<DayTimeProfile> dayTimeProfiles, MeterReading meterReading, int index)
         {
@@ -200,6 +236,13 @@ namespace TRuDI.TafAdapter.Taf2
             return (result, helpindex);
         }
 
+        /// <summary>
+        /// If a intervalReading to the tariff change timestamp is needed, this method will be called.
+        /// </summary>
+        /// <param name="meterReading">The raw data.</param>
+        /// <param name="end">The date for the meterReading</param>
+        /// <param name="index">the index of the parent loop</param>
+        /// <returns>An intervalReading or null</returns>
         public (IntervalReading reading, DateTime end) SetIntervalReading(MeterReading meterReading, DateTime end, int index)
         {
             var date = LocalSetLastReading(end, index);

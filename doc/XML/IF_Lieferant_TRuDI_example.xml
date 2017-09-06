@@ -16,6 +16,8 @@
 			<smgwId>1XXXyyy</smgwId>
 		</SMGW>
 		
+		<tariffName>EnBW Standard (Industriekunde)</tariffName>
+		
 			
 		<AnalysisProfile>
 			<tariffUseCase>2</tariffUseCase>

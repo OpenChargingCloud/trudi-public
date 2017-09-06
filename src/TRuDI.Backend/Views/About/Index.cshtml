@@ -1,5 +1,4 @@
-﻿@using System.Reflection
-@using TRuDI.Backend.Application
+﻿@using TRuDI.Backend.Application
 @using TRuDI.Backend.Utils
 @inject ApplicationState StateService
 @{
@@ -9,8 +8,19 @@
 <div class="panel panel-primary">
     <div class="panel-heading">TRuDI</div>
     <div class="panel-body">
-        <div>Version</div>
-        <div>@Microsoft.Extensions.PlatformAbstractions.PlatformServices.Default.Application.ApplicationVersion</div>
+        <table class="table">
+            <tr>
+                <th>Version</th>
+                <td>@Microsoft.Extensions.PlatformAbstractions.PlatformServices.Default.Application.ApplicationVersion</td>
+            </tr>
+
+            <tr>
+                <th></th>
+                <td>
+                    DZG Metering GmbH | AK Bundesdisplay | IVU?
+                </td>
+            </tr>
+        </table>
     </div>
 </div>
 
@@ -33,19 +43,19 @@
                     <td>
                         @adapter.ManufacturerName
                     </td>
-                    
+
                     <td>
                         @adapter.FlagId
                     </td>
-                    
+
                     <td>
                         @adapter.Assembly.GetName().Name
                     </td>
-                    
+
                     <td>
                         @adapter.Assembly.GetName().Version
                     </td>
-                    
+
                     <td style="font-family: monospace;">
                         @adapter.Hash.AddLineBreak(20)
                     </td>
@@ -60,8 +70,64 @@
 <div class="panel panel-primary">
     <div class="panel-heading">TAF Adapter</div>
     <div class="panel-body">
+        <table class="table">
+            <tr>
+                <th>TAF</th>
+                <th>Adapter</th>
+                <th>Version</th>
+                <th>RIPEMD160-Prüfsumme</th>
+            </tr>
+
+            @foreach (var adapter in TafAdapterRepository.AvailableAdapters)
+            {
+                <tr>
+                    <td>
+                        @adapter.TafId.TafToFriendlyName()
+                    </td>
+
+                    <td>
+                        @adapter.Assembly.GetName().Name
+                    </td>
+
+                    <td>
+                        @adapter.Assembly.GetName().Version
+                    </td>
+
+                    <td style="font-family: monospace;">
+                        @adapter.Hash.AddLineBreak(20)
+                    </td>
+                </tr>
+            }
+
+        </table>
+
     </div>
 </div>
 
-<a asp-action="Back">Zurück</a>
+<div class="panel panel-primary">
+    <div class="panel-heading">Lizenz</div>
+    <div class="panel-body">
+        <p>Copyright (c) [DZG|AK Bundesdisplay|IVU?]</p>
+
+        <p>
+            Hiermit wird unentgeltlich jeder Person, die eine Kopie der Software und der zugehörigen Dokumentationen (die "Software") erhält,
+            die Erlaubnis erteilt, sie uneingeschränkt zu nutzen, inklusive und ohne Ausnahme mit dem Recht, sie zu verwenden, zu kopieren,
+            zu verändern, zusammenzufügen, zu veröffentlichen, zu verbreiten, zu unterlizenzieren und/oder zu verkaufen, und Personen,
+            denen diese Software überlassen wird, diese Rechte zu verschaffen, unter den folgenden Bedingungen:
+        </p>
+
+        <p>
+            Der obige Urheberrechtsvermerk und dieser Erlaubnisvermerk sind in allen Kopien oder Teilkopien der Software beizulegen.
+        </p>
+
+        <p>
+            DIE SOFTWARE WIRD OHNE JEDE AUSDRÜCKLICHE ODER IMPLIZIERTE GARANTIE BEREITGESTELLT, EINSCHLIEẞLICH DER GARANTIE ZUR BENUTZUNG FÜR
+            DEN VORGESEHENEN ODER EINEM BESTIMMTEN ZWECK SOWIE JEGLICHER RECHTSVERLETZUNG, JEDOCH NICHT DARAUF BESCHRÄNKT. IN KEINEM FALL SIND
+            DIE AUTOREN ODER COPYRIGHTINHABER FÜR JEGLICHEN SCHADEN ODER SONSTIGE ANSPRÜCHE HAFTBAR ZU MACHEN, OB INFOLGE DER ERFÜLLUNG EINES
+            VERTRAGES, EINES DELIKTES ODER ANDERS IM ZUSAMMENHANG MIT DER SOFTWARE ODER SONSTIGER VERWENDUNG DER SOFTWARE ENTSTANDEN.
+        </p>
+    </div>
+</div>
+
+<a href="/BreadCrumb/ClosePage">Zurück</a>
 

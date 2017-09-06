@@ -24,71 +24,63 @@
                 register.Add(reg);
             }
 
-            var errorRegister = register.Where(r => r.ObisCode.E == 63).ToList() ?? new List<Register>();
-
-            if( errorRegister.Count > 0)
+            if (supplier.AnalysisProfile.TariffUseCase == HanAdapter.Interface.TafId.Taf2)
             {
-                foreach(Register reg in errorRegister)
+                var errorRegister = register.Where(r => r.ObisCode.E == 63).ToList() ?? new List<Register>();
+
+                if (errorRegister.Count > 0)
                 {
-                    switch (reg.ObisCode.C)
+                    foreach (Register reg in errorRegister)
                     {
-                        case 1:
-                            reg.TariffId = 163;
-                            break;
-                        case 2:
-                            reg.TariffId = 263;
-                            break;
-                        default:
-                            reg.TariffId = 63;
-                            break;
+                        reg.TariffId = 63;
                     }
                 }
-            }
-            else
-            {
-                var first = true;
-                var seccond = true;
-                foreach (Register reg in register.ToList())
+                else
                 {
-                    if(first && reg.ObisCode.C == 1)
+                    var first = true;
+                    var seccond = true;
+                    foreach (Register reg in register.ToList())
                     {
-                        var oc = reg.ObisCode.ToHexString();
-                        var errRegister = new Register()
+                        if (first && reg.ObisCode.C == 1)
                         {
-                            ObisCode = new ObisId(oc.Substring(0, 4) + "63" + oc.Substring(6)),
-                            TariffId = 163,
-                            Amount = 0
-                        };
+                            var oc = reg.ObisCode.ToHexString();
+                            var errRegister = new Register()
+                            {
+                                ObisCode = new ObisId(oc) { E = 63 },
+                                TariffId = 63,
+                                Amount = 0
+                            };
 
-                        register.Add(errRegister);
-                        first = false;
-                    }
-                    else if(seccond && reg.ObisCode.C == 2)
-                    {
-                        var oc = reg.ObisCode.ToHexString();
-                        var errRegister = new Register()
+                            register.Add(errRegister);
+                            first = false;
+                        }
+                        else if (seccond && reg.ObisCode.C == 2)
                         {
-                            ObisCode = new ObisId(oc.Substring(0, 4) + "63" + oc.Substring(6)),
-                            TariffId = 263,
-                            Amount = 0
-                        };
+                            var oc = reg.ObisCode.ToHexString();
+                            var errRegister = new Register()
+                            {
+                                ObisCode = new ObisId(oc) { E = 63 },
+                                TariffId = 63,
+                                Amount = 0
+                            };
 
-                        register.Add(errRegister);
-                        first = false;
-                    }
-                    else if(reg.ObisCode.C != 1 && reg.ObisCode.C != 2)
-                    {
-                        var oc = reg.ObisCode.ToHexString();
-                        var errRegister = new Register()
+                            register.Add(errRegister);
+                            seccond = false;
+                        }
+                        else if (reg.ObisCode.C != 1 && reg.ObisCode.C != 2)
                         {
-                            ObisCode = new ObisId(oc.Substring(0, 4) + "63" + oc.Substring(6)),
-                            TariffId = 63,
-                            Amount = 0
-                        };
+                            var oc = reg.ObisCode.ToHexString();
+                            var errRegister = new Register()
+                            {
+                                ObisCode = new ObisId(oc) { E = 63 },
+                                TariffId = 63,
+                                Amount = 0
+                            };
 
-                        register.Add(errRegister);
+                            register.Add(errRegister);
+                        }
+
                     }
-                    
                 }
             }
 
@@ -128,5 +120,6 @@
 
             return validDayProfiles;
         }
+
     }
 }

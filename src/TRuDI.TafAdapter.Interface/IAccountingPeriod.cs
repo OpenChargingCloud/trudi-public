@@ -10,7 +10,7 @@
         DateTime End { get; }
 
         IReadOnlyList<Reading> InitialReadings { get; }
-        IReadOnlyList<IAccountingSection> AccountingDays { get; }
+        IReadOnlyList<IAccountingSection> AccountingSections { get; }
         IReadOnlyList<Register> SummaryRegister { get; }
     }
 

@@ -1,5 +1,7 @@
 ﻿namespace TRuDI.Backend.Controllers
 {
+    using System.Linq;
+
     using Microsoft.AspNetCore.Mvc;
 
     using TRuDI.Backend.Application;
@@ -16,6 +18,11 @@
         public IActionResult Index(int id)
         {
             return this.Redirect(this.applicationState.BreadCrumbTrail.BackTo(id));
+        }
+
+        public IActionResult ClosePage()
+        {
+            return this.Redirect(this.applicationState.BreadCrumbTrail.Items.Last().Link);
         }
     }
 }

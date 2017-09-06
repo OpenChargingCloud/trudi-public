@@ -195,14 +195,22 @@
                         {
                             usagePoint.MeterReadings.LastOrDefault()
                                       .IntervalBlocks.LastOrDefault()
-                                      .Interval.Start = Convert.ToDateTime(e.Value);
+                                      .Interval.CaptureTime = Convert.ToDateTime(e.Value);
+                            usagePoint.MeterReadings.LastOrDefault()
+                                      .IntervalBlocks.LastOrDefault()
+                                      .Interval.Start = new DateTime().GetSmoothCaptureTime(Convert.ToDateTime(e.Value));
+
                         }
                         else if (e.Parent.Name.LocalName == "timePeriod")
                         {
                             usagePoint.MeterReadings.LastOrDefault()
                                  .IntervalBlocks.LastOrDefault()
                                  .IntervalReadings.LastOrDefault()
-                                 .TimePeriod.Start = Convert.ToDateTime(e.Value);
+                                 .TimePeriod.CaptureTime = Convert.ToDateTime(e.Value);
+                            usagePoint.MeterReadings.LastOrDefault()
+                                 .IntervalBlocks.LastOrDefault()
+                                 .IntervalReadings.LastOrDefault()
+                                 .TimePeriod.Start = new DateTime().GetSmoothCaptureTime(Convert.ToDateTime(e.Value));
                         }
 
                         break;
@@ -264,6 +272,11 @@
                 }
             }
 
+            if (usagePoint?.LogEntries != null && usagePoint.LogEntries.Any())
+            {
+                usagePoint.LogEntries.Sort((a, b) => a.LogEvent.Timestamp.CompareTo(b.LogEvent.Timestamp));
+            }
+
             return usagePoint;
         }
 
@@ -273,7 +286,7 @@
             var exceptions = new List<Exception>();
             var dayIdAlreadyExists = false;
 
-            foreach(XElement e in elements)
+            foreach (XElement e in elements)
             {
                 switch (e.Name.LocalName)
                 {
@@ -360,7 +373,8 @@
                         usagePoint.AnalysisProfile.BillingPeriod.Duration = Convert.ToUInt32(e.Value);
                         break;
                     case "start":
-                        usagePoint.AnalysisProfile.BillingPeriod.Start = Convert.ToDateTime(e.Value);
+                        usagePoint.AnalysisProfile.BillingPeriod.CaptureTime = Convert.ToDateTime(e.Value);
+                        usagePoint.AnalysisProfile.BillingPeriod.Start = new DateTime().GetSmoothCaptureTime(Convert.ToDateTime(e.Value));
                         break;
                     case "TariffStage":
                         usagePoint.AnalysisProfile.TariffStages.Add(new TariffStage());

@@ -1,5 +1,7 @@
 ﻿namespace TRuDI.HanAdapter.XmlValidation.Models.BasicData
 {
+    using System.Diagnostics;
+
     /// <summary>
     /// Die Klasse LogEntry spezifiziert Logeinträge.
     ///
@@ -7,6 +9,7 @@
     /// 
     /// - kann auf eine Instanz der Klasse LogEvent verweisen
     /// </summary>
+    [DebuggerDisplay("{RecordNumber}, {LogEvent.Timestamp}, {LogEvent.Text}, {LogEvent.TLevel}, {LogEvent.TOutcome}")]
     public class LogEntry
     {
 

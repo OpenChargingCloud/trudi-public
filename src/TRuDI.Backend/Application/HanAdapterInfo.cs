@@ -16,7 +16,6 @@
             this.FlagId = flagId;
             this.ManufacturerName = manufacturerName;
             this.Hash = DigestUtils.GetDigestFromAssembly(adapterType);
-            
 
             this.adapterType = adapterType;
         }

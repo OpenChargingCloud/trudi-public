@@ -19,6 +19,7 @@
 
         public IActionResult Index()
         {
+            this.ViewData["IsProgressPage"] = true;
             return this.View(this.applicationState.CurrentProgressState);
         }
 

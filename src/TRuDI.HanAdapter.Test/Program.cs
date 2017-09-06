@@ -73,8 +73,8 @@
             ctx.Contract = contractsResult.contracts.First();
             //ctx.Start = ctx.Contract.Begin;
             //ctx.End = ctx.Contract.End ?? DateTime.Now;
-            ctx.Start = new DateTime(2017, 1, 1);
-            ctx.End = new DateTime(2017, 8, 25);
+            ctx.Start = new DateTime(2016, 1, 1);
+            ctx.End = new DateTime(2017, 8, 1);
             ctx.BillingPeriod = ctx.Contract.BillingPeriods.First();
             ctx.WithLogdata = true;
 
@@ -132,6 +132,7 @@
                 Log.Error(ex.Message);
             }
         }
+
 
         private static void ProgressCallback(ProgressInfo progressInfo)
         {

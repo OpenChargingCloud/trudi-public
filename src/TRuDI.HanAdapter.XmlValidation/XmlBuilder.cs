@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Xml.Linq;
 using TRuDI.HanAdapter.XmlValidation.Models.BasicData;
 
@@ -59,8 +58,7 @@ namespace TRuDI.HanAdapter.XmlValidation
                 invoicingParty,
                 smgw
             );
-
-            usagePoint.Add(new XElement(ar + "tariffName", TariffName));
+                        
 
             // Create root element
             XElement UsagePoints = new XElement(
@@ -80,20 +78,27 @@ namespace TRuDI.HanAdapter.XmlValidation
             cer.Add(new XElement(ar + "certContent", Certificate));
             usagePoint.Add(cer);
 
+            usagePoint.Add(new XElement(ar + "tariffName", TariffName));
+
             //event logs
             if (LogList != null && LogList.Count > 0)
             {
                 foreach (LogEntry log in LogList)
                 {
-                    usagePoint.Add(new XElement(ar + "LogEntry",
-                        new XElement(ar + "recordNumber", log.RecordNumber),
+                    var logEntry = new XElement(ar + "LogEntry",
                         new XElement(ar + "LogEvent",
                             new XElement(ar + "level", (byte)log.LogEvent.Level),
                             new XElement(ar + "text", log.LogEvent.Text),
                             new XElement(ar + "outcome", (byte)log.LogEvent.Outcome),
                             new XElement(ar + "timestamp", log.LogEvent.Timestamp.ToString("yyyy-MM-ddTHH:mm:ssK")
-                        ))
-                    ));
+                        )));
+
+                    if (log.RecordNumber != null)
+                    {
+                        logEntry.AddFirst(new XElement(this.ar + "recordNumber", log.RecordNumber));
+                    }
+
+                    usagePoint.Add(logEntry);
                 }
             }
 

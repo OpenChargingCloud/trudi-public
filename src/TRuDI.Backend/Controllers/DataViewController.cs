@@ -2,11 +2,13 @@
 {
     using System;
     using System.IO;
+    using System.Linq;
 
     using Microsoft.AspNetCore.Mvc;
 
     using TRuDI.Backend.Application;
     using TRuDI.Backend.Components;
+    using TRuDI.Backend.Utils;
 
     public class DataViewController : Controller
     {
@@ -20,6 +22,11 @@
         public IActionResult Index()
         {
             this.applicationState.BreadCrumbTrail.Add("Abrechnungsdaten", "/DataView");
+            this.applicationState.SideBarMenu.Clear();
+            this.applicationState.SideBarMenu.Add(null, null);
+            this.applicationState.SideBarMenu.Add("Zertifikate", "/CertificateDetails");
+            this.applicationState.SideBarMenu.Add("Daten exportieren", "/DataView/DownloadXml");
+
             return this.View();
         }
 
@@ -38,9 +45,22 @@
             return new FileStreamResult(ms, "text/xml");
         }
 
-        public ViewComponentResult FilterLog(DateTime startTime, DateTime endTime, string filterText)
+        public ViewComponentResult FilterLog(DateTime startTime, DateTime endTime, string filterText, string filterLevel)
         {
-            return this.ViewComponent(typeof(LogItemsView), new { startTime = startTime.Date, endTime = (endTime + TimeSpan.FromDays(1)).Date, filterText });
+            return this.ViewComponent(typeof(LogItemsView), new { startTime = startTime, endTime = endTime, filterText, filterLevel });
+        }
+
+        public ViewComponentResult FilterOvl(string ovlId, DateTime startTime)
+        {
+            var ovl = this.applicationState.CurrentDataResult.OriginalValueLists.FirstOrDefault(
+                l => l.GetOriginalValueListIdent() == ovlId);
+
+            return this.ViewComponent(typeof(OriginalValueListView), new { ovl, startTime});
+        }
+
+        public ViewComponentResult SelectTariffViewDay(DateTime timestamp)
+        {
+            return this.ViewComponent(typeof(TariffDataView), new { timestamp = timestamp.Date });
         }
     }
 }

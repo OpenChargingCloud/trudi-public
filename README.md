@@ -17,7 +17,7 @@ Ansprechpartner:
 
 System           | Download
 ---              | ---
-Windows (64-Bit) | http://www.ivu-software.de/apps/TRuDI/TRuDI-Setup-0.8.0.exe
+Windows (64-Bit) | http://www.ivu-software.de/apps/TRuDI/TRuDI-Setup-0.9.0.exe
 Windows (32-Bit) | 
 Linux (64-Bit)   |
 

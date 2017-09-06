@@ -94,7 +94,7 @@ namespace TRuDI.TafAdapter.Taf2.Tests
             Assert.AreEqual(125, reg182.Amount);
             Assert.AreEqual(45, reg18x.Amount);
 
-            Assert.AreEqual(3, target.AccountingDays.Count);
+            Assert.AreEqual(3, target.AccountingSections.Count);
         }
 
         [TestMethod]
@@ -126,11 +126,11 @@ namespace TRuDI.TafAdapter.Taf2.Tests
 
             var target = new MeasuringRange(DateTime.Now.AddMonths(-1), DateTime.Now, mrObis163, 1);
 
-            Assert.AreEqual(163, target.TariffId);
+            Assert.AreEqual(63, target.TariffId);
 
             target = new MeasuringRange(DateTime.Now.AddMonths(-1), DateTime.Now, mrObis263, 1);
 
-            Assert.AreEqual(263, target.TariffId);
+            Assert.AreEqual(63, target.TariffId);
 
             target = new MeasuringRange(DateTime.Now.AddMonths(-1), DateTime.Now, mrObis63, 1);
 

@@ -1,0 +1,38 @@
+﻿@using TRuDI.Backend.Utils
+@using TRuDI.HanAdapter.XmlValidation.Models
+@model OriginalValueList
+
+@if (Model.HistoricValues == null || Model.HistoricValues.Count == 0)
+{
+    <p>Es konnten keine Werte berechnet werden.</p>
+}
+else
+{
+    <table class="table-condensed">
+        <tr>
+            <th>Beschreibung</th>
+            <th>Wert</th>
+            <th>Einheit</th>
+        </tr>
+
+        @foreach (var entry in Model.HistoricValues)
+        {
+            if (entry.Value != null)
+            {
+                <tr>
+                    <td>@entry.ToHistoricValueDescription()</td>
+                    <td>@entry.Value.GetDisplayValue(Model.Uom, Model.PowerOfTenMultiplier, Model.Scaler)</td>
+                    <td>@Model.DisplayUnit</td>
+                </tr>
+            }
+            else
+            {
+                <tr>
+                    <td>@entry.ToHistoricValueDescription()</td>
+                    <td colspan="2"><span><i class="fa fa-warning"></i> kein Messwert vorhanden</span></td>
+                </tr>
+            }
+        }
+
+    </table>
+}

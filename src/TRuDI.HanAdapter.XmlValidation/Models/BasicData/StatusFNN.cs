@@ -5,7 +5,7 @@
     public class StatusFNN
     {
         public const string SMGWMASK = "00000000000000000xxx00xx000001x1";
-        public const string BZMASK =   "00000000000xxxxxxxxxxxxx00000100";
+        public const string BZMASK = "00000000000xxxxxxxxxxxxx00000100";
 
         public StatusFNN(string status)
         {
@@ -25,6 +25,28 @@
         public BzStatusWord BzStatusWord
         {
             get; set;
+        }
+
+        public StatusPTB MapToStatusPtb()
+        {
+            if (this.BzStatusWord.HasFlag(BzStatusWord.Fatal_Error) ||
+                this.SmgwStatusWord.HasFlag(SmgwStatusWord.Fatal_Error))
+            {
+                return StatusPTB.Fatal_Error;
+            }
+
+            if (!this.SmgwStatusWord.HasFlag(SmgwStatusWord.Systemtime_Valid) ||
+                this.SmgwStatusWord.HasFlag(SmgwStatusWord.PTB_Temp_Error_is_invalid))
+            {
+                return StatusPTB.Temp_Error_is_invalid;
+            }
+
+            if (!this.SmgwStatusWord.HasFlag(SmgwStatusWord.PTB_Temp_Error_signed_invalid))
+            {
+                return StatusPTB.Warning;
+            }
+
+            return StatusPTB.No_Error;
         }
     }
 

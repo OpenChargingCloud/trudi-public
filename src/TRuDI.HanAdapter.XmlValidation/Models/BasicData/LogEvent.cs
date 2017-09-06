@@ -1,11 +1,13 @@
 ﻿namespace TRuDI.HanAdapter.XmlValidation.Models.BasicData
 {
     using System;
+    using System.Diagnostics;
 
     /// <summary>
     /// Die Klasse LogEvent spezifiziert Logereignisse.
     /// Instanzen der Klasse sind optional.
     /// </summary>
+    [DebuggerDisplay("{Timestamp}, {Level}, {Outcome}, {Text}")]
     public class LogEvent
     {
 

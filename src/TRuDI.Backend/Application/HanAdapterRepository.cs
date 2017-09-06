@@ -5,13 +5,14 @@
 
     using TRuDI.Backend.Exceptions;
     using TRuDI.HanAdapter.Example;
-    using TRuDI.HanAdapter.Interface;
+
+    using ServerId = TRuDI.Backend.ServerId;
 
     public static class HanAdapterRepository
     {
         public static IReadOnlyList<HanAdapterInfo> AvailableAdapters => availableAdapters;
 
-        private static List<HanAdapterInfo> availableAdapters = new List<HanAdapterInfo>
+        private static readonly List<HanAdapterInfo> availableAdapters = new List<HanAdapterInfo>
             {
             };
 

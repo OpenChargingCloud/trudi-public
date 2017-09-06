@@ -12,16 +12,16 @@
         No_Error = 0,
 
         //Warnung, keine (eichrechtliche) Aktion notwendig, Messwert gültig.
-        Warning,
+        Warning = 1,
 
         //Temporärer Fehler, gesendeter Messwert wird als ungültig gekennzeichnet, 
         //der Wert im Messwertfeld kann entsprechend den Regeln [VDE4400] bzw. [G685] im Backend als Ersatzwert verwendet werden.
-        Temp_Error_signed_invalid,
+        Temp_Error_signed_invalid = 2,
 
         //Temporärer Fehler, gesendeter Messwert ist ungültig, der im Messwertfeld enthaltene Wert kann im Backend nicht als Ersatzwert verwendet werden.
-        Temp_Error_is_invalid,
+        Temp_Error_is_invalid = 3,
 
         //Fataler Fehler (Zähler defekt), der aktuell gesendete und alle zukünftigen Messwerte sind ungültig.
-        Fatal_Error
+        Fatal_Error = 4
     }
 }

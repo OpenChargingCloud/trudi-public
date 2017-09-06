@@ -1,49 +1,217 @@
 ﻿namespace TRuDI.HanAdapter.Example.ConfigModel
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Xml.Linq;
     using TRuDI.HanAdapter.Interface;
-    using TRuDI.HanAdapter.XmlValidation.Models;
     using TRuDI.HanAdapter.XmlValidation.Models.BasicData;
     using TRuDI.HanAdapter.XmlValidation.Models.CheckData;
 
-    public static class XmlFactory
+    /// <summary>
+    /// This class is used to create the neccessary xml files for the dummyAdapter.
+    /// </summary>
+    public class XmlFactory
     {
-        public static XDocument FabricateHanAdapterContent(HanAdapterExampleConfig hanConfig)
+        /// <summary>
+        /// The List contains the needed namespaces for the xml file.
+        /// </summary>
+        private List<(string name, XNamespace ns)> Namespaces { get; set; }
+
+        /// <summary>
+        /// The configuration settings to create the xml files automatically 
+        /// </summary>
+        private HanAdapterExampleConfig HanConfiguration { get; set; }
+
+        /// <summary>
+        /// The namespaces will be set in the constructor. 
+        /// </summary>
+        /// <param name="HanConfiguration">A settings object</param>
+        public XmlFactory(HanAdapterExampleConfig HanConfiguration)
         {
-            XNamespace ar = XNamespace.Get("http://vde.de/AR_2418-6.xsd");
-            XNamespace xsi = XNamespace.Get("http://www.w3.org/2001/XMLSchema-instance");
-            XNamespace schemaLocation = XNamespace.Get("http://vde.de/AR_2418-6.xsd AR_2418-6.xsd");
-            XNamespace espi = XNamespace.Get("http://naesb.org/espi");
-            XNamespace atom = XNamespace.Get("http://www.w3.org/2005/Atom");
+            SetNamespaces();
+            this.HanConfiguration = HanConfiguration;
+        }
 
-            XElement serviceCategory = new XElement(espi + "ServiceCategory", new XElement(espi + "kind", hanConfig.XmlConfig.ServiceCategoryKind));
+        /// <summary>
+        /// This method is the entry point for creating the xml file.
+        /// </summary>
+        /// <returns>the xml data as a XDocument</returns>
+        public XDocument BuildTafXml()
+        {
+            var UsagePoints = new XElement(Namespaces.FirstOrDefault(ns => ns.name == "ar").ns + "UsagePoints",
+                                               new XAttribute("xmlns", Namespaces.FirstOrDefault(ns => ns.name == "ar").ns),
+                                               new XAttribute(XNamespace.Xmlns + "xsi", Namespaces.FirstOrDefault(ns => ns.name == "xsi").ns),
+                                               new XAttribute(Namespaces.FirstOrDefault(ns => ns.name == "xsi").ns + "schemaLocation", Namespaces.FirstOrDefault(ns => ns.name == "schemaLocation").ns),
+                                               new XAttribute(XNamespace.Xmlns + "espi", Namespaces.FirstOrDefault(ns => ns.name == "espi").ns),
+                                               new XAttribute(XNamespace.Xmlns + "atom", Namespaces.FirstOrDefault(ns => ns.name == "atom").ns),
+                                                   BuildUsagePoint(false));
 
-            XElement customer = new XElement(ar + "Customer", new XElement(ar + "customerId", hanConfig.XmlConfig.CustomerId));
-
-            XElement invoicingParty = new XElement(ar + "InvoicingParty", new XElement(ar + "invoicingPartyId", hanConfig.XmlConfig.InvoicingPartyId));
-
-            XElement smgw = new XElement(ar + "SMGW");
-
-            foreach (CertificateContainer cert in hanConfig.XmlConfig.Certificates)
+            if (HanConfiguration.Contract.TafId == TafId.Taf7)
             {
-                smgw.Add(new XElement(ar + "certId", cert.Certificate.CertId));
+                BuildSupplierXml(BuildUsagePoint(true));
             }
 
-            smgw.Add(new XElement(ar + "smgwId", hanConfig.XmlConfig.SmgwId));
+            return new XDocument(UsagePoints);
+        }
 
+        /// <summary>
+        /// Used to build the supplierXml in case of Taf7. Its called in BuidlUsagePoint. The supplier xml file will be stored in an HanAdapterExampleConfig instance in SupplierXml.
+        /// </summary>
+        /// <param name="usagePoint">The usagePoint which shall be used.</param>
+        private void BuildSupplierXml(XElement usagePoint)
+        {
+            var ar = Namespaces.FirstOrDefault(ns => ns.name == "ar").ns;
 
-            XElement usagePoint = new XElement(ar + "UsagePoint",
-                                                serviceCategory,
-                                                new XElement(ar + "usagePointId", hanConfig.XmlConfig.UsagePointId),
-                                                customer,
-                                                invoicingParty,
-                                                smgw
-                                                );
+            var UsagePoints = new XElement(ar + "UsagePoints",
+                                               new XAttribute("xmlns", ar),
+                                               new XAttribute(XNamespace.Xmlns + "xsi", Namespaces.FirstOrDefault(ns => ns.name == "xsi").ns),
+                                               new XAttribute(Namespaces.FirstOrDefault(ns => ns.name == "xsi").ns + "schemaLocation", Namespaces.FirstOrDefault(ns => ns.name == "schemaLocation").ns),
+                                               new XAttribute(XNamespace.Xmlns + "espi", Namespaces.FirstOrDefault(ns => ns.name == "espi").ns),
+                                               new XAttribute(XNamespace.Xmlns + "atom", Namespaces.FirstOrDefault(ns => ns.name == "atom").ns),
+                                                   usagePoint);
 
-            foreach (CertificateContainer cert in hanConfig.XmlConfig.Certificates)
+           HanConfiguration.SupplierXml =  new XDocument(UsagePoints);
+        }
+
+        /// <summary>
+        /// The central method for building the usagePoint Element. 
+        /// </summary>
+        /// <param name="isSupplierXml">If Taf7 is choosed, this element has to be true to create the supplierXml instead of the data xml.</param>
+        /// <returns>The XElement usagePoint</returns>
+        private XElement BuildUsagePoint(bool isSupplierXml)
+        {
+            var ar = Namespaces.FirstOrDefault(ns => ns.name == "ar").ns;
+            var usagePoint = new XElement(ar + "UsagePoint");
+
+            SetCommonElements(usagePoint, isSupplierXml, ar);
+
+            if (isSupplierXml)
+            {
+                BuildUsagePointSupplier(usagePoint, ar);
+            }
+            else
+            {
+                if (HanConfiguration.WithLogData)
+                {
+                    LogEntries(ar).ForEach(log => usagePoint.Add(log));
+                }
+
+                MeterReadings(ar).ForEach(mr => usagePoint.Add(mr));
+            }
+            
+            return usagePoint;
+        }
+
+        /// <summary>
+        /// Creates the supplierXml file for Taf7
+        /// </summary>
+        /// <param name="usagePoint">The usagePoint which shall be used.</param>
+        /// <param name="ar">The main namespace</param>
+        /// <returns>The XElement usagePoint for the supplier xml file.</returns>
+        private XElement BuildUsagePointSupplier(XElement usagePoint, XNamespace ar)
+        {
+            usagePoint.Add(GetAnalysisProfile(ar));
+
+            return usagePoint;
+        }
+
+        /// <summary>
+        /// Sets the first elements for the xml. In case of Taf7 it is used for both xml files.
+        /// </summary>
+        /// <param name="usagePoint">THe usagePoint which shall be used.</param>
+        /// <param name="isSupplierXml">If Taf7 is choosed, this element has to be true to create the supplierXml instead of the data xml.</param>
+        /// <param name="ar">The main namespace.</param>
+        private void SetCommonElements(XElement usagePoint, bool isSupplierXml, XNamespace ar)
+        {
+            usagePoint.Add(GetServiceCategory());
+            usagePoint.Add(new XElement(ar + "usagePointId", HanConfiguration.XmlConfig.UsagePointId));
+
+            if (isSupplierXml && HanConfiguration.XmlConfig.CustomerId != null)
+            {
+                usagePoint.Add(GetCustomer(ar));
+            }
+            else if (!isSupplierXml)
+            {
+                usagePoint.Add(GetCustomer(ar));
+            }
+
+            usagePoint.Add(GetInvoicingParty(ar));
+
+            usagePoint.Add(GetSmgw(ar));
+            if (isSupplierXml && HanConfiguration.XmlConfig.Certificates.Count > 0)
+            {
+                GetCertificates(ar).ForEach(cert => usagePoint.Add(cert));
+            }
+            else if (!isSupplierXml)
+            {
+                GetCertificates(ar).ForEach(cert => usagePoint.Add(cert));
+            }
+
+            usagePoint.Add(new XElement(ar + "tariffName", HanConfiguration.XmlConfig.TariffName));
+        }
+
+        /// <summary>
+        /// Sets the ServiceCategory XElement.
+        /// </summary>
+        /// <returns>The ServiceCategory XElement.</returns>
+        private XElement GetServiceCategory()
+        {
+            var espi = Namespaces.FirstOrDefault(ns => ns.name == "espi").ns;
+            return new XElement(espi + "ServiceCategory", new XElement(espi + "kind", HanConfiguration.XmlConfig.ServiceCategoryKind));
+        }
+
+        /// <summary>
+        /// Sets the InvoicingParty XElement.
+        /// </summary>
+        /// <param name="ar">The main namespace.</param>
+        /// <returns>THe InvoicingParty XElement</returns>
+        private XElement GetInvoicingParty(XNamespace ar)
+        {
+            return new XElement(ar + "InvoicingParty", new XElement(ar + "invoicingPartyId", HanConfiguration.XmlConfig.InvoicingPartyId));
+        }
+
+        /// <summary>
+        /// Sets the Customer XElement.
+        /// </summary>
+        /// <param name="ar">The main namespace.</param>
+        /// <returns>The Customer XElement</returns>
+        private XElement GetCustomer(XNamespace ar)
+        {
+            return new XElement(ar + "Customer", new XElement(ar + "customerId", HanConfiguration.XmlConfig.CustomerId));
+        }
+
+        /// <summary>
+        /// Sets the Smgw XElement. For each existing certificate the certId will be stored in smgw.certIds.
+        /// </summary>
+        /// <param name="ar">The main namesapce.</param>
+        /// <returns>The Smgw XElement</returns>
+        private XElement GetSmgw(XNamespace ar)
+        {
+            var smgw = new XElement(ar + "SMGW");
+
+            if (HanConfiguration.XmlConfig.Certificates != null)
+            {
+                foreach (CertificateContainer cert in HanConfiguration.XmlConfig.Certificates)
+                {
+                    smgw.Add(new XElement(ar + "certId", cert.Certificate.CertId));
+                }  
+            }
+
+            smgw.Add(new XElement(ar + "smgwId", HanConfiguration.XmlConfig.SmgwId));
+
+            return smgw;
+        }
+
+        /// <summary>
+        /// This method creates available certificates.
+        /// </summary>
+        /// <param name="ar">The main namespace.</param>
+        /// <returns>The Certificate XElements</returns>
+        private List<XElement> GetCertificates(XNamespace ar)
+        {
+            var certs = new List<XElement>();
+           
+            foreach (CertificateContainer cert in HanConfiguration.XmlConfig.Certificates)
             {
                 var cer = new XElement(ar + "Certificate",
                                             new XElement(ar + "certId", cert.Certificate.CertId),
@@ -57,535 +225,389 @@
 
                 cer.Add(new XElement(ar + "certContent", cert.CertContent));
 
-                usagePoint.Add(cer);
+                certs.Add(cer);
             }
-
-            usagePoint.Add(new XElement(ar + "tariffName", hanConfig.XmlConfig.TariffName));
-
-            if (hanConfig.WithLogData)
-            {
-
-                List<LogEntry> logs = LogCreator(hanConfig);
-
-                foreach (LogEntry log in logs)
-                {
-                    usagePoint.Add(new XElement(ar + "LogEntry",
-                                                new XElement(ar + "recordNumber", log.RecordNumber),
-                                                new XElement(ar + "LogEvent",
-                                                             new XElement(ar + "level", (byte)log.LogEvent.Level),
-                                                             new XElement(ar + "text", log.LogEvent.Text),
-                                                             new XElement(ar + "outcome", (byte)log.LogEvent.Outcome),
-                                                             new XElement(ar + "timestamp", log.LogEvent.Timestamp.ToString("yyyy-MM-ddTHH:mm:ssK")
-                                                            )
-                                               )
-                                  ));
-                }
-            }
-
-            var meterReadings = MeterReadingCreator(hanConfig);
-
-            foreach (MeterReading meterReading in meterReadings)
-            {
-                XElement mr = new XElement(ar + "MeterReading",
-                                            new XElement(ar + "Meter", new XElement(ar + "meterId", meterReading.Meters[0].MeterId)),
-                                            new XElement(ar + "meterReadingId", meterReading.MeterReadingId),
-                                            new XElement(ar + "ReadingType",
-                                                         new XElement(espi + "powerOfTenMultiplier", (short)meterReading.ReadingType.PowerOfTenMultiplier),
-                                                         new XElement(espi + "uom", (ushort)meterReading.ReadingType.Uom),
-                                                         new XElement(ar + "scaler", meterReading.ReadingType.Scaler),
-                                                         new XElement(ar + "obisCode", meterReading.ReadingType.ObisCode),
-                                                         new XElement(ar + "qualifiedLogicalName", meterReading.ReadingType.QualifiedLogicalName)
-                                                        ));
-
-                foreach (IntervalBlock iBlock in meterReading.IntervalBlocks)
-                {
-                    XElement intervalBlock = new XElement(ar + "IntervalBlock",
-                                                           new XElement(ar + "interval",
-                                                                         new XElement(ar + "duration", iBlock.Interval.Duration),
-                                                                         new XElement(ar + "start", iBlock.Interval.Start.ToString("yyyy-MM-ddTHH:mm:ssK"))
-                                                           ));
-
-                    foreach (IntervalReading iReading in iBlock.IntervalReadings)
-                    {
-                        XElement intervalReading = new XElement(ar + "IntervalReading",
-                                                                new XElement(espi + "value", iReading.Value),
-                                                                new XElement(ar + "timePeriod",
-                                                                             new XElement(ar + "duration", iReading.TimePeriod.Duration),
-                                                                             new XElement(ar + "start", iReading.TimePeriod.Start.ToString("yyyy-MM-ddTHH:mm:ssK")))
-                                                                );
-                        if (iReading.StatusPTB.HasValue)
-                        {
-                            intervalReading.Add(new XElement(ar + "statusPTB", (byte)iReading.StatusPTB));
-                        }
-                        else
-                        {
-                            intervalReading.Add(new XElement(ar + "statusFNN", iReading.StatusFNN.Status));
-                        }
-                        intervalBlock.Add(intervalReading);
-                    }
-
-                    mr.Add(intervalBlock);
-                }
-
-                usagePoint.Add(mr);
-            }
-
-
-            // Create root element
-            XElement UsagePoints = new XElement(ar + "UsagePoints",
-                                                new XAttribute("xmlns", ar),
-                                                new XAttribute(XNamespace.Xmlns + "xsi", xsi),
-                                                new XAttribute(xsi + "schemaLocation", schemaLocation),
-                                                new XAttribute(XNamespace.Xmlns + "espi", espi),
-                                                new XAttribute(XNamespace.Xmlns + "atom", atom),
-                                                    usagePoint);
-
-            XDocument trudiXml = new XDocument(UsagePoints);
-
-            if(hanConfig.Contract.TafId == TafId.Taf7)
-            {
-                hanConfig.SupplierXml = FabricateLieferantXml(hanConfig);
-            }
-
-            return trudiXml;
+            return certs;
         }
-       
-        private static XDocument FabricateLieferantXml(HanAdapterExampleConfig hanConfig)
+
+
+        /// <summary>
+        /// Creates the LogEntries for the xml file.
+        /// </summary>
+        /// <param name="ar">The main namespace.</param>
+        /// <returns>LogEntriy XElements for the xml file.</returns>
+        private List<XElement> LogEntries(XNamespace ar)
         {
-            XNamespace ar = XNamespace.Get("http://vde.de/AR_2418-6.xsd");
-            XNamespace xsi = XNamespace.Get("http://www.w3.org/2001/XMLSchema-instance");
-            XNamespace schemaLocation = XNamespace.Get("http://vde.de/AR_2418-6.xsd AR_2418-6.xsd");
-            XNamespace espi = XNamespace.Get("http://naesb.org/espi");
-            XNamespace atom = XNamespace.Get("http://www.w3.org/2005/Atom");
+            var logEntries = new List<XElement>();
+            var logData = this.CreateLogs(HanConfiguration);
 
-            XElement serviceCategory = new XElement(espi + "ServiceCategory", new XElement(espi + "kind", hanConfig.XmlConfig.ServiceCategoryKind));
-
-            XElement invoicingParty = new XElement(ar + "InvoicingParty", new XElement(ar + "invoicingPartyId", hanConfig.XmlConfig.InvoicingPartyId));
-
-            XElement smgw = new XElement(ar + "SMGW");
-
-            smgw.Add(new XElement(ar + "smgwId", hanConfig.XmlConfig.SmgwId));
-
-            XElement usagePoint = new XElement(ar + "UsagePoint",
-                                               serviceCategory,
-                                               new XElement(ar + "usagePointId", hanConfig.XmlConfig.UsagePointId));
-
-            if (hanConfig.XmlConfig.CustomerId != null)
+            foreach (var log in logData)
             {
-                XElement customer = new XElement(ar + "Customer", new XElement(ar + "customerId", hanConfig.XmlConfig.CustomerId));
-                usagePoint.Add(customer);
+               logEntries.Add(new XElement(ar + "LogEntry", 
+                   new XElement(ar + "recordNumber", log.RecordNumber), 
+                   new XElement(GetLogEvent(log.LogEvent, ar))));
+            }
+            return logEntries;
+        }
+
+        /// <summary>
+        /// Sets an XElement Interval for the xmlFile
+        /// </summary>
+        /// <param name="elementName">The used name in the xml file.</param>
+        /// <param name="interval">Contains the needed data to create the xml elements.</param>
+        /// <param name="ar">The main namespace.</param>
+        /// <returns>An interval XElement</returns>
+        private XElement GetInterval(string elementName, Interval interval, XNamespace ar)
+        {
+            var period = new XElement(ar + elementName);
+
+            period.Add(new XElement(ar + "duration", interval.Duration));
+            period.Add(new XElement(ar + "start", interval.Start.ToString("yyyy-MM-ddTHH:mm:ssK")));
+
+            return period;
+        }
+
+        /// <summary>
+        /// Creates an LogEvent xml element. It is needed for the single LogEntries.
+        /// </summary>
+        /// <param name="logEvent">Contains the needed data to create the xml elements.</param>
+        /// <param name="ar">The main namespace.</param>
+        /// <returns>A single logEvent for an LogEntry</returns>
+        private XElement GetLogEvent(LogEvent logEvent, XNamespace ar)
+        {
+            return new XElement(ar + "LogEvent", 
+                new XElement(ar + "level", (byte)logEvent.Level), 
+                new XElement(ar + "text", logEvent.Text), 
+                new XElement(ar + "outcome", (byte)logEvent.Outcome),
+                new XElement(ar + "timestamp", logEvent.Timestamp.ToString("yyyy-MM-ddTHH:mm:ssK")));
+        }
+
+        /// <summary>
+        /// This method creates a singele  ReadingType for an MeterReading objeck.
+        /// </summary>
+        /// <param name="readingType">Contains the needed data to create the xml element.</param>
+        /// <returns>A single ReadingType instance for an meterReading object</returns>
+        private XElement GetReadingType(ReadingType readingType)
+        {
+            var ar = Namespaces.FirstOrDefault(ns => ns.name == "ar").ns;
+            var espi = Namespaces.FirstOrDefault(ns => ns.name == "espi").ns;
+
+            return new XElement(ar + "ReadingType",
+                     new XElement(espi + "powerOfTenMultiplier", (short)readingType.PowerOfTenMultiplier),
+                     new XElement(espi + "uom", (ushort)readingType.Uom),
+                     new XElement(ar + "scaler", readingType.Scaler),
+                     new XElement(ar + "obisCode", readingType.ObisCode),
+                     new XElement(ar + "qualifiedLogicalName", readingType.QualifiedLogicalName));
+        }
+
+        /// <summary>
+        /// The IntervalReadings are the objects which hold the actual measuring vaule. In this method 
+        /// they will be created for the xml file.
+        /// </summary>
+        /// <param name="readings">Contains the needed data to create the xml elements.</param>
+        /// <param name="ar">The main namespace.</param>
+        /// <returns>Returns a list of intervalReading XElements for an IntervalBlock XElement.</returns>
+        private List<XElement> IntervalReadings(List<IntervalReading> readings, XNamespace ar)
+        {
+            var espi = Namespaces.FirstOrDefault(ns => ns.name == "espi").ns;
+            var intervalReadings = new List<XElement>();
+
+            foreach (IntervalReading iReading in readings)
+            {
+                XElement intervalReading = new XElement(ar + "IntervalReading");
+
+                intervalReading.Add(new XElement(espi + "value", iReading.Value));
+                intervalReading.Add(GetInterval("timePeriod", iReading.TimePeriod, ar));
+                if (iReading.StatusPTB.HasValue)
+                {
+                    intervalReading.Add(new XElement(ar + "statusPTB", (byte)iReading.StatusPTB));
+                }
+                else
+                {
+                    intervalReading.Add(new XElement(ar + "statusFNN", iReading.StatusFNN.Status));
+                }
+
+                intervalReadings.Add(intervalReading);
             }
 
-            usagePoint.Add(invoicingParty, smgw);
+            return intervalReadings;
+        }
 
-            usagePoint.Add(new XElement(ar + "tariffName", hanConfig.XmlConfig.TariffName));
+        /// <summary>
+        /// In this method the intervalBlocks XElements for the meterReading object will be created.
+        /// </summary>
+        /// <param name="intervalBlocks">Contains the needed data to create the xml elements.</param>
+        /// <param name="ar">The main namespace</param>
+        /// <returns>A list of intervaBlock XEmelents which must be added th an meterReading object.</returns>
+        private List<XElement> IntervalBlocks(List<IntervalBlock> intervalBlocks, XNamespace ar)
+        {
+            var blocks = new List<XElement>();
 
-            XElement analysisProfile = new XElement(ar + "AnalysisProfile",
-                                                    new XElement(ar + "tariffUseCase", hanConfig.XmlConfig.TariffUseCase),
-                                                    new XElement(ar + "tariffId", hanConfig.XmlConfig.TariffName),
-                                                    new XElement(ar + "billingPeriod",
-                                                     new XElement(ar + "duration", (int)(hanConfig.BillingPeriod.End - hanConfig.BillingPeriod.Begin)?.TotalSeconds),
-                                                     new XElement(ar + "start", hanConfig.BillingPeriod.Begin) 
-                                                    ));
-
-            foreach (TariffStageConfig config in hanConfig.XmlConfig.TariffStageConfigs)
+            foreach(IntervalBlock ib in intervalBlocks)
             {
-                XElement tariffStage = new XElement(ar + "TariffStage", new XElement(ar + "tariffNumber", config.TariffNumber));
+                var intervalBlock = new XElement(ar + "IntervalBlock");
+                intervalBlock.Add(GetInterval("interval", ib.Interval, ar));
 
-                if(config.Description != null)
+                var intervalReadings = IntervalReadings(ib.IntervalReadings, ar);
+                foreach (XElement ir in intervalReadings)
+                {
+                    intervalBlock.Add(ir);
+                }
+
+                blocks.Add(intervalBlock);
+            }
+
+            return blocks;
+        }
+
+        /// <summary>
+        /// Sets the meter XElement.
+        /// </summary>
+        /// <param name="meter">Contains the needed data to create the xml element.</param>
+        /// <param name="ar">The main namespace.</param>
+        /// <returns>The meter XElement.</returns>
+        private XElement GetMeter(Meter meter, XNamespace ar)
+        {
+            return new XElement(ar + "Meter", new XElement(ar + "meterId", meter.MeterId));
+        }
+
+        /// <summary>
+        /// In this method the meterReadings will be created. 
+        /// </summary>
+        /// <param name="ar">The main namespace.</param>
+        /// <returns>A list of MeterReadings XElements for the xml file.</returns>
+        private List<XElement> MeterReadings(XNamespace ar)
+        {
+            var meterReadings = new List<XElement>();
+            var readingData = this.CreateMeterReadings(HanConfiguration);
+
+            foreach(MeterReading meterReading in readingData)
+            {
+                var mr = new XElement(ar + "MeterReading");
+
+                mr.Add(GetMeter(meterReading.Meters[0], ar));
+                mr.Add(new XElement(ar + "meterReadingId", meterReading.MeterReadingId));
+                mr.Add(GetReadingType(meterReading.ReadingType));
+
+                var intervalBlocks = IntervalBlocks(meterReading.IntervalBlocks, ar);
+
+                foreach(XElement ib in intervalBlocks)
+                {
+                    mr.Add(ib);
+                }
+
+                meterReadings.Add(mr);
+            }
+
+            return meterReadings;
+        }
+
+        /// <summary>
+        /// Creates the AnalysisProfile XElement. It is used for the supplier xml file.
+        /// </summary>
+        /// <param name="ar">The main namespace.</param>
+        /// <returns>An analysisProfile XElement for the supplier xml file.</returns>
+        private XElement GetAnalysisProfile(XNamespace ar)
+        {
+            var analysisProfile = new XElement(ar + "AnalysisProfile");
+
+            analysisProfile.Add(new XElement(ar + "tariffUseCase", HanConfiguration.XmlConfig.TariffUseCase));
+            analysisProfile.Add(new XElement(ar + "tariffId", HanConfiguration.XmlConfig.TariffName));
+            analysisProfile.Add(GetInterval("billingPeriod",
+                new Interval()
+                {
+                    Start = HanConfiguration.BillingPeriod.Begin,
+                    Duration = (uint)(HanConfiguration.BillingPeriod.End - HanConfiguration.BillingPeriod.Begin)?.TotalSeconds
+                }, ar));
+
+            TariffStages(ar).ForEach(ts => analysisProfile.Add(ts));
+            analysisProfile.Add(new XElement(ar + "defaultTariffNumber", HanConfiguration.XmlConfig.DefaultTariffNumber));
+            analysisProfile.Add(GetTariffChangeTrigger(ar));
+
+            return analysisProfile;
+        }
+
+        /// <summary>
+        /// Creates the TariffStages XElements for the supplier xml files.
+        /// </summary>
+        /// <param name="ar">The main namespace.</param>
+        /// <returns>A list with tariffStage XElements</returns>
+        private List<XElement> TariffStages(XNamespace ar)
+        {
+            var tariffStages = new List<XElement>();
+           
+            foreach (TariffStageConfig config in HanConfiguration.XmlConfig.TariffStageConfigs)
+            {
+                var tariffStage = new XElement(ar + "TariffStage");
+
+                tariffStage.Add(new XElement(ar + "tariffNumber", config.TariffNumber));
+
+                if (config.Description != null)
                 {
                     tariffStage.Add(new XElement(ar + "description", config.Description));
                 }
 
                 tariffStage.Add(new XElement(ar + "obisCode", config.ObisCode));
 
-                analysisProfile.Add(tariffStage);
+                tariffStages.Add(tariffStage);
             }
 
-            analysisProfile.Add(new XElement(ar + "defaultTariffNumber", hanConfig.XmlConfig.DefaultTariffNumber));
-
-            XElement tariffChangeTrigger = new XElement(ar + "TariffChangeTrigger");
-
-            XElement timeTrigger = new XElement(ar + "TimeTrigger");
-
-            var dayProfiles = DayProfileCreator(hanConfig);
-
-            foreach(DayProfile profile in dayProfiles)
-            {
-                XElement dayProfile = new XElement(ar + "DayProfile", new XElement(ar + "dayId", profile.DayId));
-
-                foreach(DayTimeProfile dtProfile in profile.DayTimeProfiles)
-                {
-                    XElement dayTimeProfile = new XElement(ar + "DayTimeProfile");
-
-                    XElement startTime = new XElement(ar + "startTime", 
-                        new XElement(ar + "hour", dtProfile.StartTime.Hour),
-                        new XElement(ar + "minute", dtProfile.StartTime.Minute));
-
-                    dayTimeProfile.Add(startTime, new XElement(ar + "tariffNumber", dtProfile.TariffNumber));
-
-                    dayProfile.Add(dayTimeProfile);
-                }
-
-                timeTrigger.Add(dayProfile);
-            }
-
-            var specialDayProfiles = SpecialDayProfileCreator(hanConfig);
-
-            foreach(SpecialDayProfile profile in specialDayProfiles)
-            {
-                XElement specialDayProfile = new XElement(ar + "SpecialDayProfile");
-
-                specialDayProfile.Add(new XElement(ar + "specialDayDate", 
-                                                    new XElement(ar + "year", profile.SpecialDayDate.Year),
-                                                    new XElement(ar + "month", profile.SpecialDayDate.Month),
-                                                    new XElement(ar + "day_of_month", profile.SpecialDayDate.DayOfMonth)));
-
-                specialDayProfile.Add(new XElement(ar + "dayId", profile.DayId));
-
-                timeTrigger.Add(specialDayProfile);  
-            }
-           
-            tariffChangeTrigger.Add(timeTrigger);
-
-            analysisProfile.Add(tariffChangeTrigger);
-
-            usagePoint.Add(analysisProfile);
-
-            // Create root element
-            XElement UsagePoints = new XElement(ar + "UsagePoints",
-                                                new XAttribute("xmlns", ar),
-                                                new XAttribute(XNamespace.Xmlns + "xsi", xsi),
-                                                new XAttribute(xsi + "schemaLocation", schemaLocation),
-                                                new XAttribute(XNamespace.Xmlns + "espi", espi),
-                                                new XAttribute(XNamespace.Xmlns + "atom", atom),
-                                                    usagePoint);
-
-            XDocument lieferantXml = new XDocument(UsagePoints);
-
-            return lieferantXml;
+            return tariffStages;
         }
 
-        private static List<LogEntry> LogCreator(HanAdapterExampleConfig hanConfig)
+        /// <summary>
+        /// Sets the TariffChangeTrigger. It is used for the supplier xml.
+        /// </summary>
+        /// <param name="ar">The main namespace.</param>
+        /// <returns>A TariffCnageTrigger XElement.</returns>
+        private XElement GetTariffChangeTrigger(XNamespace ar)
         {
-            var logs = new List<LogEntry>();
-            TimeSpan minPeriod = new TimeSpan(0, 15, 0);
+            var trigger = new XElement(ar + "TariffChangeTrigger");
+            trigger.Add(GetTimeTrigger(ar));
 
-            if (hanConfig.XmlConfig.RandomLogCount)
-            {
-                var max = (hanConfig.End - hanConfig.Start)?.TotalSeconds / minPeriod.TotalSeconds * 3;
-                hanConfig.XmlConfig.LogCount = RandomNumber(1, (int)max);
-            }
-
-            var lastLogTime = hanConfig.Start;
-            if (!hanConfig.XmlConfig.LogCount.HasValue)
-            {
-                hanConfig.XmlConfig.LogCount = 10;
-            }
-            var period = (hanConfig.End - lastLogTime) / hanConfig.XmlConfig.LogCount;
-
-            for (int i = 0; i < hanConfig.XmlConfig.LogCount; i++)
-            {
-                logs.Add(new LogEntry()
-                {
-                    RecordNumber = (uint)i + 1,
-                    LogEvent = new LogEvent()
-                    {
-                        Level = (Level)RandomNumber(1, 2),
-                        Outcome = (Outcome)RandomNumber(0, 2),
-                        Text = hanConfig.XmlConfig.PossibleLogMessages[RandomNumber(0, hanConfig.XmlConfig.PossibleLogMessages.Count - 1)],
-                        Timestamp = (DateTime)lastLogTime?.AddMinutes((double)period?.TotalMinutes)
-                    }
-                });
-                lastLogTime = logs.LastOrDefault().LogEvent.Timestamp;
-            }
-
-            return logs;
-
+            return trigger;
         }
 
-        private static List<MeterReading> MeterReadingCreator(HanAdapterExampleConfig hanConfig)
+        /// <summary>
+        /// Sets the TimeTrigger XElement which is used for the supplier xml.
+        /// </summary>
+        /// <param name="ar">The main namespace.</param>
+        /// <returns>A TimeTrigger XElement.</returns>
+        private XElement GetTimeTrigger(XNamespace ar)
         {
-            var meterReadings = new List<MeterReading>();
-            var meterReadingConfigs = hanConfig.XmlConfig.MeterReadingConfigs;
-            var registers = hanConfig.Contract.TafId == TafId.Taf2 ? new int[hanConfig.XmlConfig.TariffStageCount + 2] : new int[hanConfig.XmlConfig.TariffStageCount];
-            var tariffStageCounter = 0;
+            var timeTrigger = new XElement(ar + "TimeTrigger");
+            
+            DayProfiles(ar).ForEach(dp => timeTrigger.Add(dp));
+            SpecialDayProfiles(ar).ForEach(sdp => timeTrigger.Add(sdp));
 
-            foreach (MeterReadingConfig meterReadingConfig in meterReadingConfigs)
-            {
-                var mr = new MeterReading();
-
-                mr.Meters.Add(new Meter() { MeterId = meterReadingConfig.MeterId });
-                mr.MeterReadingId = meterReadingConfig.MeterReadingId;
-
-                mr.ReadingType = new ReadingType()
-                {
-                    MeterReading = mr,
-                    PowerOfTenMultiplier = (PowerOfTenMultiplier)meterReadingConfig.PowerOfTenMultiplier,
-                    Uom = (Uom)meterReadingConfig.Uom,
-                    Scaler = (short)meterReadingConfig.Scaler,
-                    ObisCode = meterReadingConfig.ObisCode
-                };
-
-                if (meterReadingConfig.IsOML)
-                {
-                    mr.ReadingType.QualifiedLogicalName = BuildQualifiedLogicalName(meterReadingConfig.MeterId, mr.ReadingType.ObisCode);
-                    mr.IntervalBlocks.Add(CreateIntervalBlockOML(meterReadingConfig, hanConfig, registers));
-                }
-                else
-                {
-                    mr.ReadingType.QualifiedLogicalName = BuildQualifiedLogicalName(hanConfig.XmlConfig.TariffId, mr.ReadingType.ObisCode);
-                    var tariffStages = hanConfig.XmlConfig.TariffStageCount;
-                    var condition = hanConfig.Contract.TafId == TafId.Taf2 ? tariffStageCounter < tariffStages + 2 : tariffStageCounter < tariffStages;
-                    if (condition)
-                    {
-                        mr.IntervalBlocks.Add(CreateIntervalBlock(meterReadingConfig, hanConfig, registers, tariffStageCounter));
-                        tariffStageCounter++;
-                    }
-                }
-
-                meterReadings.Add(mr);
-            }
-            return meterReadings;
+           return timeTrigger;
         }
 
-        private static IntervalBlock CreateIntervalBlockOML( MeterReadingConfig meterReadingConfig, HanAdapterExampleConfig hanConfig, int[] registers)
+        /// <summary>
+        /// Creates a list of DayProfiles XElements which are contained in the TimeTrigger XElement.
+        /// </summary>
+        /// <param name="ar">The main namespace.</param>
+        /// <returns>A list of DayProfile XElements.</returns>
+        private List<XElement> DayProfiles(XNamespace ar)
         {
-            var intervalBlock = new IntervalBlock()
+            var dayProfiles = new List<XElement>();
+            var dayProfilesData = this.CreateDayProfiles(HanConfiguration);
+
+            foreach (var profile in dayProfilesData)
             {
-                Interval = new Interval()
-                {
-                    Duration = (uint)(hanConfig.End - hanConfig.Start)?.TotalSeconds,
-                    Start = (DateTime)hanConfig.Start
-                }
+                var dayProfile = new XElement(ar + "DayProfile", new XElement(ar + "dayId", profile.DayId));
 
-            };
+                DayTimeProfiles(profile.DayTimeProfiles, ar).ForEach(dtp => dayProfile.Add(dtp));
 
-            if(hanConfig.BillingPeriod == null)
-            {
-                hanConfig.BillingPeriod = new BillingPeriod()
-                {
-                    Begin = (DateTime)hanConfig.Start,
-                    End = hanConfig.End
-                };
-            }
-
-            var value = meterReadingConfig.OMLInitValue;
-            var usage = 0;
-            var timestamp = (DateTime)hanConfig.Start;
-            var index = 0;
-
-            if (hanConfig.XmlConfig.Taf1Reg == null)
-            {
-                uint? denominator = 0;
-                if (hanConfig.Contract.TafId == TafId.Taf1)
-                {
-                    denominator = (uint)(hanConfig.BillingPeriod.End - hanConfig.BillingPeriod.Begin)?.TotalSeconds / meterReadingConfig.PeriodSeconds;
-                }
-                hanConfig.XmlConfig.Taf1Reg = new int[(int)denominator];
-            }
-
-            while (timestamp <= hanConfig.Start?.AddSeconds((uint)(hanConfig.End - hanConfig.Start)?.TotalSeconds).GetDateWithoutSeconds())
-            {
-                
-                var ir = new IntervalReading()
-                {
-                    TimePeriod = new Interval()
-                    {
-                        Duration = 0,
-                        Start = timestamp
-                    },
-                    Value = value
-                };
-
-                timestamp = timestamp.AddSeconds((uint)meterReadingConfig.PeriodSeconds).GetDateWithoutSeconds();
-                
-                usage = RandomNumber(1, hanConfig.XmlConfig.MaxPeriodUsage);
-                value = value + usage;
-
-                if (timestamp >= hanConfig.BillingPeriod.Begin && timestamp <= hanConfig.BillingPeriod.End)
-                {
-                    if(index < hanConfig.XmlConfig.Taf1Reg.Length)
-                    {
-                        hanConfig.XmlConfig.Taf1Reg[index] = hanConfig.XmlConfig.Taf1Reg[index] + usage;
-                        index++;
-                    }
-                    var slot = RandomNumber(0, registers.Length - 1);
-                    registers[slot] = registers[slot] + usage;
-                }
-                SetStatusWord(ir, meterReadingConfig);
-                intervalBlock.IntervalReadings.Add(ir);
-            }
-            return intervalBlock;
-        }
-
-        private static IntervalBlock CreateIntervalBlock(
-            MeterReadingConfig meterReadingConfig,
-            HanAdapterExampleConfig hanConfig,
-            int[] registers, int regCounter)
-        {
-            var intervalBlock = new IntervalBlock()
-            {
-                Interval = new Interval()
-                {
-                    Duration = (uint)(hanConfig.BillingPeriod.Begin - hanConfig.BillingPeriod.End)?.TotalSeconds,
-                    Start = hanConfig.BillingPeriod.Begin
-                }
-            };
-
-            if (hanConfig.Contract.TafId == TafId.Taf1)
-            {
-                if (hanConfig.XmlConfig.Taf1Reg == null)
-                {
-                    throw new InvalidOperationException("Das abgeleitete Register für Taf-1 wurde nicht befüllt.");
-                }
-
-                var timestamp = hanConfig.BillingPeriod.Begin.GetDateWithoutSeconds().AddMonths(1);
-
-                for (int i = 0; i < hanConfig.XmlConfig.Taf1Reg.Length; i++)
-                {
-                    var ir = new IntervalReading()
-                    {
-                        TimePeriod = new Interval()
-                        {
-
-                            Duration = 0,
-                            Start = timestamp
-                        },
-                        Value = hanConfig.XmlConfig.Taf1Reg[i]
-                    };
-                    SetStatusWord(ir, meterReadingConfig);
-                    timestamp = timestamp.AddMonths(1);
-                    intervalBlock.IntervalReadings.Add(ir);
-                }
-            }
-            else
-            {
-                var ir = new IntervalReading()
-                {
-                    TimePeriod = new Interval()
-                    {
-                        Duration = 0,
-                        Start = hanConfig.BillingPeriod.Begin.GetDateWithoutSeconds()
-                    } 
-                };
-
-                if(regCounter == 0)
-                {
-                    var summary = 0;
-                    foreach (int register in registers)
-                    {
-                        summary = summary + register;
-                    }
-                    ir.Value = summary;
-                }
-                else
-                {
-                    ir.Value = registers[regCounter];
-                }
-
-                SetStatusWord(ir, meterReadingConfig);
-                intervalBlock.IntervalReadings.Add(ir);
-            }
-
-            return intervalBlock;
-        }
-
-        private static List<DayProfile> DayProfileCreator(HanAdapterExampleConfig hanConfig)
-        {
-            var dayProfiles = new List<DayProfile>();
-
-            foreach(DayProfileConfig config in hanConfig.XmlConfig.DayProfiles)
-            {
-                var dayProfile = new DayProfile();
-                var dayTimeProfiles = new List<DayTimeProfile>();
-
-                dayProfile.DayId = config.DayId;
-
-                foreach (DayTimeProfileConfig dayTimeConfig in config.DayTimeProfiles)
-                {
-                    var time = dayTimeConfig.Start;
-                    
-                    while(time <= dayTimeConfig.End)
-                    {
-                        var dayTimeProfile = new DayTimeProfile();
-                        dayTimeProfile.StartTime.Hour = (byte)time.Hour;
-                        dayTimeProfile.StartTime.Minute = (byte)time.Minute;
-                        dayTimeProfile.TariffNumber = dayTimeConfig.TariffNumber;
-                        time = time.AddSeconds(900);
-                        dayTimeProfiles.Add(dayTimeProfile);
-                    }
-
-                }
-
-                dayProfile.DayTimeProfiles = dayTimeProfiles;
                 dayProfiles.Add(dayProfile);
             }
 
             return dayProfiles;
         }
 
-        private static List<SpecialDayProfile> SpecialDayProfileCreator(HanAdapterExampleConfig hanConfig)
+        /// <summary>
+        /// Creates the DayTimeProfiles XElements which are contained in a DayProfile XElement.
+        /// </summary>
+        /// <param name="profiles">Contains the needed data to create the xml elements.</param>
+        /// <param name="ar">The main namespace.</param>
+        /// <returns>A list of DayTimeProfiles XElements for an DayProfile XElement.</returns>
+        private List<XElement> DayTimeProfiles(List<DayTimeProfile> profiles, XNamespace ar)
         {
-            var specialDayProfiles = new List<SpecialDayProfile>();
+            var dayTimeProfiles = new List<XElement>();
 
-            var date = hanConfig.BillingPeriod.Begin;
-
-            while(date < hanConfig.BillingPeriod.End)
+            foreach(DayTimeProfile dayTimeProfile in profiles)
             {
-                var specialDayProfile = new SpecialDayProfile();
-                specialDayProfile.SpecialDayDate = new DayVarType();
-                specialDayProfile.SpecialDayDate.Year = (ushort)date.Year;
-                specialDayProfile.SpecialDayDate.Month = (byte)date.Month;
-                specialDayProfile.SpecialDayDate.DayOfMonth = (byte)date.Day;
-                if(hanConfig.XmlConfig.DayIdCount == 2)
-                {
-                    if (date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday)
-                    {
-                        specialDayProfile.DayId = 2;
-                    }
-                    else
-                    {
-                        specialDayProfile.DayId = 1;
-                    }
-                }
-                else
-                {
-                    specialDayProfile.DayId = (ushort)RandomNumber(1, hanConfig.XmlConfig.DayIdCount);
-                }
-                date = date.AddDays(1);
+                var dtp = new XElement(ar + "DayTimeProfile");
+
+                dtp.Add(GetTimeVarType(dayTimeProfile.StartTime, "startTime", ar));
+                dtp.Add(new XElement(ar + "tariffNumber", dayTimeProfile.TariffNumber));
+
+                dayTimeProfiles.Add(dtp);
+            }
+
+            return dayTimeProfiles;
+        }
+
+        /// <summary>
+        /// Creates a TimeVarType Element. They are used in DayTimeProfiles.
+        /// </summary>
+        /// <param name="timeVarType">Contains the needed data to create the xml elements.</param>
+        /// <param name="typeName">The name of the xml element.</param>
+        /// <param name="ar">The main namespace.</param>
+        /// <returns>A TimeVarType XElement.</returns>
+        private XElement GetTimeVarType(TimeVarType timeVarType, string typeName, XNamespace ar)
+        {
+            var type = new XElement(ar + typeName);
+
+            type.Add(new XElement(ar + "hour", timeVarType.Hour));
+            type.Add(new XElement(ar + "minute", timeVarType.Minute));
+
+            return type;
+        }
+
+        /// <summary>
+        /// Creates the SpecialDayProfiles which are stored in the TimeTrigger element.
+        /// </summary>
+        /// <param name="ar">The main namespace.</param>
+        /// <returns>A list of specialDayProfiles XElements.</returns>
+        private List<XElement> SpecialDayProfiles(XNamespace ar)
+        {
+            var specialDayProfiles = new List<XElement>();
+            var specialDayData = this.CreateSpecialDayProfiles(HanConfiguration);
+
+            foreach (SpecialDayProfile profile in specialDayData)
+            {
+                var specialDayProfile = new XElement(ar + "SpecialDayProfile");
+
+                specialDayProfile.Add(GetDayVarType(profile.SpecialDayDate, "specialDayDate", ar));
+
+                specialDayProfile.Add(new XElement(ar + "dayId", profile.DayId));
+
                 specialDayProfiles.Add(specialDayProfile);
             }
+
             return specialDayProfiles;
         }
 
-        private static void SetStatusWord(IntervalReading ir, MeterReadingConfig config)
+        /// <summary>
+        /// Creates a DayVarType element. They are used in the SpecialDayProfile XElements.
+        /// </summary>
+        /// <param name="dayVarType">Contains the needed data to create the xml elements.</param>
+        /// <param name="typeName">The xml element name for th DayVarType.</param>
+        /// <param name="ar">The main namespace.</param>
+        /// <returns>A DayVarType XElement.</returns>
+        private XElement GetDayVarType(DayVarType dayVarType, string typeName, XNamespace ar)
         {
-            if (config.UsedStatus == "FNN")
-            {
-                ir.StatusFNN = new StatusFNN(GetStatusFNN());
-            }
-            else if (config.UsedStatus == "PTB")
-            {
-                ir.StatusPTB = (StatusPTB)RandomNumber(0, 4);
-            }
+            var type = new XElement(ar + typeName);
+
+            type.Add(new XElement(ar + "year", dayVarType.Year));
+            type.Add(new XElement(ar + "month", dayVarType.Month));
+            type.Add(new XElement(ar + "day_of_month", dayVarType.DayOfMonth));
+
+            return type;
         }
 
-        private static string BuildQualifiedLogicalName(string iD, string obisCode)
+        /// <summary>
+        /// Sets the needed namespaces for the xml file.
+        /// </summary>
+        private void SetNamespaces()
         {
-            return $"{obisCode}.{iD}.sm";
-        }
+            this.Namespaces = new List<(string name, XNamespace ns)>();
 
-        private static string GetStatusFNN()
-        {
-            return "0000010500100504";
-        }
+            XNamespace ar = XNamespace.Get("http://vde.de/AR_2418-6.xsd");
+            Namespaces.Add(("ar", ar));
 
-        private static int RandomNumber(int min, int max)
-        {
-            Random random = new Random();
-            return random.Next(min, max + 1);
-        }
+            XNamespace xsi = XNamespace.Get("http://www.w3.org/2001/XMLSchema-instance");
+            Namespaces.Add(("xsi", xsi));
 
+            XNamespace schemaLocation = XNamespace.Get("http://vde.de/AR_2418-6.xsd AR_2418-6.xsd");
+            Namespaces.Add(("schemaLocation", schemaLocation));
+
+            XNamespace espi = XNamespace.Get("http://naesb.org/espi");
+            Namespaces.Add(("espi", espi));
+
+            XNamespace atom = XNamespace.Get("http://www.w3.org/2005/Atom");
+            Namespaces.Add(("atom", atom));   
+        }
     }
 }

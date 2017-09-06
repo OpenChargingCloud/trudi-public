@@ -58,6 +58,16 @@ namespace TRuDI.HanAdapter.Example.ConfigModel
             get; set;
         }
 
+        public int MinLogCount
+        {
+            get; set;
+        }
+
+        public int MaxLogCount
+        {
+            get; set;
+        }
+
         public List<string> PossibleLogMessages
         {
             get; set;
@@ -83,7 +93,12 @@ namespace TRuDI.HanAdapter.Example.ConfigModel
             get; set;
         }
 
-        public int[] Taf1Reg
+        public int MaxConsumptionValue
+        {
+            get; set;
+        }
+
+        public List<int[]> Taf1Reg
         {
             get; set;
         }
@@ -93,106 +108,58 @@ namespace TRuDI.HanAdapter.Example.ConfigModel
             get; set;
         }
 
-        public List<MeterReadingConfig> MeterReadingConfigs
-        {
-            get; set;
-        }
+        public List<MeterReadingConfig> MeterReadingConfigs { get; set; }
 
-        public List<TariffStageConfig> TariffStageConfigs
-        {
-            get; set;
-        }
+        public List<TariffStageConfig> TariffStageConfigs { get; set; }
 
-        public List<DayProfileConfig> DayProfiles
-        {
-            get; set;
-        }
+        public List<DayProfileConfig> DayProfiles { get; set; }
 
+        public List<SpecialDayProfileSet> SpecialDayProfileSet { get; set; }
     }
 
     public class CertificateContainer
     {
-        public Certificate Certificate
-        {
-            get; set;
-        }
+        public Certificate Certificate { get; set; }
 
-        public string CertContent
-        {
-            get; set;
-        }
+        public string CertContent { get; set; }
     }
 
     public class MeterReadingConfig
     {
+        public string MeterId { get; set; }
 
-        public string MeterId
-        {
-            get; set;
-        }
+        public string MeterReadingId { get; set; }
 
-        public string MeterReadingId
-        {
-            get; set;
-        }
+        public bool IsOML { get; set; }
 
-        public bool IsOML
-        {
-            get; set;
-        }
+        public int OMLInitValue { get; set; }
 
-        public int OMLInitValue
-        {
-            get; set;
-        }
+        public int Taf2TariffStages { get; set; }
 
-        public uint? PeriodSeconds
-        {
-            get; set;
-        }
+        public int Taf2TariffStage { get; set; }
 
-        public short? PowerOfTenMultiplier
-        {
-            get; set;
-        }
+        public uint? PeriodSeconds { get; set; }
 
-        public ushort? Uom
-        {
-            get; set;
-        }
+        public byte Taf1PeriodInMonth { get; set; }
 
-        public short? Scaler
-        {
-            get; set;
-        }
+        public short? PowerOfTenMultiplier { get; set; }
 
-        public string ObisCode
-        {
-            get; set;
-        }
+        public ushort? Uom { get; set; }
 
-        public string UsedStatus
-        {
-            get; set;
-        }
+        public short? Scaler { get; set; }
+
+        public string ObisCode { get; set; }
+
+        public string UsedStatus { get; set; }
     }
 
     public class TariffStageConfig
     {
-        public int? TariffNumber
-        {
-            get; set;
-        }
+        public int? TariffNumber { get; set; }
 
-        public string Description
-        {
-            get; set;
-        } 
+        public string Description { get; set; } 
 
-        public string ObisCode
-        {
-            get; set;
-        }
+        public string ObisCode { get; set; }
     }
 
     public class DayProfileConfig
@@ -225,4 +192,10 @@ namespace TRuDI.HanAdapter.Example.ConfigModel
             get; set;
         }
     }
+
+    public class SpecialDayProfileSet
+    {
+        public List<int> AllowedDayIds { get; set; }
+    }
+
 }

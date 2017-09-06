@@ -78,20 +78,20 @@
             get; set;
         }
 
-        // Xml data
+        
 
         public XmlConfig XmlConfig
         {
             get; set;
         }
 
-        // If Taf7 is configured 
+        
         public XDocument SupplierXml
         {
             get; set;
         }
 
-        // The used Contract
+     
         public ContractInfo Contract
         {
             get; set;

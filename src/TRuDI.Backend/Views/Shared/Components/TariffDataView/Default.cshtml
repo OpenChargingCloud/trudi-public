@@ -1,0 +1,121 @@
+﻿@using System.Globalization
+@using TRuDI.Backend.Application
+@using TRuDI.HanAdapter.XmlValidation.Models
+@inject ApplicationState StateService
+@{
+    var data = StateService.CurrentSupplierFile.AccountingPeriod;
+
+    var colors = new Dictionary<int, string> {
+        { 1, "#00baad" },
+        { 2, "#ff5733" },
+        { 3, "#2a7b9b" },
+        { 4, "#ff8d1a" },
+        { 5, "#3d3d6b" },
+        { 6, "#ffc300" },
+        { 7, "#511849" },
+        { 8, "#eddd53" },
+        { 9, "#900c3f" },
+        { 10, "#add45c" },
+        { 11, "#c70039" },
+        { 12, "#57c785" },
+        { 13, "#ff00ff" },
+        { 14, "#0000ff" },
+        { 15, "#00ffff" },
+        { 16, "#00ff00" },
+        { 17, "#ffff00" },
+        { 18, "#7f0000" },
+        { 19, "#7f007f" },
+        { 20, "#00007f" },
+        { 63,"red" },
+        { 163,"red" },
+        { 263,"red" },
+    };
+}
+
+
+<style>
+    .chart-section div {
+        display: inline-block;
+        *display: inline;
+        zoom: 1;
+        vertical-align: top;
+    }
+
+    .stroke {
+        color: white;
+        text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+    }
+</style>
+
+@foreach (var sec in data.AccountingSections.Where(s => s.Start == Model))
+{
+    if (sec.Reading.ObisCode.ToUpperInvariant() == "0100010800FF")
+    {
+        <h3>Bezug am @Model.ToString("dd.MM.yyyy")</h3>
+    }
+    else
+    {
+        <h3>Lieferung am @Model.ToString("dd.MM.yyyy")</h3>
+    }
+
+    <div>
+        @{
+            var ovl = StateService.CurrentDataResult.OriginalValueLists.FirstOrDefault(o => o.Obis.A == sec.SummaryRegister.First().ObisCode.A && o.Obis.B == sec.SummaryRegister.First().ObisCode.B && o.Obis.C == sec.SummaryRegister.First().ObisCode.C && o.Obis.D == sec.SummaryRegister.First().ObisCode.D && o.Obis.E == 0 && o.Obis.F == sec.SummaryRegister.First().ObisCode.F);
+            var unit = ovl.Uom.GetDisplayUnit(ovl.PowerOfTenMultiplier);
+
+            int minPeriodLength = 96;
+            foreach (var mr in sec.MeasuringRanges)
+            {
+                var length = (int)(mr.End - mr.Start).TotalMinutes / 15;
+                minPeriodLength = Math.Min(minPeriodLength, length);
+            }
+        }
+
+        <div class="col-sm-6">
+            <h4>Tarifschaltzeiten</h4>
+
+            @foreach (var mr in sec.MeasuringRanges)
+            {
+                var duration = (int)(mr.End - mr.Start).TotalMinutes / 15;
+
+                <div class="chart-section">
+                    <div class="stroke" style="background: @colors[mr.TariffId]; height: @((duration / minPeriodLength * 4).ToString("F1", CultureInfo.InvariantCulture))em; width: 4em; text-align: center;">
+                        @mr.Start.ToString("HH:mm")<br />
+                        @("T" + mr.TariffId)
+                    </div>
+
+                    <div>
+                        Tarif @mr.TariffId von @mr.Start.ToString("HH:mm") Uhr bis @(mr.End.Hour == 0 && mr.End.Minute == 0 ? "24:00" : mr.End.ToString("HH:mm")) Uhr<br />
+                        <strong>@mr.Amount.GetDisplayValue(ovl.Uom, ovl.PowerOfTenMultiplier, ovl.Scaler) @unit</strong>
+                    </div>
+                </div>
+            }
+
+        </div>
+
+        <div class="col-sm-6">
+            <h4>Tagessummen</h4>
+
+            <table class="table">
+                <tr>
+                    <th>Tarif</th>
+                    <th>Wert</th>
+                    <th>Einheit</th>
+                </tr>
+
+                @foreach (var register in sec.SummaryRegister)
+                {
+                    <tr>
+                        <td>@(register.TariffId >= 63 ? "Fehlerregister" : "Tarif " + register.TariffId)</td>
+                        <td>
+                            @register.Amount.GetDisplayValue(ovl.Uom, ovl.PowerOfTenMultiplier, ovl.Scaler)
+                        </td>
+                        <td>@ovl.Uom.GetDisplayUnit(ovl.PowerOfTenMultiplier)</td>
+                    </tr>
+                }
+
+            </table>
+        </div>
+    </div>
+
+}

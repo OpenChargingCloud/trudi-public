@@ -13,7 +13,7 @@
     </InvoicingParty>
     <SMGW>
       <certId>1</certId>
-      <smgwId />
+      <smgwId>EDNT0012345678</smgwId>
     </SMGW>
     <Certificate>
       <certId>1</certId>

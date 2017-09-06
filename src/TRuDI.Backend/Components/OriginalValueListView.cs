@@ -16,12 +16,10 @@
             this.applicationState = applicationState;
         }
 
-        public IViewComponentResult Invoke(OriginalValueList ovl, DateTime startTime, DateTime endTime)
+        public IViewComponentResult Invoke(OriginalValueList ovl, DateTime startTime)
         {
-            if (endTime == DateTime.MinValue)
-            {
-                endTime = DateTime.MaxValue;
-            }
+            startTime = startTime.Date;
+            var endTime = startTime + TimeSpan.FromDays(1);
 
             var items = ovl.GetReadings(startTime, endTime);
 

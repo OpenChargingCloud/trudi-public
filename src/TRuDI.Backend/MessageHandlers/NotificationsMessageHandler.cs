@@ -39,7 +39,7 @@
 
             try
             {
-                await this.InvokeClientMethodAsync(this.WebSocketConnectionManager.GetId(this.lastSocket), "ProgressUpdate", new object[] { message, progress });
+                await this.InvokeClientMethodAsync(this.WebSocketConnectionManager.GetId(this.lastSocket), "ProgressUpdate", new object[] { System.Net.WebUtility.HtmlEncode(message), progress });
             }
             catch (Exception ex)
             {

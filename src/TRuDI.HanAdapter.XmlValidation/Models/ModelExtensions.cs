@@ -121,8 +121,25 @@
         /// <returns>Das gekürzute DateTime Objekt</returns>
         public static DateTime GetDateWithoutSeconds(this DateTime dateTime)
         {
-            return new DateTime(dateTime.Year, dateTime.Month, dateTime.Day, dateTime.Hour, dateTime.Minute, 0);
+            return new DateTime(dateTime.Year, dateTime.Month, dateTime.Day, dateTime.Hour, dateTime.Minute, 0, dateTime.Kind);
         }
+
+        /// <summary>
+        /// Die Funktion liefert den "geglätteten" captureTime Zeitstempel zurück
+        /// </summary>
+        /// <param name="dateTime">Dem Element wird der geglättete Wert zugewisen</param>
+        /// <param name="captureTime">Der zu glättende Zeitwert</param>
+        /// <returns>Der gerundete Zeitstempel</returns>
+        public static DateTime GetSmoothCaptureTime(this DateTime dateTime, DateTime captureTime)
+        {
+            if(captureTime.Second > 58)
+            {
+                return captureTime.GetDateWithoutSeconds().AddMinutes(1);
+            }
+
+            return captureTime.GetDateWithoutSeconds();
+        }
+
 
         /// <summary>
         /// Teilt den FNN Status hex String in die beiden Enumerationen SmgwStatusWord und BzStatusWord auf
@@ -184,6 +201,16 @@
         public static bool IsDateInIntervalBlock(this Interval interval, DateTime date)
         {
             if(date >= interval.Start && date <= interval.GetEnd())
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public static bool IsPeriodInIntervalBlock(this Interval interval, DateTime start, DateTime end)
+        {
+            if(start >= interval.Start && end <= interval.GetEnd())
             {
                 return true;
             }

@@ -5,16 +5,16 @@
 
     public class BreadCrumbTrail
     {
-        private readonly List<Item> items = new List<Item>();
+        private readonly List<BreadCrumbTrailItem> items = new List<BreadCrumbTrailItem>();
 
-        public IReadOnlyList<Item> Items => this.items;
+        public IReadOnlyList<BreadCrumbTrailItem> Items => this.items;
 
         public void Add(string name, string link)
         {
             var existingItem = this.items.FirstOrDefault(i => i.Link == link);
             if (existingItem == null)
             {
-                this.items.Add(new Item(this.items.Count, name, link));
+                this.items.Add(new BreadCrumbTrailItem(this.items.Count, name, link));
             }
             else
             {
@@ -35,22 +35,6 @@
         public void Reset()
         {
             this.BackTo(0);
-        }
-
-        public class Item
-        {
-            public Item(int id, string name, string link)
-            {
-                this.Id = id;
-                this.Name = name;
-                this.Link = link;
-            }
-
-            public int Id { get; set; }
-
-            public string Name { get; set; }
-
-            public string Link { get; set; }
         }
     }
 }

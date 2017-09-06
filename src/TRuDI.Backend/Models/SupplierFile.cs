@@ -5,6 +5,7 @@
 
     using TRuDI.HanAdapter.Interface;
     using TRuDI.HanAdapter.XmlValidation.Models.BasicData;
+    using TRuDI.TafAdapter.Interface;
 
     public class SupplierFile
     {
@@ -21,5 +22,7 @@
         public string DigestSha3 { get; set; }
 
         public AdapterContext Ctx { get; set; }
+
+        public IAccountingPeriod AccountingPeriod { get; set; }
     }
 }

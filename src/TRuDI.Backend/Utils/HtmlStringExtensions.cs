@@ -1,6 +1,7 @@
 ﻿namespace TRuDI.Backend.Utils
 {
     using System;
+    using System.Globalization;
 
     using Microsoft.AspNetCore.Html;
     using System.Security.Cryptography;
@@ -116,13 +117,105 @@
 
         public static string ToStatusString(this IntervalReading reading)
         {
-            if (reading.StatusPTB == null)
+            if (reading == null || (reading.StatusPTB == null && reading.StatusFNN == null))
             {
-                var x = reading.StatusFNN.SmgwStatusWord + " " + reading.StatusFNN.BzStatusWord;
-                return x;
+                return string.Empty;
             }
 
-            return reading.StatusPTB.ToString();
+            var status = reading.StatusPTB ?? reading.StatusFNN.MapToStatusPtb();
+
+            switch (status)
+            {
+                case StatusPTB.No_Error:
+                    return "kein Fehler";
+
+                case StatusPTB.Warning:
+                    return "Warung";
+
+                case StatusPTB.Temp_Error_signed_invalid:
+                    return "temporärer Fehler";
+
+                case StatusPTB.Temp_Error_is_invalid:
+                    return "temporärer Fehler";
+
+                case StatusPTB.Fatal_Error:
+                    return "fataler Fehler";
+
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        public static string ToStatusBackground(this IntervalReading reading)
+        {
+            if (reading == null)
+            {
+                return string.Empty;
+            }
+
+            if (reading.Value == null)
+            {
+                return "bg-warning";
+            }
+
+            if (reading.StatusPTB == null && reading.StatusFNN == null)
+            {
+                return string.Empty;
+            }
+
+            var status = reading.StatusPTB ?? reading.StatusFNN.MapToStatusPtb();
+
+            switch (status)
+            {
+                case StatusPTB.No_Error:
+                    return string.Empty;
+
+                case StatusPTB.Warning:
+                    return "bg-warning";
+
+                case StatusPTB.Temp_Error_signed_invalid:
+                    return "bg-warning";
+
+                case StatusPTB.Temp_Error_is_invalid:
+                    return "bg-warning";
+
+                case StatusPTB.Fatal_Error:
+                    return "bg-danger";
+
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        public static string ToStatusIcon(this IntervalReading reading)
+        {
+            if (reading == null || (reading.StatusPTB == null && reading.StatusFNN == null))
+            {
+                return string.Empty;
+            }
+
+            var status = reading.StatusPTB ?? reading.StatusFNN.MapToStatusPtb();
+
+            switch (status)
+            {
+                case StatusPTB.No_Error:
+                    return "fa fa-check-circle-o";
+
+                case StatusPTB.Warning:
+                    return "fa fa-check-circle";
+
+                case StatusPTB.Temp_Error_signed_invalid:
+                    return "fa fa-exclamation-circle";
+
+                case StatusPTB.Temp_Error_is_invalid:
+                    return "fa fa-exclamation-triangle";
+
+                case StatusPTB.Fatal_Error:
+                    return "fa fa-times-circle";
+
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         public static string GetOriginalValueListIdent(this OriginalValueList ovl)
@@ -165,6 +258,42 @@
 
                 default:
                     throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        public static string ToHistoricValueDescription(this HistoricConsumption value)
+        {
+            switch (value.UnitOfTime)
+            {
+                case TimeUnit.Day:
+                    return value.Begin.ToString("dddd, dd.MM.yyyy", CultureInfo.GetCultureInfo("DE"));
+
+                case TimeUnit.Week:
+                    var cal = new GregorianCalendar();
+                    var week = cal.GetWeekOfYear(value.Begin, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
+                    return $"Woche {week}/{value.Begin.Year}, {value.Begin.ToString("dd.MM.yyyy", CultureInfo.GetCultureInfo("DE"))} bis {value.End.ToString("dd.MM.yyyy", CultureInfo.GetCultureInfo("DE"))}";
+
+                case TimeUnit.Month:
+                    return value.Begin.ToString("MMMM yyyy");
+
+                case TimeUnit.Year:
+                    return value.Begin.ToString("yyyy");
+
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        public static string ToFormattedDeviceId(this string value)
+        {
+            try
+            {
+                var serverId = new TRuDI.Backend.ServerId(value);
+                return serverId.ToString();
+            }
+            catch
+            {
+                return value;
             }
         }
     }

@@ -73,5 +73,22 @@
 
             return count;
         }
+
+        public static Interval GetMeterReadingInterval(this MeterReading reading)
+        {
+            var blocks = reading.IntervalBlocks.OrderBy(ib => ib.Interval.Start).ToList();
+
+            var start = blocks.FirstOrDefault().Interval.Start;
+            var end = blocks.LastOrDefault().Interval.GetEnd();
+            var duration = (end - start).TotalSeconds;
+
+            return new Interval() { Start = start, Duration = (uint)duration };
+        }
+
+        public static IntervalReading GetIntervalReadingFromDate(this MeterReading reading, DateTime date)
+        {
+           return reading.IntervalBlocks?.FirstOrDefault(ib => ib.Interval.IsDateInIntervalBlock(date))
+                .IntervalReadings?.FirstOrDefault(ir => ir.TimePeriod.Start == date);
+        }
     }
 }

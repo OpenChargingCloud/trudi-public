@@ -22,13 +22,15 @@
                             @versionItem.Component
                         </th>
                         <td>
+                            <label>Version</label>
                             <div>
                                 @versionItem.Version
                             </div>
                             @if (!string.IsNullOrWhiteSpace(versionItem.Hash))
                             {
-                                <div>
-                                    @versionItem.Hash
+                                <label>Prüfsumme</label>
+                                <div style="font-family: monospace;">
+                                    @versionItem.Hash.AddLineBreak(40)
                                 </div>
                             }
                         </td>
@@ -47,62 +49,11 @@
 
         @if (StateService.LastConnectResult?.Certificate != null)
         {
-            var cert = StateService.LastConnectResult?.Certificate;
-
-            <table class="table">
-                <tr>
-                    <th>Ausgestellt für</th>
-                    <td>@cert.GetNameInfo(X509NameType.SimpleName, true)</td>
-                </tr>
-
-                <tr>
-                    <th>Ausgestellt von</th>
-                    <td>@cert.GetNameInfo(X509NameType.SimpleName, false)</td>
-                </tr>
-
-                <tr>
-                    <th>Gültigkeit</th>
-                    <td>@cert.NotBefore bis @cert.NotAfter</td>
-                </tr>
-
-                <tr>
-                    <th>Format</th>
-                    <td>@cert.GetFormat()</td>
-                </tr>
-
-                <tr>
-                    <th>Version</th>
-                    <td>@cert.Version</td>
-                </tr>
-
-                <tr>
-                    <th>Öffentlicher Schlüssel</th>
-                    <td style="font-family: monospace;">@cert.GetPublicKeyString().AddLineBreak(32)</td>
-                </tr>
-
-                <tr>
-                    <th>Serial Number</th>
-                    <td>@cert.GetSerialNumberString()</td>
-                </tr>
-
-                <tr>
-                    <th>Key Algorithm</th>
-                    <td>@cert.GetKeyAlgorithm().OidToFriendlyName()</td>
-                </tr>
-                <tr>
-                    <th>Hash</th>
-                    <td style="font-family: monospace;">@cert.GetCertHashString().AddLineBreak(32)</td>
-                </tr>
-
-                <tr>
-                    <th>Signature Algorithm</th>
-                    <td>@cert.SignatureAlgorithm.FriendlyName</td>
-                </tr>
-            </table>
+            @await Component.InvokeAsync("CertDetailsView", new { cert = StateService.LastConnectResult?.Certificate })
         }
 
     </div>
 </div>
 
-<a asp-action="Back">Zurück</a>
+<a href="/BreadCrumb/ClosePage">Zurück</a>
 

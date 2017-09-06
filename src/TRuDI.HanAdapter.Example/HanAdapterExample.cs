@@ -179,7 +179,9 @@
                 config.End = DateTime.Now.GetDateWithoutSeconds();
             }
 
-            var trudiXml = XmlFactory.FabricateHanAdapterContent(config);
+            var xmlFactory = new XmlFactory(config);
+
+            var trudiXml = xmlFactory.BuildTafXml(); 
 
             progressCallback(new ProgressInfo(100, $"Alle Daten erfolgreich geladen."));
 

@@ -1,0 +1,130 @@
+﻿@using TRuDI.Backend.Application
+@inject ApplicationState StateService
+@{
+    ViewData["Title"] = "Beschreibung und Glossar";
+}
+
+<h3>Smart-Meter-Gateway</h3>
+
+<p>
+    In einem intelligenten Messsystem bildet die Kommunikationseinheit, das Smart Meter Gateway (SMGW) mit, 
+    die zentrale Komponente, welche Messdaten von Zählern empfängt, speichert und diese für Marktakteure aufbereitet. 
+</p>
+
+<h3>Messwert-Status</h3>
+
+<table class="table">
+    <tr>
+        <th>Icon</th>
+        <th>Kurztext</th>
+        <th>Status</th>
+        <th>Beschreibung</th>
+    </tr>
+    
+    <tr>
+        <td><i class="fa fa-check-circle-o"></i></td>
+        <td>OK</td>
+        <td>0</td>
+        <td>Kein Fehler.</td>
+    </tr>
+    
+    <tr>
+        <td><i class="fa fa-check-circle"></i></td>
+        <td>Warnung</td>
+        <td>1</td>
+        <td>Warnung, keine (eichrechtliche) Aktion notwendig, Messwert gültig.</td>
+    </tr>
+    
+    <tr>
+        <td><i class="fa fa-exclamation-circle"></i></td>
+        <td>temp. Fehler</td>
+        <td>2</td>
+        <td>
+            Temporärer Fehler, gesendeter Messwert wird als ungültig gekennzeichnet, der Wert im Messwertfeld kann entsprechend
+            der "VDE-Anwendungsregel VDE-AR-N 4400:2011-09" bzw. "DVGW-Arbeitsblatt G685 Gasabrechnung, 11/2008"
+            im Backend als Ersatzwert verwendet werden.
+        </td>
+    </tr>
+    
+    <tr>
+        <td><i class="fa fa-exclamation-triangle"></i></td>
+        <td>temp. Fehler</td>
+        <td>3</td>
+        <td>
+            Temporärer Fehler, gesendeter Messwert ist ungültig, der im Messwertfeld enthaltene Wert kann im Backend nicht als
+            Ersatzwert verwendet werden.
+        </td>
+    </tr>
+    
+    <tr>
+        <td><i class="fa fa-times-circle"></i></td>
+        <td>fataler Fehler</td>
+        <td>4</td>
+        <td>Fataler Fehler (Zähler defekt), der aktuell gesendete und alle zukünftigen Messwerte sind ungültig.</td>
+    </tr>
+</table>
+
+<h3>Begriffe</h3>
+
+<ul>
+    <li>
+        <strong>SMGW, Smart-Meter-Gateway</strong>
+        <p>Kommunikationseinheit...</p>
+    </li>
+    
+    <li>
+        <strong>Technische Richtlinie TR-03109</strong>
+        <p>
+            Die Technischen Richtlinie TR-03109 beinhaltet die funktionalen Anforderungen, die ein Smart-Meter-Gateway mindestens erfüllen muss.
+        </p>
+    </li>
+    
+    <li>
+        <strong>Anwendungsregel AR2418-6</strong>
+        <p></p>
+    </li>
+
+    <li>
+        <strong>Smart Meter, Zähler</strong>
+    </li>
+
+    <li>
+        <strong>Zählpunkt</strong>
+    </li>
+    
+    <li>
+        <strong>TAF, Tarifanwendungsfall</strong>
+        <p></p>
+    </li>
+    
+
+    <li>
+        <strong>WAN, Wide Area Netz</strong>
+        <p>
+            Die WAN-Schnittstelle ist als IP-Schnittstelle ausgeführt. Aus Gründen der Sicherheit gehen sämtliche Kommunikationsverbindungen vom 
+            Smart Meter Gateway aus. Diese können bei Bedarf oder zu festgelegten Zeitpunkten durch das Gateway etabliert werden. Um aber auch auf 
+            spontane Ereignisse reagieren zu können, kann das Smart Meter Gateway über einen Wake-Up Dienst zu einem Verbindungsaufbau veranlasst werden.
+        </p>
+        <p>
+            Über die WAN-Schnittstelle ist das Smart Meter Gateway in eine Public-Key-Infrastruktur eingebunden und jegliche Kommunikation ist mit TLS verschlüsselt.
+        </p>
+    </li>
+    
+    <li>
+        <strong>LMN, Lokales metrologisches Netz</strong>
+        <p>
+            Die LMN-Schnittstelle kann nach der Technischen Richtlinie sowohl als Nahbereichs-Funkschnittstelle (wireless Mbus) oder als serielle Schnittstelle ausgeführt sein.
+        </p>
+    </li>
+
+    <li>
+        <strong>HAN, Home Area Network</strong>
+    </li>
+    
+    <li>
+        <strong>PKI, Public-Key-Infrastruktur</strong>
+    </li>
+
+</ul>
+<a href="/BreadCrumb/ClosePage">Zurück</a>
+

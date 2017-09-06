@@ -1,5 +1,12 @@
-﻿@using TRuDI.Backend.Application
+﻿@using Microsoft.AspNetCore.Http
+@using TRuDI.Backend.Application
+@using TRuDI.Backend.Utils
 @inject ApplicationState StateService
+
+@{
+    var isProgressPage = ViewData.ContainsKey("IsProgressPage");
+}
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -16,93 +23,127 @@
 </head>
 <body>
 
-<nav class="navbar navbar-default navbar-fixed-top">
-    <div class="container">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            @if (StateService.OperationMode == OperationMode.DisplayFunction)
-            {
-                <div class="navbar-brand">TRuDI Abrechnungskontrolle</div>
-            }
-            else
-            {
-                <div class="navbar-brand">TRuDI Transparenzfunktion</div>
-            }
-            
-            <h2>@ViewData["Title"]</h2>
-        </div>
-        <div id="navbar" class="navbar-collapse collapse">
-            @*<ul class="nav navbar-nav">
-                <li class="active"><a href="#">Home</a></li>
-                <li><a href="#about">About</a></li>
-                <li><a href="#contact">Contact</a></li>
-            </ul>*@
-            <div class="nav navbar-nav navbar-right">
-                <ul class="breadcrumb">
-                @foreach (var item in StateService.BreadCrumbTrail.Items)
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                @if (StateService.OperationMode == OperationMode.DisplayFunction)
                 {
-                    <li><a href="/BreadCrumb?id=@item.Id">@item.Name</a></li>
+                    <div class="navbar-brand">TRuDI Abrechnungskontrolle</div>
                 }
-                </ul>
+                else
+                {
+                    <div class="navbar-brand">TRuDI Transparenzfunktion</div>
+                }
+
+                <h2>@ViewData["Title"]</h2>
             </div>
-        </div><!--/.nav-collapse -->
-    </div>
-</nav>
-    
-
-
-<script>
-    if (typeof module === 'object') {
-        window.module = module;
-        module = undefined;
-    }
-</script>
-
-<environment>
-    <script src="~/lib/jquery/dist/jquery.js"></script>
-    <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
-    <script src="~/lib/moment/min/moment-with-locales.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
-    <script src="~/js/site.js"></script>
-    <script src="~/lib/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
-</environment>
-
-<script>if (window.module)
-    module = window.module;</script>
-
-@RenderSection("Scripts", required: false)
-
-<div class="container body-content">
-    <div class="row">
-        <div class="col-md-8">
-            <h2> </h2>
-        </div>
-
-        <div class="col-md-8" id="errorContainer">
-            @await Html.PartialAsync("_ErrorMessage", null, ViewData)
-            @RenderBody()
-        </div>
-        @if (StateService.ActiveHanAdapter?.GatewayImageView != null)
-        {
-            <div class="col-md-4">
-                <div class="panel panel-primary">
-                    <div class="panel-heading">@StateService.ActiveHanAdapter.DeviceId</div>
-                    <div class="panel-body" style="overflow: hidden;">
-                        @await Component.InvokeAsync(StateService.ActiveHanAdapter.GatewayImageView, new { deviceId = StateService.ActiveHanAdapter.DeviceId })
-                        @if (!ViewData.ContainsKey("IsGatewayDetails"))
+            <div id="navbar" class="navbar-collapse collapse">
+                <div class="nav navbar-nav navbar-right">
+                    <ul class="breadcrumb">
+                        @foreach (var item in StateService.BreadCrumbTrail.Items)
                         {
-                            <a asp-controller="GatewayDetails">Details zum Smart Meter Gateway</a>
+                            if (isProgressPage)
+                            {
+                                <li><span style="none; opacity: 0.5;">@item.Name</span></li>
+                            }
+                            else
+                            {
+                                <li><a href="/BreadCrumb?id=@item.Id">@item.Name</a></li>
+                            }
+                        }
+                    </ul>
+                </div>
+            </div><!--/.nav-collapse -->
+        </div>
+    </nav>
+
+
+
+    <script>
+        if (typeof module === 'object') {
+            window.module = module;
+            module = undefined;
+        }
+    </script>
+
+    <environment>
+        <script src="~/lib/jquery/dist/jquery.js"></script>
+        <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+        <script src="~/lib/moment/min/moment-with-locales.js"></script>
+        <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+        <script src="~/js/site.js"></script>
+        <script src="~/lib/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
+    </environment>
+
+    <script>
+        if (window.module)
+            module = window.module;</script>
+
+    @RenderSection("Scripts", required: false)
+
+    <div class="container body-content">
+        <div class="row">
+            <div class="col-md-8">
+                <h2> </h2>
+            </div>
+
+            <div class="col-md-8" id="body-container">
+                @RenderBody()
+            </div>
+
+            <div class="col-md-4">
+                <div class="well">
+                    <div>
+                        @foreach (var menuItem in StateService.SideBarMenu.Items)
+                        {
+                            if (menuItem.Name == null)
+                            {
+                                <hr />
+
+                                continue;
+                            }
+
+                            if (isProgressPage)
+                            {
+                                <div style="opacity: 0.5;">@menuItem.Name</div>
+                            }
+                            else
+                            {
+                                <div><a href="@menuItem.Link">@menuItem.Name</a></div>
+                            }
                         }
                     </div>
                 </div>
+
+                @if (StateService.ActiveHanAdapter?.GatewayImageView != null)
+                {
+                    <div class="panel panel-default">
+                        <div class="panel-heading">@StateService.ActiveHanAdapter.DeviceId.ToFormattedDeviceId()</div>
+                        <div class="panel-body" style="overflow: hidden;">
+                            @await Component.InvokeAsync(StateService.ActiveHanAdapter.GatewayImageView, new { deviceId = StateService.ActiveHanAdapter.DeviceId })
+                        </div>
+                        <div class="panel-footer">
+                            @if (isProgressPage)
+                            {
+                                <div style="opacity: 0.5;">Details zum Smart Meter Gateway</div>
+                            }
+                            else
+                            {
+                                <div>
+                                    <a asp-controller="GatewayDetails">Details zum Smart Meter Gateway</a>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
             </div>
-        }
+        </div>
     </div>
-</div>
 </body>
 </html>

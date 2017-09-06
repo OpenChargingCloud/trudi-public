@@ -2,17 +2,18 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.IO;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using System.Xml.Linq;
 
+    using TRuDI.Backend.Exceptions;
     using TRuDI.Backend.MessageHandlers;
     using TRuDI.Backend.Models;
     using TRuDI.HanAdapter.Interface;
     using TRuDI.HanAdapter.XmlValidation;
     using TRuDI.HanAdapter.XmlValidation.Models;
+    using TRuDI.HanAdapter.XmlValidation.Models.BasicData;
 
     public class ApplicationState
     {
@@ -24,6 +25,7 @@
         public OperationMode OperationMode { get; set; }
 
         public BreadCrumbTrail BreadCrumbTrail { get; } = new BreadCrumbTrail();
+        public SideBarMenu SideBarMenu { get; } = new SideBarMenu();
 
         public List<string> LastErrorMessages { get; } = new List<string>();
 
@@ -34,6 +36,8 @@
             this.notificationsMessageHandler = notificationsMessageHandler;
             this.ConnectData = new ConnectDataViewModel();
             this.BreadCrumbTrail.Add("Start", "/OperatingModeSelection");
+            this.SideBarMenu.Add("Über TRuDI", "/About", true);
+            this.SideBarMenu.Add("Beschreibung", "/Help", true);
         }
 
         public void LoadAdapter(string serverId)
@@ -81,23 +85,23 @@
                     try
                     {
                         this.LastConnectResult = await this.activeHanAdapter.Connect(
-                            this.ConnectData,
-                            this.ClientCert,
-                            this.ManufacturerParameters,
-                            ct,
-                            this.ProgressCallback);
+                                                     this.ConnectData,
+                                                     this.ClientCert,
+                                                     this.ManufacturerParameters,
+                                                     ct,
+                                                     this.ProgressCallback);
 
                         var contracts = await this.activeHanAdapter.LoadAvailableContracts(ct, this.ProgressCallback);
-                        var containers = contracts.Where(c => c.TafId != TafId.Taf6).Select(c => new ContractContainer() { Contract = c }).ToList();
+                        var containers = contracts.Where(c => c.TafId != TafId.Taf6)
+                            .Select(c => new ContractContainer() { Contract = c }).ToList();
 
                         foreach (var taf6Contract in contracts.Where(c => c.TafId == TafId.Taf6))
                         {
-                            var cnt = containers.FirstOrDefault(c =>
-                                taf6Contract.TafName == c.Contract.TafName &&
-                                taf6Contract.Begin == c.Contract.Begin &&
-                                taf6Contract.End == c.Contract.End &&
-                                taf6Contract.SupplierId == c.Contract.SupplierId &&
-                                taf6Contract.Meters.SequenceEqual(c.Contract.Meters));
+                            var cnt = containers.FirstOrDefault(
+                                c => taf6Contract.TafName == c.Contract.TafName
+                                     && taf6Contract.Begin == c.Contract.Begin && taf6Contract.End == c.Contract.End
+                                     && taf6Contract.SupplierId == c.Contract.SupplierId
+                                     && taf6Contract.Meters.SequenceEqual(c.Contract.Meters));
 
                             if (cnt != null)
                             {
@@ -117,18 +121,57 @@
                         }
                         else
                         {
-                            var tariffContract = this.Contracts.Select(c => c.Contract).FirstOrDefault(c => c.TafId == TafId.Taf7 && c.MeteringPointId == this.CurrentSupplierFile.Model.UsagePointId && c.TafName == this.CurrentSupplierFile.Model.AnalysisProfile.TariffId);
-
-
-
+                            var tariffContract = this.Contracts.Select(c => c.Contract).FirstOrDefault(
+                                c => c.TafId == TafId.Taf7
+                                     && c.MeteringPointId == this.CurrentSupplierFile.Model.UsagePointId
+                                     && c.TafName == this.CurrentSupplierFile.Model.AnalysisProfile.TariffId);
                         }
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        await this.LoadNextPageAfterProgress("/Connect");
+                    }
+                    catch (HanAdapterException ex)
+                    {
+                        this.HandleHanAdapterException(ex);
+                        await this.LoadNextPageAfterProgress("/Error");
                     }
                     catch (Exception ex)
                     {
                         this.LastErrorMessages.Add(ex.Message);
-                        await this.LoadNextPageAfterProgress("/Connect");
+                        await this.LoadNextPageAfterProgress("/Error");
                     }
                 });
+        }
+
+        private void HandleHanAdapterException(HanAdapterException ex)
+        {
+            switch (ex.AdapterError.Type)
+            {
+                case ErrorType.TcpConnectFailed:
+                    this.LastErrorMessages.Add("Netzwerkverbindung konnte nicht hergestellt werden.");
+                    break;
+
+                case ErrorType.TlsConnectFailed:
+                    this.LastErrorMessages.Add("TLS-Verbindung zum Smart Meter Gateway konnte nicht hergestellt werden.");
+                    break;
+
+                case ErrorType.AuthenticationFailed:
+                    this.LastErrorMessages.Add("Anmeldung am Smart Meter Gateway fehlgeschlagen.");
+                    break;
+
+                case ErrorType.Other:
+                    this.LastErrorMessages.Add("Nicht spezifizierter Fehler.");
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            if (!string.IsNullOrWhiteSpace(ex.AdapterError.Message))
+            {
+                this.LastErrorMessages.Add(ex.AdapterError.Message);
+            }
         }
 
         public void LoadData(XDocument raw)
@@ -160,16 +203,41 @@
                         catch
                         {
                             // Errors are collected by LoadDataFromXml, just go to the error page now
-                            await this.LoadNextPageAfterProgress("/DataView/ValidationError");
+                            await this.LoadNextPageAfterProgress("/ValidationError");
                             return;
+                        }
+
+                        if (ctx.BillingPeriod.End == null)
+                        {
+                            var rawCurrentRegisters = await this.activeHanAdapter.GetCurrentRegisterValues(ctx, ct, this.ProgressCallback);
+
+                            try
+                            {
+                                this.UpdateRegisterValuesFromXml(rawCurrentRegisters, ctx);
+                            }
+                            catch
+                            {
+                                // Errors are collected by LoadDataFromXml, just go to the error page now
+                                await this.LoadNextPageAfterProgress("/ValidationError");
+                                return;
+                            }
                         }
 
                         await this.LoadNextPageAfterProgress("/DataView");
                     }
+                    catch (OperationCanceledException)
+                    {
+                        await this.LoadNextPageAfterProgress(this.BreadCrumbTrail.Items.Last().Link);
+                    }
+                    catch (HanAdapterException ex)
+                    {
+                        this.HandleHanAdapterException(ex);
+                        await this.LoadNextPageAfterProgress("/Error");
+                    }
                     catch (Exception ex)
                     {
                         this.LastErrorMessages.Add(ex.Message);
-                        await this.LoadNextPageAfterProgress("/Contracts");
+                        await this.LoadNextPageAfterProgress(this.BreadCrumbTrail.Items.Last().Link);
                     }
                 });
         }
@@ -216,6 +284,12 @@
                 {
                     ContextValidation.ValidateContext(this.CurrentDataResult.Model, ctx);
                 }
+
+                if (this.CurrentSupplierFile?.Model != null)
+                {
+                    var tafAdapter = TafAdapterRepository.LoadAdapter(this.CurrentSupplierFile.Model.AnalysisProfile.TariffUseCase);
+                    this.CurrentSupplierFile.AccountingPeriod = tafAdapter.Calculate(this.CurrentDataResult.Model, this.CurrentSupplierFile.Model);
+                }
             }
             catch (AggregateException ex)
             {
@@ -239,6 +313,58 @@
 
             meterReadings.Sort((a, b) => string.Compare(a.ReadingType.ObisCode, b.ReadingType.ObisCode, StringComparison.InvariantCultureIgnoreCase));
             this.CurrentDataResult.MeterReadings = meterReadings;
+            this.CurrentDataResult.Begin = meterReadings.FirstOrDefault()?.IntervalBlocks?.FirstOrDefault()?.Interval?.Start;
+
+            if (this.CurrentDataResult.Begin != null)
+            {
+                var duration = meterReadings.FirstOrDefault()?.IntervalBlocks?.FirstOrDefault()?.Interval?.Duration;
+                if (duration != null)
+                {
+                    this.CurrentDataResult.End = this.CurrentDataResult.Begin + TimeSpan.FromSeconds(duration.Value);
+                }
+            }
+        }
+
+        private void UpdateRegisterValuesFromXml(XDocument raw, AdapterContext ctx)
+        {
+            this.LastErrorMessages.Clear();
+            UsagePointAdapterTRuDI model;
+
+            try
+            {
+                Ar2418Validation.ValidateSchema(raw);
+                model = XmlModelParser.ParseHanAdapterModel(raw?.Root?.Descendants());
+                ModelValidation.ValidateHanAdapterModel(model);
+            }
+            catch (AggregateException ex)
+            {
+                foreach (var err in ex.InnerExceptions)
+                {
+                    this.LastErrorMessages.Add(err.Message);
+                }
+
+                throw;
+            }
+            catch (Exception ex)
+            {
+                this.LastErrorMessages.Add(ex.Message);
+                throw;
+            }
+
+            var meterReadings = model.MeterReadings.Where(mr => !mr.IsOriginalValueList()).ToList();
+
+            meterReadings.Sort((a, b) => string.Compare(a.ReadingType.ObisCode, b.ReadingType.ObisCode, StringComparison.InvariantCultureIgnoreCase));
+            this.CurrentDataResult.MeterReadings = meterReadings;
+            this.CurrentDataResult.Begin = meterReadings.FirstOrDefault()?.IntervalBlocks?.FirstOrDefault()?.Interval?.Start;
+
+            if (this.CurrentDataResult.Begin != null)
+            {
+                var duration = meterReadings.FirstOrDefault()?.IntervalBlocks?.FirstOrDefault()?.Interval?.Duration;
+                if (duration != null)
+                {
+                    this.CurrentDataResult.End = this.CurrentDataResult.Begin + TimeSpan.FromSeconds(duration.Value);
+                }
+            }
         }
 
         private void ProgressCallback(ProgressInfo progressInfo)

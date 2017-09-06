@@ -2,6 +2,7 @@
 {
     using System;
     using System.Globalization;
+    using System.Text.RegularExpressions;
 
     public class ObisId
     {
@@ -9,21 +10,73 @@
         {
         }
 
+        public ObisId(ObisId src)
+        {
+            this.A = src.A;
+            this.B = src.B;
+            this.C = src.C;
+            this.D = src.D;
+            this.E = src.E;
+            this.F = src.F;
+        }
+
         public ObisId(string hexString)
         {
-            var value = ulong.Parse(hexString, NumberStyles.HexNumber);
-            if (value > 0xFFFFFFFFFFFF)
+            if (Regex.IsMatch(hexString, "[0-9A-Fa-f]{12}"))
             {
-                throw new ArgumentException("OBIS id must be a value less or equal to 0xFFFFFFFFFFFF", nameof(hexString));
+                var value = ulong.Parse(hexString, NumberStyles.HexNumber);
+                if (value > 0xFFFFFFFFFFFF)
+                {
+                    throw new ArgumentException(
+                        "OBIS id must be a value less or equal to 0xFFFFFFFFFFFF",
+                        nameof(hexString));
+                }
+
+                this.A = (byte)((value >> 40) & 0xFF);
+                this.B = (byte)((value >> 32) & 0xFF);
+                this.C = (byte)((value >> 24) & 0xFF);
+                this.D = (byte)((value >> 16) & 0xFF);
+                this.E = (byte)((value >> 8) & 0xFF);
+                this.F = (byte)(value & 0xFF);
+                return;
             }
 
-            this.A = (byte)((value >> 40) & 0xFF);
-            this.B = (byte)((value >> 32) & 0xFF);
-            this.C = (byte)((value >> 24) & 0xFF);
-            this.D = (byte)((value >> 16) & 0xFF);
-            this.E = (byte)((value >> 8) & 0xFF);
-            this.F = (byte)(value & 0xFF);
+            var match = Regex.Match(hexString, @"^(?<A>\d+)-(?<B>\d+)\:(?<C>\d+)\.(?<D>\d+)\.(?<E>\d+)\*(?<F>\d+)$|^(?<A>\d+)-(?<B>\d+)\:(?<C>\d+)\.(?<D>\d+)\.(?<E>\d+)$|^(?<C>\d+)\.(?<D>\d+)\.(?<E>\d+)$");
+            if (match.Success)
+            {
+                if (match.Groups["A"].Success)
+                {
+                    this.A = byte.Parse(match.Groups["A"].Value);
+                }
+                else
+                {
+                    this.A = 1;
+                }
+
+                if (match.Groups["B"].Success)
+                {
+                    this.B = byte.Parse(match.Groups["B"].Value);
+                }
+                else
+                {
+                    this.B = 0;
+                }
+
+                this.C = byte.Parse(match.Groups["C"].Value);
+                this.D = byte.Parse(match.Groups["D"].Value);
+                this.E = byte.Parse(match.Groups["E"].Value);
+
+                if (match.Groups["F"].Success)
+                {
+                    this.F = byte.Parse(match.Groups["F"].Value);
+                }
+                else
+                {
+                    this.F = 255;
+                }
+            }
         }
+
 
         public ObisMedium Medium => (ObisMedium)this.A;
 

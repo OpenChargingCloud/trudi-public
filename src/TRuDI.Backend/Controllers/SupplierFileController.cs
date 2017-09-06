@@ -28,6 +28,8 @@
 
         public IActionResult Index()
         {
+            this.applicationState.SideBarMenu.Clear();
+
             return this.View();
         }
 
