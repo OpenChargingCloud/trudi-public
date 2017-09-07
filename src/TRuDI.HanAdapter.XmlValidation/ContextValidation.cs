@@ -138,7 +138,7 @@
         {
             var meterReadingCount = usagePoint.MeterReadings.Count;
 
-            if (ctx.BillingPeriod.End.HasValue)
+            if (ctx.BillingPeriod != null && ctx.BillingPeriod.End.HasValue)
             {
                 if (ctx.Contract.TafId == TafId.Taf1 && meterReadingCount < 2)
                 {

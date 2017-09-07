@@ -12,13 +12,13 @@ namespace TRuDI.Backend.Tests
         {
             var target = new BreadCrumbTrail();
 
-            target.Add("A", "A");
-            target.Add("B", "B");
+            target.Add("A", "A", true);
+            target.Add("B", "B", true);
 
-            target.BackTo(1);
+            target.BackTo(1, true);
             Assert.AreEqual(2, target.Items.Count);
 
-            target.BackTo(0);
+            target.BackTo(0, true);
             Assert.AreEqual(1, target.Items.Count);
             Assert.AreEqual("A", target.Items[0].Name);
         }

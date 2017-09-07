@@ -35,7 +35,7 @@
         {
             this.notificationsMessageHandler = notificationsMessageHandler;
             this.ConnectData = new ConnectDataViewModel();
-            this.BreadCrumbTrail.Add("Start", "/OperatingModeSelection");
+            this.BreadCrumbTrail.Add("Start", "/OperatingModeSelection", false);
             this.SideBarMenu.Add("Über TRuDI", "/About", true);
             this.SideBarMenu.Add("Beschreibung", "/Help", true);
         }
@@ -77,6 +77,8 @@
             this.CurrentProgressState.Reset("Verbindungsaufbau", "_ConnectingPartial");
             this.cts = new CancellationTokenSource();
             var ct = this.cts.Token;
+
+            this.BreadCrumbTrail.RemoveUnselectedItems();
 
             Task.Run(async () =>
                 {

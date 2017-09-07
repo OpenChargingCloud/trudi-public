@@ -15,7 +15,7 @@
 
         public IActionResult Index()
         {
-            this.applicationState.BreadCrumbTrail.Reset();
+            this.applicationState.BreadCrumbTrail.BackTo(0, false);
             return this.View();
         }
 
@@ -23,11 +23,15 @@
         {
             this.applicationState.OperationMode = OperationMode.DisplayFunction;
             this.applicationState.CurrentSupplierFile = null;
+
+            this.applicationState.BreadCrumbTrail.RemoveUnselectedItems();
+
             return this.RedirectToAction("Index", "Connect");
         }
 
         public IActionResult StartTransparencyFunction()
         {
+            this.applicationState.BreadCrumbTrail.RemoveUnselectedItems();
             this.applicationState.OperationMode = OperationMode.TransparencyFunction;
             return this.RedirectToAction("Index", "SupplierFile");
         }

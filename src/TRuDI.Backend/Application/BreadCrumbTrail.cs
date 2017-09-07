@@ -9,32 +9,57 @@
 
         public IReadOnlyList<BreadCrumbTrailItem> Items => this.items;
 
-        public void Add(string name, string link)
+        public void Add(string name, string link, bool removeFollowingItems)
         {
             var existingItem = this.items.FirstOrDefault(i => i.Link == link);
             if (existingItem == null)
             {
-                this.items.Add(new BreadCrumbTrailItem(this.items.Count, name, link));
+                foreach (var item in this.items)
+                {
+                    item.IsActive = true;
+                    item.IsSelected = false;
+                }
+
+                this.items.Add(new BreadCrumbTrailItem(this.items.Count, name, link) { IsSelected = true });
             }
             else
             {
-                this.BackTo(existingItem.Id);
+                this.BackTo(existingItem.Id, removeFollowingItems);
             }
         }
 
-        public string BackTo(int id)
+        public void RemoveUnselectedItems()
         {
-            if (this.items.Count > id + 1)
+            this.items.RemoveAll(i => !(i.IsActive || i.IsSelected));
+        }
+
+        public string BackTo(int id, bool removeFollowingItems)
+        {
+            if (removeFollowingItems && this.items.Count > id + 1)
             {
                 this.items.RemoveRange(id + 1, this.items.Count - id - 1);
+
+                for (int i = 0; i < this.items.Count; i++)
+                {
+                    this.items[i].IsActive = true;
+                    this.Items[i].IsSelected = i == id;
+                }
+
+                return this.items.Last().Link;
             }
 
-            return this.items.Last().Link;
+            for (int i = 0; i < this.items.Count; i++)
+            {
+                this.items[i].IsActive = i < id;
+                this.Items[i].IsSelected = i == id;
+            }
+
+            return this.items[id].Link;
         }
 
         public void Reset()
         {
-            this.BackTo(0);
+            this.BackTo(0, true);
         }
     }
 }

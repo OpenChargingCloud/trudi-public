@@ -83,6 +83,7 @@ namespace TRuDI.TafAdapter.Taf2
                                            (int)profile.SpecialDayDate.Month,
                                            (int)profile.SpecialDayDate.DayOfMonth);
 
+            MeasuringRange range = null;
             for (int i = 0; i < dayTimeProfiles.Count; i++)
             {
                 if (i < dayTimeProfiles.Count - 1)
@@ -95,21 +96,18 @@ namespace TRuDI.TafAdapter.Taf2
 
                         if (endReading.reading != null)
                         {
-                            var range = new MeasuringRange(start, endReading.end, (ushort)dayTimeProfiles[i].TariffNumber, (long)(endReading.reading.Value - startReading.Value));
-                            start = endReading.end;
-                            startReading = endReading.reading;
-                            currentDay.Add(range);
+                            range = new MeasuringRange(start, endReading.end, (ushort)dayTimeProfiles[i].TariffNumber, (long)(endReading.reading.Value - startReading.Value));
                         }
                         else
                         {
                             var result = FindLastValidTime(start, end, profile, dayTimeProfiles, meterReading, i);
                             endReading = SetIntervalReading(meterReading, result.end, result.index);
-                            var range = new MeasuringRange(start, endReading.end, meterReading, (long)(endReading.reading.Value - startReading.Value));
-                            start = result.end;
-                            startReading = endReading.reading;
-                            currentDay.Add(range);
+                            range = new MeasuringRange(start, endReading.end, meterReading, (long)(endReading.reading.Value - startReading.Value));
                             i = result.index;
                         }
+                        start = endReading.end;
+                        startReading = endReading.reading;
+                        currentDay.Add(range);
                     }
                     else
                     {
@@ -127,23 +125,17 @@ namespace TRuDI.TafAdapter.Taf2
                     else
                     {
                         var endReading = SetIntervalReading(meterReading, end, i);
-                      
                         if (endReading.reading != null)
                         {
-                            var range = new MeasuringRange(start, endReading.end, (ushort)dayTimeProfiles[i].TariffNumber, (long)(endReading.reading.Value - startReading.Value));
-                            start = endReading.end;
-                            startReading = endReading.reading;
-                            currentDay.Add(range);
+                            range = new MeasuringRange(start, endReading.end, (ushort)dayTimeProfiles[i].TariffNumber, (long)(endReading.reading.Value - startReading.Value));
                         }
                         else
                         {
                             var result = FindLastValidTime(start, end, profile, dayTimeProfiles, meterReading, i);
                             endReading = SetIntervalReading(meterReading, result.end, i);
-                            var range = new MeasuringRange(start, endReading.end, meterReading, (long)(endReading.reading.Value - startReading.Value));
-                            start = endReading.end;
-                            startReading = endReading.reading;
-                            currentDay.Add(range);
+                            range = new MeasuringRange(start, endReading.end, meterReading, (long)(endReading.reading.Value - startReading.Value));
                         }
+                        currentDay.Add(range);
                     }
                 }
             }

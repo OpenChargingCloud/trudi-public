@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
 
     public interface IAccountingSection
     {
@@ -12,6 +11,4 @@
         IReadOnlyList<IMeasuringRange> MeasuringRanges { get; }
         IReadOnlyList<Register> SummaryRegister { get; }
     }
-
-
 }

@@ -17,7 +17,7 @@
 
         public IActionResult Index(int id)
         {
-            return this.Redirect(this.applicationState.BreadCrumbTrail.BackTo(id));
+            return this.Redirect(this.applicationState.BreadCrumbTrail.BackTo(id, false));
         }
 
         public IActionResult ClosePage()

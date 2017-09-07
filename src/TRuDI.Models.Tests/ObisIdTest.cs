@@ -47,5 +47,24 @@ namespace TRuDI.Models.Tests
 
             Assert.AreEqual("1-0:1.8.0*255", target.ToString());
         }
+
+        [TestMethod]
+        public void TestObisIdEquals()
+        {
+            var a = new ObisId("1-0:1.8.0*255");
+            var b = new ObisId("1-0:1.8.0*255");
+            var c = new ObisId("1-0:1.8.1*255");
+
+            Assert.IsTrue(a == b);
+            Assert.IsFalse(a == c);
+            Assert.IsTrue(a != c);
+            Assert.IsFalse(a != b);
+
+            Assert.IsTrue(a == "1-0:1.8.0*255");
+            Assert.IsFalse(a == "1-0:1.8.1*255");
+
+            Assert.IsTrue("1-0:1.8.0*255" == a);
+            Assert.IsFalse("1-0:1.8.1*255" == a);
+        }
     }
 }

@@ -126,7 +126,7 @@
 
                 <tr>
                     <td>
-                        @StateService.CurrentDataResult.Model.Smgw.SmgwId
+                        @StateService.CurrentDataResult.Model.Smgw.SmgwId.ToFormattedDeviceId()
                     </td>
                     <td>
                         @StateService.CurrentSupplierFile?.AccountingPeriod.Begin.ToFormatedString()
@@ -141,20 +141,21 @@
             <table class="table">
                 <tr>
                     <th>Register</th>
-                    <th>Wert</th>
+                    <th class="text-right">Wert</th>
                     <th>Einheit</th>
                     <th>Beschreibung</th>
                 </tr>
 
-                @foreach (var register in tariffData.SummaryRegister)
+                @foreach (var register in tariffData.GetAccountingRegistersWithTotal())
                 {
                     var ovl = StateService.CurrentDataResult.OriginalValueLists.FirstOrDefault(o => o.Obis.A == register.ObisCode.A && o.Obis.B == register.ObisCode.B && o.Obis.C == register.ObisCode.C && o.Obis.D == register.ObisCode.D && o.Obis.E == 0 && o.Obis.F == register.ObisCode.F);
+
                     <tr>
                         <td>@register.ObisCode.ToString()</td>
 
                         @if (ovl != null)
                         {
-                            <td>
+                            <td class="text-right">
                                 @register.Amount.GetDisplayValue(ovl.Uom, ovl.PowerOfTenMultiplier, ovl.Scaler)
                             </td>
                             <td>@ovl.Uom.GetDisplayUnit(ovl.PowerOfTenMultiplier)</td>
@@ -460,7 +461,7 @@
             {
             <div role="tabpanel" class="tab-pane" id="tab_hvl_@ovl.GetOriginalValueListIdent()">
                 <div class="panel panel-primary">
-                    <div class="panel-heading">Historsiche Messwerte @ovl.Meter (@ovl.Obis.ToString())</div>
+                    <div class="panel-heading">Historische Messwerte @ovl.Meter.ToFormattedDeviceId() (@ovl.Obis.ToString())</div>
                     <div class="panel-body">
                         <div id="hvl_@ovl.Meter">
                             @await Component.InvokeAsync("HistoricValueListView", new { ovl })

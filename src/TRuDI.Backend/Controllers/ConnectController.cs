@@ -26,7 +26,7 @@
 
         public IActionResult Index()
         {
-            this.applicationState.BreadCrumbTrail.Add("Verbinden", "/Connect");
+            this.applicationState.BreadCrumbTrail.Add("Verbinden", "/Connect", false);
             this.applicationState.SideBarMenu.Clear();
 
             this.ViewData["ErrorMessage"] = this.applicationState.LastErrorMessages.FirstOrDefault();

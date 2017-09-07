@@ -25,7 +25,7 @@
 
             <tr>
                 <th>Smart Meter Gateway</th>
-                <td>@data.Smgw?.SmgwId</td>
+                <td>@data.Smgw?.SmgwId.ToFormattedDeviceId()</td>
             </tr>
 
             <tr>
@@ -54,7 +54,7 @@
             </tr>
 
             <tr>
-                <th>RIPMD160-Prüfsumme</th>
+                <th>RIPEMD-160-Prüfsumme</th>
                 <td>@StateService.CurrentSupplierFile.DigestRipemd160</td>
             </tr>
 

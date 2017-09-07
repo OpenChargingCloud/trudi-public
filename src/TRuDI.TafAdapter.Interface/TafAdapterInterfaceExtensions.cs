@@ -1,5 +1,6 @@
 ﻿namespace TRuDI.TafAdapter.Interface
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using TRuDI.HanAdapter.XmlValidation.Models;
@@ -39,6 +40,7 @@
                 {
                     var first = true;
                     var seccond = true;
+                    var next = 2;
                     foreach (Register reg in register.ToList())
                     {
                         if (first && reg.ObisCode.C == 1)
@@ -67,7 +69,7 @@
                             register.Add(errRegister);
                             seccond = false;
                         }
-                        else if (reg.ObisCode.C != 1 && reg.ObisCode.C != 2)
+                        else if (reg.ObisCode.C != 1 && reg.ObisCode.C != 2 && reg.ObisCode.C > next)
                         {
                             var oc = reg.ObisCode.ToHexString();
                             var errRegister = new Register()
@@ -76,7 +78,7 @@
                                 TariffId = 63,
                                 Amount = 0
                             };
-
+                            next++;
                             register.Add(errRegister);
                         }
 
@@ -91,6 +93,16 @@
         {
             var validDayProfiles = new List<ushort?>();
             var tariffIdList = new List<ushort?>();
+
+            if (mrObisId == default(ObisId) || tariffStages == null)
+            {
+                throw new ArgumentNullException("The parameter mrObisId or tariffStages is null.");
+            }
+
+            if(tariffStages.Count < 1 || dayProfiles.Count < 1)
+            {
+                throw new ArgumentException("The parameter tariffStages or the parameter dayProfiles contains 0 elements.");
+            }
 
             foreach (TariffStage stage in tariffStages)
             {
@@ -120,6 +132,5 @@
 
             return validDayProfiles;
         }
-
     }
 }

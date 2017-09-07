@@ -20,61 +20,83 @@
             this.F = src.F;
         }
 
-        public ObisId(string hexString)
+        public ObisId(string value)
         {
-            if (Regex.IsMatch(hexString, "[0-9A-Fa-f]{12}"))
+            if (!TryParse(value, out var id))
             {
-                var value = ulong.Parse(hexString, NumberStyles.HexNumber);
-                if (value > 0xFFFFFFFFFFFF)
-                {
-                    throw new ArgumentException(
-                        "OBIS id must be a value less or equal to 0xFFFFFFFFFFFF",
-                        nameof(hexString));
-                }
-
-                this.A = (byte)((value >> 40) & 0xFF);
-                this.B = (byte)((value >> 32) & 0xFF);
-                this.C = (byte)((value >> 24) & 0xFF);
-                this.D = (byte)((value >> 16) & 0xFF);
-                this.E = (byte)((value >> 8) & 0xFF);
-                this.F = (byte)(value & 0xFF);
-                return;
+                throw new ArgumentException($"Invalid OBIS value: \"{value}\"", nameof(value));
             }
 
-            var match = Regex.Match(hexString, @"^(?<A>\d+)-(?<B>\d+)\:(?<C>\d+)\.(?<D>\d+)\.(?<E>\d+)\*(?<F>\d+)$|^(?<A>\d+)-(?<B>\d+)\:(?<C>\d+)\.(?<D>\d+)\.(?<E>\d+)$|^(?<C>\d+)\.(?<D>\d+)\.(?<E>\d+)$");
+            this.A = id.A;
+            this.B = id.B;
+            this.C = id.C;
+            this.D = id.D;
+            this.E = id.E;
+            this.F = id.F;
+        }
+
+        public static bool TryParse(string value, out ObisId id)
+        {
+            id = null;
+
+            if (Regex.IsMatch(value, "[0-9A-Fa-f]{12}"))
+            {
+                var longValue = ulong.Parse(value, NumberStyles.HexNumber);
+                if (longValue > 0xFFFFFFFFFFFF)
+                {
+                    return false;
+                }
+
+                id = new ObisId();
+                id.A = (byte)((longValue >> 40) & 0xFF);
+                id.B = (byte)((longValue >> 32) & 0xFF);
+                id.C = (byte)((longValue >> 24) & 0xFF);
+                id.D = (byte)((longValue >> 16) & 0xFF);
+                id.E = (byte)((longValue >> 8) & 0xFF);
+                id.F = (byte)(longValue & 0xFF);
+                return true;
+            }
+
+            var match = Regex.Match(value, @"^(?<A>\d+)-(?<B>\d+)\:(?<C>\d+)\.(?<D>\d+)\.(?<E>\d+)\*(?<F>\d+)$|^(?<A>\d+)-(?<B>\d+)\:(?<C>\d+)\.(?<D>\d+)\.(?<E>\d+)$|^(?<C>\d+)\.(?<D>\d+)\.(?<E>\d+)$");
             if (match.Success)
             {
+                id = new ObisId();
+
                 if (match.Groups["A"].Success)
                 {
-                    this.A = byte.Parse(match.Groups["A"].Value);
+                    id.A = byte.Parse(match.Groups["A"].Value);
                 }
                 else
                 {
-                    this.A = 1;
+                    id.A = 1;
                 }
 
                 if (match.Groups["B"].Success)
                 {
-                    this.B = byte.Parse(match.Groups["B"].Value);
+                    id.B = byte.Parse(match.Groups["B"].Value);
                 }
                 else
                 {
-                    this.B = 0;
+                    id.B = 0;
                 }
 
-                this.C = byte.Parse(match.Groups["C"].Value);
-                this.D = byte.Parse(match.Groups["D"].Value);
-                this.E = byte.Parse(match.Groups["E"].Value);
+                id.C = byte.Parse(match.Groups["C"].Value);
+                id.D = byte.Parse(match.Groups["D"].Value);
+                id.E = byte.Parse(match.Groups["E"].Value);
 
                 if (match.Groups["F"].Success)
                 {
-                    this.F = byte.Parse(match.Groups["F"].Value);
+                    id.F = byte.Parse(match.Groups["F"].Value);
                 }
                 else
                 {
-                    this.F = 255;
+                    id.F = 255;
                 }
+
+                return true;
             }
+
+            return false;
         }
 
 
@@ -95,6 +117,75 @@
         public string ToHexString()
         {
             return $"{this.A:X2}{this.B:X2}{this.C:X2}{this.D:X2}{this.E:X2}{this.F:X2}";
+        }
+
+        public static bool operator ==(ObisId a, string b)
+        {
+            if (!TryParse(b, out var bv))
+            {
+                return false;
+            }
+
+            return a == bv;
+        }
+        public static bool operator !=(ObisId a, string b)
+        {
+            return !(a == b);
+        }
+
+        public static bool operator ==(string a, ObisId b)
+        {
+            if (!TryParse(a, out var av))
+            {
+                return false;
+            }
+
+            return av == b;
+        }
+
+        public static bool operator !=(string a, ObisId b)
+        {
+            return !(a == b);
+        }
+
+        public static bool operator ==(ObisId a, ObisId b)
+        {
+            if (ReferenceEquals(null, a) && ReferenceEquals(null, b))
+            {
+                return true;
+            }
+
+            if (ReferenceEquals(null, a) || ReferenceEquals(null, b))
+            {
+                return false;
+            }
+
+            return a.A == b.A 
+                && a.B == b.B
+                && a.C == b.C
+                && a.D == b.D
+                && a.E == b.E
+                && a.F == b.F;
+        }
+
+        public static bool operator !=(ObisId a, ObisId b)
+        {
+            return !(a == b);
+        }
+
+        public bool Equals(ObisId other)
+        {
+            return this == other;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj))
+            {
+                return false;
+            }
+
+            return obj is ObisId && this.Equals((ObisId)obj);
         }
     }
 }

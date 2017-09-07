@@ -1,7 +1,9 @@
 ﻿namespace TRuDI.Backend.Utils
 {
     using System;
+    using System.Collections.Generic;
     using System.Globalization;
+    using System.Linq;
 
     using Microsoft.AspNetCore.Html;
     using System.Security.Cryptography;
@@ -10,6 +12,7 @@
     using TRuDI.HanAdapter.Interface;
     using TRuDI.HanAdapter.XmlValidation.Models;
     using TRuDI.HanAdapter.XmlValidation.Models.BasicData;
+    using TRuDI.TafAdapter.Interface;
 
     public static class HtmlStringExtensions
     {
@@ -295,6 +298,28 @@
             {
                 return value;
             }
+        }
+
+        public static IEnumerable<Register> GetAccountingRegistersWithTotal(this IAccountingPeriod accountingPeriod)
+        {
+            long totalAmount = 0;
+
+            foreach (var reg in accountingPeriod.SummaryRegister)
+            {
+                if (reg.Amount.HasValue)
+                {
+                    totalAmount += reg.Amount.Value;
+                }
+
+                yield return reg;
+            }
+
+            yield return new Register
+                             {
+                                 Amount = totalAmount,
+                                 TariffId = 0,
+                                 ObisCode = new ObisId(accountingPeriod.SummaryRegister.First().ObisCode) { E = 0 }
+                             };
         }
     }
 }

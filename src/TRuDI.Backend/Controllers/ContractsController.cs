@@ -19,7 +19,7 @@
 
         public IActionResult Index()
         {
-            this.applicationState.BreadCrumbTrail.Add("Verträge", "/Contracts");
+            this.applicationState.BreadCrumbTrail.Add("Verträge", "/Contracts", false);
             this.applicationState.SideBarMenu.Clear();
 
             this.ViewData["ErrorMessage"] = this.applicationState.LastErrorMessages.FirstOrDefault();

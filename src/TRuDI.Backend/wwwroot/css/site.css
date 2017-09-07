@@ -1,5 +1,5 @@
 ﻿body {
-    padding-top: 110px;
+    padding-top: 130px;
     padding-bottom: 20px;
 }
 
@@ -43,3 +43,197 @@ textarea {
 }
 
 
+
+
+
+
+.breadcrumb {
+    padding: 0px;
+    background: #D4D4D4;
+    list-style: none;
+    overflow: hidden;
+    margin-top: 20px;
+}
+
+    .breadcrumb > li + li:before {
+        padding: 0;
+    }
+
+    .breadcrumb li {
+        float: left;
+    }
+
+        .breadcrumb li.active a {
+            background: #286090;
+        }
+
+        .breadcrumb li.completed a {
+            background: #337ab7; /* fallback color */
+        }
+
+        .breadcrumb li.active a:after {
+            border-left: 30px solid #286090;
+        }
+
+        .breadcrumb li.completed a:after {
+            border-left: 30px solid #337ab7;
+        }
+
+        .breadcrumb li a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 0 10px 45px;
+            position: relative;
+            display: block;
+            float: left;
+        }
+
+            .breadcrumb li a:after {
+                content: " ";
+                display: block;
+                width: 0;
+                height: 0;
+                border-top: 50px solid transparent; /* Go big on the size, and let overflow hide */
+                border-bottom: 50px solid transparent;
+                border-left: 30px solid hsla(0, 0%, 83%, 1);
+                position: absolute;
+                top: 50%;
+                margin-top: -50px;
+                left: 100%;
+                z-index: 2;
+            }
+
+            .breadcrumb li.last a:after {
+                content: " ";
+                display: block;
+                width: 0;
+                height: 0;
+                border-top: 50px solid transparent; /* Go big on the size, and let overflow hide */
+                border-bottom: 50px solid transparent;
+                border-left: 30px solid hsla(0, 0%, 83%, 1);
+                position: absolute;
+                top: 50%;
+                margin-top: -50px;
+                left: 10%;
+                z-index: 2;
+            }
+
+            .breadcrumb li a:before {
+                content: " ";
+                display: block;
+                width: 0;
+                height: 0;
+                border-top: 50px solid transparent; /* Go big on the size, and let overflow hide */
+                border-bottom: 50px solid transparent;
+                border-left: 30px solid white;
+                position: absolute;
+                top: 50%;
+                margin-top: -50px;
+                margin-left: 1px;
+                left: 100%;
+                z-index: 1;
+            }
+
+        .breadcrumb li:first-child a {
+            padding-left: 15px;
+        }
+
+
+        .breadcrumb li a:hover {
+            background: #286090;
+        }
+
+            .breadcrumb li a:hover:after {
+                border-left-color: #286090 !important;
+            }
+
+
+
+
+        .breadcrumb li.active span {
+            background: #286090;
+        }
+
+        .breadcrumb li.completed span {
+            background: #337ab7; /* fallback color */
+        }
+
+        .breadcrumb li.active span:after {
+            border-left: 30px solid #286090;
+        }
+
+        .breadcrumb li.completed span:after {
+            border-left: 30px solid #337ab7;
+        }
+
+        .breadcrumb li span {
+            color: white;
+            text-decoration: none;
+            padding: 10px 0 10px 45px;
+            position: relative;
+            display: block;
+            float: left;
+        }
+
+            .breadcrumb li span:after {
+                content: " ";
+                display: block;
+                width: 0;
+                height: 0;
+                border-top: 50px solid transparent; /* Go big on the size, and let overflow hide */
+                border-bottom: 50px solid transparent;
+                border-left: 30px solid hsla(0, 0%, 83%, 1);
+                position: absolute;
+                top: 50%;
+                margin-top: -50px;
+                left: 100%;
+                z-index: 2;
+            }
+
+        .breadcrumb li.last span:after {
+            content: " ";
+            display: block;
+            width: 0;
+            height: 0;
+            border-top: 50px solid transparent; /* Go big on the size, and let overflow hide */
+            border-bottom: 50px solid transparent;
+            border-left: 30px solid hsla(0, 0%, 83%, 1);
+            position: absolute;
+            top: 50%;
+            margin-top: -50px;
+            left: 10%;
+            z-index: 2;
+        }
+
+        .breadcrumb li span:before {
+            content: " ";
+            display: block;
+            width: 0;
+            height: 0;
+            border-top: 50px solid transparent; /* Go big on the size, and let overflow hide */
+            border-bottom: 50px solid transparent;
+            border-left: 30px solid white;
+            position: absolute;
+            top: 50%;
+            margin-top: -50px;
+            margin-left: 1px;
+            left: 100%;
+            z-index: 1;
+        }
+
+        .breadcrumb li:first-child span {
+            padding-left: 15px;
+        }
+
+
+        .breadcrumb li span:hover {
+            background: #286090;
+        }
+
+            .breadcrumb li span:hover:after {
+                border-left-color: #286090 !important;
+            }
+
+.navbar-brand {
+    float: none;
+}

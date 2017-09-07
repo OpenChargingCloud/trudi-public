@@ -15,6 +15,9 @@
 
         public string Link { get; set; }
 
+        public bool IsActive { get; set; }
+        public bool IsSelected { get; set; }
+
         /// <summary>
         /// Gets or sets a value indicating whether this item is shown on each page.
         /// </summary>

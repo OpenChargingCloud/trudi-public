@@ -99,20 +99,48 @@
             <table class="table">
                 <tr>
                     <th>Tarif</th>
-                    <th>Wert</th>
+                    <th class="text-right">Wert</th>
                     <th>Einheit</th>
                 </tr>
+                
+                @{
+                    long totalAmount = 0;
+                }
 
                 @foreach (var register in sec.SummaryRegister)
                 {
+                    var tariffDescription = StateService.CurrentSupplierFile.Model.AnalysisProfile?.TariffStages?.FirstOrDefault(ts => new ObisId(ts.ObisCode) == register.ObisCode)?.Description;
+                    if (!string.IsNullOrWhiteSpace(tariffDescription) && register.TariffId != 63)
+                    {
+                        tariffDescription = $"{tariffDescription} (Tarif {register.TariffId})";
+                    }
+                    else
+                    {
+                        tariffDescription = register.TariffId >= 63 ? "Fehlerregister" : "Tarif " + register.TariffId;
+                    }
+
+                    if (register.Amount.HasValue)
+                    {
+                        totalAmount += register.Amount.Value;
+                    }
+
                     <tr>
-                        <td>@(register.TariffId >= 63 ? "Fehlerregister" : "Tarif " + register.TariffId)</td>
-                        <td>
+                        <td>@tariffDescription</td>
+                        <td class="text-right">
                             @register.Amount.GetDisplayValue(ovl.Uom, ovl.PowerOfTenMultiplier, ovl.Scaler)
                         </td>
                         <td>@ovl.Uom.GetDisplayUnit(ovl.PowerOfTenMultiplier)</td>
                     </tr>
                 }
+                
+                
+                <tr>
+                    <td><strong>Gesamt</strong></td>
+                    <td class="text-right">
+                        <strong>@totalAmount.GetDisplayValue(ovl.Uom, ovl.PowerOfTenMultiplier, ovl.Scaler)</strong>
+                    </td>
+                    <td><strong>@ovl.Uom.GetDisplayUnit(ovl.PowerOfTenMultiplier)</strong></td>
+                </tr>
 
             </table>
         </div>

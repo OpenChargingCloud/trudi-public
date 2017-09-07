@@ -28,6 +28,7 @@
 
         public IActionResult Index()
         {
+            this.applicationState.BreadCrumbTrail.Add("Tarifdaten laden", "/SupplierFile", false);
             this.applicationState.SideBarMenu.Clear();
 
             return this.View();
@@ -49,7 +50,7 @@
                 return this.RedirectToAction("ValidationError");
             }
 
-            this.applicationState.BreadCrumbTrail.Add("Tarifdaten", "/SupplierFile/BillingPeriodSelection");
+            this.applicationState.BreadCrumbTrail.Add("Tarifdaten", "/SupplierFile/BillingPeriodSelection", false);
             return this.View();
         }
 

@@ -21,17 +21,12 @@
 
         public IActionResult Index()
         {
-            this.applicationState.BreadCrumbTrail.Add("Abrechnungsdaten", "/DataView");
+            this.applicationState.BreadCrumbTrail.Add("Abrechnungsdaten", "/DataView", false);
             this.applicationState.SideBarMenu.Clear();
             this.applicationState.SideBarMenu.Add(null, null);
             this.applicationState.SideBarMenu.Add("Zertifikate", "/CertificateDetails");
             this.applicationState.SideBarMenu.Add("Daten exportieren", "/DataView/DownloadXml");
 
-            return this.View();
-        }
-
-        public IActionResult ValidationError()
-        {
             return this.View();
         }
 
