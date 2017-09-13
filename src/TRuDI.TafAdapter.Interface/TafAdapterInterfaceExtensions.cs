@@ -3,12 +3,20 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using TRuDI.HanAdapter.XmlValidation.Models;
-    using TRuDI.HanAdapter.XmlValidation.Models.BasicData;
-    using TRuDI.HanAdapter.XmlValidation.Models.CheckData;
+    using TRuDI.Models;
+    using TRuDI.Models.BasicData;
+    using TRuDI.Models.CheckData;
 
+    /// <summary>
+    /// Extension methods for the TafAdapter interface
+    /// </summary>
     public static class TafAdapterInterfaceExtensions
     {
+        /// <summary>
+        /// The method provides the derrived register for the Taf7 calculation.
+        /// </summary>
+        /// <param name="supplier">The supplier model which contains the needed tariff data for the register.</param>
+        /// <returns>A list of all register which are needed for the calculation.</returns>
         public static List<Register> GetRegister(this UsagePointLieferant supplier)
         {
             var register = new List<Register>();
@@ -41,6 +49,7 @@
                     var first = true;
                     var seccond = true;
                     var next = 2;
+
                     foreach (Register reg in register.ToList())
                     {
                         if (first && reg.ObisCode.C == 1)
@@ -81,14 +90,19 @@
                             next++;
                             register.Add(errRegister);
                         }
-
                     }
                 }
             }
-
             return register;
         }
 
+        /// <summary>
+        /// This method is a DayProfile filter.
+        /// </summary>
+        /// <param name="dayProfiles">A list of all dayProfiles.</param>
+        /// <param name="mrObisId">The ObisId of the current MeterReading.</param>
+        /// <param name="tariffStages">A List of all tariff stages.</param>
+        /// <returns>All valid DayProfiles which contains just the allowed tariff stages.</returns>
         public static List<ushort?> GetValidDayProfilesForMeterReading(this List<DayProfile> dayProfiles, ObisId mrObisId, List<TariffStage> tariffStages)
         {
             var validDayProfiles = new List<ushort?>();
@@ -129,7 +143,6 @@
                     validDayProfiles.Add(dayProfile.DayId);
                 }
             }
-
             return validDayProfiles;
         }
     }

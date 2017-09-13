@@ -5,7 +5,7 @@
     using Microsoft.AspNetCore.Mvc;
 
     using TRuDI.Backend.Application;
-    using TRuDI.HanAdapter.XmlValidation.Models;
+    using TRuDI.Models;
 
     public class OriginalValueListView : ViewComponent
     {

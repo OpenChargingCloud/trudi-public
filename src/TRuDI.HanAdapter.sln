@@ -11,14 +11,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TRuDI.HanAdapter.Example", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TRuDI.Backend", "TRuDI.Backend\TRuDI.Backend.csproj", "{62A90560-58E0-4207-9601-65C204D36890}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TRuDI.HanAdapter.XmlValidation", "TRuDI.HanAdapter.XmlValidation\TRuDI.HanAdapter.XmlValidation.csproj", "{E51AD24C-A25F-41E7-BB0D-A21A32B02F9F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TRuDI.Models", "TRuDI.Models\TRuDI.Models.csproj", "{E51AD24C-A25F-41E7-BB0D-A21A32B02F9F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3E533041-A848-4BC1-916A-6D336E1720AB}"
 	ProjectSection(SolutionItems) = preProject
+		TRuDI.Frontend\backend_connect_failed.html = TRuDI.Frontend\backend_connect_failed.html
 		build.cmd = build.cmd
+		TRuDI.Frontend\integrity_check_failed.html = TRuDI.Frontend\integrity_check_failed.html
 		TRuDI.Frontend\main.js = TRuDI.Frontend\main.js
 		TRuDI.Frontend\package.json = TRuDI.Frontend\package.json
 		..\README.md = ..\README.md
+		TRuDI.Frontend\startup.html = TRuDI.Frontend\startup.html
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TRuDI.TafAdapter.Taf2", "TRuDI.TafAdapter.Taf2\TRuDI.TafAdapter.Taf2.csproj", "{336EFA96-ACF4-4B5B-B03D-A897D165EADF}"

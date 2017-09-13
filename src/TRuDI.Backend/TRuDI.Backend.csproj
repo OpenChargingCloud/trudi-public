@@ -8,25 +8,31 @@
     <UserSecretsId>aspnet-TRuDI.HanAdapter.UiTest-49A490D1-55E7-44CF-93EE-45F9EBEA9A38</UserSecretsId>
     <AssemblyName>TRuDI.Backend</AssemblyName>
     <RootNamespace>TRuDI.Backend</RootNamespace>
+    <PreserveCompilationContext>true</PreserveCompilationContext>
+    <CopyOutputSymbolsToPublishDirectory>false</CopyOutputSymbolsToPublishDirectory>
   </PropertyGroup>
   
   <PropertyGroup>
     <RestoreSources>$(RestoreSources);../../private-packages;https://api.nuget.org/v3/index.json</RestoreSources>
-    <AssemblyVersion>0.10.0.0</AssemblyVersion>
-    <FileVersion>0.10.0.0</FileVersion>
-    <Version>0.10.0</Version>
+    <AssemblyVersion>0.13.0.0</AssemblyVersion>
+    <FileVersion>0.13.0.0</FileVersion>
+    <Version>0.12.0</Version>
   </PropertyGroup>
-
+  
   <ItemGroup>
+    <Compile Remove="Data\**" />
+    <Content Remove="Data\**" />
+    <EmbeddedResource Remove="Data\**" />
+    <None Remove="Data\**" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.0" />
     <PackageReference Include="Microsoft.Extensions.CommandLineUtils" Version="1.1.1" />
     <PackageReference Include="Serilog.Sinks.File" Version="3.2.0" />
     <PackageReference Include="Serilog.Sinks.Trace" Version="2.1.0" />
-    <PackageReference Include="TRuDI.HanAdapter.Interface" Version="1.0.7" />
     <PackageReference Include="WebSocketManager" Version="1.0.1" />
     <PackageReference Include="IVU.BouncyCastle.Crypto" Version="2.0.0" />
     <PackageReference Include="IVU.Http" Version="1.0.8" />
     <PackageReference Include="Serilog.Sinks.ColoredConsole" Version="3.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.ViewCompilation" Version="2.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -39,15 +45,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TRuDI.HanAdapter.Example\TRuDI.HanAdapter.Example.csproj" />
+    <ProjectReference Include="..\TRuDI.HanAdapter.Interface\TRuDI.HanAdapter.Interface.csproj" />
+    <ProjectReference Include="..\TRuDI.Models\TRuDI.Models.csproj" />
     <ProjectReference Include="..\TRuDI.TafAdapter.Interface\TRuDI.TafAdapter.Interface.csproj" />
     <ProjectReference Include="..\TRuDI.TafAdapter.Taf1\TRuDI.TafAdapter.Taf1.csproj" />
     <ProjectReference Include="..\TRuDI.TafAdapter.Taf2\TRuDI.TafAdapter.Taf2.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Update="Views\Progress\Index.cshtml">
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
   </ItemGroup>
 
 </Project>

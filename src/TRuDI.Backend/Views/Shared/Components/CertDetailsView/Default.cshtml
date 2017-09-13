@@ -30,25 +30,25 @@
 
     <tr>
         <th>Öffentlicher Schlüssel</th>
-        <td style="font-family: monospace;">@Model.GetPublicKeyString().AddLineBreak(32)</td>
+        <td style="font-family: monospace; word-break: break-all;">@Model.GetPublicKeyString()</td>
     </tr>
 
     <tr>
-        <th>Serial Number</th>
+        <th>Seriennummer</th>
         <td>@Model.GetSerialNumberString()</td>
     </tr>
 
     <tr>
-        <th>Key Algorithm</th>
+        <th>Schlüsselalgorithmus</th>
         <td>@Model.GetKeyAlgorithm().OidToFriendlyName()</td>
     </tr>
     <tr>
-        <th>Hash</th>
-        <td style="font-family: monospace;">@Model.GetCertHashString().AddLineBreak(32)</td>
+        <th>Prüfsumme</th>
+        <td style="font-family: monospace; word-break: break-all;">@Model.GetCertHashString()</td>
     </tr>
 
     <tr>
-        <th>Signature Algorithm</th>
+        <th>Signaturalgorithmus</th>
         <td>@Model.SignatureAlgorithm.FriendlyName</td>
     </tr>
 </table>

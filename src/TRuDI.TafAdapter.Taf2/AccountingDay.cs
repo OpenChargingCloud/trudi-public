@@ -1,11 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using TRuDI.TafAdapter.Interface;
-
-namespace TRuDI.TafAdapter.Taf2
+﻿namespace TRuDI.TafAdapter.Taf2
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using TRuDI.Models;
+    using TRuDI.TafAdapter.Interface;
+
     public class AccountingDay : IAccountingSection
     {
         private List<MeasuringRange> measuringRanges = new List<MeasuringRange>();
@@ -16,22 +17,15 @@ namespace TRuDI.TafAdapter.Taf2
             this.summaryRegister = new List<Register>(register);
         }
 
-        public DateTime Start
-        {
-            get; set;
-        }
+        public DateTime Start { get; set; }
 
-        public Reading Reading
-        {
-            get; set;
-        }
+        public Reading Reading { get; set; }
 
-        public void Add(MeasuringRange range)
+        public void Add(MeasuringRange range, ObisId obisId)
         {
             this.measuringRanges.Add(range);
-
-            this.summaryRegister.FirstOrDefault(r => r.TariffId == range.TariffId).Amount =
-                       summaryRegister.FirstOrDefault(r => r.TariffId == range.TariffId).Amount + range.Amount;
+            this.summaryRegister.FirstOrDefault(r => r.TariffId == range.TariffId && obisId.C == r.ObisCode.C).Amount =
+                summaryRegister.FirstOrDefault(r => r.TariffId == range.TariffId && obisId.C == r.ObisCode.C).Amount + range.Amount;  
         }
 
         public IReadOnlyList<IMeasuringRange> MeasuringRanges => this.measuringRanges;

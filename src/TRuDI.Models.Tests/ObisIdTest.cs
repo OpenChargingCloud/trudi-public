@@ -1,7 +1,7 @@
 namespace TRuDI.Models.Tests
 {
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using TRuDI.HanAdapter.XmlValidation.Models;
+    using TRuDI.Models;
 
     [TestClass]
     public class ObisIdTests

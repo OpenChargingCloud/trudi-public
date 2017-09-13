@@ -29,8 +29,8 @@
                             @if (!string.IsNullOrWhiteSpace(versionItem.Hash))
                             {
                                 <label>Prüfsumme</label>
-                                <div style="font-family: monospace;">
-                                    @versionItem.Hash.AddLineBreak(40)
+                                <div style="font-family: monospace; word-break: break-all;">
+                                    @versionItem.Hash
                                 </div>
                             }
                         </td>

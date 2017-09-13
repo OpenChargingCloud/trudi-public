@@ -8,18 +8,30 @@
 <div class="panel panel-primary">
     <div class="panel-heading">TRuDI</div>
     <div class="panel-body">
+
+        <p>
+            <strong>Transparenz- und Display-Software (TRuDI)</strong><br />
+            Version @Microsoft.Extensions.PlatformAbstractions.PlatformServices.Default.Application.ApplicationVersion
+        </p>
+
+        <p style="margin-bottom: 2em;">
+            Arbeitskreis Bundesdisplay
+        </p>
+
         <table class="table">
             <tr>
-                <th>Version</th>
-                <td>@Microsoft.Extensions.PlatformAbstractions.PlatformServices.Default.Application.ApplicationVersion</td>
+                <th>Komponente</th>
+                <th>RIPEMD-160-Prüfsummen</th>
             </tr>
 
-            <tr>
-                <th></th>
-                <td>
-                    DZG Metering GmbH | AK Bundesdisplay | IVU?
-                </td>
-            </tr>
+            @foreach (var item in StateService.BackendChecksums.Items)
+            {
+                <tr>
+                    <td>@item.Filename</td>
+                    <td style="font-family: monospace; word-break: break-all;">@item.Digest</td>
+                </tr>
+            }
+
         </table>
     </div>
 </div>
@@ -56,8 +68,8 @@
                         @adapter.Assembly.GetName().Version
                     </td>
 
-                    <td style="font-family: monospace;">
-                        @adapter.Hash.AddLineBreak(20)
+                    <td style="font-family: monospace; word-break: break-all;">
+                        @adapter.Hash
                     </td>
                 </tr>
             }
@@ -93,8 +105,8 @@
                         @adapter.Assembly.GetName().Version
                     </td>
 
-                    <td style="font-family: monospace;">
-                        @adapter.Hash.AddLineBreak(20)
+                    <td style="font-family: monospace; word-break: break-all;">
+                        @adapter.Hash
                     </td>
                 </tr>
             }

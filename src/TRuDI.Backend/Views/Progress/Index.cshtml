@@ -35,7 +35,7 @@
 <script src="~/js/WebSocketManager.js"></script>
 <script language="javascript" type="text/javascript">
     $(document).ready(function () {
-        var connection = new WebSocketManager.Connection("ws://localhost:" + location.port + "/notifications");
+        var connection = new WebSocketManager.Connection('@ViewData["WebSocketProtocol"]//localhost:' + location.port + '/notifications');
         connection.enableLogging = true;
 
         connection.connectionMethods.onConnected = () => {

@@ -8,10 +8,11 @@
     using System.Threading.Tasks;
     using System.Xml.Linq;
 
+    using Serilog;
+
     using TRuDI.Backend.Exceptions;
     using TRuDI.Backend.Models;
     using TRuDI.HanAdapter.Interface;
-    using TRuDI.HanAdapter.XmlValidation;
 
     public class HanAdapterContainer
     {
@@ -37,6 +38,7 @@
             var stream = this.hanAdapterInfo.Assembly.GetManifestResourceStream(resourceName);
             if(stream == null)
             {
+                Log.Error("Resource file wasn't found: {0}, path: {1}", resourceName, path);
                 throw new FileNotFoundException("Resource file wasn't found", resourceName);
             }
 
@@ -57,7 +59,7 @@
         }
 
         public async Task<ConnectResult> Connect(
-            ConnectDataViewModel connectData,
+            ConnectData connectData,
             CertData clientCert,
             Dictionary<string, string> manufacturerParameters,
             CancellationToken ct,

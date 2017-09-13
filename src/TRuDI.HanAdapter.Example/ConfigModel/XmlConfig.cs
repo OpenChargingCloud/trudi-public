@@ -1,120 +1,55 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using TRuDI.HanAdapter.XmlValidation.Models.BasicData;
-
-namespace TRuDI.HanAdapter.Example.ConfigModel
+﻿namespace TRuDI.HanAdapter.Example.ConfigModel
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Text;
+    using TRuDI.Models.BasicData;
+
+    /// <summary>
+    /// The configuration model for the automatically creation of the xml data.
+    /// For Taf7 a supplier xml will be created too.
+    /// </summary>
     public class XmlConfig
     {
+        public string UsagePointId { get; set; }
 
-        public string UsagePointId
-        {
-            get; set;
-        }
+        public string TariffName { get; set; }
 
-        public string TariffName
-        {
-            get; set;
-        }
+        public string TariffId { get; set; }
 
-        public string TariffId
-        {
-            get; set;
-        }
+        public string CustomerId { get; set; }
 
-        public string CustomerId
-        {
-            get; set;
-        }
+        public string InvoicingPartyId { get; set; }
 
-        public string InvoicingPartyId
-        {
-            get; set;
-        }
+        public string SmgwId { get; set; }
 
-        public string SmgwId
-        {
-            get; set;
-        }
+        public ushort ServiceCategoryKind { get; set; }
 
-        public ushort ServiceCategoryKind
-        {
-            get; set;
-        }
+        public List<CertificateContainer> Certificates { get; set; }
 
-        public List<CertificateContainer> Certificates
-        {
-            get; set;
-        }
+        public int MinLogCount { get; set; }
 
-        public bool RandomLogCount
-        {
-            get; set;
-        }
+        public int MaxLogCount { get; set; }
 
-        public int? LogCount
-        {
-            get; set;
-        }
+        public List<string> PossibleLogMessages { get; set; }
 
-        public int MinLogCount
-        {
-            get; set;
-        }
+        public int TariffUseCase { get; set; }
 
-        public int MaxLogCount
-        {
-            get; set;
-        }
+        public int TariffStageCount { get; set; }
 
-        public List<string> PossibleLogMessages
-        {
-            get; set;
-        }
+        public int DefaultTariffNumber { get; set; }
 
-        public int TariffUseCase
-        {
-            get; set;
-        }
+        public int MaxPeriodUsage { get; set; }
 
-        public int TariffStageCount
-        {
-            get; set;
-        }
+        public int MaxConsumptionValue { get; set; }
 
-        public int DefaultTariffNumber
-        {
-            get; set;
-        }
-
-        public int MaxPeriodUsage
-        {
-            get; set;
-        }
-
-        public int MaxConsumptionValue
-        {
-            get; set;
-        }
-
-        public List<int[]> Taf1Reg
-        {
-            get; set;
-        }
-
-        public byte DayIdCount
-        {
-            get; set;
-        }
+        public List<int[]> Taf1Reg { get; set; }
 
         public List<MeterReadingConfig> MeterReadingConfigs { get; set; }
 
         public List<TariffStageConfig> TariffStageConfigs { get; set; }
 
         public List<DayProfileConfig> DayProfiles { get; set; }
-
-        public List<SpecialDayProfileSet> SpecialDayProfileSet { get; set; }
     }
 
     public class CertificateContainer
@@ -127,7 +62,7 @@ namespace TRuDI.HanAdapter.Example.ConfigModel
     public class MeterReadingConfig
     {
         public string MeterId { get; set; }
-
+    
         public string MeterReadingId { get; set; }
 
         public bool IsOML { get; set; }
@@ -164,38 +99,17 @@ namespace TRuDI.HanAdapter.Example.ConfigModel
 
     public class DayProfileConfig
     {
-        public ushort? DayId
-        {
-            get; set;
-        }
+        public ushort? DayId { get; set; }
 
-        public List<DayTimeProfileConfig> DayTimeProfiles
-        {
-            get; set;
-        }
+        public List<DayTimeProfileConfig> DayTimeProfiles { get; set; }
     }
 
     public class DayTimeProfileConfig
     {
-        public DateTime Start
-        {
-            get; set;
-        }
+        public DateTime Start { get; set; }
 
-        public DateTime End
-        {
-            get; set;
-        }
+        public DateTime End { get; set; }
 
-        public ushort? TariffNumber
-        {
-            get; set;
-        }
+        public ushort? TariffNumber { get; set; }
     }
-
-    public class SpecialDayProfileSet
-    {
-        public List<int> AllowedDayIds { get; set; }
-    }
-
 }

@@ -4,7 +4,7 @@
     <espi:ServiceCategory>
       <espi:kind>0</espi:kind>
     </espi:ServiceCategory>
-    <usagePointId>upid0000000001</usagePointId>
+    <usagePointId>DE000000000000000000000000000032</usagePointId>
     <Customer>
       <customerId>User01</customerId>
     </Customer>
@@ -12,15 +12,15 @@
       <invoicingPartyId>IVU Imag Strom</invoicingPartyId>
     </InvoicingParty>
     <SMGW>
-      <smgwId>EDNT0012345678</smgwId>
+      <smgwId>EDNT0116909060</smgwId>
     </SMGW>
     <tariffName>Zählerstandsgangmessung IVU</tariffName>
     <AnalysisProfile>
       <tariffUseCase>2</tariffUseCase>
-      <tariffId>Zählerstandsgangmessung IVU</tariffId>
+      <tariffId>ev-7</tariffId>
       <billingPeriod>
         <duration>13219200</duration>
-        <start>2017-03-01T00:00:00.0000000</start>
+        <start>2017-08-01T00:00:00</start>
       </billingPeriod>
       <TariffStage>
         <tariffNumber>1</tariffNumber>

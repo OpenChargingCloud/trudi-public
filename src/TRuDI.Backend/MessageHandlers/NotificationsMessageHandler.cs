@@ -4,8 +4,15 @@
     using System.Diagnostics;
     using System.Net.WebSockets;
     using System.Threading.Tasks;
+
+    using Serilog;
+
     using WebSocketManager;
 
+    /// <summary>
+    /// Manages sending of messages using a web socket connection to the frontend.
+    /// </summary>
+    /// <seealso cref="WebSocketManager.WebSocketHandler" />
     public class NotificationsMessageHandler : WebSocketHandler
     {
         private WebSocket lastSocket;
@@ -30,7 +37,7 @@
 
         public async Task ProgressUpdate(string message, int progress)
         {
-            Trace.WriteLine($"ProgressUpdate: \"{message}\", {progress}");
+            Log.Information("Progress update: {0}, {1} %", message, progress);
 
             if (this.lastSocket == null || this.lastSocket.State == WebSocketState.Closed)
             {
@@ -43,7 +50,7 @@
             }
             catch (Exception ex)
             {
-                Trace.WriteLine($"LoadNextPage: {ex.Message}");
+                Log.Debug(ex, "Updating process failed: {0}", ex.Message);
             }
         }
 

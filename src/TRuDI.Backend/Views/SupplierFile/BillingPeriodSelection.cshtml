@@ -1,8 +1,8 @@
 ﻿@using TRuDI.Backend.Application
 @using TRuDI.Backend.Utils
 @using TRuDI.HanAdapter.Interface
-@using TRuDI.HanAdapter.XmlValidation.Models
-@model ConnectDataViewModel
+@using TRuDI.Models
+@model ConnectData
 @inject ApplicationState StateService
 @{
     var data = StateService.CurrentSupplierFile.Model;
@@ -49,18 +49,13 @@
             </tr>
 
             <tr>
-                <th>Tarifanwendungsfall</th>
-                <td>@data.AnalysisProfile.TariffUseCase.TafToFriendlyName()</td>
-            </tr>
-
-            <tr>
                 <th>RIPEMD-160-Prüfsumme</th>
-                <td>@StateService.CurrentSupplierFile.DigestRipemd160</td>
+                <td style="font-family: monospace; word-break: break-all;">@StateService.CurrentSupplierFile.DigestRipemd160</td>
             </tr>
 
             <tr>
                 <th>SHA-3-Prüfsumme</th>
-                <td>@StateService.CurrentSupplierFile.DigestSha3.AddLineBreak(36)</td>
+                <td style="font-family: monospace; word-break: break-all;">@StateService.CurrentSupplierFile.DigestSha3</td>
             </tr>
         </table>
 

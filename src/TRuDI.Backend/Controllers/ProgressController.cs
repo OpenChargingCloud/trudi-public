@@ -20,6 +20,11 @@
         public IActionResult Index()
         {
             this.ViewData["IsProgressPage"] = true;
+#if DEBUG
+            this.ViewData["WebSocketProtocol"] = "ws:";
+#else
+            this.ViewData["WebSocketProtocol"] = "wss:";
+#endif
             return this.View(this.applicationState.CurrentProgressState);
         }
 

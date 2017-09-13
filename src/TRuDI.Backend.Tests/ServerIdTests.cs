@@ -2,7 +2,7 @@ namespace TRuDI.Backend.Tests
 {
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-    using TRuDI.HanAdapter.XmlValidation.Models;
+    using TRuDI.Models;
 
     [TestClass]
     public class ServerIdTests

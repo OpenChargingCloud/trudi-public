@@ -41,7 +41,7 @@
                     e => e.LogEvent != null
                          && e.LogEvent.Timestamp >= startTime && e.LogEvent.Timestamp <= endTime
                          && (string.IsNullOrWhiteSpace(filterText) || e.LogEvent.Text.Contains(filterText))
-                         && (string.IsNullOrWhiteSpace(filterLevel) || (int)e.LogEvent.Level.Value >= MinLogLevel(filterLevel))));
+                         && (string.IsNullOrWhiteSpace(filterLevel) || (int)e.LogEvent.Level >= MinLogLevel(filterLevel))));
         }
     }
 }

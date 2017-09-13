@@ -11,7 +11,7 @@
     using TRuDI.HanAdapter.Example;
     using TRuDI.HanAdapter.Interface;
     using TRuDI.HanAdapter.LandisGyr;
-    using TRuDI.HanAdapter.XmlValidation;
+    using TRuDI.Models;
     using System.Collections.Generic;
     using System.Xml.Linq;
 
@@ -73,8 +73,8 @@
             ctx.Contract = contractsResult.contracts.First();
             //ctx.Start = ctx.Contract.Begin;
             //ctx.End = ctx.Contract.End ?? DateTime.Now;
-            ctx.Start = new DateTime(2016, 1, 1);
-            ctx.End = new DateTime(2017, 8, 1);
+            ctx.Start = new DateTime(2017, 1, 1);
+            ctx.End = new DateTime(2017, 9, 1);
             ctx.BillingPeriod = ctx.Contract.BillingPeriods.First();
             ctx.WithLogdata = true;
 
@@ -107,7 +107,7 @@
                     ContextValidation.ValidateContext(model, supplierModel, ctx);
                     
                     // Wenn es gewünscht ist die erzeugte Xml Datei abzuspeichern, muss die nächte Zeile auskommentiert werden. 
-                    ////supplierResult.supplierXml.Save("supplierXml.xml");
+                    ////supplierResult.supplierXml.Save("supplierXml_2OML_UCTaf1.xml");
                 }
                 else
                 {
@@ -118,7 +118,7 @@
                 }
           
                 // Wenn es gewünscht ist die erzeugte Xml Datei abzuspeichern, muss die nächte Zeile auskommentiert werden. 
-                ////dataResult.trudiXml.Save($"trudiXml{ctx.Contract.TafId}.xml");
+                ////dataResult.trudiXml.Save($"trudiXml{ctx.Contract.TafId}_2OML_UCTaf1.xml");
             }
             catch (AggregateException ae)
             {

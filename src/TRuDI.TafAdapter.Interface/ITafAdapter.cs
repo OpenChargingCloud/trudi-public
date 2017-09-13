@@ -1,6 +1,6 @@
 namespace TRuDI.TafAdapter.Interface
 {
-    using TRuDI.HanAdapter.XmlValidation.Models.BasicData;
+    using TRuDI.Models.BasicData;
 
     /// <summary>
     /// Plugin interface for TRuDI TAF adapters.

@@ -1,27 +1,24 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Mvc.Razor;
-using Microsoft.Extensions.FileProviders;
-
-using System.Reflection;
-using TRuDI.Backend.Application;
-using Microsoft.Extensions.Logging;
-using WebSocketManager;
-using System;
-using TRuDI.Backend.MessageHandlers;
-
-namespace TRuDI.Backend
+﻿namespace TRuDI.Backend
 {
+    using System;
+
+    using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.AspNetCore.Mvc.Razor;
+    using Microsoft.Extensions.FileProviders;
+
     using TRuDI.Backend.Application;
     using TRuDI.Backend.MessageHandlers;
+
+    using WebSocketManager;
 
     public class Startup
     {
         public Startup(IConfiguration configuration)
         {
-            Configuration = configuration;
+            this.Configuration = configuration;
         }
 
         public IConfiguration Configuration { get; }
@@ -29,7 +26,11 @@ namespace TRuDI.Backend
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
+            services.AddMvcCore()
+                .AddViews()
+                .AddRazorViewEngine()
+                .AddJsonFormatters();
+
             services.AddWebSocketManager();
             services.AddSingleton<ApplicationState>();
 
@@ -54,10 +55,10 @@ namespace TRuDI.Backend
             {
                 app.UseExceptionHandler("/Home/Error");
             }
-
+            
             app.UseStaticFiles();
             app.UseWebSockets();
-
+            
             app.MapWebSocketManager("/notifications", serviceProvider.GetService<NotificationsMessageHandler>());
 
             app.UseMvc(routes =>

@@ -3,9 +3,9 @@ namespace TRuDI.TafAdapter.Taf2
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using TRuDI.HanAdapter.XmlValidation.Models;
-    using TRuDI.HanAdapter.XmlValidation.Models.BasicData;
-    using TRuDI.HanAdapter.XmlValidation.Models.CheckData;
+    using TRuDI.Models;
+    using TRuDI.Models.BasicData;
+    using TRuDI.Models.CheckData;
     using TRuDI.TafAdapter.Interface;
 
     /// <summary>
@@ -22,25 +22,22 @@ namespace TRuDI.TafAdapter.Taf2
         public IAccountingPeriod Calculate(UsagePointAdapterTRuDI device, UsagePointLieferant supplier)
         {
             var accountingPeriod = new AccountingPeriod(supplier.GetRegister());
+            accountingPeriod.SetDates(supplier.AnalysisProfile.BillingPeriod.Start, supplier.AnalysisProfile.BillingPeriod.GetEnd());
             var dayProfiles = supplier.AnalysisProfile.TariffChangeTrigger.TimeTrigger.DayProfiles;
-
-            accountingPeriod.Begin = supplier.AnalysisProfile.BillingPeriod.Start;
-            accountingPeriod.End = supplier.AnalysisProfile.BillingPeriod.GetEnd();
-
 
             foreach (MeterReading meterReading in device.MeterReadings)
             {
                 if (meterReading.IsOriginalValueList())
                 {
-                    var validDayProfiles = dayProfiles.GetValidDayProfilesForMeterReading(new ObisId(meterReading.ReadingType.ObisCode), 
-                        supplier.AnalysisProfile.TariffStages);
+                    var obisId = new ObisId(meterReading.ReadingType.ObisCode);
+                    var validDayProfiles = dayProfiles.GetValidDayProfilesForMeterReading(obisId, supplier.AnalysisProfile.TariffStages);
+                    var specialDayProfiles = GetSpecialDayProfiles(supplier, validDayProfiles, accountingPeriod.Begin, accountingPeriod.End);
 
-                    var specialDayProfiles = supplier.AnalysisProfile.TariffChangeTrigger.TimeTrigger.SpecialDayProfiles.Where(s => validDayProfiles.Contains(s.DayId)).ToList();
+                    CheckUsedLists(validDayProfiles, specialDayProfiles);
 
                     foreach (SpecialDayProfile profile in specialDayProfiles)
                     {
                         var currentDay = GetDayData(profile, dayProfiles, meterReading, supplier);
-
                         accountingPeriod.Add(currentDay);
                     }
 
@@ -56,7 +53,6 @@ namespace TRuDI.TafAdapter.Taf2
             }
 
             accountingPeriod.OrderSections();
-
             return accountingPeriod;
         }
 
@@ -71,18 +67,18 @@ namespace TRuDI.TafAdapter.Taf2
         public AccountingDay GetDayData(SpecialDayProfile profile, List<DayProfile> dayProfiles, MeterReading meterReading, UsagePointLieferant supplier)
         {
             var currentDay = new AccountingDay(supplier.GetRegister());
-            var dayTimeProfiles = dayProfiles.First(p => p.DayId == profile.DayId).DayTimeProfiles;
-            DateTime start = new DateTime().GetDateTimeFromSpecialDayProfile(profile, dayTimeProfiles[0]);
-            DateTime end = start;
+            var dayTimeProfiles = dayProfiles.FirstOrDefault(p => p.DayId == profile.DayId).DayTimeProfiles
+                .OrderBy(dtp => new DateTime().GetDateTimeFromSpecialDayProfile(profile, dtp)).ToList();
+            var start = new DateTime().GetDateTimeFromSpecialDayProfile(profile, dayTimeProfiles[0]);
+            var end = start;
+            var startReading = meterReading?.IntervalBlocks?.FirstOrDefault(ib => ib.Interval.IsDateInIntervalBlock(start))
+                .IntervalReadings?.FirstOrDefault(ir => ir.TimePeriod.Start == start);
 
-            var startReading = meterReading.IntervalBlocks.FirstOrDefault(ib => ib.Interval.IsDateInIntervalBlock(start))
-                .IntervalReadings.FirstOrDefault(ir => ir.TimePeriod.Start == start);
+            CheckInitSettings(dayTimeProfiles, startReading);
 
             currentDay.Reading =  new Reading() { Amount = startReading.Value, ObisCode = meterReading.ReadingType.ObisCode };
-            currentDay.Start = new DateTime((int)profile.SpecialDayDate.Year,
-                                           (int)profile.SpecialDayDate.Month,
-                                           (int)profile.SpecialDayDate.DayOfMonth);
-
+            currentDay.Start = profile.SpecialDayDate.GetDate();
+            
             MeasuringRange range = null;
             for (int i = 0; i < dayTimeProfiles.Count; i++)
             {
@@ -91,7 +87,6 @@ namespace TRuDI.TafAdapter.Taf2
                     if (dayTimeProfiles[i].TariffNumber != dayTimeProfiles[i + 1].TariffNumber)
                     {
                         end = new DateTime().GetDateTimeFromSpecialDayProfile(profile, dayTimeProfiles[i + 1]);
-
                         var endReading = SetIntervalReading(meterReading, end, i + 1);
 
                         if (endReading.reading != null)
@@ -102,12 +97,52 @@ namespace TRuDI.TafAdapter.Taf2
                         {
                             var result = FindLastValidTime(start, end, profile, dayTimeProfiles, meterReading, i);
                             endReading = SetIntervalReading(meterReading, result.end, result.index);
-                            range = new MeasuringRange(start, endReading.end, meterReading, (long)(endReading.reading.Value - startReading.Value));
+                            if (result.end < end)
+                            {
+                                range = new MeasuringRange(start, endReading.end, (ushort)dayTimeProfiles[i].TariffNumber, (long)(endReading.reading.Value - startReading.Value));
+                            }
+                            else
+                            {
+                                range = new MeasuringRange(start, endReading.end, (long)(endReading.reading.Value - startReading.Value));
+                            }
+
+                            if(i == result.index)
+                            {
+                                currentDay.Add(range, new ObisId(meterReading.ReadingType.ObisCode));
+                                var j = result.index;
+                                var nextDate = new DateTime().GetDateTimeFromSpecialDayProfile(profile, dayTimeProfiles[j+1]);
+                                var nextReading = SetIntervalReading(meterReading, nextDate, j+1);
+                                while (nextReading.reading == null)
+                                {
+                                    j++;
+                                    if(j < dayTimeProfiles.Count - 1)
+                                    {
+                                        nextDate = new DateTime().GetDateTimeFromSpecialDayProfile(profile, dayTimeProfiles[j + 1]);
+                                        nextReading = SetIntervalReading(meterReading, nextDate, j + 1);
+                                    }
+                                    else
+                                    {
+                                        nextDate = new DateTime().GetDateTimeFromSpecialDayProfile(profile, dayTimeProfiles[j]);
+                                        nextReading = SetIntervalReading(meterReading, nextDate, j);
+                                        if(nextReading.reading == null)
+                                        {
+                                            nextReading = endReading;
+                                            break;
+                                        }
+                                    }
+                                }
+                                range = new MeasuringRange(endReading.end, nextReading.end, (long)(nextReading.reading.Value - endReading.reading.Value));
+                                endReading = nextReading;
+                                result.index = j + 1;
+                            }
+
                             i = result.index;
+
                         }
+
                         start = endReading.end;
                         startReading = endReading.reading;
-                        currentDay.Add(range);
+                        currentDay.Add(range, new ObisId(meterReading.ReadingType.ObisCode));
                     }
                     else
                     {
@@ -133,9 +168,9 @@ namespace TRuDI.TafAdapter.Taf2
                         {
                             var result = FindLastValidTime(start, end, profile, dayTimeProfiles, meterReading, i);
                             endReading = SetIntervalReading(meterReading, result.end, i);
-                            range = new MeasuringRange(start, endReading.end, meterReading, (long)(endReading.reading.Value - startReading.Value));
+                            range = new MeasuringRange(start, endReading.end, (long)(endReading.reading.Value - startReading.Value));
                         }
-                        currentDay.Add(range);
+                        currentDay.Add(range, new ObisId(meterReading.ReadingType.ObisCode));
                     }
                 }
             }
@@ -176,7 +211,7 @@ namespace TRuDI.TafAdapter.Taf2
                 var reading = meterReading.IntervalBlocks.FirstOrDefault(ib => ib.Interval.IsDateInIntervalBlock(result))?
                      .IntervalReadings?.FirstOrDefault(ir => ir.TimePeriod.Start == result);
 
-                if(reading != null)
+                if (reading != null)
                 {
                     match = true;
                 }
@@ -212,7 +247,6 @@ namespace TRuDI.TafAdapter.Taf2
                 }
 
                 result = new DateTime().GetDateTimeFromSpecialDayProfile(profile, dayTimeProfiles[helpindex]);
-
                 var reading = meterReading.IntervalBlocks.FirstOrDefault(ib => ib.Interval.IsDateInIntervalBlock(result))?
                     .IntervalReadings?.FirstOrDefault(ir => ir.TimePeriod.Start == result);
 
@@ -248,6 +282,41 @@ namespace TRuDI.TafAdapter.Taf2
                     return time.AddSeconds(900);
                 }
                 return time;
+            }
+        }
+
+
+
+        public List<SpecialDayProfile> GetSpecialDayProfiles(UsagePointLieferant supplier, List<ushort?> dayProfiles, DateTime begin, DateTime end)
+        {
+            return supplier.AnalysisProfile.TariffChangeTrigger.TimeTrigger
+                .SpecialDayProfiles
+                .Where(s => dayProfiles.Contains(s.DayId) && s.SpecialDayDate.GetDate() >= begin && s.SpecialDayDate.GetDate() <= end)
+                .OrderBy(s => s.SpecialDayDate.GetDate()).ToList();
+        }
+
+        public void CheckUsedLists(List<ushort?> validDayProfiles, List<SpecialDayProfile> specialDayProfiles)
+        {
+            if (validDayProfiles == null || validDayProfiles.Count < 1)
+            {
+                throw new InvalidOperationException("Taf7 calculation error: No valid DayProfiles found.");
+            }
+            if(specialDayProfiles == null || specialDayProfiles.Count < 1)
+            {
+                throw new InvalidOperationException("Taf7 calculation error: No valid SpecialDayProfiles fount.");
+            }
+        }
+
+        public void CheckInitSettings(List<DayTimeProfile> dayTimeProfiles, IntervalReading reading)
+        {
+            if (dayTimeProfiles == null || dayTimeProfiles.Count < 1)
+            {
+                throw new InvalidOperationException("A valid dayProfile contains no DayTimeProfiles.");
+            }
+
+            if (reading == null)
+            {
+                throw new InvalidOperationException("No valid start value found.");
             }
         }
     }

@@ -2,6 +2,9 @@
 {
     using TRuDI.HanAdapter.Interface;
 
+    /// <summary>
+    /// Stores the current progress page state.
+    /// </summary>
     public class ProgressData
     {
         public ProgressData()
@@ -16,6 +19,7 @@
         public string NextPageAfterProgress { get; set; }
 
         public string StatusText { get; set; }
+
         public int Progress { get; set; }
 
         public void Reset(string title = null, string detailsViewName = null)

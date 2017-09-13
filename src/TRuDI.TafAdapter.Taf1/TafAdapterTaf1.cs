@@ -3,9 +3,9 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using TRuDI.HanAdapter.XmlValidation.Models;
-    using TRuDI.HanAdapter.XmlValidation.Models.BasicData;
-    using TRuDI.HanAdapter.XmlValidation.Models.CheckData;
+    using TRuDI.Models;
+    using TRuDI.Models.BasicData;
+    using TRuDI.Models.CheckData;
     using TRuDI.TafAdapter.Interface;
 
     /// <summary>
@@ -33,43 +33,44 @@
 
             foreach (MeterReading meterReading in originalValueList)
             {
-                var currentDate = meterReading.IntervalBlocks.FirstOrDefault().Interval.Start;
-                var end = meterReading.IntervalBlocks.LastOrDefault().Interval.GetEnd();
+                var currentDate = meterReading.IntervalBlocks.First().Interval.Start;
+                var end = meterReading.IntervalBlocks.Last().Interval.GetEnd();
                 var validDayProfiles = dayProfiles.GetValidDayProfilesForMeterReading(new ObisId(meterReading.ReadingType.ObisCode),
                     supplier.AnalysisProfile.TariffStages);
-
-                var startReading = meterReading.GetIntervalReadingFromDate(currentDate);
-               
-                if (validDayProfiles.Count > 1)
+                if (validDayProfiles.Count != 1)
                 {
                     throw new InvalidOperationException("Invalid DayProfiles Count.");
                 }
 
-                var tariffId = supplier.AnalysisProfile.TariffStages.FirstOrDefault(t => t.TariffNumber == supplier.AnalysisProfile.
-                               TariffChangeTrigger.TimeTrigger.DayProfiles.FirstOrDefault(pr => pr.DayId == validDayProfiles[0]).DayTimeProfiles.FirstOrDefault().TariffNumber).TariffNumber;
+                var dayId = validDayProfiles.First().GetValueOrDefault(1);
 
-                var specialDayProfiles = supplier.AnalysisProfile.TariffChangeTrigger
-                    .TimeTrigger.SpecialDayProfiles.Where(s => s.DayId == validDayProfiles[0]).OrderBy(s => s.SpecialDayDate.GetDate());
+                var tariffStages = supplier.AnalysisProfile.TariffStages;
+                var tariffId = tariffStages.First(t => t.TariffNumber == dayProfiles.First(dp => dp.DayId == dayId).DayTimeProfiles.First().TariffNumber).TariffNumber;
 
-                var checkDayIds = CheckDayIdInPeriod(specialDayProfiles.ToList(), (ushort)validDayProfiles[0]);
+                var specialDayProfiles = supplier
+                    .AnalysisProfile
+                    .TariffChangeTrigger
+                    .TimeTrigger
+                    .SpecialDayProfiles.Where(s => s.DayId == dayId)
+                    .OrderBy(s => s.SpecialDayDate.GetDate());
 
-                if (checkDayIds)
-                {
-                    while (currentDate < end)
-                    {
-                        var result = GetSection(supplier, meterReading, startReading, currentDate, end, tariffId);
-                        currentDate = result.currentDate;
-                        accountingPeriod.Add(result.section);
-                    }
-                }
-                else
+                var hasOnlyOneDayId = CheckDayIdInPeriod(specialDayProfiles.ToList(), dayId);
+                if (!hasOnlyOneDayId)
                 {
                     throw new InvalidOperationException("Taf1: A tariff change is not allowed.");
                 }
 
+                var startReading = meterReading.GetIntervalReadingFromDate(currentDate);
+                while (currentDate < end)
+                {
+                    var result = GetSection(supplier, meterReading, startReading, currentDate, end, tariffId);
+                    currentDate = result.currentDate;
+                    accountingPeriod.Add(result.section);
+                }
+
                 accountingPeriod.AddInitialReading(new Reading()
                 {
-                    Amount = accountingPeriod.AccountingSections.FirstOrDefault(s => s.Reading.ObisCode == meterReading.ReadingType.ObisCode).Reading.Amount,
+                    Amount = accountingPeriod.AccountingSections.First(s => s.Reading.ObisCode == meterReading.ReadingType.ObisCode).Reading.Amount,
                     ObisCode = meterReading.ReadingType.ObisCode
                 });
             }

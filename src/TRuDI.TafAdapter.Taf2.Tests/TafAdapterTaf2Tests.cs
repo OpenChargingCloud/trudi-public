@@ -3,8 +3,10 @@ namespace TRuDI.TafAdapter.Taf2.Tests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using System;
     using System.Collections.Generic;
-    using TRuDI.HanAdapter.XmlValidation.Models;
-    using TRuDI.HanAdapter.XmlValidation.Models.BasicData;
+    using System.Xml.Linq;
+
+    using TRuDI.Models;
+    using TRuDI.Models.BasicData;
     using TRuDI.TafAdapter.Interface;
 
     [TestClass]
@@ -19,9 +21,9 @@ namespace TRuDI.TafAdapter.Taf2.Tests
 
             var target = new AccountingDay(new[] { reg181, reg182, reg18x });
 
-            target.Add(new MeasuringRange() { Start = DateTime.Now.AddMonths(-1), End = DateTime.Now, TariffId = 1, Amount = 25 });
-            target.Add(new MeasuringRange() { Start = DateTime.Now.AddMonths(-1), End = DateTime.Now, TariffId = 2, Amount = 25 });
-            target.Add(new MeasuringRange() { Start = DateTime.Now.AddMonths(-1), End = DateTime.Now, TariffId = 63, Amount = 25 });
+            target.Add(new MeasuringRange() { Start = DateTime.Now.AddMonths(-1), End = DateTime.Now, TariffId = 1, Amount = 25 }, new ObisId("0100010801FF"));
+            target.Add(new MeasuringRange() { Start = DateTime.Now.AddMonths(-1), End = DateTime.Now, TariffId = 2, Amount = 25 }, new ObisId("0100010802FF"));
+            target.Add(new MeasuringRange() { Start = DateTime.Now.AddMonths(-1), End = DateTime.Now, TariffId = 63, Amount = 25 }, new ObisId("0100010803FF"));
            
 
 
@@ -29,17 +31,17 @@ namespace TRuDI.TafAdapter.Taf2.Tests
             Assert.AreEqual(25, reg182.Amount);
             Assert.AreEqual(25, reg18x.Amount);
 
-            target.Add(new MeasuringRange() { Start = DateTime.Now.AddMonths(-1), End = DateTime.Now, TariffId = 1, Amount = 5 });
-            target.Add(new MeasuringRange() { Start = DateTime.Now.AddMonths(-1), End = DateTime.Now, TariffId = 2, Amount = 5 });
-            target.Add(new MeasuringRange() { Start = DateTime.Now.AddMonths(-1), End = DateTime.Now, TariffId = 63, Amount = 5 });
+            target.Add(new MeasuringRange() { Start = DateTime.Now.AddMonths(-1), End = DateTime.Now, TariffId = 1, Amount = 5  }, new ObisId("0100010801FF"));
+            target.Add(new MeasuringRange() { Start = DateTime.Now.AddMonths(-1), End = DateTime.Now, TariffId = 2, Amount = 5  }, new ObisId("0100010802FF"));
+            target.Add(new MeasuringRange() { Start = DateTime.Now.AddMonths(-1), End = DateTime.Now, TariffId = 63, Amount = 5 }, new ObisId("0100010803FF"));
 
             Assert.AreEqual(30, reg181.Amount);
             Assert.AreEqual(30, reg182.Amount);
             Assert.AreEqual(30, reg18x.Amount);
 
-            target.Add(new MeasuringRange() { Start = DateTime.Now.AddMonths(-1), End = DateTime.Now, TariffId = 1, Amount = 15 });
-            target.Add(new MeasuringRange() { Start = DateTime.Now.AddMonths(-1), End = DateTime.Now, TariffId = 2, Amount = 15 });
-            target.Add(new MeasuringRange() { Start = DateTime.Now.AddMonths(-1), End = DateTime.Now, TariffId = 63, Amount = 15 });
+            target.Add(new MeasuringRange() { Start = DateTime.Now.AddMonths(-1), End = DateTime.Now, TariffId = 1, Amount = 15  }, new ObisId("0100010801FF"));
+            target.Add(new MeasuringRange() { Start = DateTime.Now.AddMonths(-1), End = DateTime.Now, TariffId = 2, Amount = 15  }, new ObisId("0100010802FF"));
+            target.Add(new MeasuringRange() { Start = DateTime.Now.AddMonths(-1), End = DateTime.Now, TariffId = 63, Amount = 15 }, new ObisId("0100010803FF"));
 
 
             Assert.AreEqual(45, reg181.Amount);
@@ -64,9 +66,9 @@ namespace TRuDI.TafAdapter.Taf2.Tests
 
             var target = new AccountingPeriod(new[] { reg181, reg182, reg18x });
 
-            day.Add(new MeasuringRange() { Start = DateTime.Now.AddMonths(-1), End = DateTime.Now, TariffId = 1, Amount = 50 });
-            day.Add(new MeasuringRange() { Start = DateTime.Now.AddMonths(-1), End = DateTime.Now, TariffId = 2, Amount = 25 });
-            day.Add(new MeasuringRange() { Start = DateTime.Now.AddMonths(-1), End = DateTime.Now, TariffId = 63, Amount = 10 });
+            day.Add(new MeasuringRange() { Start = DateTime.Now.AddMonths(-1), End = DateTime.Now, TariffId = 1, Amount = 50 }, new ObisId("0100010801FF"));
+            day.Add(new MeasuringRange() { Start = DateTime.Now.AddMonths(-1), End = DateTime.Now, TariffId = 2, Amount = 25 }, new ObisId("0100010802FF"));
+            day.Add(new MeasuringRange() { Start = DateTime.Now.AddMonths(-1), End = DateTime.Now, TariffId = 63, Amount = 10 }, new ObisId("0100010803FF"));
 
             target.Add(day);
 
@@ -74,9 +76,9 @@ namespace TRuDI.TafAdapter.Taf2.Tests
             Assert.AreEqual(25, reg182.Amount);
             Assert.AreEqual(10, reg18x.Amount);
 
-            day.Add(new MeasuringRange() { Start = DateTime.Now.AddMonths(-1), End = DateTime.Now, TariffId = 1, Amount = 25 });
-            day.Add(new MeasuringRange() { Start = DateTime.Now.AddMonths(-1), End = DateTime.Now, TariffId = 2, Amount = 15 });
-            day.Add(new MeasuringRange() { Start = DateTime.Now.AddMonths(-1), End = DateTime.Now, TariffId = 63, Amount = 5 });
+            day.Add(new MeasuringRange() { Start = DateTime.Now.AddMonths(-1), End = DateTime.Now, TariffId = 1, Amount = 25 }, new ObisId("0100010801FF"));
+            day.Add(new MeasuringRange() { Start = DateTime.Now.AddMonths(-1), End = DateTime.Now, TariffId = 2, Amount = 15 }, new ObisId("0100010802FF"));
+            day.Add(new MeasuringRange() { Start = DateTime.Now.AddMonths(-1), End = DateTime.Now, TariffId = 63, Amount = 5 }, new ObisId("0100010803FF"));
 
             target.Add(day);
 
@@ -84,9 +86,9 @@ namespace TRuDI.TafAdapter.Taf2.Tests
             Assert.AreEqual(65, reg182.Amount);
             Assert.AreEqual(25, reg18x.Amount);
 
-            day.Add(new MeasuringRange() { Start = DateTime.Now.AddMonths(-1), End = DateTime.Now, TariffId = 1, Amount = 25 });
-            day.Add(new MeasuringRange() { Start = DateTime.Now.AddMonths(-1), End = DateTime.Now, TariffId = 2, Amount = 20 });
-            day.Add(new MeasuringRange() { Start = DateTime.Now.AddMonths(-1), End = DateTime.Now, TariffId = 63, Amount = 5 });
+            day.Add(new MeasuringRange() { Start = DateTime.Now.AddMonths(-1), End = DateTime.Now, TariffId = 1, Amount = 25 }, new ObisId("0100010801FF"));
+            day.Add(new MeasuringRange() { Start = DateTime.Now.AddMonths(-1), End = DateTime.Now, TariffId = 2, Amount = 20 }, new ObisId("0100010802FF"));
+            day.Add(new MeasuringRange() { Start = DateTime.Now.AddMonths(-1), End = DateTime.Now, TariffId = 63, Amount = 5 }, new ObisId("0100010803FF"));
 
             target.Add(day);
 
@@ -536,6 +538,7 @@ namespace TRuDI.TafAdapter.Taf2.Tests
             }
         }
         
+        [TestMethod]
         public void TestFindNextValidTime()
         {
             throw new NotImplementedException();
@@ -554,6 +557,21 @@ namespace TRuDI.TafAdapter.Taf2.Tests
         public void TestGetValidDayProfilesForMeterReading()
         {
             throw new NotImplementedException();
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"Data\trudiXmlTaf7_2OML_4TS_UCTaf2.xml")]
+        [DeploymentItem(@"Data\supplierXml_2OML_4TS_UCTaf2.xml")]
+        public void TestImportExportDirections()
+        {
+            var deviceXml  = XDocument.Load(@"Data\trudiXmlTaf7_2OML_4TS_UCTaf2.xml");
+            var deviceModel = XmlModelParser.ParseHanAdapterModel(deviceXml.Root.Descendants());
+
+            var supplierXml = XDocument.Load(@"Data\supplierXml_2OML_4TS_UCTaf2.xml");
+            var supplierModel = XmlModelParser.ParseSupplierModel(supplierXml.Root.Descendants());
+
+            var target = new TafAdapterTaf2();
+            var result = target.Calculate(deviceModel, supplierModel);
         }
     }
 }

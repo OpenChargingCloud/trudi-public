@@ -22,7 +22,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TRuDI.HanAdapter.XmlValidation\TRuDI.HanAdapter.XmlValidation.csproj" />
+    <ProjectReference Include="..\TRuDI.Models\TRuDI.Models.csproj" />
   </ItemGroup>
 
 </Project>

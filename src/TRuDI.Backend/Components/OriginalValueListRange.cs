@@ -2,8 +2,8 @@
 {
     using System.Collections.Generic;
 
-    using TRuDI.HanAdapter.XmlValidation.Models;
-    using TRuDI.HanAdapter.XmlValidation.Models.BasicData;
+    using TRuDI.Models;
+    using TRuDI.Models.BasicData;
 
     public class OriginalValueListRange
     {

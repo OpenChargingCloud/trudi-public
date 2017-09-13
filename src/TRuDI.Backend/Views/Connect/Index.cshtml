@@ -1,7 +1,7 @@
 ﻿@using System
 @using Microsoft.AspNetCore.Mvc.ViewFeatures
 @using TRuDI.Backend.Application
-@model ConnectDataViewModel
+@model ConnectData
 @inject ApplicationState StateService
 @{
     ViewData["Title"] = "Daten laden";
@@ -61,15 +61,15 @@
                                             {
                                                 case CertPasswordState.PasswordValid:
                                                 case CertPasswordState.WithoutPassword:
-                                        @await Html.PartialAsync("_CertWithoutPasswordPartial", StateService.ClientCert, new ViewDataDictionary(ViewData));
+                                                    @await Html.PartialAsync("_CertWithoutPasswordPartial", StateService.ClientCert, new ViewDataDictionary(ViewData));
                                                     break;
 
                                                 case CertPasswordState.InvalidPassword:
-                                        @await Html.PartialAsync("_CertPasswordInputPartial", StateService.ClientCert, new ViewDataDictionary(ViewData));
+                                                    @await Html.PartialAsync("_CertPasswordInputPartial", StateService.ClientCert, new ViewDataDictionary(ViewData));
                                                     break;
 
                                                 case CertPasswordState.InvalidCertFile:
-                                        @await Html.PartialAsync("_CertInvalidFilePartial", StateService.ClientCert, new ViewDataDictionary(ViewData));
+                                                    @await Html.PartialAsync("_CertInvalidFilePartial", StateService.ClientCert, new ViewDataDictionary(ViewData));
                                                     break;
 
                                                 case CertPasswordState.NoCertSelected:
@@ -90,11 +90,12 @@
                             <label asp-for="DeviceId">Identifikationsnummer:</label>
                             @if (StateService.OperationMode == OperationMode.DisplayFunction || string.IsNullOrWhiteSpace(Model.DeviceId))
                             {
-                            <input class="form-control" asp-for="DeviceId" />
+                                <input class="form-control" asp-for="DeviceId" />
                             }
                             else
                             {
-                            <input class="form-control" asp-for="DeviceId" disabled />
+                                <input class="form-control" asp-for="DeviceId" disabled />
+                                <input type="hidden" asp-for="DeviceId"  />
                             }
                         </div>
 
@@ -113,11 +114,11 @@
                     <div id="manufacturer-parameters">
                         @if (StateService?.ActiveHanAdapter?.ManufacturerParametersView != null)
                         {
-                        @await Html.PartialAsync("_ManufacturerParametersFormPartial", Model.DeviceId, new ViewDataDictionary(ViewData) { { "ManufacturerParametersViewName", StateService?.ActiveHanAdapter?.ManufacturerParametersView } });
+                            @await Html.PartialAsync("_ManufacturerParametersFormPartial", Model.DeviceId, new ViewDataDictionary(ViewData) { { "ManufacturerParametersViewName", StateService?.ActiveHanAdapter?.ManufacturerParametersView } });
                         }
                         else
                         {
-                        @await Html.PartialAsync("_ManufacturerParametersFormEmptyPartial", Model.DeviceId, new ViewDataDictionary(ViewData) { { "ManufacturerParametersViewName", string.Empty } });
+                            @await Html.PartialAsync("_ManufacturerParametersFormEmptyPartial", Model.DeviceId, new ViewDataDictionary(ViewData) { { "ManufacturerParametersViewName", string.Empty } });
                         }
                     </div>
                 </div>
@@ -134,12 +135,12 @@
                     <div class="panel-heading">Datei laden</div>
                     <div class="panel-body">
                         <p>
-                            Sie können aus dem Smart Meter Gateway abgerufenen Daten in eine Datei speichern und zu einem 
+                            Sie können aus dem Smart Meter Gateway abgerufenen Daten in eine Datei speichern und zu einem
                             späteren Zeitpunkt hier wieder laden.
                         </p>
                         <div class="form-group">
                             <button type="button" class="btn btn-default" id="btnXmlUpload" onclick="openfileDialogXml();">Datei auswählen...</button>
-                            <input type="file" id="xmlFileLoader" accept="application/xml" style="display: none" onchange="onXmlSelected();"/>
+                            <input type="file" id="xmlFileLoader" accept="application/xml" style="display: none" onchange="onXmlSelected();" />
                             <div id="xmlFileErrors"></div>
                         </div>
                     </div>
@@ -265,7 +266,7 @@
                 window.location.href = "/DataView";
             },
             error: function (err) {
-                window.location.href = "/DataView/ValidationError";
+                window.location.href = "/ValidationError";
             }
         });
     }

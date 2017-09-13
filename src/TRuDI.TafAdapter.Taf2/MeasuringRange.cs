@@ -1,14 +1,14 @@
-﻿namespace TRuDI.TafAdapter.Taf2
+﻿using TRuDI.Models;
+
+namespace TRuDI.TafAdapter.Taf2
 {
     using System;
-    using TRuDI.HanAdapter.XmlValidation.Models.BasicData;
+    using TRuDI.Models.BasicData;
     using TRuDI.TafAdapter.Interface;
 
     public class MeasuringRange : IMeasuringRange
     {
-        public MeasuringRange()
-        {
-        }
+        public MeasuringRange() { }
 
         public MeasuringRange(DateTime start, DateTime end, ushort tariffId, long amount)
         {
@@ -18,7 +18,7 @@
             this.Amount = amount;
         }
 
-        public MeasuringRange(DateTime start, DateTime end, MeterReading reading, long amount)
+        public MeasuringRange(DateTime start, DateTime end, long amount)
         {
             this.Start = start;
             this.End = end;
@@ -26,24 +26,21 @@
             this.Amount = amount;
         }
 
-        public DateTime Start
+        public MeasuringRange(DateTime start, DateTime end, MeterReading mr, int amount)
         {
-            get; set;
+            this.Start = start;
+            this.End = end;
+            var obis = new ObisId(mr.ReadingType.ObisCode);
+            this.TariffId = obis.E;
+            this.Amount = amount;
         }
 
-        public DateTime End
-        {
-            get; set;
-        }
+        public DateTime Start { get; set; }
 
-        public ushort TariffId
-        {
-            get; set;
-        }
+        public DateTime End { get; set; }
 
-        public long Amount
-        {
-            get; set;
-        }
+        public ushort TariffId { get; set; }
+
+        public long Amount { get; set; }
     }
 }

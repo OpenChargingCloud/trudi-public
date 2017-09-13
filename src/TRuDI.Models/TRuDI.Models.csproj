@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Schemata\AR_2418-6.xsd" />
+    <None Remove="Schemata\atom.xsd" />
+    <None Remove="Schemata\espi_derived.xsd" />
+    <None Remove="Schemata\xml.xsd" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Schemata\AR_2418-6.xsd" />
+    <EmbeddedResource Include="Schemata\atom.xsd" />
+    <EmbeddedResource Include="Schemata\espi_derived.xsd" />
+    <EmbeddedResource Include="Schemata\xml.xsd" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TRuDI.HanAdapter.Interface\TRuDI.HanAdapter.Interface.csproj" />
+  </ItemGroup>
+
+</Project>

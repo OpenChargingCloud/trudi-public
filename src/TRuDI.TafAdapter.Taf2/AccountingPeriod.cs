@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using TRuDI.TafAdapter.Interface;
-
-namespace TRuDI.TafAdapter.Taf2
+﻿namespace TRuDI.TafAdapter.Taf2
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using TRuDI.TafAdapter.Interface;
+
     public class AccountingPeriod : IAccountingPeriod
     {
         private List<AccountingDay> accountingDays = new List<AccountingDay>();
@@ -17,21 +16,15 @@ namespace TRuDI.TafAdapter.Taf2
             this.summaryRegister = new List<Register>(summaryRegister);
         }
 
-        public DateTime Begin
-        {
-            get; set;
-        }
+        public DateTime Begin { get; set; }
 
-        public DateTime End
-        {
-            get; set;
-        }
+        public DateTime End { get; set; }
 
         public void Add(AccountingDay day)
         {
             foreach (Register reg in this.summaryRegister)
             {
-                reg.Amount = reg.Amount + day.SummaryRegister.FirstOrDefault(r => r.TariffId == reg.TariffId).Amount;
+                reg.Amount = reg.Amount + day.SummaryRegister.FirstOrDefault(r => r.TariffId == reg.TariffId && reg.ObisCode.C == r.ObisCode.C).Amount;
             }
 
             this.accountingDays.Add(day);
@@ -56,8 +49,14 @@ namespace TRuDI.TafAdapter.Taf2
         {
             if(this.accountingDays.Count > 1)
             {
-                this.accountingDays.OrderBy(day => day.Start);
+                this.accountingDays = this.accountingDays.OrderBy(day => day.Start).ToList();
             }
+        }
+
+        public void SetDates(DateTime begin, DateTime end)
+        {
+            this.Begin = begin;
+            this.End = end;
         }
 
         public IReadOnlyList<Reading> InitialReadings => this.initialReadings;

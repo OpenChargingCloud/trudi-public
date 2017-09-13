@@ -14,8 +14,8 @@
       "TafName": "Datensparsamer Tarif IVU",
       "Description": "Taf1 wird für die Verbrauchsabrechnungen herangezogen, bei denen ein hohes Interesse an Datensparsamkeit besteht.",
       "Meters": [
-        "DE01234567890000000001",
-        "DE01234567890000000002"
+        "0A01454D48000051971E",
+        "0A01454D48000051971C"
       ],
       "SupplierId": "IVU Imag Strom",
       "ConsumerId": "User01",
@@ -34,7 +34,7 @@
       "TafName": "Zählerstandsgangmessung IVU",
       "Description": "Dieser Anwendungsfall erlaubt die Erfassung und Versendung von Zählerstandsgängen.",
       "Meters": [
-        "DE01234567890000000003"
+        "0A01454D48000051971E"
       ],
       "SupplierId": "IVU Imag Strom",
       "ConsumerId": "User01",
@@ -53,7 +53,7 @@
       "TafName": "Zeitvariabler Tarif IVU",
       "Description": "Dem Letztverbraucher werden für unterschiedliche Zeiträume verschiedene Preise für die in den jeweiligen Zeiträumen angefallenen Energiemengen in Rechnungen stellt",
       "Meters": [
-        "DE01234567890000000004"
+        "0A01454D48000051971E"
       ],
       "SupplierId": "IVU Imag Strom",
       "ConsumerId": "User01",
@@ -97,7 +97,7 @@
     "MaxConsumptionValue": "15",
     "MeterReadingConfigs": [
       {
-        "MeterId": "DE01234567890000000004",
+        "MeterId": "0A01454D48000051971E",
         "MeterReadingId": "DE0000000000000000001",
         "IsOML": "true",
         "OMLInitValue": "100000",
@@ -110,7 +110,7 @@
 		"UsedStatus": "FNN"
       },
 	  {
-        "MeterId": "DE01234567890000000004",
+        "MeterId": "0A01454D48000051971E",
         "MeterReadingId": "DE0000000000000000001",
         "IsOML": "true",
         "OMLInitValue": "50000",
@@ -123,7 +123,7 @@
 		"UsedStatus": "FNN"
       },
       {
-        "MeterId": "DE01234567890000000004",
+        "MeterId": "0A01454D48000051971E",
         "MeterReadingId": "DE0000000000000000002",
         "IsOML": "false",
         "PowerOfTenMultiplier": "0",
@@ -133,7 +133,7 @@
 		"UsedStatus": "FNN"
       },
       {
-        "MeterId": "DE01234567890000000004",
+        "MeterId": "0A01454D48000051971E",
         "MeterReadingId": "DE0000000000000000003",
         "IsOML": "false",
 		"Taf2TariffStage": "1",
@@ -144,7 +144,7 @@
 		"UsedStatus": "FNN"
       },
       {
-        "MeterId": "DE01234567890000000004",
+        "MeterId": "0A01454D48000051971E",
         "MeterReadingId": "DE0000000000000000004",
         "IsOML": "false",
 		"Taf2TariffStage": "2",
@@ -155,7 +155,7 @@
 		"UsedStatus": "FNN"
       },
       {
-        "MeterId": "DE01234567890000000004",
+        "MeterId": "0A01454D48000051971E",
         "MeterReadingId": "DE0000000000000000005",
         "IsOML": "false",
 		"Taf2TariffStage": "0",
@@ -166,7 +166,7 @@
 		"UsedStatus": "FNN"
       },
 	  {
-        "MeterId": "DE01234567890000000004",
+        "MeterId": "0A01454D48000051971E",
         "MeterReadingId": "DE0000000000000000002",
         "IsOML": "false",
         "PowerOfTenMultiplier": "0",
@@ -176,7 +176,7 @@
 		"UsedStatus": "FNN"
       },
       {
-        "MeterId": "DE01234567890000000004",
+        "MeterId": "0A01454D48000051971E",
         "MeterReadingId": "DE0000000000000000003",
         "IsOML": "false",
 		"Taf2TariffStage": "1",
@@ -187,7 +187,7 @@
 		"UsedStatus": "FNN"
       },
 	  {
-        "MeterId": "DE01234567890000000004",
+        "MeterId": "0A01454D48000051971E",
         "MeterReadingId": "DE0000000000000000003",
         "IsOML": "false",
 		"Taf2TariffStage": "2",
@@ -198,7 +198,7 @@
 		"UsedStatus": "FNN"
       },
 	  {
-        "MeterId": "DE01234567890000000004",
+        "MeterId": "0A01454D48000051971E",
         "MeterReadingId": "DE0000000000000000003",
         "IsOML": "false",
 		"Taf2TariffStage": "3",
@@ -209,7 +209,7 @@
 		"UsedStatus": "FNN"
       },
       {
-        "MeterId": "DE01234567890000000004",
+        "MeterId": "0A01454D48000051971E",
         "MeterReadingId": "DE0000000000000000005",
         "IsOML": "false",
 		"Taf2TariffStage": "0",

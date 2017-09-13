@@ -1,7 +1,7 @@
 ﻿@using TRuDI.Backend.Application
 @using TRuDI.Backend.Utils
-@using TRuDI.HanAdapter.XmlValidation.Models
-@using TRuDI.HanAdapter.XmlValidation.Models.BasicData
+@using TRuDI.Models
+@using TRuDI.Models.BasicData
 @inject ApplicationState StateService
 @{
     ViewData["Title"] = "Abrechnungsdaten";
@@ -37,31 +37,70 @@
                         @data.TariffName
                     </td>
                 </tr>
+
+
+
+                @if (StateService.CurrentDataResult.Begin != null && StateService.CurrentDataResult.End != null)
+                {
+                    if (StateService.CurrentDataResult.Begin == StateService.CurrentDataResult.End)
+                    {
+                        <tr>
+                            <th>Ablesezeitpunkt</th>
+                            <th></th>
+                            <th>Tarifanwendungsfall</th>
+                        </tr>
+
+                        <tr>
+
+                            <td>@StateService.CurrentDataResult.Begin.ToFormatedString()</td>
+                            <td></td>
+                            <td>@StateService.CurrentDataResult.TafId.TafToFriendlyName()</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        <tr>
+                            <th>Startzeitpunkt</th>
+                            <th>Endzeitpunkt</th>
+                            <th>Tarifanwendungsfall</th>
+                        </tr>
+                        <tr>
+                            <td>@StateService.CurrentDataResult.Begin.ToFormatedString()</td>
+                            <td>@StateService.CurrentDataResult.End.ToFormatedString()</td>
+                            <td>@StateService.CurrentDataResult.TafId.TafToFriendlyName()</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <th>Startzeitpunkt</th>
+                        <th>Endzeitpunkt</th>
+                        <th>Tarifanwendungsfall</th>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td>@StateService.CurrentDataResult.TafId.TafToFriendlyName()</td>
+                    </tr>
+                }
+
+                <tr>
+                    <th>Smart Meter Gateway</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+
+                <tr>
+                    <td>@StateService.CurrentDataResult.Model.Smgw.SmgwId.ToFormattedDeviceId()</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+
             </table>
 
             if (meterReadings.MeterReadings != null && meterReadings.MeterReadings.Count > 0)
             {
-                <table class="table">
-                    <tr>
-                        <th>Smart Meter Gateway</th>
-                        <th>Startzeitpunkt</th>
-                        <th>Endzeitpunkt</th>
-                    </tr>
-
-                    <tr>
-                        <td>
-                            @StateService.CurrentDataResult.Model.Smgw.SmgwId.ToFormattedDeviceId()
-                        </td>
-                        <td>
-                            @StateService.CurrentDataResult.Begin.ToFormatedString()
-                        </td>
-
-                        <td>
-                            @StateService.CurrentDataResult.End.ToFormatedString()
-                        </td>
-                    </tr>
-                </table>
-
                 <table class="table">
                     <tr>
                         <th>Register</th>
@@ -103,38 +142,33 @@
                 </tr>
 
                 <tr>
-                    <td>
-                        @data.Customer.CustomerId
-                    </td>
-
-                    <td>
-                        @data.InvoicingParty.InvoicingPartyId
-                    </td>
-
-                    <td>
-                        @data.TariffName
-                    </td>
+                    <td>@data.Customer.CustomerId</td>
+                    <td>@data.InvoicingParty.InvoicingPartyId</td>
+                    <td>@data.TariffName</td>
                 </tr>
-            </table>
 
-            <table class="table">
                 <tr>
-                    <th>Smart Meter Gateway</th>
                     <th>Startzeitpunkt</th>
                     <th>Endzeitpunkt</th>
+                    <th>Tarifanwendungsfall</th>
                 </tr>
 
                 <tr>
-                    <td>
-                        @StateService.CurrentDataResult.Model.Smgw.SmgwId.ToFormattedDeviceId()
-                    </td>
-                    <td>
-                        @StateService.CurrentSupplierFile?.AccountingPeriod.Begin.ToFormatedString()
-                    </td>
+                    <td>@StateService.CurrentSupplierFile?.AccountingPeriod.Begin.ToFormatedString()</td>
+                    <td>@StateService.CurrentSupplierFile?.AccountingPeriod.End.ToFormatedString()</td>
+                    <td>@StateService.CurrentSupplierFile?.TafId.TafToFriendlyName()</td>
+                </tr>
 
-                    <td>
-                        @StateService.CurrentSupplierFile?.AccountingPeriod.End.ToFormatedString()
-                    </td>
+                <tr>
+                    <th>Smart Meter Gateway</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+
+                <tr>
+                    <td>@StateService.CurrentDataResult.Model.Smgw.SmgwId.ToFormattedDeviceId()</td>
+                    <td></td>
+                    <td></td>
                 </tr>
             </table>
 
@@ -146,7 +180,7 @@
                     <th>Beschreibung</th>
                 </tr>
 
-                @foreach (var register in tariffData.GetAccountingRegistersWithTotal())
+                @foreach (var register in tariffData.SummaryRegister.GetAccountingRegistersWithTotal())
                 {
                     var ovl = StateService.CurrentDataResult.OriginalValueLists.FirstOrDefault(o => o.Obis.A == register.ObisCode.A && o.Obis.B == register.ObisCode.B && o.Obis.C == register.ObisCode.C && o.Obis.D == register.ObisCode.D && o.Obis.E == 0 && o.Obis.F == register.ObisCode.F);
 
@@ -349,25 +383,25 @@
                                 <th>Zähler</th>
                                 <th>Messperiode</th>
                                 <th>OBIS</th>
+                                <th>Werte</th>
                             </tr>
                             <tr>
                                 <td>@ovl.Meter.ToFormattedDeviceId()</td>
                                 <td>@ovl.MeasurementPeriod.TotalSeconds Sekunden</td>
                                 <td>@ovl.Obis.ToString()</td>
+                                <td>@ovl.ValueCount</td>
                             </tr>
-                        </table>
-                        <table class="table">
+
                             <tr>
                                 <th>Startzeitpunkt</th>
                                 <th>Endzeitpunkt</th>
-                                <th>Werte</th>
                                 <th>Lücken</th>
+                                <th>Fehler</th>
                             </tr>
 
                             <tr>
                                 <td>@ovl.Start.ToFormatedString()</td>
                                 <td>@ovl.End.ToFormatedString()</td>
-                                <td>@ovl.ValueCount</td>
                                 <td>
                                     @if (ovl.GapCount == 0)
                                     {
@@ -381,6 +415,45 @@
                                             <i class="fa fa-warning"></i>
                                             @ovl.GapCount Lücken gefunden
                                         </span>
+                                    }
+                                </td>
+
+                                <td>
+                                    @if (!ovl.HasErrors)
+                                    {
+                                        <span>keine Fehler</span>
+                                    }
+                                    else
+                                    {
+                                        if (ovl.FatalErrorCount > 0)
+                                        {
+                                            <div>
+                                                <span>
+                                                    <i class="fa fa-times-circle"></i>
+                                                    @ovl.WarningCount @(ovl.FatalErrorCount == 1 ? "fataler Fehler" : "fatale Fehler")
+                                                </span>
+                                            </div>
+                                        }
+
+                                        if (ovl.TempError2Count > 0 || ovl.TempError1Count > 0)
+                                        {
+                                            <div>
+                                                <span>
+                                                    <i class="fa fa-exclamation-triangle"></i>
+                                                    @(ovl.TempError2Count + ovl.TempError1Count) @(ovl.TempError2Count + ovl.TempError1Count == 1 ? "temporärer Fehler" : "temporäre Fehler")
+                                                </span>
+                                            </div>
+                                        }
+
+                                        if (ovl.WarningCount > 0)
+                                        {
+                                            <div>
+                                                <span>
+                                                    <i class="fa fa-check-circle"></i>
+                                                    @ovl.WarningCount @(ovl.WarningCount == 1 ? "Warnung" : "Warnungen")
+                                                </span>
+                                            </div>
+                                        }
                                     }
                                 </td>
 
@@ -458,7 +531,7 @@
 
 
         @foreach (var ovl in originalValueLists)
-            {
+        {
             <div role="tabpanel" class="tab-pane" id="tab_hvl_@ovl.GetOriginalValueListIdent()">
                 <div class="panel panel-primary">
                     <div class="panel-heading">Historische Messwerte @ovl.Meter.ToFormattedDeviceId() (@ovl.Obis.ToString())</div>

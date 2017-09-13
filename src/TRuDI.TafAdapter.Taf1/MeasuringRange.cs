@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using TRuDI.HanAdapter.XmlValidation.Models;
-using TRuDI.HanAdapter.XmlValidation.Models.BasicData;
+using TRuDI.Models;
+using TRuDI.Models.BasicData;
 using TRuDI.TafAdapter.Interface;
 
 namespace TRuDI.TafAdapter.Taf1

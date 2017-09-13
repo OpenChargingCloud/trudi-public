@@ -3,6 +3,9 @@
     using System.Collections.Generic;
     using System.Linq;
 
+    /// <summary>
+    /// This class is used to manage the bread crumb trail navigation on top of the page.
+    /// </summary>
     public class BreadCrumbTrail
     {
         private readonly List<BreadCrumbTrailItem> items = new List<BreadCrumbTrailItem>();

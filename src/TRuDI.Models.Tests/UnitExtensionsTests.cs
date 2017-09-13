@@ -1,8 +1,8 @@
 namespace TRuDI.Models.Tests
 {
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using TRuDI.HanAdapter.XmlValidation.Models;
-    using TRuDI.HanAdapter.XmlValidation.Models.BasicData;
+    using TRuDI.Models;
+    using TRuDI.Models.BasicData;
 
     [TestClass]
     public class UnitExtensionsTests

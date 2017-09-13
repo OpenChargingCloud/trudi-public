@@ -7,61 +7,142 @@
     using System.Threading.Tasks;
     using System.Xml.Linq;
 
+    using Serilog;
+
     using TRuDI.Backend.Exceptions;
     using TRuDI.Backend.MessageHandlers;
     using TRuDI.Backend.Models;
     using TRuDI.HanAdapter.Interface;
-    using TRuDI.HanAdapter.XmlValidation;
-    using TRuDI.HanAdapter.XmlValidation.Models;
-    using TRuDI.HanAdapter.XmlValidation.Models.BasicData;
+    using TRuDI.Models;
+    using TRuDI.Models.BasicData;
+    using TRuDI.Models.CheckData;
 
+    using AnalysisProfile = TRuDI.Models.CheckData.AnalysisProfile;
+
+    /// <summary>
+    /// This class is used to manage the current state of the application.
+    /// It's instanciated as singelton instance.
+    /// </summary>
     public class ApplicationState
     {
+        /// <summary>
+        /// The notifications message handler used to send progress notification to the progress page.
+        /// </summary>
         private readonly NotificationsMessageHandler notificationsMessageHandler;
 
+        /// <summary>
+        /// The active HAN adapter selected by the user.
+        /// </summary>
         private HanAdapterContainer activeHanAdapter;
+
+        /// <summary>
+        /// The cancellation token that is used to cancel HAN adapter operations.
+        /// </summary>
         private CancellationTokenSource cts;
 
+        /// <summary>
+        /// Gets or sets the current active operation mode (display or transparency function).
+        /// </summary>
         public OperationMode OperationMode { get; set; }
 
+        /// <summary>
+        /// Gets the bread crumb trail.
+        /// </summary>
         public BreadCrumbTrail BreadCrumbTrail { get; } = new BreadCrumbTrail();
+
+        /// <summary>
+        /// Gets the side bar menu of the current page.
+        /// </summary>
         public SideBarMenu SideBarMenu { get; } = new SideBarMenu();
 
+        /// <summary>
+        /// Gets the last error messages.
+        /// </summary>
         public List<string> LastErrorMessages { get; } = new List<string>();
 
+        /// <summary>
+        /// Gets the active han adapter.
+        /// </summary>
         public HanAdapterContainer ActiveHanAdapter => this.activeHanAdapter;
 
+        /// <summary>
+        /// Gets or sets the connect data.
+        /// </summary>
+        public ConnectData ConnectData { get; set; }
+
+        /// <summary>
+        /// Gets or sets the client certificate used for the TLS connection to the SMGW.
+        /// </summary>
+        public CertData ClientCert { get; set; }
+
+        /// <summary>
+        /// Gets or sets the dictionary with HAN adapter specific parameters.
+        /// </summary>
+        public Dictionary<string, string> ManufacturerParameters { get; set; }
+
+        /// <summary>
+        /// Gets the current progress state relevant for the progress page.
+        /// </summary>
+        public ProgressData CurrentProgressState { get; } = new ProgressData();
+
+        /// <summary>
+        /// Gets the last connect result of the active HAN adapter.
+        /// </summary>
+        public ConnectResult LastConnectResult { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the current list of contracts read from the SMGW.
+        /// </summary>
+        public IReadOnlyList<ContractContainer> Contracts { get; private set; }
+
+        /// <summary>
+        /// Gets the current adapter context used to load the data from the SMGW.
+        /// </summary>
+        public AdapterContext CurrentAdapterContext { get; private set; }
+
+        /// <summary>
+        /// Gets the current data result loaded by the HAN adapter from the SMGW.
+        /// </summary>
+        public XmlDataResult CurrentDataResult { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the current supplier file containing the analysis profile.
+        /// </summary>
+        public SupplierFile CurrentSupplierFile { get; set; }
+
+        /// <summary>
+        /// Gets the backend checksums calculated at application startup.
+        /// </summary>
+        public ApplicationChecksums BackendChecksums { get; } = new ApplicationChecksums();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ApplicationState"/> class.
+        /// </summary>
+        /// <param name="notificationsMessageHandler">The notifications message handler.</param>
         public ApplicationState(NotificationsMessageHandler notificationsMessageHandler)
         {
             this.notificationsMessageHandler = notificationsMessageHandler;
-            this.ConnectData = new ConnectDataViewModel();
+            this.ConnectData = new ConnectData();
             this.BreadCrumbTrail.Add("Start", "/OperatingModeSelection", false);
             this.SideBarMenu.Add("Über TRuDI", "/About", true);
             this.SideBarMenu.Add("Beschreibung", "/Help", true);
         }
 
+        /// <summary>
+        /// Loads the HAN adapter for the specified server ID.
+        /// </summary>
+        /// <param name="serverId">The server identifier to load the HAN adapter for.</param>
         public void LoadAdapter(string serverId)
         {
             this.activeHanAdapter = HanAdapterRepository.LoadAdapter(serverId);
         }
 
-        public ConnectDataViewModel ConnectData { get; set; }
-        public CertData ClientCert { get; set; }
-
-        public IReadOnlyList<ContractContainer> Contracts { get; set; }
-
-        public ConnectResult LastConnectResult { get; private set; }
-
-        public Dictionary<string, string> ManufacturerParameters { get; set; }
-
-        public AdapterContext CurrentAdapterContext { get; private set; }
-
-        public ProgressData CurrentProgressState { get; } = new ProgressData();
-
-        public XmlDataResult CurrentDataResult { get; private set; }
-
-        public SupplierFile CurrentSupplierFile { get; set; }
-
+        /// <summary>
+        /// Gets the specfied file from the embedded resources of the current active HAN adapter (e.g. for the SMGW image).
+        /// </summary>
+        /// <param name="path">The path to the resource file.</param>
+        /// <returns>The file content and it's content type.</returns>
+        /// <exception cref="InvalidOperationException">Is thrown if there's no active HAN adapter.</exception>
         public (byte[] data, string contentType) GetResourceFile(string path)
         {
             if (this.activeHanAdapter == null)
@@ -72,8 +153,18 @@
             return this.activeHanAdapter.GetResourceFile(path);
         }
 
+        /// <summary>
+        /// Loads the contracts list from the SMGW.
+        /// </summary>
         public void ConnectAndLoadContracts()
         {
+            Log.Information("Connecting to the SMGW and loading TAF contracts");
+
+            if (this.activeHanAdapter == null)
+            {
+                this.LoadAdapter(this.ConnectData.DeviceId);
+            }
+
             this.CurrentProgressState.Reset("Verbindungsaufbau", "_ConnectingPartial");
             this.cts = new CancellationTokenSource();
             var ct = this.cts.Token;
@@ -86,6 +177,7 @@
 
                     try
                     {
+                        Log.Information("Connecting to the SMGW {0}", this.ConnectData.DeviceId);
                         this.LastConnectResult = await this.activeHanAdapter.Connect(
                                                      this.ConnectData,
                                                      this.ClientCert,
@@ -93,10 +185,14 @@
                                                      ct,
                                                      this.ProgressCallback);
 
+                        Log.Information("Loading available contracts from SMGW {0}", this.ConnectData.DeviceId);
                         var contracts = await this.activeHanAdapter.LoadAvailableContracts(ct, this.ProgressCallback);
-                        var containers = contracts.Where(c => c.TafId != TafId.Taf6)
-                            .Select(c => new ContractContainer() { Contract = c }).ToList();
 
+                        Log.Verbose("Contracts received: {@Contracts}", contracts);
+                        var containers = contracts.Where(c => c.TafId != TafId.Taf6)
+                            .Select(c => new ContractContainer { Contract = c }).ToList();
+
+                        Log.Debug("Grouping TAF-6 contracts");
                         foreach (var taf6Contract in contracts.Where(c => c.TafId == TafId.Taf6))
                         {
                             var cnt = containers.FirstOrDefault(
@@ -119,18 +215,39 @@
 
                         if (this.OperationMode == OperationMode.DisplayFunction)
                         {
+                            Log.Information("Display function: showing contract list");
                             await this.LoadNextPageAfterProgress("/Contracts");
                         }
                         else
                         {
+                            Log.Information("Transparency function: search matching contract for metering point {0} and TAF name {1}",
+                                this.CurrentSupplierFile.Model.UsagePointId,
+                                this.CurrentSupplierFile.Model.AnalysisProfile.TariffId);
+
                             var tariffContract = this.Contracts.Select(c => c.Contract).FirstOrDefault(
                                 c => c.TafId == TafId.Taf7
                                      && c.MeteringPointId == this.CurrentSupplierFile.Model.UsagePointId
                                      && c.TafName == this.CurrentSupplierFile.Model.AnalysisProfile.TariffId);
+
+                            if (tariffContract == null)
+                            {
+                                Log.Error("No contract found");
+                                this.LastErrorMessages.Add($"Vertrag mit der ID \"{this.CurrentSupplierFile.Model.AnalysisProfile.TariffId}\" für Zählpunkt \"{this.CurrentSupplierFile.Model.UsagePointId}\" konnte nicht im Smart Meter Gateway gefunden werden.");
+                                await this.LoadNextPageAfterProgress("/Error");
+                                return;
+                            }
+
+                            this.CurrentSupplierFile.Ctx.Contract = tariffContract;
+                            this.CurrentAdapterContext = this.CurrentSupplierFile.Ctx;
+
+                            Log.Information("Loading TAF-7 data from SMGW");
+                            this.LoadData(this.CurrentSupplierFile.Ctx);
+                            await this.LoadNextPageAfterProgress("/Progress");
                         }
                     }
                     catch (OperationCanceledException)
                     {
+                        Log.Warning("Connect/Loading contracts canceled");
                         await this.LoadNextPageAfterProgress("/Connect");
                     }
                     catch (HanAdapterException ex)
@@ -140,14 +257,22 @@
                     }
                     catch (Exception ex)
                     {
+                        Log.Error(ex, "Connect/Loading contracts failed: {0}", ex.Message);
                         this.LastErrorMessages.Add(ex.Message);
                         await this.LoadNextPageAfterProgress("/Error");
                     }
                 });
         }
 
+        /// <summary>
+        /// Handles specified HAN adapter exception and adds a message to <see cref="LastErrorMessages"/>.
+        /// </summary>
+        /// <param name="ex">The ex.</param>
+        /// <exception cref="ArgumentOutOfRangeException">Unsupported <see cref="ErrorType"/>.</exception>
         private void HandleHanAdapterException(HanAdapterException ex)
         {
+            Log.Error("HAN adapter error: {0}, message: {1}", ex.AdapterError.Type, ex.AdapterError.Message);
+
             switch (ex.AdapterError.Type)
             {
                 case ErrorType.TcpConnectFailed:
@@ -176,6 +301,11 @@
             }
         }
 
+        /// <summary>
+        /// Loads the data from the specifed XML document.
+        /// This is called if the user loads a XML file instead of connecting to the SMGW.
+        /// </summary>
+        /// <param name="raw">The XML document to load.</param>
         public void LoadData(XDocument raw)
         {
             this.LastErrorMessages.Clear();
@@ -184,6 +314,14 @@
 
         public void LoadData(AdapterContext ctx)
         {
+            Log.Information("Loading data for metering point {0}, TAF name: {1} ", ctx.Contract.MeteringPointId, ctx.Contract.TafName);
+            Log.Verbose("Adapter context: {@AdapterContext}", ctx);
+
+            if (this.activeHanAdapter == null)
+            {
+                throw new InvalidOperationException($"There's no active HAN adapter to load data");
+            }
+
             this.CurrentAdapterContext = ctx;
 
             this.CurrentProgressState.Reset("Daten laden", "_LoadingDataPartial");
@@ -196,6 +334,7 @@
 
                     try
                     {
+                        Log.Information("Loading data from SMGW {0}", this.ConnectData.DeviceId);
                         var raw = await this.activeHanAdapter.LoadData(ctx, ct, this.ProgressCallback);
 
                         try
@@ -209,8 +348,9 @@
                             return;
                         }
 
-                        if (ctx.BillingPeriod.End == null)
+                        if (ctx.BillingPeriod?.End == null)
                         {
+                            Log.Information("Billing period not completetd: get current register values", this.ConnectData.DeviceId);
                             var rawCurrentRegisters = await this.activeHanAdapter.GetCurrentRegisterValues(ctx, ct, this.ProgressCallback);
 
                             try
@@ -229,6 +369,7 @@
                     }
                     catch (OperationCanceledException)
                     {
+                        Log.Warning("Loading data canceled");
                         await this.LoadNextPageAfterProgress(this.BreadCrumbTrail.Items.Last().Link);
                     }
                     catch (HanAdapterException ex)
@@ -238,8 +379,9 @@
                     }
                     catch (Exception ex)
                     {
+                        Log.Error(ex, "Loading data from device {0} failed: {1}", this.ConnectData.DeviceId, ex.Message);
                         this.LastErrorMessages.Add(ex.Message);
-                        await this.LoadNextPageAfterProgress(this.BreadCrumbTrail.Items.Last().Link);
+                        await this.LoadNextPageAfterProgress("/Error");
                     }
                 });
         }
@@ -250,13 +392,17 @@
 
             try
             {
+                Log.Information("Parsing supplier model");
                 this.CurrentSupplierFile.Model = XmlModelParser.ParseSupplierModel(this.CurrentSupplierFile.Xml.Root.Descendants());
+
+                Log.Information("Validating supplier model");
                 ModelValidation.ValidateSupplierModel(this.CurrentSupplierFile.Model);
             }
             catch (AggregateException ex)
             {
                 foreach (var err in ex.InnerExceptions)
                 {
+                    Log.Error(err, err.Message);
                     this.LastErrorMessages.Add(err.Message);
                 }
 
@@ -264,31 +410,39 @@
             }
             catch (Exception ex)
             {
+                Log.Error(ex, "Loading supplier file failed: {0}", ex.Message);
                 this.LastErrorMessages.Add(ex.Message);
                 throw;
             }
         }
 
-
         private void LoadDataFromXml(XDocument raw, AdapterContext ctx)
         {
+            Log.Information("Loading XML file");
             this.LastErrorMessages.Clear();
 
             try
             {
                 this.CurrentDataResult = new XmlDataResult { Raw = raw };
 
+                Log.Information("Validating XSD schema");
                 Ar2418Validation.ValidateSchema(raw);
+
+                Log.Information("Parsing model");
                 this.CurrentDataResult.Model = XmlModelParser.ParseHanAdapterModel(this.CurrentDataResult?.Raw?.Root?.Descendants());
+
+                Log.Information("Validating model");
                 ModelValidation.ValidateHanAdapterModel(this.CurrentDataResult.Model);
 
-                if (ctx != null)
-                {
-                    ContextValidation.ValidateContext(this.CurrentDataResult.Model, ctx);
-                }
+                Log.Information("Validating model using the adapter context");
+                ContextValidation.ValidateContext(this.CurrentDataResult.Model, ctx);
 
                 if (this.CurrentSupplierFile?.Model != null)
                 {
+                    Log.Information("Validating model using supplier file model");
+                    ContextValidation.ValidateContext(this.CurrentDataResult.Model, this.CurrentSupplierFile.Model, ctx);
+
+                    Log.Information("Loading TAF adapter: {0}", this.CurrentSupplierFile.Model.AnalysisProfile.TariffUseCase);
                     var tafAdapter = TafAdapterRepository.LoadAdapter(this.CurrentSupplierFile.Model.AnalysisProfile.TariffUseCase);
                     this.CurrentSupplierFile.AccountingPeriod = tafAdapter.Calculate(this.CurrentDataResult.Model, this.CurrentSupplierFile.Model);
                 }
@@ -297,6 +451,7 @@
             {
                 foreach (var err in ex.InnerExceptions)
                 {
+                    Log.Error(err, err.Message);
                     this.LastErrorMessages.Add(err.Message);
                 }
 
@@ -304,6 +459,7 @@
             }
             catch (Exception ex)
             {
+                Log.Error(ex, "Loading XML data failed: {0}", ex.Message);
                 this.LastErrorMessages.Add(ex.Message);
                 throw;
             }
@@ -311,9 +467,19 @@
             this.CurrentDataResult.OriginalValueLists =
                 this.CurrentDataResult.Model.MeterReadings.Where(mr => mr.IsOriginalValueList()).Select(mr => new OriginalValueList(mr)).ToList();
 
-            var meterReadings = this.CurrentDataResult.Model.MeterReadings.Where(mr => !mr.IsOriginalValueList()).ToList();
+            foreach (var ovl in this.CurrentDataResult.OriginalValueLists)
+            {
+                Log.Information("Original value list: meter: {0}, OBIS: {1}, {2} values", ovl.Meter, ovl.Obis, ovl.ValueCount);
+            }
 
+            var meterReadings = this.CurrentDataResult.Model.MeterReadings.Where(mr => !mr.IsOriginalValueList()).ToList();
             meterReadings.Sort((a, b) => string.Compare(a.ReadingType.ObisCode, b.ReadingType.ObisCode, StringComparison.InvariantCultureIgnoreCase));
+
+            foreach (var mr in meterReadings)
+            {
+                Log.Information("Meter reading: {@Meters}, OBIS: {1}", mr.Meters, mr.ReadingType.ObisCode);
+            }
+
             this.CurrentDataResult.MeterReadings = meterReadings;
             this.CurrentDataResult.Begin = meterReadings.FirstOrDefault()?.IntervalBlocks?.FirstOrDefault()?.Interval?.Start;
 
@@ -325,23 +491,104 @@
                     this.CurrentDataResult.End = this.CurrentDataResult.Begin + TimeSpan.FromSeconds(duration.Value);
                 }
             }
+
+            // If the analysis profile is missing, add it based on the contract info
+            if (this.CurrentDataResult.Model.AnalysisProfile == null && ctx?.Contract != null)
+            {
+                this.AddAnalysisProfile(ctx);
+            }
+        }
+
+        private void AddAnalysisProfile(AdapterContext ctx)
+        {
+            Log.Information("Addding analysis profile");
+
+            this.CurrentDataResult.Model.AnalysisProfile =
+                new AnalysisProfile { TariffUseCase = ctx.Contract.TafId, TariffId = ctx.Contract.TafName, };
+
+            var lowestTariffId = ushort.MaxValue;
+            foreach (var mr in this.CurrentDataResult.MeterReadings)
+            {
+                var ts = new TariffStage
+                {
+                    ObisCode = mr.ReadingType.ObisCode,
+                    TariffNumber = new ObisId(mr.ReadingType.ObisCode).E,
+                    Description = string.Empty
+                };
+
+                lowestTariffId = Math.Min(lowestTariffId, ts.TariffNumber);
+                this.CurrentDataResult.Model.AnalysisProfile.TariffStages.Add(ts);
+            }
+
+            this.CurrentDataResult.Model.AnalysisProfile.DefaultTariffNumber = lowestTariffId;
+
+            DateTime begin;
+            DateTime end;
+
+            if (ctx.BillingPeriod != null)
+            {
+                begin = ctx.BillingPeriod.Begin;
+                end = ctx.BillingPeriod.End ?? DateTime.Now;
+            }
+            else
+            {
+                begin = ctx.Contract.Begin;
+                end = ctx.Contract.End ?? DateTime.Now;
+            }
+
+            this.CurrentDataResult.Model.AnalysisProfile.BillingPeriod =
+                new Interval { Start = begin, Duration = (uint)(end - begin).TotalSeconds };
+
+            XNamespace ns = @"http://vde.de/AR_2418-6.xsd";
+            var tariffNameElement = this.CurrentDataResult?.Raw?.Root?.Descendants().FirstOrDefault(n => n.Name.LocalName == "tariffName");
+            if (tariffNameElement == null)
+            {
+                return;
+            }
+
+            var analysisProfile = new XElement(ns + "AnalysisProfile",
+                new XElement(ns + "tariffUseCase", (int)this.CurrentDataResult.Model.AnalysisProfile.TariffUseCase),
+                new XElement(ns + "tariffId", this.CurrentDataResult.Model.AnalysisProfile.TariffId),
+                new XElement(ns + "billingPeriod",
+                    new XElement(ns + "duration", this.CurrentDataResult.Model.AnalysisProfile.BillingPeriod.Duration),
+                    new XElement(ns + "start", this.CurrentDataResult.Model.AnalysisProfile.BillingPeriod.Start)));
+
+            foreach (var ts in this.CurrentDataResult.Model.AnalysisProfile.TariffStages)
+            {
+                analysisProfile.Add(new XElement(ns + "TariffStage",
+                        new XElement(ns + "tariffNumber", ts.TariffNumber),
+                        new XElement(ns + "description", ts.Description),
+                        new XElement(ns + "obisCode", ts.ObisCode))
+                );
+            }
+
+            analysisProfile.Add(new XElement(ns + "defaultTariffNumber", this.CurrentDataResult.Model.AnalysisProfile.DefaultTariffNumber));
+            tariffNameElement.AddAfterSelf(analysisProfile);
         }
 
         private void UpdateRegisterValuesFromXml(XDocument raw, AdapterContext ctx)
         {
+            Log.Information("Adding the current register value to the XML result file.");
+
             this.LastErrorMessages.Clear();
             UsagePointAdapterTRuDI model;
 
             try
             {
+                Log.Information("Validating XSD schema");
                 Ar2418Validation.ValidateSchema(raw);
+
+                Log.Information("Parsing model");
                 model = XmlModelParser.ParseHanAdapterModel(raw?.Root?.Descendants());
+
+                Log.Information("Validating model");
                 ModelValidation.ValidateHanAdapterModel(model);
             }
             catch (AggregateException ex)
             {
                 foreach (var err in ex.InnerExceptions)
                 {
+                    Log.Error(err, err.Message);
                     this.LastErrorMessages.Add(err.Message);
                 }
 
@@ -349,6 +596,7 @@
             }
             catch (Exception ex)
             {
+                Log.Error(ex, "Loading XML data with current values failed: {0}", ex.Message);
                 this.LastErrorMessages.Add(ex.Message);
                 throw;
             }
@@ -379,11 +627,13 @@
 
         public void CancelOperation()
         {
+            Log.Information("Operation canceld by the user.");
             this.cts?.Cancel();
         }
 
         public async Task LoadNextPageAfterProgress(string page)
         {
+            Log.Debug("Next page after progress: {0}", page);
             this.CurrentProgressState.NextPageAfterProgress = page;
             await this.notificationsMessageHandler.LoadNextPage(page);
         }

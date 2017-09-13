@@ -4,9 +4,9 @@
     using System.Collections.Generic;
     using System.Linq;
     using TRuDI.HanAdapter.Interface;
-    using TRuDI.HanAdapter.XmlValidation.Models;
-    using TRuDI.HanAdapter.XmlValidation.Models.BasicData;
-    using TRuDI.HanAdapter.XmlValidation.Models.CheckData;
+    using TRuDI.Models;
+    using TRuDI.Models.BasicData;
+    using TRuDI.Models.CheckData;
 
     /// <summary>
     /// The class provides methods to create the model data for an XmlBuilder instance.

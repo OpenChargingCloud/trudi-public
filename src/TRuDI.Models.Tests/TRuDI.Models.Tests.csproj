@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TRuDI.HanAdapter.XmlValidation\TRuDI.HanAdapter.XmlValidation.csproj" />
+    <ProjectReference Include="..\TRuDI.Models\TRuDI.Models.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,6 +24,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Data\IF_Adapter_TRuDI_DatenTAF7.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\UsagePoint_without_AnalysisProfile.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\UsagePoint_with_AnalysisProfile.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

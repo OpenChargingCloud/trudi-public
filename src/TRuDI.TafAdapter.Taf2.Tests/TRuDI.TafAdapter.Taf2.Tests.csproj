@@ -17,4 +17,13 @@
     <ProjectReference Include="..\TRuDI.TafAdapter.Taf2\TRuDI.TafAdapter.Taf2.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Data\supplierXml_2OML_4TS_UCTaf2.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\trudiXmlTaf7_2OML_4TS_UCTaf2.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

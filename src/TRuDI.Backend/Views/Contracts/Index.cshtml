@@ -92,7 +92,7 @@
 
                         @foreach (var period in cnt.Contract.BillingPeriods)
                         {
-                            <tr>
+                            <tr id="@string.Format("{0}_{1}_BP", contractIndex, billingPeriodIndex)">
                                 <td>
                                     <input type="radio"
                                            name='@string.Format("{0}", contractIndex)'
@@ -126,7 +126,7 @@
 
                         @foreach (var period in cnt.Taf6.BillingPeriods)
                         {
-                            <tr>
+                            <tr id="@string.Format("{0}_{1}_TAF6", contractIndex, billingPeriodIndex)">
                                 <td>
                                     <input type="radio"
                                            name='@string.Format("{0}", contractIndex)'
@@ -144,8 +144,9 @@
                 }
 
             </form>
+            
 
-            <table class="table-condensed">
+        <table class="table-condensed">
                 <tr>
                     <th>Startzeitpunkt</th>
                     <th>Endzeitpunkt</th>

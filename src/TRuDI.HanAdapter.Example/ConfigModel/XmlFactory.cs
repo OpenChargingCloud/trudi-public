@@ -4,8 +4,8 @@
     using System.Linq;
     using System.Xml.Linq;
     using TRuDI.HanAdapter.Interface;
-    using TRuDI.HanAdapter.XmlValidation.Models.BasicData;
-    using TRuDI.HanAdapter.XmlValidation.Models.CheckData;
+    using TRuDI.Models.BasicData;
+    using TRuDI.Models.CheckData;
 
     /// <summary>
     /// This class is used to create the neccessary xml files for the dummyAdapter.

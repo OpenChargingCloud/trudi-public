@@ -11,8 +11,8 @@
     using TRuDI.HanAdapter.Example.Logging;
     using TRuDI.HanAdapter.Interface;
     using TRuDI.HanAdapter.Example.Components;
-    using TRuDI.HanAdapter.XmlValidation.Models;
-    using TRuDI.HanAdapter.XmlValidation.Models.BasicData;
+    using TRuDI.Models;
+    using TRuDI.Models.BasicData;
     using TRuDI.HanAdapter.Example.ConfigModel;
 
     /// <inheritdoc />

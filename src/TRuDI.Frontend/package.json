@@ -1,44 +1,52 @@
-{ 
-    "name" : "TRuDI",
-    "version" : "0.10.0",
-    "description" : "TRuDI - Transparenz- und Display-Software",
-    "author" : "IVU Softwareentwicklung GmbH",
-    "repository" : "",
-    "main" : "main.js",
-    "dependencies" : { 
-        "dirsum" : "^0.1.1"
+{
+  "name": "TRuDI",
+  "version": "0.13.0",
+  "description": "TRuDI - Transparenz- und Display-Software",
+  "author": "IVU Softwareentwicklung GmbH",
+  "repository": "",
+  "main": "main.js",
+  "dependencies": {
+    "bootstrap": "^3.3.7",
+    "jquery": "^3.2.1"
+  },
+  "devDependencies": {
+    "electron": "^1.7.5",
+    "electron-builder": "^19.24.1"
+  },
+  "scripts": {
+    "start": "electron .",
+    "dist": "build"
+  },
+  "build": {
+    "appId": "trudi",
+    "directories": {
+      "buildResources": "../../assets",
+      "output": "../../dist"
     },
-    "devDependencies" : { 
-        "electron" : "^1.7.5",
-        "electron-builder" : "^19.24.1"
+    "extraResources": {
+      "from": "../TRuDI.Backend/bin/dist/",
+      "to": "TRuDI.Backend/bin/dist/",
+      "filter": [
+        "**/*"
+      ]
     },
-    "scripts" : { 
-        "start" : "electron .",
-        "dist" : "build"
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ]
     },
-    "build" : { 
-        "appId" : "trudi",
-        "directories" : { 
-            "buildResources" : "../../assets",
-            "output" : "../../dist"
-        },
-        "extraResources" : { 
-            "from" : "../TRuDI.Backend/bin/dist/",
-            "to" : "TRuDI.Backend/bin/dist/",
-            "filter" : [ "**/*" ]
-        },
-        "linux" : { 
-            "target" : [ "AppImage", "deb" ]
-        },
-        "mac" : { 
-            "category" : "trudi"
-        },
-        "win" : { 
-            "target" : [ "nsis" ]
-        },
-        "nsis" : { 
-            "oneClick" : false,
-            "allowElevation" : false
-        }
+    "mac": {
+      "category": "trudi"
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowElevation": false
     }
+  }
 }

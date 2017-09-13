@@ -1,16 +1,22 @@
 ﻿namespace TRuDI.Backend
 {
-    using System.IO;
-
     using Microsoft.AspNetCore;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.CommandLineUtils;
-
     using Serilog;
     using Serilog.Core;
     using Serilog.Events;
+    using System.IO;
+    using System.Net;
+    using System.Net.Sockets;
 
     using TRuDI.Backend.Application;
+
+#if !DEBUG
+    using System;
+    using Microsoft.AspNetCore.Server.Kestrel.Https;
+    using TRuDI.Backend.Utils;
+#endif
 
     public class Program
     {
@@ -26,8 +32,7 @@
             commandLineApplication.HelpOption("-? | -h | --help");
             commandLineApplication.Execute(args);
 
-            var logLevelSwitch = new LoggingLevelSwitch();
-            logLevelSwitch.MinimumLevel = LogEventLevel.Information;
+            var logLevelSwitch = new LoggingLevelSwitch { MinimumLevel = LogEventLevel.Information };
 
             if (logLevelOption.HasValue())
             {
@@ -102,16 +107,43 @@
             BuildWebHost(args).Run();
         }
 
+        public static int FindFreeTcpPort()
+        {
+            var listener = new TcpListener(IPAddress.Loopback, 0);
+            listener.Start();
+            int port = ((IPEndPoint)listener.LocalEndpoint).Port;
+            listener.Stop();
+            return port;
+        }
+
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-/*                .UseKestrel(
+                .UseKestrel(
                     options =>
                         {
-                            options.Listen(IPAddress.Loopback, 5001, listenOptions =>
+#if DEBUG
+                            options.Listen(IPAddress.Loopback, 5000);
+#else
+                            // Get free TCP port and write it to STDOUT where the Electron frontend can catch it.
+                            var port = FindFreeTcpPort();
+                            Console.WriteLine($"##### TRUDI-BACKEND-PORT: {port} #####");
+
+                            options.Listen(IPAddress.Loopback, port, listenOptions =>
                                 {
-                                    listenOptions.UseHttps("testCert.pfx", "testPassword");
+                                    var httpsOptions =
+                                        new HttpsConnectionAdapterOptions
+                                            {
+                                                ServerCertificate =
+                                                    CertificateGenerator
+                                                        .GenerateCertificate(
+                                                            $"CN={DigestUtils.GetDigestFromAssembly(typeof(Program)).ToLowerInvariant()}")
+                                            };
+
+                                    listenOptions.UseHttps(httpsOptions);
                                 });
-                        })*/
+#endif
+
+                        })
                 .UseStartup<Startup>()
                 .Build();
     }

@@ -72,7 +72,7 @@
                     continue;
                 }
 
-                if (typeof(ConnectDataViewModel).GetProperty(item.Key) == null)
+                if (typeof(ConnectData).GetProperty(item.Key) == null)
                 {
                     manufacturerParameters.Add(item.Key, item.Value);
                 }
@@ -160,7 +160,7 @@
         }
 
         [HttpPost]
-        public IActionResult Connect(ConnectDataViewModel connectData)
+        public IActionResult Connect(ConnectData connectData)
         {
             this.applicationState.ManufacturerParameters = this.GetManufacturerParametersFromRequest();
 

@@ -10,8 +10,8 @@
     using System.Text;
 
     using TRuDI.HanAdapter.Interface;
-    using TRuDI.HanAdapter.XmlValidation.Models;
-    using TRuDI.HanAdapter.XmlValidation.Models.BasicData;
+    using TRuDI.Models;
+    using TRuDI.Models.BasicData;
     using TRuDI.TafAdapter.Interface;
 
     public static class HtmlStringExtensions
@@ -36,6 +36,16 @@
         {
             var o = new Oid(oid);
             return o.FriendlyName;
+        }
+
+        public static string TafToFriendlyName(this TafId? id)
+        {
+            if (id == null)
+            {
+                return string.Empty;
+            }
+
+            return id.Value.TafToFriendlyName();
         }
 
         public static string TafToFriendlyName(this TafId id)
@@ -291,7 +301,7 @@
         {
             try
             {
-                var serverId = new TRuDI.Backend.ServerId(value);
+                var serverId = new ServerId(value);
                 return serverId.ToString();
             }
             catch
@@ -300,26 +310,56 @@
             }
         }
 
-        public static IEnumerable<Register> GetAccountingRegistersWithTotal(this IAccountingPeriod accountingPeriod)
+        public static IList<Register> GetAccountingRegistersWithTotal(this IEnumerable<Register> registers)
         {
-            long totalAmount = 0;
+            var sortedRegisters = registers.ToList();
+            sortedRegisters.Sort((a, b) => string.Compare(a.ObisCode.ToHexString(), b.ObisCode.ToHexString(), StringComparison.InvariantCulture));
 
-            foreach (var reg in accountingPeriod.SummaryRegister)
+            var totalImport = new Register { Amount = null, ObisCode = new ObisId("1-0:1.8.0*255"), TariffId = 0 };
+            foreach (var reg in sortedRegisters)
             {
-                if (reg.Amount.HasValue)
+                if (reg.Amount.HasValue && reg.ObisCode.Medium == ObisMedium.Electricity && reg.ObisCode.C == 1
+                    && reg.ObisCode.D == 8)
                 {
-                    totalAmount += reg.Amount.Value;
+                    if (totalImport.Amount == null)
+                    {
+                        totalImport.Amount = reg.Amount.Value;
+                    }
+                    else
+                    {
+                        totalImport.Amount += reg.Amount.Value;
+                    }
                 }
-
-                yield return reg;
             }
 
-            yield return new Register
-                             {
-                                 Amount = totalAmount,
-                                 TariffId = 0,
-                                 ObisCode = new ObisId(accountingPeriod.SummaryRegister.First().ObisCode) { E = 0 }
-                             };
+            if (totalImport.Amount != null)
+            {
+                sortedRegisters.Insert(sortedRegisters.FindLastIndex(r => r.ObisCode.Medium == ObisMedium.Electricity && r.ObisCode.C == 1 && r.ObisCode.D == 8) + 1, totalImport);
+            }
+
+            var totalExport = new Register { Amount = null, ObisCode = new ObisId("1-0:2.8.0*255"), TariffId = 0 };
+            foreach (var reg in sortedRegisters)
+            {
+                if (reg.Amount.HasValue && reg.ObisCode.Medium == ObisMedium.Electricity && reg.ObisCode.C == 2
+                    && reg.ObisCode.D == 8)
+                {
+                    if (totalExport.Amount == null)
+                    {
+                        totalExport.Amount = reg.Amount.Value;
+                    }
+                    else
+                    {
+                        totalExport.Amount += reg.Amount.Value;
+                    }
+                }
+            }
+
+            if (totalExport.Amount != null)
+            {
+                sortedRegisters.Insert(sortedRegisters.FindLastIndex(r => r.ObisCode.Medium == ObisMedium.Electricity && r.ObisCode.C == 2 && r.ObisCode.D == 8) + 1, totalExport);
+            }
+
+            return sortedRegisters;
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿@using System.Globalization
 @using TRuDI.Backend.Application
-@using TRuDI.HanAdapter.XmlValidation.Models
+@using TRuDI.Models
 @inject ApplicationState StateService
 @{
     var data = StateService.CurrentSupplierFile.AccountingPeriod;
@@ -49,101 +49,105 @@
 
 @foreach (var sec in data.AccountingSections.Where(s => s.Start == Model))
 {
-    if (sec.Reading.ObisCode.ToUpperInvariant() == "0100010800FF")
-    {
-        <h3>Bezug am @Model.ToString("dd.MM.yyyy")</h3>
-    }
-    else
-    {
-        <h3>Lieferung am @Model.ToString("dd.MM.yyyy")</h3>
-    }
+    var importDirection = sec.Reading.ObisCode.ToUpperInvariant() == "0100010800FF";
 
-    <div>
-        @{
-            var ovl = StateService.CurrentDataResult.OriginalValueLists.FirstOrDefault(o => o.Obis.A == sec.SummaryRegister.First().ObisCode.A && o.Obis.B == sec.SummaryRegister.First().ObisCode.B && o.Obis.C == sec.SummaryRegister.First().ObisCode.C && o.Obis.D == sec.SummaryRegister.First().ObisCode.D && o.Obis.E == 0 && o.Obis.F == sec.SummaryRegister.First().ObisCode.F);
-            var unit = ovl.Uom.GetDisplayUnit(ovl.PowerOfTenMultiplier);
-
-            int minPeriodLength = 96;
-            foreach (var mr in sec.MeasuringRanges)
-            {
-                var length = (int)(mr.End - mr.Start).TotalMinutes / 15;
-                minPeriodLength = Math.Min(minPeriodLength, length);
-            }
+    <div style="clear: both; overflow: auto;">
+        
+        @if (importDirection)
+        {
+            <h3>Bezug am @Model.ToString("dd.MM.yyyy")</h3>
+        }
+        else
+        {
+            <h3>Lieferung am @Model.ToString("dd.MM.yyyy")</h3>
         }
 
-        <div class="col-sm-6">
-            <h4>Tarifschaltzeiten</h4>
+        <div>
+            @{
+                var ovl = StateService.CurrentDataResult.OriginalValueLists.FirstOrDefault(o => o.Obis.A == sec.SummaryRegister.First().ObisCode.A && o.Obis.B == sec.SummaryRegister.First().ObisCode.B && o.Obis.C == sec.SummaryRegister.First().ObisCode.C && o.Obis.D == sec.SummaryRegister.First().ObisCode.D && o.Obis.E == 0 && o.Obis.F == sec.SummaryRegister.First().ObisCode.F);
+                var unit = ovl.Uom.GetDisplayUnit(ovl.PowerOfTenMultiplier);
 
-            @foreach (var mr in sec.MeasuringRanges)
-            {
-                var duration = (int)(mr.End - mr.Start).TotalMinutes / 15;
-
-                <div class="chart-section">
-                    <div class="stroke" style="background: @colors[mr.TariffId]; height: @((duration / minPeriodLength * 4).ToString("F1", CultureInfo.InvariantCulture))em; width: 4em; text-align: center;">
-                        @mr.Start.ToString("HH:mm")<br />
-                        @("T" + mr.TariffId)
-                    </div>
-
-                    <div>
-                        Tarif @mr.TariffId von @mr.Start.ToString("HH:mm") Uhr bis @(mr.End.Hour == 0 && mr.End.Minute == 0 ? "24:00" : mr.End.ToString("HH:mm")) Uhr<br />
-                        <strong>@mr.Amount.GetDisplayValue(ovl.Uom, ovl.PowerOfTenMultiplier, ovl.Scaler) @unit</strong>
-                    </div>
-                </div>
+                int minPeriodLength = 96;
+                foreach (var mr in sec.MeasuringRanges)
+                {
+                    var length = (int)(mr.End - mr.Start).TotalMinutes / 15;
+                    minPeriodLength = Math.Min(minPeriodLength, length);
+                }
             }
 
-        </div>
+            <div class="col-sm-6">
+                <h4>Tarifschaltzeiten</h4>
 
-        <div class="col-sm-6">
-            <h4>Tagessummen</h4>
+                @foreach (var mr in sec.MeasuringRanges)
+                {
+                    var duration = (int)(mr.End - mr.Start).TotalMinutes / 15;
 
-            <table class="table">
-                <tr>
-                    <th>Tarif</th>
-                    <th class="text-right">Wert</th>
-                    <th>Einheit</th>
-                </tr>
-                
-                @{
-                    long totalAmount = 0;
+                    <div class="chart-section">
+                        <div class="stroke" style="background: @colors[mr.TariffId]; height: @((duration / minPeriodLength * 4).ToString("F1", CultureInfo.InvariantCulture))em; width: 4em; text-align: center;">
+                            @mr.Start.ToString("HH:mm")<br/>
+                            @("T" + mr.TariffId)
+                        </div>
+
+                        <div>
+                            Tarif @mr.TariffId von @mr.Start.ToString("HH:mm") Uhr bis @(mr.End.Hour == 0 && mr.End.Minute == 0 ? "24:00" : mr.End.ToString("HH:mm")) Uhr<br/>
+                            <strong>@mr.Amount.GetDisplayValue(ovl.Uom, ovl.PowerOfTenMultiplier, ovl.Scaler) @unit</strong>
+                        </div>
+                    </div>
                 }
 
-                @foreach (var register in sec.SummaryRegister)
-                {
-                    var tariffDescription = StateService.CurrentSupplierFile.Model.AnalysisProfile?.TariffStages?.FirstOrDefault(ts => new ObisId(ts.ObisCode) == register.ObisCode)?.Description;
-                    if (!string.IsNullOrWhiteSpace(tariffDescription) && register.TariffId != 63)
-                    {
-                        tariffDescription = $"{tariffDescription} (Tarif {register.TariffId})";
-                    }
-                    else
-                    {
-                        tariffDescription = register.TariffId >= 63 ? "Fehlerregister" : "Tarif " + register.TariffId;
+            </div>
+
+            <div class="col-sm-6">
+                <h4>Tagessummen</h4>
+
+                <table class="table">
+                    <tr>
+                        <th>Tarif</th>
+                        <th class="text-right">Wert</th>
+                        <th>Einheit</th>
+                    </tr>
+
+                    @{
+                        long totalAmount = 0;
                     }
 
-                    if (register.Amount.HasValue)
+                    @foreach (var register in sec.SummaryRegister.Where(s => s.ObisCode.C == (importDirection ? 1 : 2)))
                     {
-                        totalAmount += register.Amount.Value;
+                        var tariffDescription = StateService.CurrentSupplierFile.Model.AnalysisProfile?.TariffStages?.FirstOrDefault(ts => new ObisId(ts.ObisCode) == register.ObisCode)?.Description;
+                        if (!string.IsNullOrWhiteSpace(tariffDescription) && register.TariffId != 63)
+                        {
+                            tariffDescription = $"{tariffDescription} (Tarif {register.TariffId})";
+                        }
+                        else
+                        {
+                            tariffDescription = register.TariffId >= 63 ? "Fehlerregister" : "Tarif " + register.TariffId;
+                        }
+
+                        if (register.Amount.HasValue)
+                        {
+                            totalAmount += register.Amount.Value;
+                        }
+
+                        <tr>
+                            <td>@tariffDescription</td>
+                            <td class="text-right">
+                                @register.Amount.GetDisplayValue(ovl.Uom, ovl.PowerOfTenMultiplier, ovl.Scaler)
+                            </td>
+                            <td>@ovl.Uom.GetDisplayUnit(ovl.PowerOfTenMultiplier)</td>
+                        </tr>
                     }
+
 
                     <tr>
-                        <td>@tariffDescription</td>
+                        <td><strong>Gesamt</strong></td>
                         <td class="text-right">
-                            @register.Amount.GetDisplayValue(ovl.Uom, ovl.PowerOfTenMultiplier, ovl.Scaler)
+                            <strong>@totalAmount.GetDisplayValue(ovl.Uom, ovl.PowerOfTenMultiplier, ovl.Scaler)</strong>
                         </td>
-                        <td>@ovl.Uom.GetDisplayUnit(ovl.PowerOfTenMultiplier)</td>
+                        <td><strong>@ovl.Uom.GetDisplayUnit(ovl.PowerOfTenMultiplier)</strong></td>
                     </tr>
-                }
-                
-                
-                <tr>
-                    <td><strong>Gesamt</strong></td>
-                    <td class="text-right">
-                        <strong>@totalAmount.GetDisplayValue(ovl.Uom, ovl.PowerOfTenMultiplier, ovl.Scaler)</strong>
-                    </td>
-                    <td><strong>@ovl.Uom.GetDisplayUnit(ovl.PowerOfTenMultiplier)</strong></td>
-                </tr>
 
-            </table>
+                </table>
+            </div>
         </div>
     </div>
-
 }

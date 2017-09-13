@@ -4,9 +4,12 @@
     using System.Xml.Linq;
 
     using TRuDI.HanAdapter.Interface;
-    using TRuDI.HanAdapter.XmlValidation.Models.BasicData;
+    using TRuDI.Models.BasicData;
     using TRuDI.TafAdapter.Interface;
 
+    /// <summary>
+    /// A instance of this class holds the supplier file data used by the transparency function.
+    /// </summary>
     public class SupplierFile
     {
         public string Filename { get; set; }
@@ -24,5 +27,10 @@
         public AdapterContext Ctx { get; set; }
 
         public IAccountingPeriod AccountingPeriod { get; set; }
+
+        /// <summary>
+        /// Gets the TAF identifier from the analysis profile if it exists within the data.
+        /// </summary>
+        public TafId? TafId => this.Model?.AnalysisProfile?.TariffUseCase;
     }
 }

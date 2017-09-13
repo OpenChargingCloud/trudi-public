@@ -4,9 +4,9 @@
     using System;
     using System.Collections.Generic;
     using System.Text;
-    using TRuDI.HanAdapter.XmlValidation.Models;
-    using TRuDI.HanAdapter.XmlValidation.Models.BasicData;
-    using TRuDI.HanAdapter.XmlValidation.Models.CheckData;
+    using TRuDI.Models;
+    using TRuDI.Models.BasicData;
+    using TRuDI.Models.CheckData;
 
     [TestClass]
     public class TafAdapterInterfaceExtensionsTests
