@@ -237,3 +237,7 @@ textarea {
 .navbar-brand {
     float: none;
 }
+
+.error {
+    color: red;
+}

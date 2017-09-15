@@ -23,7 +23,7 @@
             }
 
             serverId = serverId.ToUpperInvariant();
-            var match = Regex.Match(serverId, "([0-9E]{1})([A-Z]{3})([0-9]{2})([0-9]{8})");
+            var match = Regex.Match(serverId, @"([0-9E]{1})\s*([A-Z]{3})\s*([0-9]{2})\s*([0-9]{8})");
             if (match.Success)
             {
                 this.Id = serverId;
@@ -46,6 +46,11 @@
             }
 
             throw new ArgumentException("Unknown format of server id", nameof(serverId));
+        }
+
+        public string ToStringWithoutSpace()
+        {
+            return $"{(byte)this.Medium:X1}{this.FlagId}{this.ProductionBlock:D2}{this.Number:D8}";
         }
 
         public override string ToString()

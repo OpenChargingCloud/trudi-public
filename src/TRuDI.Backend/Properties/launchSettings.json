@@ -10,7 +10,7 @@
   "profiles": {
     "TRuDI.Backend": {
       "commandName": "Project",
-      "commandLineArgs": "--loglevel verbose",
+      "commandLineArgs": "--loglevel info",
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"

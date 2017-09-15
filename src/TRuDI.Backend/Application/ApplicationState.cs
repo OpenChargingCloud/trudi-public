@@ -411,7 +411,7 @@
             catch (Exception ex)
             {
                 Log.Error(ex, "Loading supplier file failed: {0}", ex.Message);
-                this.LastErrorMessages.Add(ex.Message);
+                this.LastErrorMessages.Add("Keine gültige Datei.");
                 throw;
             }
         }

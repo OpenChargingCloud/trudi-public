@@ -17,6 +17,7 @@ namespace TRuDI.Models.Tests
             Assert.AreEqual(10486901u, target.Number);
 
             Assert.AreEqual("E PPC 02 10486901", target.ToString());
+            Assert.AreEqual("EPPC0210486901", target.ToStringWithoutSpace());
             Assert.AreEqual("0A0E5050430200A00475", target.ToHexString());
         }
 
@@ -30,7 +31,22 @@ namespace TRuDI.Models.Tests
             Assert.AreEqual(5347102u, target.Number);
 
             Assert.AreEqual("1 EMH 00 05347102", target.ToString());
+            Assert.AreEqual("1EMH0005347102", target.ToStringWithoutSpace());
             Assert.AreEqual("0A01454D48000051971E", target.ToHexString());
+        }
+
+        [TestMethod]
+        public void TestServerId3()
+        {
+            var target = new ServerId("E PPC 02 10486901");
+            Assert.AreEqual(ObisMedium.Communication, target.Medium);
+            Assert.AreEqual("PPC", target.FlagId);
+            Assert.AreEqual(2, target.ProductionBlock);
+            Assert.AreEqual(10486901u, target.Number);
+
+            Assert.AreEqual("E PPC 02 10486901", target.ToString());
+            Assert.AreEqual("EPPC0210486901", target.ToStringWithoutSpace());
+            Assert.AreEqual("0A0E5050430200A00475", target.ToHexString());
         }
     }
 }

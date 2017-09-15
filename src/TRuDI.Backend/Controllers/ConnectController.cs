@@ -164,6 +164,9 @@
         {
             this.applicationState.ManufacturerParameters = this.GetManufacturerParametersFromRequest();
 
+            connectData.DeviceId = connectData.DeviceId.Trim();
+            connectData.Address = connectData.Address.Trim();
+
             this.applicationState.ConnectData = connectData;
 
             if (this.applicationState.ConnectData.AuthMode == AuthMode.ClientCertificate)

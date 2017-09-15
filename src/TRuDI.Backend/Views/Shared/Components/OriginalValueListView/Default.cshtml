@@ -5,7 +5,7 @@
 <table class="table-condensed">
     <tr>
         <th>Zeitpunkt</th>
-        <th>Wert</th>
+        <th class="text-right">Wert</th>
         <th>Einheit</th>
         <th>Status</th>
     </tr>
@@ -17,7 +17,7 @@
             
             <tr class="@entry.ToStatusBackground()">
                 <td>@entry.TimePeriod.CaptureTime</td>
-                <td>@entry.Value.GetDisplayValue(Model.Source.Uom, Model.Source.PowerOfTenMultiplier, Model.Source.Scaler)</td>
+                <td class="text-right">@entry.Value.GetDisplayValue(Model.Source.Uom, Model.Source.PowerOfTenMultiplier, Model.Source.Scaler)</td>
                 <td>@Model.Source.DisplayUnit</td>
                 <td><i class="@entry.ToStatusIcon()"></i> @entry.ToStatusString()</td>
             </tr>

@@ -3,7 +3,7 @@
 @inject ApplicationState StateService
 
 <div class="panel panel-primary">
-    <div class="panel-heading">Smart Meter Gateway @StateService.ConnectData.DeviceId</div>
+    <div class="panel-heading">Smart Meter Gateway @StateService.ConnectData.DeviceId.ToFormattedDeviceId()</div>
     <div class="panel-body">
 
         <table class="table">
