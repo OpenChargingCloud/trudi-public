@@ -289,7 +289,7 @@ function connectToBackend(port) {
     }
 
     console.log("Connecting to backend on port %s", port);
-    mainWindow.loadURL("https://localhost:" + port);
+    mainWindow.loadURL("https://127.0.0.1:" + port);
 }
 
 // This method will be called when Electron has finished

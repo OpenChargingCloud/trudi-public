@@ -17,6 +17,21 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Data\cc_2_2_first_or_last_read_off_by_more_than_60_seconds.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\cc_2_3_reading_gaps_at_the_begin_of_ctx_period.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\cc_2_4_reading_gaps_at_the_end_of_ctx_period.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\cc_2_5_reading_gaps_inside_loaded_period.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\cc_3_2_query_over_multiple_bill_periods.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>	
     <None Update="Data\IF_Adapter_TRuDI_DatenTAF2.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

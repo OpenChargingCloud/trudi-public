@@ -18,12 +18,15 @@ Ansprechpartner:
 ### Electron
 
 - Node.js 6.11: https://nodejs.org/
+- npm-Pakete:
+  npm install electron-builder -g
+
 
 ## Installations-Pakete
 
 System           | Download
 ---              | ---
-Windows (64-Bit) | http://www.ivu-software.de/apps/TRuDI/TRuDI-Setup-1.0.0.exe
+Windows (64-Bit) | http://www.ivu-software.de/apps/TRuDI/TRuDI-Setup-1.0.2.exe
 Windows (32-Bit) | 
 Linux ([AppImage](https://de.wikipedia.org/wiki/AppImage), 64-Bit) | http://www.ivu-software.de/apps/TRuDI/TRuDI-1.0.0-x86_64.AppImage
 Linux (deb, 64-Bit) | 

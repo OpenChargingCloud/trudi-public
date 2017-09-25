@@ -91,7 +91,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    Connection.prototype.start = function () {
 	        var _this = this;
-	        this.socket = new WebSocket(this.url);
+            this.socket = new WebSocket(this.url);
+            //this.rejectUnauthorized = false;
 	        this.socket.onopen = function (event) {
 	            _this.connectionMethods['onOpen'].apply(_this, event);
             };

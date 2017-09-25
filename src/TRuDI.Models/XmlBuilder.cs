@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Text;
     using System.Xml.Linq;
 
     using TRuDI.Models.BasicData;
@@ -26,6 +27,20 @@
 
         public List<LogEntry> LogList { get; set; }
         public List<MeterReading> MeterReadings { get; set; }
+
+        public string MissingProperties()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            if (String.IsNullOrEmpty(this.CustomerId)) sb.Append("CUstomerId ");
+            if (String.IsNullOrEmpty(this.InvoicingPartyId)) sb.Append("InvoicingPartyId ");
+            if (String.IsNullOrEmpty(this.SmgwId)) sb.Append("SmgwId ");
+            if (String.IsNullOrEmpty(this.Certificate)) sb.Append("Certificate ");
+            if (String.IsNullOrEmpty(this.UsagePointId)) sb.Append("UsagePointId ");
+            if (String.IsNullOrEmpty(this.TariffName)) sb.Append("TariffName ");
+
+            return sb.ToString();
+        }
 
         private bool HasAllProperties()
         {
