@@ -30,7 +30,7 @@
 
     <tr>
         <th>Öffentlicher Schlüssel</th>
-        <td style="font-family: monospace; word-break: break-all;">@Model.GetPublicKeyString()</td>
+        <td style="font-family: monospace;">@Model.GetPublicKeyString().AddSpace(4)</td>
     </tr>
 
     <tr>
@@ -44,7 +44,7 @@
     </tr>
     <tr>
         <th>Prüfsumme</th>
-        <td style="font-family: monospace; word-break: break-all;">@Model.GetCertHashString()</td>
+        <td style="font-family: monospace;">@Model.GetCertHashString().AddSpace(4)</td>
     </tr>
 
     <tr>

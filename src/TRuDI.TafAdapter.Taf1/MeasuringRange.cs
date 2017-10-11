@@ -7,6 +7,8 @@ using TRuDI.TafAdapter.Interface;
 
 namespace TRuDI.TafAdapter.Taf1
 {
+    using TRuDI.TafAdapter.Interface.Taf2;
+
     public class MeasuringRange : IMeasuringRange
     {
         public MeasuringRange()

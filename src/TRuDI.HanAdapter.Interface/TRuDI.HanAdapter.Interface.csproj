@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Description>HAN adapter interface of the TRuDI application.</Description>
     <Authors>Thomas Müller</Authors>
     <Company>IVU Softwareentwicklung GmbH</Company>

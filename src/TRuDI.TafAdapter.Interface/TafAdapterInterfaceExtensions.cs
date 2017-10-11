@@ -6,6 +6,7 @@
     using TRuDI.Models;
     using TRuDI.Models.BasicData;
     using TRuDI.Models.CheckData;
+    using TRuDI.TafAdapter.Interface.Taf2;
 
     /// <summary>
     /// Extension methods for the TafAdapter interface

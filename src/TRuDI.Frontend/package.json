@@ -1,17 +1,22 @@
 {
   "name": "TRuDI",
-  "version": "1.0.2",
+  "version": "1.0.6",
   "description": "TRuDI - Transparenz- und Display-Software",
-  "author": "IVU Softwareentwicklung GmbH",
+  "author": {
+    "name": "IVU Softwareentwicklung GmbH",
+    "email": "info@ivu-software.de"
+  },
+  "homepage": "http://www.ivu-software.de",
   "repository": "",
   "main": "main.js",
   "dependencies": {
     "bootstrap": "^3.3.7",
-    "jquery": "^3.2.1"
+    "jquery": "^3.2.1",
+    "yargs": "^9.0.1"
   },
   "devDependencies": {
-    "electron": "^1.7.5",
-    "electron-builder": "^19.24.1"
+    "electron": "1.7.8",
+    "electron-builder": "^19.33.0"
   },
   "scripts": {
     "start": "electron .",
@@ -19,6 +24,7 @@
   },
   "build": {
     "appId": "trudi",
+    "icon": "icon",
     "directories": {
       "buildResources": "../../assets",
       "output": "../../dist"
@@ -31,13 +37,15 @@
       ]
     },
     "linux": {
+      "synopsis": "Transparenz- und Display Software",
+      "category": "Utility",
       "target": [
         "AppImage",
         "deb"
       ]
     },
     "mac": {
-      "category": "trudi"
+      "category": "Utility"
     },
     "win": {
       "target": [

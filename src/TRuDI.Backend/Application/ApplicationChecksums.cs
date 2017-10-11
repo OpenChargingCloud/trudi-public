@@ -2,7 +2,8 @@
 {
     using System.Collections.Generic;
     using System.IO;
-
+    using System.Runtime.InteropServices;
+    
     using TRuDI.Backend.Utils;
 
     public class ApplicationChecksums
@@ -11,12 +12,24 @@
 
         public ApplicationChecksums()
         {
-            this.Items = new List<DigestItem>
-                             {
-                                 this.GetDigest("../../../../../TRuDI.exe"),
-                                 this.GetDigest("../../../../app.asar"),
-                                 this.GetDigest("../../../../electron.asar"),
-                             };
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                this.Items = new List<DigestItem>
+                                 {
+                                     this.GetDigest("../../../../../TRuDI.exe"),
+                                     this.GetDigest("../../../../app.asar"),
+                                     this.GetDigest("../../../../electron.asar"),
+                                 };
+            }
+            else
+            {
+                this.Items = new List<DigestItem>
+                                 {
+                                     this.GetDigest("../../../../../trudi"),
+                                     this.GetDigest("../../../../app.asar"),
+                                     this.GetDigest("../../../../electron.asar"),
+                                 };
+            }
         }
 
         private DigestItem GetDigest(string filename)

@@ -9,8 +9,13 @@
     using Microsoft.AspNetCore.Mvc.Razor;
     using Microsoft.Extensions.FileProviders;
 
+    using Serilog;
+    using Serilog.Events;
+
     using TRuDI.Backend.Application;
     using TRuDI.Backend.MessageHandlers;
+    using TRuDI.Backend.Utils;
+    using TRuDI.TafAdapter.Interface;
 
     using WebSocketManager;
 
@@ -34,13 +39,24 @@
             services.AddWebSocketManager();
             services.AddSingleton<ApplicationState>();
 
+            services.AddTransient<ITafData, ITafData>((ctx) =>
+                {
+                    var state = ctx.GetService<ApplicationState>();
+                    return state.CurrentSupplierFile?.TafData?.Data;
+                });
+
             services.Configure<RazorViewEngineOptions>(options =>
             {
-                foreach(var hanAdapterInfo in HanAdapterRepository.AvailableAdapters)
+                foreach (var hanAdapterInfo in HanAdapterRepository.AvailableAdapters)
                 {
                     options.FileProviders.Add(new EmbeddedFileProvider(hanAdapterInfo.Assembly, hanAdapterInfo.BaseNamespace));
                 }
-            });            
+
+                foreach (var tafAdapterInfo in TafAdapterRepository.AvailableAdapters)
+                {
+                    options.FileProviders.Add(new EmbeddedFileProvider(tafAdapterInfo.Assembly, tafAdapterInfo.BaseNamespace));
+                }
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -55,10 +71,15 @@
             {
                 app.UseExceptionHandler("/Home/Error");
             }
-            
+
+            if (Log.IsEnabled(LogEventLevel.Debug))
+            {
+                app.UseRequestLogging();
+            }
+
             app.UseStaticFiles();
             app.UseWebSockets();
-            
+
             app.MapWebSocketManager("/notifications", serviceProvider.GetService<NotificationsMessageHandler>());
 
             app.UseMvc(routes =>

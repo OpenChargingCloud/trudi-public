@@ -16,6 +16,21 @@ namespace TRuDI.HanAdapter.Interface
         Taf2 = 2,
 
         /// <summary>
+        /// Lastvariable Tarife
+        /// </summary>
+        Taf3 = 3,
+
+        /// <summary>
+        /// Verbrauchsvariable Tarife
+        /// </summary>
+        Taf4 = 4,
+
+        /// <summary>
+        /// Ereignisvariable Tarife
+        /// </summary>
+        Taf5 = 5,
+
+        /// <summary>
         /// Abruf von Messwerten im Bedarfsfall
         /// </summary>
         Taf6 = 6,
@@ -24,6 +39,11 @@ namespace TRuDI.HanAdapter.Interface
         /// Zählerstandsgangsmessung
         /// </summary>
         Taf7 = 7,
+
+        /// <summary>
+        /// Erfassung von Extremwerten.
+        /// </summary>
+        Taf8 = 8,
 
         /// <summary>
         /// Abruf der Ist-Einspeisung einer Erzeugungsanlage.

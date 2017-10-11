@@ -15,7 +15,7 @@
         {
             var exceptions = new List<Exception>();
 
-            if(ctx != null)
+            if (ctx != null)
             {
                 ValidateMeterReadingCount(usagePoint, ctx, exceptions);
                 ValidateMaximumTimeSpan(ctx, exceptions);
@@ -36,7 +36,7 @@
             CompareCertIds(usagePoint, exceptions);
             ValidateCertificateRawData(usagePoint, exceptions);
             ValidateIntervalBlockConsistence(usagePoint, exceptions);
-           
+
             if (exceptions.Any())
             {
                 throw new AggregateException("Context error:>", exceptions);
@@ -46,9 +46,9 @@
         // Validation of additional requirements with additional supplier xml (only Taf-7)
         public static void ValidateContext(UsagePointAdapterTRuDI usagePoint, UsagePointLieferant supplierModel, AdapterContext ctx)
         {
-            
+
             ValidateContext(usagePoint, ctx);
-            
+
             var exceptions = new List<Exception>();
 
             ValidateTaf7ModelSupplierCompatibility(usagePoint, supplierModel, exceptions);
@@ -59,7 +59,7 @@
             ValidateTaf7SupplierDayProfiles(supplierModel, exceptions);
             ValidateTarifStageOccurence(supplierModel, exceptions);
             ValidateSupplierModelDayProfileOccurence(supplierModel, exceptions);
-            
+
             if (exceptions.Any())
             {
                 throw new AggregateException("Taf-7 Context error:>", exceptions);
@@ -93,7 +93,7 @@
 
                     if (!match)
                     {
-                        exceptions.Add(new InvalidOperationException($"No match in Certificates for the SMGW certId {sId}."));
+                        exceptions.Add(new InvalidOperationException($"Das Smart Meter Gateway-Zertifikat mit der ID {sId} konnte nicht gefunden werden."));
                     }
                 }
             }
@@ -114,8 +114,7 @@
                 }
                 catch (Exception e)
                 {
-                    exceptions.Add(new InvalidOperationException("Not able to create a Certificate from the raw data.", e));
-                    continue;
+                    exceptions.Add(new InvalidOperationException($"Zertifikat konnte nicht gelesen werden: ID={certificate.CertId}, Typ={certificate.CertType}", e));
                 }
             }
         }
@@ -142,12 +141,12 @@
         // Check of the meterReadingIds are unique
         private static void ValidateMeterReadingIds(UsagePointAdapterTRuDI usagePoint, List<Exception> exceptions)
         {
-            for(int i = 0; i < usagePoint.MeterReadings.Count; i++)
+            for (int i = 0; i < usagePoint.MeterReadings.Count; i++)
             {
                 var reading = usagePoint.MeterReadings[i];
-                for (int j = i+1; j < usagePoint.MeterReadings.Count; j++)
+                for (int j = i + 1; j < usagePoint.MeterReadings.Count; j++)
                 {
-                    if(reading.MeterReadingId == usagePoint.MeterReadings[j].MeterReadingId)
+                    if (reading.MeterReadingId == usagePoint.MeterReadings[j].MeterReadingId)
                     {
                         exceptions.Add(new InvalidOperationException("The MeterReadingIds are not unique."));
                     }
@@ -158,21 +157,21 @@
         // Check if there is a gap between multiple IntervalBlocks or if the overlap
         private static void ValidateIntervalBlockConsistence(UsagePointAdapterTRuDI usagePoint, List<Exception> exceptions)
         {
-            foreach(MeterReading reading in usagePoint.MeterReadings)
+            foreach (MeterReading reading in usagePoint.MeterReadings)
             {
                 var intervalBlocks = reading.IntervalBlocks.OrderBy(ib => ib.Interval.Start).ToList();
 
-                for(int i = 0; i < intervalBlocks.Count; i++)
+                for (int i = 0; i < intervalBlocks.Count; i++)
                 {
-                    if(i < intervalBlocks.Count - 1)
+                    if (i < intervalBlocks.Count - 1)
                     {
-                        if(intervalBlocks[i].Interval.GetEnd() < intervalBlocks[i + 1].Interval.Start)
+                        if (intervalBlocks[i].Interval.GetEnd() < intervalBlocks[i + 1].Interval.Start)
                         {
-                            exceptions.Add(new InvalidOperationException("There is a Gap between two IntervalBlocks."));
+                            exceptions.Add(new InvalidOperationException("Lücke zwischen zwei Intervallblöcken."));
                         }
                         else if (intervalBlocks[i].Interval.GetEnd() > intervalBlocks[i + 1].Interval.Start)
                         {
-                            exceptions.Add(new InvalidOperationException("There is an overlap between two IntervalBlocks."));
+                            exceptions.Add(new InvalidOperationException("Es wurden zwei überlappende Intervallblöcke gefunden."));
                         }
                     }
                 }
@@ -214,10 +213,10 @@
                 if (!reading.IsOriginalValueList())
                 {
                     var intervalTest = reading.GetMeterReadingInterval();
-                    
+
                     if (interval.Duration != intervalTest.Duration)
                     {
-                        exceptions.Add(new InvalidOperationException("Taf-2: The Durations do not match."));
+                        exceptions.Add(new InvalidOperationException("TAF-2: Die Dauer der einzelnen Ablesungen stimmen nicht überein."));
                     }
                 }
             }
@@ -241,11 +240,11 @@
 
                 if (currentPeriod < smallestPeriod || currentPeriod > greatestPeriod)
                 {
-                    exceptions.Add(new InvalidOperationException("Taf-7: The period is invalid."));
+                    exceptions.Add(new InvalidOperationException($"TAF-7: Ungültige Messperiode: {currentPeriod.TotalMinutes:F2} Minuten"));
                 }
                 else if ((long)currentPeriod.TotalSeconds % (long)smallestPeriod.TotalSeconds != 0)
                 {
-                    exceptions.Add(new InvalidOperationException("Taf-7: The period is not a multiple of 15 minutes."));
+                    exceptions.Add(new InvalidOperationException($"TAF-7: Die Messperiode ist kein vielfaches von 15 Minuten: {currentPeriod.TotalMinutes:F2} Minuten"));
                 }
             }
         }
@@ -253,11 +252,11 @@
         // Taf-7: Validate if all meter readings are original value lists
         private static void ValidateTaf7MeterReadingsAreOriginalValueLists(UsagePointAdapterTRuDI model, List<Exception> exceptions)
         {
-            foreach(MeterReading reading in model.MeterReadings)
+            foreach (MeterReading reading in model.MeterReadings)
             {
                 if (!reading.IsOriginalValueList())
                 {
-                    exceptions.Add(new InvalidOperationException("Taf-7: The MeterReading is not an Original Value List."));
+                    exceptions.Add(new InvalidOperationException("TAF-7: The MeterReading is not an Original Value List."));
                 }
             }
         }
@@ -266,16 +265,23 @@
         private static void ValidateTaf7PeriodsInInterval(UsagePointAdapterTRuDI model, List<Exception> exceptions)
         {
             var originalValueLists = model.MeterReadings.Where(mr => mr.IsOriginalValueList());
-            
-            foreach(MeterReading reading in originalValueLists)
+
+            foreach (MeterReading reading in originalValueLists)
             {
-                foreach(IntervalBlock ib in reading.IntervalBlocks)
+                foreach (IntervalBlock ib in reading.IntervalBlocks)
                 {
-                    foreach(IntervalReading ir in ib.IntervalReadings)
+                    //when capture times don't match intended read times we need to override the IntervalBlock duration
+                    var intervalBlockEnd = ib.Interval.GetEnd();
+                    if (ib.Interval.CaptureTime != ib.Interval.Start)
                     {
-                        if(ir.TimePeriod.Start < ib.Interval.Start || ir.TimePeriod.GetEnd() > ib.Interval.GetEnd())
+                        intervalBlockEnd = intervalBlockEnd.AddSeconds((ib.Interval.CaptureTime - ib.Interval.Start).TotalSeconds);
+                    }
+
+                    foreach (IntervalReading ir in ib.IntervalReadings)
+                    {
+                        if (ir.TimePeriod.Start < ib.Interval.Start || ir.TimePeriod.GetEnd() > intervalBlockEnd)
                         {
-                            exceptions.Add(new InvalidOperationException("Taf-7: The TimePeriod of an IntervalReading is outside of the enclosing IntervalBlock"));
+                            exceptions.Add(new InvalidOperationException("TAF-7: The TimePeriod of an IntervalReading is outside of the enclosing IntervalBlock"));
                         }
                     }
                 }
@@ -292,42 +298,44 @@
             {
                 var modelInterval = reading.GetMeterReadingInterval();
 
+                var obis = new ObisId(reading.ReadingType.ObisCode);
+
                 if (modelInterval.Start > supplierInterval.Start || modelInterval.GetEnd() < supplierInterval.GetEnd())
                 {
-                    exceptions.Add(new InvalidOperationException("Taf-7: The model does not match with the billing period of the supplier data."));
+                    exceptions.Add(new InvalidOperationException($"TAF-7: {obis}: Zeitbereich der abgelesenen Daten ({modelInterval.Start} bis {modelInterval.GetEnd()}) passt nicht zum Zeitbereich der Tarifdatei des Lieferanten ({supplierInterval.Start} bis {supplierInterval.GetEnd()})."));
                 }
             }
         }
 
         // Validate of all the neccessary ids of the model xml match with the ids in the supplier xml
-        private static void ValidateTaf7ModelSupplierCompatibility(UsagePointAdapterTRuDI model,UsagePointLieferant supplier, List<Exception> exceptions)
+        private static void ValidateTaf7ModelSupplierCompatibility(UsagePointAdapterTRuDI model, UsagePointLieferant supplier, List<Exception> exceptions)
         {
-            if(model.UsagePointId != supplier.UsagePointId)
+            if (model.UsagePointId != supplier.UsagePointId)
             {
-                exceptions.Add(new InvalidOperationException("Taf-7: The UsagePointId of the model and the supplier do not match."));
+                exceptions.Add(new InvalidOperationException($"TAF-7: Die ID des Zählpunkts \"{model.UsagePointId}\" stimmt nicht mit der ID des Zählpunkts \"{supplier.UsagePointId}\" aus der Tarifdatei des Lieferanten überein."));
             }
 
-            if(model.InvoicingParty.InvoicingPartyId != supplier.InvoicingParty.InvoicingPartyId)
+            if (model.InvoicingParty.InvoicingPartyId != supplier.InvoicingParty.InvoicingPartyId)
             {
-                exceptions.Add(new InvalidOperationException("Taf-7: The InvoicingPartyId of the model and the supplier do not match."));
+                exceptions.Add(new InvalidOperationException($"TAF-7: Die Rechnungssteller-ID \"{model.InvoicingParty.InvoicingPartyId}\" stimmt nicht mit der Rechnungssteller-ID \"{supplier.InvoicingParty.InvoicingPartyId}\" aus der Tarifdatei des Lieferanten überein."));
             }
 
-            if(model.ServiceCategory.Kind != supplier.ServiceCategory.Kind)
+            if (model.ServiceCategory.Kind != supplier.ServiceCategory.Kind)
             {
-                exceptions.Add(new InvalidOperationException("Taf-7: The kind of th service category  of the model and the supplier do not match."));
+                exceptions.Add(new InvalidOperationException($"TAF-7: Die Service-Kategory \"{model.ServiceCategory.Kind}\" stimmt nicht mit der Service-Kategory \"{supplier.ServiceCategory.Kind}\" aus der Tarifdatei des Lieferanten überein."));
             }
 
-            if(model.Smgw.SmgwId != supplier.Smgw.SmgwId)
+            if (model.Smgw.SmgwId != supplier.Smgw.SmgwId)
             {
-                exceptions.Add(new InvalidOperationException("Taf-7: The Smgw id  of the model and the supplier do not match."));
+                exceptions.Add(new InvalidOperationException($"TAF-7: Die ID des Smart Meter Gateway \"{model.Smgw.SmgwId}\" stimmt nicht mit der ID \"{supplier.Smgw.SmgwId}\" aus der Tarifdatei des Lieferanten überein."));
             }
 
-            if(model.TariffName != supplier.TariffName)
+            if (model.TariffName != supplier.TariffName)
             {
-                exceptions.Add(new InvalidOperationException("Taf-7: The tariff name  of the model and the supplier do not match."));
+                exceptions.Add(new InvalidOperationException($"TAF-7: Der Tarifname \"{model.TariffName}\" stimmt nicht mit dem Tariffnamen \"{supplier.TariffName}\" aus der Tarifdatei des Lieferanten überein."));
             }
         }
-        
+
         // Taf-7: Validate if the supplier periods have a duration of 15 minutes
         private static void ValidateTaf7SupplierDayProfiles(UsagePointLieferant supplier, List<Exception> exceptions)
         {
@@ -344,7 +352,6 @@
                     }
 
                     var current = new TimeSpan((int)dtProfiles[i].StartTime.Hour, (int)dtProfiles[i].StartTime.Minute, 0);
-
                     var next = new TimeSpan((int)dtProfiles[i + 1].StartTime.Hour, (int)dtProfiles[i + 1].StartTime.Minute, 0);
 
                     if ((int)(next - current).TotalSeconds == 900)
@@ -352,12 +359,10 @@
                         continue;
                     }
 
-                    {
-                        exceptions.Add(new InvalidOperationException("Taf-7: The supplier calender periods are not 15 minutes."));
-                    }
+                    exceptions.Add(new InvalidOperationException("TAF-7: Die Tarifschaltzeiten in der Tarifdatei des Lieferanten sind nicht für jede 15-Minuten-Messperiode angegeben."));
                 }
             }
-        }       
+        }
 
         // Check whether all referenced tarif stages which are used in the DayTimeProfiles are valid
         private static void ValidateTarifStageOccurence(UsagePointLieferant supplier, List<Exception> exceptions)
@@ -384,7 +389,7 @@
                     }
                     if (!match)
                     {
-                        exceptions.Add(new InvalidOperationException("Taf-7: The used tariffNumber in an DayTimeProfile is invalid."));
+                        exceptions.Add(new InvalidOperationException($"TAF-7: Ungültige Tarif-Nummer innerhalb eines Tagesprofils: {dtProfile.TariffNumber}"));
                     }
                 }
             }
@@ -403,7 +408,7 @@
             foreach (SpecialDayProfile spProfile in supplier.AnalysisProfile.TariffChangeTrigger.TimeTrigger.SpecialDayProfiles)
             {
                 bool match = false;
-                foreach (int id in dayProfileIds)
+                foreach (var id in dayProfileIds)
                 {
                     if (id == spProfile.DayId)
                     {
@@ -413,7 +418,7 @@
                 }
                 if (!match)
                 {
-                    exceptions.Add(new InvalidOperationException("Taf-7: The used DayProfile in SpecialDayProfile is invalid."));
+                    exceptions.Add(new InvalidOperationException("TAF-7: The used DayProfile in SpecialDayProfile is invalid."));
                 }
             }
         }
@@ -421,21 +426,21 @@
         // Validates the maximum amount of tariff stages
         private static void ValidateSupplierModelTariffStageCount(UsagePointLieferant supplier, List<Exception> exceptions)
         {
-            if(supplier.AnalysisProfile.TariffStages.Count > 20)
+            if (supplier.AnalysisProfile.TariffStages.Count > 20)
             {
                 var stages = supplier.AnalysisProfile.TariffStages;
                 int errorRegisterCount = 0;
                 foreach (TariffStage stage in stages)
                 {
                     var obisId = new ObisId(stage.ObisCode);
-                    if(obisId.E == 63)
+                    if (obisId.E == 63)
                     {
                         errorRegisterCount++;
                     }
                 }
-                if(stages.Count - errorRegisterCount > 20)
+                if (stages.Count - errorRegisterCount > 20)
                 {
-                    exceptions.Add(new InvalidOperationException("The maximum of 20 tarif stages was exceeded."));
+                    exceptions.Add(new InvalidOperationException("Es sind maximal 20 Tarifstuffen zulässig."));
                 }
             }
         }
@@ -443,44 +448,33 @@
         // Check if the delivered supplier xml has an completely enrolled calendar
         private static void ValidateSupplierModelCompletelyEnrolledCalendar(UsagePointAdapterTRuDI model, UsagePointLieferant supplier, List<Exception> exceptions)
         {
-            
-            var omlCount = 0;
-            foreach(MeterReading reading in model.MeterReadings)
-            {
-                if (reading.IsOriginalValueList())
-                {
-                    omlCount++;
-                }
-            }
-
             var period = supplier.AnalysisProfile.BillingPeriod;
             var profiles = supplier.AnalysisProfile.TariffChangeTrigger.TimeTrigger.SpecialDayProfiles;
-           
+
             var sdpCheckList = new Dictionary<DateTime, int>();
             var timestamp = period.Start;
             var hasCounted = false;
             while (timestamp <= period.GetEnd().AddDays(-1))
             {
                 sdpCheckList.Add(timestamp, 0);
-              
+
                 timestamp = timestamp.AddDays(1);
             }
 
-            foreach (SpecialDayProfile profile in profiles)
+            foreach (var profile in profiles)
             {
-                if(sdpCheckList.ContainsKey(profile.SpecialDayDate.GetDate()))
+                if (sdpCheckList.ContainsKey(profile.SpecialDayDate.GetDate()))
                 {
                     sdpCheckList[profile.SpecialDayDate.GetDate()] += 1;
                     hasCounted = true;
                 }
-               
             }
 
-            foreach (KeyValuePair<DateTime, int> item in sdpCheckList)
+            foreach (var item in sdpCheckList)
             {
-                if(item.Value != omlCount && hasCounted)
+                if (item.Value == 0 && hasCounted)
                 {
-                    exceptions.Add(new InvalidOperationException("The count of identical SpecialDayProfiles is invalid."));
+                    exceptions.Add(new InvalidOperationException($"Tagesprofil für Tag {item.Key:dd.MM.yyy} nicht vorhanden."));
                 }
             }
         }
@@ -492,17 +486,17 @@
             var end = supplier.AnalysisProfile.BillingPeriod.GetEnd();
             var counter = 0;
 
-            foreach(SpecialDayProfile profile in supplier.AnalysisProfile.TariffChangeTrigger.TimeTrigger.SpecialDayProfiles)
+            foreach (SpecialDayProfile profile in supplier.AnalysisProfile.TariffChangeTrigger.TimeTrigger.SpecialDayProfiles)
             {
-                if(profile.SpecialDayDate.GetDate() >= begin && profile.SpecialDayDate.GetDate() <= end)
+                if (profile.SpecialDayDate.GetDate() >= begin && profile.SpecialDayDate.GetDate() <= end)
                 {
                     counter++;
                 }
             }
 
-            if(counter == 0)
+            if (counter == 0)
             {
-                exceptions.Add(new InvalidOperationException("The supplier xml does not contain any SpecialDayProfile for the billing period."));
+                exceptions.Add(new InvalidOperationException("Die Tarifdatei des Lieferanten enthält keine Tagesprofile für die Abrechnungsperiode."));
             }
         }
     }

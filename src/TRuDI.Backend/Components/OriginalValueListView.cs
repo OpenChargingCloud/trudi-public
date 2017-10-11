@@ -23,7 +23,7 @@
 
             var items = ovl.GetReadings(startTime, endTime);
 
-            return this.View(new OriginalValueListRange(ovl, items));
+            return this.View(new OriginalValueListRange(startTime, endTime, ovl, items));
         }
     }
 }

@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection.Metadata.Ecma335;
 
     using TRuDI.Models.BasicData;
 
@@ -14,7 +15,7 @@
         /// <summary>
         /// The meter reading which belongs to the orignial value list.
         /// </summary>
-        private readonly MeterReading meterReading;
+        public MeterReading MeterReading { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OriginalValueList"/> class.
@@ -22,13 +23,13 @@
         /// <param name="meterReading">The meter reading.</param>
         public OriginalValueList(MeterReading meterReading)
         {
-            this.meterReading = meterReading;
+            this.MeterReading = meterReading;
 
-            this.Obis = new ObisId(this.meterReading.ReadingType.ObisCode);
-            this.DisplayUnit = this.meterReading.ReadingType.Uom.GetDisplayUnit(this.meterReading.ReadingType.PowerOfTenMultiplier ?? PowerOfTenMultiplier.None);
+            this.Obis = new ObisId(this.MeterReading.ReadingType.ObisCode);
+            this.DisplayUnit = this.MeterReading.ReadingType.Uom.GetDisplayUnit(this.MeterReading.ReadingType.PowerOfTenMultiplier ?? PowerOfTenMultiplier.None);
 
             this.MeasurementPeriod = meterReading.GetMeasurementPeriod();
-            foreach (var block in this.meterReading.IntervalBlocks)
+            foreach (var block in this.MeterReading.IntervalBlocks)
             {
                 this.GapCount += block.GetGapCount(this.MeasurementPeriod);
                 this.ValueCount += block.IntervalReadings.Count;
@@ -41,10 +42,10 @@
                 this.FatalErrorCount += statusCount.FatalError;
             }
 
-            this.Start = this.meterReading.IntervalBlocks.First().IntervalReadings.First().TimePeriod.Start;
-            this.End = this.meterReading.IntervalBlocks.Last().IntervalReadings.Last().TimePeriod.Start;
+            this.Start = this.MeterReading.IntervalBlocks.First().IntervalReadings.First().TimePeriod.Start;
+            this.End = this.MeterReading.IntervalBlocks.Last().IntervalReadings.Last().TimePeriod.Start;
 
-            this.Meter = this.meterReading.Meters.FirstOrDefault()?.MeterId;
+            this.Meter = this.MeterReading.Meters.FirstOrDefault()?.MeterId;
 
             this.HistoricValues = this.CalculateHistoricConsumption();
         }
@@ -68,11 +69,11 @@
 
         public string DisplayUnit { get; }
 
-        public Uom Uom => this.meterReading.ReadingType.Uom ?? Uom.Not_Applicable;
+        public Uom Uom => this.MeterReading.ReadingType.Uom ?? Uom.Not_Applicable;
 
-        public PowerOfTenMultiplier PowerOfTenMultiplier => this.meterReading.ReadingType.PowerOfTenMultiplier ?? PowerOfTenMultiplier.None;
+        public PowerOfTenMultiplier PowerOfTenMultiplier => this.MeterReading.ReadingType.PowerOfTenMultiplier ?? PowerOfTenMultiplier.None;
 
-        public short Scaler => this.meterReading.ReadingType.Scaler;
+        public short Scaler => this.MeterReading.ReadingType.Scaler;
 
         public string Meter { get; }
 
@@ -83,7 +84,7 @@
         {
             var currentTimestamp = this.Start;
 
-            foreach (var block in this.meterReading.IntervalBlocks)
+            foreach (var block in this.MeterReading.IntervalBlocks)
             {
                 foreach (var reading in block.IntervalReadings)
                 {
@@ -112,9 +113,60 @@
             }
         }
 
+        public List<DailyOvlErrorStatus> GetErrorsList()
+        {
+            var statusList = new List<DailyOvlErrorStatus>();
+            var currentDay = new DailyOvlErrorStatus { Timestamp = DateTime.MinValue.Date };
+
+            foreach (var reading in this.GetReadings(this.Start, this.End))
+            {
+                if (currentDay.Timestamp != reading.TimePeriod.Start.Date)
+                {
+                    currentDay = new DailyOvlErrorStatus { Timestamp = reading.TimePeriod.Start.Date };
+                    statusList.Add(currentDay);
+                }
+
+                currentDay.ValueCount++;
+
+                if (reading.Value == null)
+                {
+                    currentDay.GapCount++;
+                    continue;
+                }
+                
+                switch (reading.StatusPTB ?? reading.StatusFNN.MapToStatusPtb())
+                {
+                    case StatusPTB.No_Error:
+                        currentDay.OkCount++;
+                        break;
+
+                    case StatusPTB.Warning:
+                        currentDay.WarningCount++;
+                        break;
+
+                    case StatusPTB.Temp_Error_signed_invalid:
+                        currentDay.TempError1Count++;
+                        break;
+
+                    case StatusPTB.Temp_Error_is_invalid:
+                        currentDay.TempError2Count++;
+                        break;
+
+                    case StatusPTB.Fatal_Error:
+                        currentDay.FatalErrorCount++;
+                        break;
+
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+
+            return statusList;
+        }
+
         public IntervalReading GetReading(DateTime timestamp)
         {
-            foreach (var block in this.meterReading.IntervalBlocks)
+            foreach (var block in this.MeterReading.IntervalBlocks)
             {
                 var reading = block.IntervalReadings.FirstOrDefault(ir => ir.TimePeriod.Start == timestamp);
                 if (reading != null)

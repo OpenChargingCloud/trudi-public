@@ -44,7 +44,6 @@ if (os.platform() === 'linux') {
     backendConfig.workPath = path.join(__dirname, backendPathLinux);
     backendConfig.executablePath = path.join(__dirname, backendPathLinux, 'TRuDI.Backend');
     backendConfig.mainAssembly = path.join(__dirname, backendPathLinux, 'TRuDI.Backend.dll');
-    backendConfig.checksums = JSON.parse(fs.readFileSync("checksums-linux.json", 'utf-8'));
     backendConfig.checksums = JSON.parse(fs.readFileSync(path.join(__dirname, "checksums-linux.json"), 'utf-8'));
     backendConfig.certCommonName = backendConfig.checksums.find(function (f) { return f.path === "/TRuDI.Backend.dll" }).hash;
 }
@@ -86,16 +85,22 @@ for (let i = 0; i < argv.length; i++) {
 
 // Generates a RIPEMD-160 digest value for the specified file
 function generateRipeMd160(filename, callback) {
-    var hash = crypto.createHash('RIPEMD160');
-    var fileStream = fs.ReadStream(filename);
+        var hash = crypto.createHash('RIPEMD160');
+        var fileStream = fs.ReadStream(filename);
 
-    fileStream.on('data', function (data) {
-        hash.update(data);
-    });
-    fileStream.on('end', function () {
-        var digest = hash.digest('hex');
-        callback(null, digest);
-    });
+        fileStream.on('error', function(err) {
+            console.log("Error on file '" + filename + "', error message: " + err);
+            var digest = hash.digest('hex');
+            callback(null, digest);
+        });
+
+        fileStream.on('data', function (data) {
+            hash.update(data);
+        });
+        fileStream.on('end', function () {
+            var digest = hash.digest('hex');
+            callback(null, digest);
+        });
 }
 
 // Generates a list of all files with RIPEMD-160 digest values for the specified directory
@@ -115,6 +120,9 @@ function generateChecksumsForTree(dir, done) {
 
         list.forEach(function (file) {
             fs.stat(path.join(dir, file), function (err, stat) {
+                if (err) {
+                    return done(err);
+                }
 
                 if (stat && stat.isDirectory()) {
                     generateChecksumsForTree(path.join(dir, file), function (err, res) {
@@ -129,7 +137,7 @@ function generateChecksumsForTree(dir, done) {
                         var fname = path.join(dir, file);
                         generateRipeMd160(fname, function (e, hash) {
                             if (e) {
-                                done(e);
+                                return done(e);
                             }
 
                             results.push({ "path": fname.substring(backendConfig.workPath.length), "hash": hash });
@@ -146,13 +154,15 @@ function generateChecksumsForTree(dir, done) {
                     }
                 }
             });
-        });
+         });
     });
 };
 
 
 // Check if the backend has the expected digest values
 function checkIntegrity() {
+    console.log("Checking application integrity...");
+
     generateChecksumsForTree(backendConfig.workPath,
         function (err, results) {
             if (err) {
@@ -213,7 +223,6 @@ function checkIntegrity() {
                         results[i].hash,
                         backendConfig.checksums[i].hash);
 
-                    mainWindow.stop();
                     mainWindow.loadURL(url.format({
                         pathname: path.join(__dirname, 'integrity_check_failed.html'),
                         protocol: 'file:',

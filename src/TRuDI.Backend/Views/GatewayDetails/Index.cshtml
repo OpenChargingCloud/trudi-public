@@ -14,46 +14,50 @@
 
         @if (StateService.LastConnectResult?.FirmwareVersions != null)
             {
-            <table class="table">
-                @foreach (var versionItem in StateService.LastConnectResult.FirmwareVersions)
-                {
+                <table class="table">
                     <tr>
-                        <th>
-                            @versionItem.Component
-                        </th>
-                        <td>
-                            <label>Version</label>
-                            <div>
-                                @versionItem.Version
-                            </div>
-                            @if (!string.IsNullOrWhiteSpace(versionItem.Hash))
-                            {
-                                <label>Prüfsumme</label>
-                                <div style="font-family: monospace; word-break: break-all;">
-                                    @versionItem.Hash
-                                </div>
-                            }
-                        </td>
+                        <th>Komponente</th>
+                        <th>Version/Prüfsumme</th>
                     </tr>
-                }
+                    @foreach (var versionItem in StateService.LastConnectResult.FirmwareVersions)
+                    {
+                        <tr>
+                            <td>
+                                @versionItem.Component
+                            </td>
+                            <td>
+                                <div>
+                                    @versionItem.Version
+                                </div>
+                                @if (!string.IsNullOrWhiteSpace(versionItem.Hash))
+                                {
+                                    <div style="font-family: monospace; word-break: break-all;">
+                                        @versionItem.Hash
+                                    </div>
+                                }
+                            </td>
+                        </tr>
+                    }
 
-            </table>
+                </table>
         }
-
-    </div>
-</div>
-
-<div class="panel panel-primary">
-    <div class="panel-heading">Zertifikat der TLS-Verbindung</div>
-    <div class="panel-body">
-
-        @if (StateService.LastConnectResult?.Certificate != null)
+        else
         {
-            @await Component.InvokeAsync("CertDetailsView", new { cert = StateService.LastConnectResult?.Certificate })
+            <div>Es sind keine Informationen zum Smart Meter Gateway verfügbar.</div>
         }
 
     </div>
 </div>
+
+@if (StateService.LastConnectResult?.Certificate != null)
+{
+    <div class="panel panel-primary">
+        <div class="panel-heading">Zertifikat der TLS-Verbindung</div>
+        <div class="panel-body">
+            @await Component.InvokeAsync("CertDetailsView", new { cert = StateService.LastConnectResult?.Certificate })
+        </div>
+    </div>
+}
 
 <a href="/BreadCrumb/ClosePage">Zurück</a>
 

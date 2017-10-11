@@ -1,5 +1,6 @@
 ﻿@using TRuDI.Backend.Application
 @using TRuDI.Backend.Utils
+@using TRuDI.Models
 @inject ApplicationState StateService
 
 @{
@@ -12,8 +13,13 @@
 
         <table class="table">
             <tr>
-                <th>TAF Name</th>
+                <th>Tarifbezeichnung</th>
                 <td>@contract.TafName</td>
+            </tr>
+            
+            <tr>
+                <th>Energieart</th>
+                <td>@contract.GetMedium()</td>
             </tr>
 
             <tr>

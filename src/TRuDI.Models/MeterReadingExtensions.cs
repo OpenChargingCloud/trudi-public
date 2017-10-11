@@ -46,8 +46,6 @@
                         intervalSpan = span;
                     }
                 }
-
-                
             }
 
             if (intervalSpan == TimeSpan.MaxValue)

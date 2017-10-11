@@ -6,7 +6,7 @@ namespace TRuDI.Backend.Tests
 
     using TRuDI.Backend.Utils;
     using TRuDI.Models;
-    using TRuDI.TafAdapter.Interface;
+    using TRuDI.TafAdapter.Interface.Taf2;
 
     [TestClass]
     public class HtmlStringExtensionsTests

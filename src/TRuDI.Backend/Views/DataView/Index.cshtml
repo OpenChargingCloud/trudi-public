@@ -10,230 +10,55 @@
 }
 
 <div class="panel panel-primary">
-    <div class="panel-heading">Zählpunkt @StateService.CurrentDataResult.Model.UsagePointId (@StateService.CurrentDataResult.Model.ServiceCategory.Kind.ToServiceCategoryString())</div>
+    <div class="panel-heading">Zählpunkt @StateService.CurrentDataResult.Model.UsagePointId</div>
     <div class="panel-body">
 
         @if (StateService.CurrentSupplierFile?.Model == null)
         {
-            var data = StateService.CurrentDataResult.Model;
-
-            <table class="table">
-                <tr>
-                    <th>Kunden ID</th>
-                    <th>Rechnungssteller ID</th>
-                    <th>Tarifbezeichnung</th>
-                </tr>
-
-                <tr>
-                    <td>
-                        @data.Customer.CustomerId
-                    </td>
-
-                    <td>
-                        @data.InvoicingParty.InvoicingPartyId
-                    </td>
-
-                    <td>
-                        @data.TariffName
-                    </td>
-                </tr>
-
-
-
-                @if (StateService.CurrentDataResult.Begin != null && StateService.CurrentDataResult.End != null)
-                {
-                    if (StateService.CurrentDataResult.Begin == StateService.CurrentDataResult.End)
-                    {
-                        <tr>
-                            <th>Ablesezeitpunkt</th>
-                            <th></th>
-                            <th>Tarifanwendungsfall</th>
-                        </tr>
-
-                        <tr>
-
-                            <td>@StateService.CurrentDataResult.Begin.ToFormatedString()</td>
-                            <td></td>
-                            <td>@StateService.CurrentDataResult.TafId.TafToFriendlyName()</td>
-                        </tr>
-                    }
-                    else
-                    {
-                        <tr>
-                            <th>Startzeitpunkt</th>
-                            <th>Endzeitpunkt</th>
-                            <th>Tarifanwendungsfall</th>
-                        </tr>
-                        <tr>
-                            <td>@StateService.CurrentDataResult.Begin.ToFormatedString()</td>
-                            <td>@StateService.CurrentDataResult.End.ToFormatedString()</td>
-                            <td>@StateService.CurrentDataResult.TafId.TafToFriendlyName()</td>
-                        </tr>
-                    }
-                }
-                else
-                {
-                    <tr>
-                        <th>Startzeitpunkt</th>
-                        <th>Endzeitpunkt</th>
-                        <th>Tarifanwendungsfall</th>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td>@StateService.CurrentDataResult.TafId.TafToFriendlyName()</td>
-                    </tr>
-                }
-
-                <tr>
-                    <th>Smart Meter Gateway</th>
-                    <th></th>
-                    <th></th>
-                </tr>
-
-                <tr>
-                    <td>@StateService.CurrentDataResult.Model.Smgw.SmgwId.ToFormattedDeviceId()</td>
-                    <td></td>
-                    <td></td>
-                </tr>
-
-            </table>
-
-            if (meterReadings.MeterReadings != null && meterReadings.MeterReadings.Count > 0)
-            {
-                <table class="table">
-                    <tr>
-                        <th>Register</th>
-                        <th>Wert</th>
-                        <th>Einheit</th>
-                        <th>Status</th>
-                        <th>Beschreibung</th>
-                    </tr>
-
-                    @foreach (var reading in meterReadings.MeterReadings)
-                    {
-                        var obisId = new ObisId(reading.ReadingType.ObisCode);
-                        var status = reading.IntervalBlocks.FirstOrDefault()?.IntervalReadings.FirstOrDefault();
-
-                        <tr class="@status.ToStatusBackground()">
-                            <td>@obisId.ToString()</td>
-                            <td>
-                                @reading.IntervalBlocks.FirstOrDefault()?.IntervalReadings.FirstOrDefault()?.Value.GetDisplayValue(reading.ReadingType.Uom ?? Uom.Not_Applicable, reading.ReadingType.PowerOfTenMultiplier ?? PowerOfTenMultiplier.None, reading.ReadingType.Scaler)
-                            </td>
-                            <td>@reading.ReadingType.Uom.GetDisplayUnit(@reading.ReadingType.PowerOfTenMultiplier ?? PowerOfTenMultiplier.None)</td>
-                            <td><i class="@status.ToStatusIcon()"></i> @status.ToStatusString()</td>
-                            <td>@obisId.GetLabel()</td>
-                        </tr>
-                    }
-
-                </table>
-            }
+            @await Html.PartialAsync("_SummaryHeaderDisplayFunctionPartial");
         }
         else
         {
-            var data = StateService.CurrentSupplierFile.Model;
-            var tariffData = StateService.CurrentSupplierFile.AccountingPeriod;
-
-            <table class="table">
-                <tr>
-                    <th>Kunden ID</th>
-                    <th>Rechnungssteller ID</th>
-                    <th>Tarifbezeichnung</th>
-                </tr>
-
-                <tr>
-                    <td>@data.Customer.CustomerId</td>
-                    <td>@data.InvoicingParty.InvoicingPartyId</td>
-                    <td>@data.TariffName</td>
-                </tr>
-
-                <tr>
-                    <th>Startzeitpunkt</th>
-                    <th>Endzeitpunkt</th>
-                    <th>Tarifanwendungsfall</th>
-                </tr>
-
-                <tr>
-                    <td>@StateService.CurrentSupplierFile?.AccountingPeriod.Begin.ToFormatedString()</td>
-                    <td>@StateService.CurrentSupplierFile?.AccountingPeriod.End.ToFormatedString()</td>
-                    <td>@StateService.CurrentSupplierFile?.TafId.TafToFriendlyName()</td>
-                </tr>
-
-                <tr>
-                    <th>Smart Meter Gateway</th>
-                    <th></th>
-                    <th></th>
-                </tr>
-
-                <tr>
-                    <td>@StateService.CurrentDataResult.Model.Smgw.SmgwId.ToFormattedDeviceId()</td>
-                    <td></td>
-                    <td></td>
-                </tr>
-            </table>
-
-            <table class="table">
-                <tr>
-                    <th>Register</th>
-                    <th class="text-right">Wert</th>
-                    <th>Einheit</th>
-                    <th>Beschreibung</th>
-                </tr>
-
-                @foreach (var register in tariffData.SummaryRegister.GetAccountingRegistersWithTotal())
-                {
-                    var ovl = StateService.CurrentDataResult.OriginalValueLists.FirstOrDefault(o => o.Obis.A == register.ObisCode.A && o.Obis.B == register.ObisCode.B && o.Obis.C == register.ObisCode.C && o.Obis.D == register.ObisCode.D && o.Obis.E == 0 && o.Obis.F == register.ObisCode.F);
-
-                    <tr>
-                        <td>@register.ObisCode.ToString()</td>
-
-                        @if (ovl != null)
-                        {
-                            <td class="text-right">
-                                @register.Amount.GetDisplayValue(ovl.Uom, ovl.PowerOfTenMultiplier, ovl.Scaler)
-                            </td>
-                            <td>@ovl.Uom.GetDisplayUnit(ovl.PowerOfTenMultiplier)</td>
-                        }
-                        else
-                        {
-                            <td colspan="2">Wert kann nicht Formatiert werden: @register.Amount</td>
-                        }
-
-                        <td>@register.ObisCode.GetLabel()</td>
-                    </tr>
-                }
-
-            </table>
+            @await Html.PartialAsync("_SummaryHeaderTransparencyFunctionPartial");
         }
     </div>
 </div>
 
 
 <div>
-
     <ul class="nav nav-tabs" role="tablist">
         <li role="presentation" class="active"><a href="#tab_logdata" aria-controls="tab_logdata" role="tab" data-toggle="tab">Logbuchdaten</a></li>
-        <li role="presentation" class="dropdown">
-            <a href="#" class="dropdown-toggle" id="tab-dropdown-ovl" data-toggle="dropdown" aria-controls="tab-dropdown-contents" aria-expanded="false">Originäre Messwertliste<span class="caret"></span></a>
-            <ul class="dropdown-menu" aria-labelledby="tab-dropdown-ovl" id="tab-dropdown-ovl-contents">
-                @foreach (var ovl in originalValueLists)
-                {
-                    <li class=""><a href="#tab_@ovl.GetOriginalValueListIdent()" id="#tab_@ovl.GetOriginalValueListIdent()-tab" aria-expanded="false" aria-controls="tab_@ovl.GetOriginalValueListIdent()" role="tab" data-toggle="tab">@ovl.Meter.ToFormattedDeviceId() (@ovl.Obis.ToString())</a></li>
-                }
-            </ul>
-        </li>
+        
+        @if (originalValueLists.Count == 1)
+        {
+            var ovl = originalValueLists.First();
+            <li role="presentation"><a href="#tab_@ovl.GetOriginalValueListIdent()" aria-controls="tab_@ovl.GetOriginalValueListIdent()" role="tab" data-toggle="tab">Originäre Messwertliste</a></li>
+            <li role="presentation"><a href="#tab_hvl_@ovl.GetOriginalValueListIdent()" aria-controls="tab_hvl_@ovl.GetOriginalValueListIdent()" role="tab" data-toggle="tab">Historische Messwerte</a></li>
+        }
+        else
+        {
+            <li role="presentation" class="dropdown">
+                <a href="#" class="dropdown-toggle" id="tab-dropdown-ovl" data-toggle="dropdown" aria-controls="tab-dropdown-contents" aria-expanded="false">Originäre Messwertliste<span class="caret"></span></a>
+                <ul class="dropdown-menu" aria-labelledby="tab-dropdown-ovl" id="tab-dropdown-ovl-contents">
+                    @foreach (var ovl in originalValueLists)
+                    {
+                        <li class=""><a href="#tab_@ovl.GetOriginalValueListIdent()" id="#tab_@ovl.GetOriginalValueListIdent()-tab" aria-expanded="false" aria-controls="tab_@ovl.GetOriginalValueListIdent()" role="tab" data-toggle="tab">@ovl.Meter.ToFormattedDeviceId() (@ovl.Obis.ToString())</a></li>
+                    }
+                </ul>
+            </li>
 
-        <li role="presentation" class="dropdown">
-            <a href="#" class="dropdown-toggle" id="tab-dropdown-hvl" data-toggle="dropdown" aria-controls="tab-dropdown-contents" aria-expanded="false">Historische Messwerte<span class="caret"></span></a>
-            <ul class="dropdown-menu" aria-labelledby="tab-dropdown-hvl" id="tab-dropdown-hvl-contents">
-                @foreach (var ovl in originalValueLists)
-                {
-                    <li class=""><a href="#tab_hvl_@ovl.GetOriginalValueListIdent()" id="#tab_hvl_@ovl.GetOriginalValueListIdent()-tab" aria-expanded="false" aria-controls="tab_hvl_@ovl.GetOriginalValueListIdent()" role="tab" data-toggle="tab">@ovl.Meter.ToFormattedDeviceId() (@ovl.Obis.ToString())</a></li>
-                }
-            </ul>
-        </li>
+            <li role="presentation" class="dropdown">
+                <a href="#" class="dropdown-toggle" id="tab-dropdown-hvl" data-toggle="dropdown" aria-controls="tab-dropdown-contents" aria-expanded="false">Historische Messwerte<span class="caret"></span></a>
+                <ul class="dropdown-menu" aria-labelledby="tab-dropdown-hvl" id="tab-dropdown-hvl-contents">
+                    @foreach (var ovl in originalValueLists)
+                    {
+                        <li class=""><a href="#tab_hvl_@ovl.GetOriginalValueListIdent()" id="#tab_hvl_@ovl.GetOriginalValueListIdent()-tab" aria-expanded="false" aria-controls="tab_hvl_@ovl.GetOriginalValueListIdent()" role="tab" data-toggle="tab">@ovl.Meter.ToFormattedDeviceId() (@ovl.Obis.ToString())</a></li>
+                    }
+                </ul>
+            </li>
+        }
 
-        @if (StateService.CurrentSupplierFile?.AccountingPeriod != null)
+        @if (StateService.CurrentSupplierFile?.TafData != null)
         {
             <li role="presentation"><a href="#tab_tariffdata" aria-controls="tab_tariffdata" role="tab" data-toggle="tab">Tarifdaten</a></li>
         }
@@ -430,17 +255,27 @@
                                             <div>
                                                 <span>
                                                     <i class="fa fa-times-circle"></i>
-                                                    @ovl.WarningCount @(ovl.FatalErrorCount == 1 ? "fataler Fehler" : "fatale Fehler")
+                                                    @ovl.FatalErrorCount @(ovl.FatalErrorCount == 1 ? "fataler Fehler" : "fatale Fehler")
                                                 </span>
                                             </div>
                                         }
 
-                                        if (ovl.TempError2Count > 0 || ovl.TempError1Count > 0)
+                                        if (ovl.TempError1Count > 0)
+                                        {
+                                            <div>
+                                                <span>
+                                                    <i class="fa fa-exclamation-circle"></i>
+                                                    @(ovl.TempError1Count) @(ovl.TempError1Count == 1 ? "temporärer Fehler 1" : "temporäre Fehler 1")
+                                                </span>
+                                            </div>
+                                        }
+
+                                        if (ovl.TempError2Count > 0)
                                         {
                                             <div>
                                                 <span>
                                                     <i class="fa fa-exclamation-triangle"></i>
-                                                    @(ovl.TempError2Count + ovl.TempError1Count) @(ovl.TempError2Count + ovl.TempError1Count == 1 ? "temporärer Fehler" : "temporäre Fehler")
+                                                    @(ovl.TempError2Count) @(ovl.TempError2Count == 1 ? "temporärer Fehler 2" : "temporäre Fehler 2")
                                                 </span>
                                             </div>
                                         }
@@ -460,14 +295,7 @@
                             </tr>
                         </table>
 
-
                         <table class="table-condensed">
-                            <tr>
-                                <th>
-                                    Startzeitpunkt
-                                </th>
-                            </tr>
-
                             <tr>
                                 <td>
                                     <div class="form-group">
@@ -479,29 +307,36 @@
                                         </div>
                                     </div>
                                 </td>
+
+                                <td>
+                                    <div class="form-group">
+                                        <button type="button" class="btn btn-default" id="btnFilterOvlErrors_@ovl.GetOriginalValueListIdent()" onclick="showErrorsList('@ovl.GetOriginalValueListIdent()');">Status-Übersicht anzeigen</button>
+                                    </div>
+                                </td>
                             </tr>
                         </table>
-
+                        
                         <div id="ovl_@ovl.GetOriginalValueListIdent()">
                             @await Component.InvokeAsync("OriginalValueListView", new { ovl, startTime = ovlBegin })
                         </div>
 
                         <script type="text/javascript">
-                        $(function() {
-                            $("#dp_start_@ovl.GetOriginalValueListIdent()").datetimepicker({
-                                locale: 'de',
-                                format: 'DD.MM.YYYY'
-                            });
+                            $(function() {
+                                $("#dp_start_@ovl.GetOriginalValueListIdent()").datetimepicker({
+                                    locale: 'de',
+                                    format: 'DD.MM.YYYY'
+                                });
 
-                            $("#dp_start_@ovl.GetOriginalValueListIdent()").on("dp.change", function (e) {
-                                selectOvlDay("@ovl.GetOriginalValueListIdent()");
-                            });
+                                $("#dp_start_@ovl.GetOriginalValueListIdent()").on("dp.change", function (e) {
+                                    loadOvlDay("@ovl.GetOriginalValueListIdent()");
+                                });
 
-                            $("#dp_start_@ovl.GetOriginalValueListIdent()").data("DateTimePicker").minDate(moment('@ovlBegin.ToIso8601()'));
-                            $("#dp_start_@ovl.GetOriginalValueListIdent()").data("DateTimePicker").maxDate(moment('@ovlEnd.ToIso8601()'));
-                            $("#dp_start_@ovl.GetOriginalValueListIdent()").data("DateTimePicker").date(moment('@ovlBegin.ToIso8601()'));
-                        });
+                                $("#dp_start_@ovl.GetOriginalValueListIdent()").data("DateTimePicker").minDate(moment('@ovlBegin.Date.ToIso8601()'));
+                                $("#dp_start_@ovl.GetOriginalValueListIdent()").data("DateTimePicker").maxDate(moment('@ovlEnd.ToIso8601()'));
+                                $("#dp_start_@ovl.GetOriginalValueListIdent()").data("DateTimePicker").date(moment('@ovlBegin.Date.ToIso8601()'));
+                            });
                         </script>
+
                     </div>
                 </div>
             </div>
@@ -509,23 +344,46 @@
 
         <script type="text/javascript">
 
-                        function selectOvlDay(ovlId) {
+                            function loadOvlDay(ovlId) {
+                                $.ajax({
+                                    url: '/DataView/FilterOvl',
+                                    type: "POST",
+                                    data: "startTime=" +
+                                    encodeURIComponent($("#dp_start_" + ovlId).data("DateTimePicker").date().toISOString()) +
+                                    "&ovlId=" +
+                                    encodeURIComponent(ovlId),
+                                    contentType: 'application/x-www-form-urlencoded',
+                                    processData: false,
+                                    success: function (result) {
+                                        $("#ovl_" + ovlId).html(result);
+                                    },
+                                    error: function (err) { }
+                                });
+                            };
 
-                            $.ajax({
-                                url: '/DataView/FilterOvl',
-                                type: "POST",
-                                data: "startTime=" +
-                                encodeURIComponent($("#dp_start_" + ovlId).data("DateTimePicker").date().toISOString()) +
-                                "&ovlId=" +
-                                encodeURIComponent(ovlId),
-                                contentType: 'application/x-www-form-urlencoded',
-                                processData: false,
-                                success: function (result) {
-                                    $("#ovl_" + ovlId).html(result);
-                                },
-                                error: function (err) { }
-                            });
-                        };
+                            function selectOvlDay(ovlId, timestamp) {
+                                var currentDate = $("#dp_start_" + ovlId).data("DateTimePicker").date();
+                                if (currentDate.isSame(timestamp)) {
+                                    loadOvlDay(ovlId);
+                                } else {
+                                    $("#dp_start_" + ovlId).data("DateTimePicker").date(timestamp);    
+                                }
+                            };
+
+                            function showErrorsList(ovlId) {
+                                $.ajax({
+                                    url: '/DataView/ShowErrorsList',
+                                    type: "POST",
+                                    data: "ovlId=" + encodeURIComponent(ovlId),
+                                    contentType: 'application/x-www-form-urlencoded',
+                                    processData: false,
+                                    success: function (result) {
+                                        $("#ovl_" + ovlId).html(result);
+                                    },
+                                    error: function (err) { }
+                                });
+                            };
+
         </script>
 
 
@@ -544,69 +402,17 @@
             </div>
         }
 
-        @if (StateService.CurrentSupplierFile?.AccountingPeriod != null)
+        @if (StateService.CurrentSupplierFile?.TafData?.Data != null)
         {
             <div role="tabpanel" class="tab-pane" id="tab_tariffdata">
                 <div class="panel panel-primary">
                     <div class="panel-heading">Tarifdaten</div>
                     <div class="panel-body">
-
-                        <table>
-                            <tr>
-                                <td></td>
-                                <td>
-                                    <div class="form-group">
-                                        <div class='input-group date' id="tariffDataViewDaySelection">
-                                            <input type='text' class="form-control" />
-                                            <span class="input-group-addon">
-                                                <span class="glyphicon glyphicon-calendar"></span>
-                                            </span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td></td>
-                            </tr>
-                        </table>
-
-                        <div id="tariff-day-view">
-                            @await Component.InvokeAsync("TariffDataView", new { timestamp = StateService.CurrentSupplierFile?.AccountingPeriod.Begin })
-                        </div>
-
-                        <script type="text/javascript">
-                            $(function () {
-                                $("#tariffDataViewDaySelection").datetimepicker({
-                                    locale: 'de',
-                                    format: 'DD.MM.YYYY'
-                                });
-
-                                $("#tariffDataViewDaySelection").data("DateTimePicker").minDate(moment('@StateService.CurrentSupplierFile?.AccountingPeriod.Begin.Date.ToIso8601()'));
-                                $("#tariffDataViewDaySelection").data("DateTimePicker").maxDate(moment('@StateService.CurrentSupplierFile?.AccountingPeriod.End.Date.ToIso8601()'));
-                                $("#tariffDataViewDaySelection").data("DateTimePicker").date(moment('@StateService.CurrentSupplierFile?.AccountingPeriod.Begin.Date.ToIso8601()'));
-
-                                $("#tariffDataViewDaySelection").on("dp.change", function (e) {
-                                    selectTariffViewDay();
-                                });
-                            });
-
-                            function selectTariffViewDay() {
-
-                                $.ajax({
-                                    url: '/DataView/SelectTariffViewDay',
-                                    type: "POST",
-                                    data: "timestamp=" + encodeURIComponent($("#tariffDataViewDaySelection").data("DateTimePicker").date().toISOString()),
-                                    contentType: 'application/x-www-form-urlencoded',
-                                    processData: false,
-                                    success: function (result) {
-                                        $("#tariff-day-view").html(result);
-                                    },
-                                    error: function (err) { }
-                                });
-                            };
-                        </script>
-
+                        @await Component.InvokeAsync(StateService.CurrentSupplierFile?.TafData.DetailView.Name)
                     </div>
                 </div>
             </div>
         }
+
     </div>
 </div>

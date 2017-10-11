@@ -1,15 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using TRuDI.TafAdapter.Interface;
-
-namespace TRuDI.TafAdapter.Taf1
+﻿namespace TRuDI.TafAdapter.Taf1
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using TRuDI.TafAdapter.Interface;
+
+    using TRuDI.TafAdapter.Interface.Taf2;
+
     public class AccountingMonth : IAccountingSection
     {
-        private List<MeasuringRange> measuringRanges = new List<MeasuringRange>();
-        private List<Register> summaryRegister;
+        private readonly List<MeasuringRange> measuringRanges = new List<MeasuringRange>();
+        private readonly List<Register> summaryRegister;
 
         public AccountingMonth(IList<Register> register)
         {
@@ -31,7 +32,7 @@ namespace TRuDI.TafAdapter.Taf1
             this.measuringRanges.Add(range);
 
             this.summaryRegister.FirstOrDefault(r => r.TariffId == range.TariffId).Amount =
-                       summaryRegister.FirstOrDefault(r => r.TariffId == range.TariffId).Amount + range.Amount;
+                       this.summaryRegister.FirstOrDefault(r => r.TariffId == range.TariffId).Amount + range.Amount;
         }
 
         public IReadOnlyList<IMeasuringRange> MeasuringRanges => this.measuringRanges;

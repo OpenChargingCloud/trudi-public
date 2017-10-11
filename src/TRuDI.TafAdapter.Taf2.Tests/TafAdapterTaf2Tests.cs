@@ -8,6 +8,7 @@ namespace TRuDI.TafAdapter.Taf2.Tests
     using TRuDI.Models;
     using TRuDI.Models.BasicData;
     using TRuDI.TafAdapter.Interface;
+    using TRuDI.TafAdapter.Interface.Taf2;
 
     [TestClass]
     public class TafAdapterTaf2Tests
@@ -64,7 +65,7 @@ namespace TRuDI.TafAdapter.Taf2.Tests
 
             var day = new AccountingDay(new[] { dayReg181, dayReg182, dayReg18x });
 
-            var target = new AccountingPeriod(new[] { reg181, reg182, reg18x });
+            var target = new Taf2Data(new[] { reg181, reg182, reg18x }, null); //TODO second null parameter added blindly just in order to compile successfully
 
             day.Add(new MeasuringRange() { Start = DateTime.Now.AddMonths(-1), End = DateTime.Now, TariffId = 1, Amount = 50 }, new ObisId("0100010801FF"));
             day.Add(new MeasuringRange() { Start = DateTime.Now.AddMonths(-1), End = DateTime.Now, TariffId = 2, Amount = 25 }, new ObisId("0100010802FF"));

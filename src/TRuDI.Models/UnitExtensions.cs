@@ -141,6 +141,11 @@
             return multiplier.GetSiPrefix() + uom.GetUnitSymbol();
         }
 
+        public static string GetDisplayValue(this long? value, ReadingType readingType)
+        {
+            return value.GetDisplayValue(readingType.Uom.Value, readingType.PowerOfTenMultiplier.Value, readingType.Scaler);
+        }
+
         public static string GetDisplayValue(this long? value, Uom uom, PowerOfTenMultiplier multiplier, int scaler)
         {
             if (value == null)
@@ -149,6 +154,14 @@
             }
 
             return value.Value.GetDisplayValue(uom, multiplier, scaler);
+        }
+
+        public static string GetDisplayValue(this long value, ReadingType readingType)
+        {
+            return value.GetDisplayValue(
+                readingType.Uom.Value,
+                readingType.PowerOfTenMultiplier.Value,
+                readingType.Scaler);
         }
 
         public static string GetDisplayValue(this long value, Uom uom, PowerOfTenMultiplier multiplier, int scaler)

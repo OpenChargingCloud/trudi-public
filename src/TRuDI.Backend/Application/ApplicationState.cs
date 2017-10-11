@@ -31,6 +31,11 @@
         private readonly NotificationsMessageHandler notificationsMessageHandler;
 
         /// <summary>
+        /// The backend checksums calculated at application startup.
+        /// </summary>
+        private ApplicationChecksums backendChecksums;
+
+        /// <summary>
         /// The active HAN adapter selected by the user.
         /// </summary>
         private HanAdapterContainer activeHanAdapter;
@@ -113,7 +118,18 @@
         /// <summary>
         /// Gets the backend checksums calculated at application startup.
         /// </summary>
-        public ApplicationChecksums BackendChecksums { get; } = new ApplicationChecksums();
+        public ApplicationChecksums BackendChecksums
+        {
+            get
+            {
+                if (this.backendChecksums == null)
+                {
+                    this.backendChecksums = new ApplicationChecksums();
+                }
+
+                return this.backendChecksums;
+            }
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ApplicationState"/> class.
@@ -224,9 +240,19 @@
                                 this.CurrentSupplierFile.Model.UsagePointId,
                                 this.CurrentSupplierFile.Model.AnalysisProfile.TariffId);
 
-                            var tariffContract = this.Contracts.Select(c => c.Contract).FirstOrDefault(
-                                c => c.TafId == TafId.Taf7
-                                     && c.MeteringPointId == this.CurrentSupplierFile.Model.UsagePointId
+                            var taf7Contracts =
+                                this.Contracts.Select(c => c.Contract).Where(c => c.TafId == TafId.Taf7).ToList();
+
+                            if (!taf7Contracts.Any())
+                            {
+                                Log.Error("No contract found: no TAF-7 contract found");
+                                this.LastErrorMessages.Add($"Vertrag mit der ID \"{this.CurrentSupplierFile.Model.AnalysisProfile.TariffId}\" für Zählpunkt \"{this.CurrentSupplierFile.Model.UsagePointId}\" konnte nicht im Smart Meter Gateway gefunden werden: Kein TAF-7-Profil vorhanden.");
+                                await this.LoadNextPageAfterProgress("/Error");
+                                return;
+                            }
+
+                            var tariffContract = taf7Contracts.FirstOrDefault( c => 
+                                     c.MeteringPointId == this.CurrentSupplierFile.Model.UsagePointId
                                      && c.TafName == this.CurrentSupplierFile.Model.AnalysisProfile.TariffId);
 
                             if (tariffContract == null)
@@ -285,6 +311,23 @@
 
                 case ErrorType.AuthenticationFailed:
                     this.LastErrorMessages.Add("Anmeldung am Smart Meter Gateway fehlgeschlagen.");
+                    break;
+
+                case ErrorType.DeviceError:
+                    this.LastErrorMessages.Add("Fehler während der Kommunikation mit dem Smart Meter Gateway. Das Smart Meter Gateway lieferte folgenden Fehler zurück:");
+                    break;
+
+                case ErrorType.NoDataInSelectedTimeRange:
+                    if (this.CurrentAdapterContext != null)
+                    {
+                        this.LastErrorMessages.Add(
+                            $"Im gewählten Zeitbereich ({this.CurrentAdapterContext.Start:G} bis {this.CurrentAdapterContext.End:G}) konnten keine Messdaten vom Smart Meter Gateway abgerufen werden.");
+                    }
+                    else
+                    {
+                        this.LastErrorMessages.Add(
+                            "Im gewählten Zeitbereich konnten keine Messdaten vom Smart Meter Gateway abgerufen werden.");
+                    }
                     break;
 
                 case ErrorType.Other:
@@ -444,7 +487,7 @@
 
                     Log.Information("Loading TAF adapter: {0}", this.CurrentSupplierFile.Model.AnalysisProfile.TariffUseCase);
                     var tafAdapter = TafAdapterRepository.LoadAdapter(this.CurrentSupplierFile.Model.AnalysisProfile.TariffUseCase);
-                    this.CurrentSupplierFile.AccountingPeriod = tafAdapter.Calculate(this.CurrentDataResult.Model, this.CurrentSupplierFile.Model);
+                    this.CurrentSupplierFile.TafData = tafAdapter.Calculate(this.CurrentDataResult.Model, this.CurrentSupplierFile.Model);
                 }
             }
             catch (AggregateException ex)

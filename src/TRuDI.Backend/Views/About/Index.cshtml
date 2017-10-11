@@ -28,7 +28,7 @@
             {
                 <tr>
                     <td>@item.Filename</td>
-                    <td style="font-family: monospace; word-break: break-all;">@item.Digest</td>
+                    <td style="font-family: monospace;">@item.Digest.AddSpace(4)</td>
                 </tr>
             }
 
@@ -68,8 +68,8 @@
                         @adapter.Assembly.GetName().Version
                     </td>
 
-                    <td style="font-family: monospace; word-break: break-all;">
-                        @adapter.Hash
+                    <td style="font-family: monospace;">
+                        @adapter.Hash.AddSpace(4)
                     </td>
                 </tr>
             }
@@ -105,8 +105,8 @@
                         @adapter.Assembly.GetName().Version
                     </td>
 
-                    <td style="font-family: monospace; word-break: break-all;">
-                        @adapter.Hash
+                    <td style="font-family: monospace;">
+                        @adapter.Hash.AddSpace(4)
                     </td>
                 </tr>
             }
@@ -119,7 +119,7 @@
 <div class="panel panel-primary">
     <div class="panel-heading">Lizenz</div>
     <div class="panel-body">
-        <p>Copyright (c) [DZG|AK Bundesdisplay|IVU?]</p>
+        <p>Copyright (c) Arbeitskreis Bundesdisplay</p>
 
         <p>
             Hiermit wird unentgeltlich jeder Person, die eine Kopie der Software und der zugehörigen Dokumentationen (die "Software") erhält,

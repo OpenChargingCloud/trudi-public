@@ -1,25 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using TRuDI.TafAdapter.Interface;
-
-namespace TRuDI.TafAdapter.Taf1
+﻿namespace TRuDI.TafAdapter.Taf1
 {
-    public class AccountingPeriod : IAccountingPeriod
-    {
-        private List<AccountingMonth> accountingMonths = new List<AccountingMonth>();
-        private List<Register> summaryRegister = new List<Register>();
-        private List<Reading> initialReadings = new List<Reading>();
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
 
-        public AccountingPeriod(IList<Register> summaryRegister)
+    using TRuDI.HanAdapter.Interface;
+    using TRuDI.Models.CheckData;
+    using TRuDI.TafAdapter.Interface.Taf2;
+
+    public class Taf1Data : ITaf2Data
+    {
+        private readonly List<AccountingMonth> accountingMonths = new List<AccountingMonth>();
+        private readonly List<Register> summaryRegister;
+        private readonly List<Reading> initialReadings = new List<Reading>();
+
+        public Taf1Data(IList<Register> summaryRegister, IReadOnlyList<TariffStage> tariffStages)
         {
             this.summaryRegister = new List<Register>(summaryRegister);
+            this.TariffStages = tariffStages;
         }
+
+        public TafId TafId => TafId.Taf1;
 
         public DateTime Begin { get; private set; }
 
         public DateTime End { get; private set; }
+
+        public IReadOnlyList<TariffStage> TariffStages { get; }
 
         public void SetDate(DateTime begin, DateTime end)
         {
@@ -35,7 +42,7 @@ namespace TRuDI.TafAdapter.Taf1
             }
             else
             {
-                if (initialReadings.FirstOrDefault(ir => ir.ObisCode == reading.ObisCode) == null)
+                if (this.initialReadings.FirstOrDefault(ir => ir.ObisCode == reading.ObisCode) == null)
                 {
                     this.initialReadings.Add(reading);
                 }

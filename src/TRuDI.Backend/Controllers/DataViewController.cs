@@ -53,9 +53,12 @@
             return this.ViewComponent(typeof(OriginalValueListView), new { ovl, startTime});
         }
 
-        public ViewComponentResult SelectTariffViewDay(DateTime timestamp)
+        public ViewComponentResult ShowErrorsList(string ovlId)
         {
-            return this.ViewComponent(typeof(TariffDataView), new { timestamp = timestamp.Date });
+            var ovl = this.applicationState.CurrentDataResult.OriginalValueLists.FirstOrDefault(
+                l => l.GetOriginalValueListIdent() == ovlId);
+
+            return this.ViewComponent(typeof(OriginalValueListErrorsView), new { ovl });
         }
     }
 }

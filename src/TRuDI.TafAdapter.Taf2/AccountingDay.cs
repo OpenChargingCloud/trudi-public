@@ -3,14 +3,14 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Text;
+
     using TRuDI.Models;
-    using TRuDI.TafAdapter.Interface;
+    using TRuDI.TafAdapter.Interface.Taf2;
 
     public class AccountingDay : IAccountingSection
     {
-        private List<MeasuringRange> measuringRanges = new List<MeasuringRange>();
-        private List<Register> summaryRegister;
+        private readonly List<MeasuringRange> measuringRanges = new List<MeasuringRange>();
+        private readonly List<Register> summaryRegister;
 
         public AccountingDay(IList<Register> register)
         {
@@ -24,8 +24,8 @@
         public void Add(MeasuringRange range, ObisId obisId)
         {
             this.measuringRanges.Add(range);
-            this.summaryRegister.FirstOrDefault(r => r.TariffId == range.TariffId && obisId.C == r.ObisCode.C).Amount =
-                summaryRegister.FirstOrDefault(r => r.TariffId == range.TariffId && obisId.C == r.ObisCode.C).Amount + range.Amount;  
+            this.summaryRegister.First(r => r.TariffId == range.TariffId && obisId.C == r.ObisCode.C).Amount =
+                this.summaryRegister.First(r => r.TariffId == range.TariffId && obisId.C == r.ObisCode.C).Amount + range.Amount;  
         }
 
         public IReadOnlyList<IMeasuringRange> MeasuringRanges => this.measuringRanges;

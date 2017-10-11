@@ -11,14 +11,14 @@
     <PreserveCompilationContext>true</PreserveCompilationContext>
     <CopyOutputSymbolsToPublishDirectory>false</CopyOutputSymbolsToPublishDirectory>
   </PropertyGroup>
-  
+
   <PropertyGroup>
     <RestoreSources>$(RestoreSources);../../private-packages;https://api.nuget.org/v3/index.json</RestoreSources>
-    <AssemblyVersion>1.0.2.0</AssemblyVersion>
-    <FileVersion>1.0.2.0</FileVersion>
-    <Version>1.0.2</Version>
+    <AssemblyVersion>1.0.6.0</AssemblyVersion>
+    <FileVersion>1.0.6.0</FileVersion>
+    <Version>1.0.6</Version>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <Compile Remove="Data\**" />
     <Content Remove="Data\**" />
@@ -28,6 +28,7 @@
     <PackageReference Include="Microsoft.Extensions.CommandLineUtils" Version="1.1.1" />
     <PackageReference Include="Serilog.Sinks.File" Version="3.2.0" />
     <PackageReference Include="Serilog.Sinks.Trace" Version="2.1.0" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="4.4.0" />
     <PackageReference Include="WebSocketManager" Version="1.0.1" />
     <PackageReference Include="IVU.BouncyCastle.Crypto" Version="2.0.0" />
     <PackageReference Include="IVU.Http" Version="1.0.10" />
@@ -52,4 +53,20 @@
     <ProjectReference Include="..\TRuDI.TafAdapter.Taf2\TRuDI.TafAdapter.Taf2.csproj" />
   </ItemGroup>
 
+  <Target Name="SetMVCRazorOutputPath">
+    <PropertyGroup>
+      <MvcRazorOutputPath>$(OutputPath)</MvcRazorOutputPath>
+    </PropertyGroup>
+  </Target>
+
+  <Target Name="_MvcRazorPrecompileOnBuild" DependsOnTargets="SetMvcRazorOutputPath;MvcRazorPrecompile" AfterTargets="Build" Condition=" '$(Configuration)' == 'Release' And '$(SelfContainedBuild)' != 'true' " />
+
+  <Target Name="IncludePrecompiledViewsInPublishOutput" DependsOnTargets="_MvcRazorPrecompileOnBuild" BeforeTargets="PrepareForPublish" Condition=" '$(Configuration)' == 'Release' And '$(SelfContainedBuild)' != 'true' ">
+    <Message Text="Precompile views..." Importance="high" />
+    <ItemGroup>
+      <_PrecompiledViewsOutput Include="$(MvcRazorOutputPath)$(MSBuildProjectName).PrecompiledViews.DLL" />
+      <_PrecompiledViewsOutput Include="$(MvcRazorOutputPath)$(MSBuildProjectName).PrecompiledViews.pdb" />
+      <ContentWithTargetPath Include="@(_PrecompiledViewsOutput->'%(FullPath)')" RelativePath="%(_PrecompiledViewsOutput.Identity)" TargetPath="%(_PrecompiledViewsOutput.Filename)%(_PrecompiledViewsOutput.Extension)" CopyToPublishDirectory="PreserveNewest" />
+    </ItemGroup>
+  </Target>
 </Project>

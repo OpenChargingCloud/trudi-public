@@ -26,7 +26,10 @@
 
         public AdapterContext Ctx { get; set; }
 
-        public IAccountingPeriod AccountingPeriod { get; set; }
+        /// <summary>
+        /// Contains the summary, the detail view and the calculate data that is displayed by the views.
+        /// </summary>
+        public TafAdapterData TafData { get; set; }
 
         /// <summary>
         /// Gets the TAF identifier from the analysis profile if it exists within the data.

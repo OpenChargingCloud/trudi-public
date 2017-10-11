@@ -12,7 +12,7 @@ namespace TRuDI.TafAdapter.Interface
         /// </summary>
         /// <param name="device">The meter reading from the device.</param>
         /// <param name="supplier">The supplier XML file.</param>
-        /// <returns>The calculated accounting period.</returns>
-        IAccountingPeriod Calculate(UsagePointAdapterTRuDI device, UsagePointLieferant supplier);
+        /// <returns>Returns the types of the summary and detail view components including the data that should be shown by the view component.</returns>
+        TafAdapterData Calculate(UsagePointAdapterTRuDI device, UsagePointLieferant supplier);
     }
 }

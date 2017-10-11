@@ -13,6 +13,7 @@
     using TRuDI.Models;
     using TRuDI.Models.BasicData;
     using TRuDI.TafAdapter.Interface;
+    using TRuDI.TafAdapter.Interface.Taf2;
 
     public static class HtmlStringExtensions
     {
@@ -26,6 +27,22 @@
                 if ((i + 1) % lineLength == 0)
                 {
                     sb.AppendLine("<br/>");
+                }
+            }
+
+            return new HtmlString(sb.ToString());
+        }
+
+        public static HtmlString AddSpace(this string source, int length)
+        {
+            var sb = new StringBuilder();
+
+            for (int i = 0; i < source.Length; i++)
+            {
+                sb.Append(source[i]);
+                if ((i + 1) % length == 0)
+                {
+                    sb.Append(" ");
                 }
             }
 
@@ -72,60 +89,9 @@
             }
         }
 
-        public static string ToFormatedString(this DateTime timestamp)
-        {
-            return timestamp.ToLocalTime().ToString("dd.MM.yyyy HH:mm");
-        }
-
-        public static string ToFormatedString(this DateTime? timestamp)
-        {
-            if (timestamp == null)
-            {
-                return string.Empty;
-            }
-
-            return timestamp.Value.ToFormatedString();
-        }
-
         public static string IsCompleted(this BillingPeriod billingPeriod)
         {
             return billingPeriod.End == null ? "nein" : "ja";
-        }
-
-        public static DateTime GetEndTimeOrNow(this DateTime? timestamp)
-        {
-            if (timestamp == null)
-            {
-                return DateTime.UtcNow;
-            }
-
-            if (timestamp.Value.ToUniversalTime() > DateTime.UtcNow)
-            {
-                return DateTime.UtcNow;
-            }
-
-            return timestamp.Value;
-        }
-
-        public static DateTime RoundDown(this DateTime value, int minutes)
-        {
-            var diff = value.Minute % minutes;
-            return new DateTime(value.Year, value.Month, value.Day, value.Hour, value.Minute - diff, 0, value.Kind);
-        }
-
-        public static string ToIso8601(this DateTime timestamp)
-        {
-            return timestamp.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ");
-        }
-
-        public static string ToIso8601(this DateTime? timestamp)
-        {
-            if (timestamp == null)
-            {
-                return string.Empty;
-            }
-
-            return timestamp.Value.ToIso8601();
         }
 
         public static string ToStatusString(this IntervalReading reading)
@@ -143,13 +109,13 @@
                     return "kein Fehler";
 
                 case StatusPTB.Warning:
-                    return "Warung";
+                    return "Warnung";
 
                 case StatusPTB.Temp_Error_signed_invalid:
-                    return "temporärer Fehler";
+                    return "temporärer Fehler 1";
 
                 case StatusPTB.Temp_Error_is_invalid:
-                    return "temporärer Fehler";
+                    return "temporärer Fehler 2";
 
                 case StatusPTB.Fatal_Error:
                     return "fataler Fehler";
@@ -310,56 +276,46 @@
             }
         }
 
-        public static IList<Register> GetAccountingRegistersWithTotal(this IEnumerable<Register> registers)
+        public static string GetMedium(this ContractInfo contract)
         {
-            var sortedRegisters = registers.ToList();
-            sortedRegisters.Sort((a, b) => string.Compare(a.ObisCode.ToHexString(), b.ObisCode.ToHexString(), StringComparison.InvariantCulture));
-
-            var totalImport = new Register { Amount = null, ObisCode = new ObisId("1-0:1.8.0*255"), TariffId = 0 };
-            foreach (var reg in sortedRegisters)
+            var meter = contract.Meters?.FirstOrDefault();
+            if (string.IsNullOrWhiteSpace(meter))
             {
-                if (reg.Amount.HasValue && reg.ObisCode.Medium == ObisMedium.Electricity && reg.ObisCode.C == 1
-                    && reg.ObisCode.D == 8)
-                {
-                    if (totalImport.Amount == null)
-                    {
-                        totalImport.Amount = reg.Amount.Value;
-                    }
-                    else
-                    {
-                        totalImport.Amount += reg.Amount.Value;
-                    }
-                }
+                return "unbekannt";
             }
 
-            if (totalImport.Amount != null)
-            {
-                sortedRegisters.Insert(sortedRegisters.FindLastIndex(r => r.ObisCode.Medium == ObisMedium.Electricity && r.ObisCode.C == 1 && r.ObisCode.D == 8) + 1, totalImport);
-            }
+            var serverId = new ServerId(meter);
 
-            var totalExport = new Register { Amount = null, ObisCode = new ObisId("1-0:2.8.0*255"), TariffId = 0 };
-            foreach (var reg in sortedRegisters)
+            switch (serverId.Medium)
             {
-                if (reg.Amount.HasValue && reg.ObisCode.Medium == ObisMedium.Electricity && reg.ObisCode.C == 2
-                    && reg.ObisCode.D == 8)
-                {
-                    if (totalExport.Amount == null)
-                    {
-                        totalExport.Amount = reg.Amount.Value;
-                    }
-                    else
-                    {
-                        totalExport.Amount += reg.Amount.Value;
-                    }
-                }
-            }
+                case ObisMedium.Electricity:
+                    return "Strom";
 
-            if (totalExport.Amount != null)
-            {
-                sortedRegisters.Insert(sortedRegisters.FindLastIndex(r => r.ObisCode.Medium == ObisMedium.Electricity && r.ObisCode.C == 2 && r.ObisCode.D == 8) + 1, totalExport);
-            }
+                case ObisMedium.HeatCostAllocator:
+                    return "Heizkostenabrechnung";
 
-            return sortedRegisters;
+                case ObisMedium.Cooling:
+                    return "Kälte";
+
+                case ObisMedium.Heat:
+                    return "Wärme";
+
+                case ObisMedium.Gas:
+                    return "Gas";
+
+                case ObisMedium.WaterCold:
+                    return "Kaltwasser";
+
+                case ObisMedium.WaterHot:
+                    return "Warmwasser";
+
+                case ObisMedium.Communication:
+                case ObisMedium.Abstract:
+                    return string.Empty;
+
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
     }
 }

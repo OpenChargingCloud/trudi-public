@@ -1,0 +1,118 @@
+@using TRuDI.Backend.Application
+@using TRuDI.Backend.Utils
+@using TRuDI.Models
+@using TRuDI.Models.BasicData
+@inject ApplicationState StateService
+@{
+    var data = StateService.CurrentDataResult.Model;
+    var meterReadings = StateService.CurrentDataResult;
+}
+
+<table class="table">
+    <tr>
+        <th>Kunden ID</th>
+        <th>Rechnungssteller ID</th>
+        <th>Tarifbezeichnung</th>
+    </tr>
+
+    <tr>
+        <td>
+            @data.Customer.CustomerId
+        </td>
+
+        <td>
+            @data.InvoicingParty.InvoicingPartyId
+        </td>
+
+        <td>
+            @data.TariffName
+        </td>
+    </tr>
+
+
+    @if (StateService.CurrentDataResult.Begin != null && StateService.CurrentDataResult.End != null)
+    {
+        if (StateService.CurrentDataResult.Begin == StateService.CurrentDataResult.End)
+        {
+        <tr>
+            <th>Ablesezeitpunkt</th>
+            <th></th>
+            <th>Tarifanwendungsfall</th>
+        </tr>
+
+        <tr>
+            <td>@StateService.CurrentDataResult.Begin.ToFormatedString()</td>
+            <td></td>
+            <td>@StateService.CurrentDataResult.TafId.TafToFriendlyName()</td>
+        </tr>
+        }
+        else
+        {
+        <tr>
+            <th>Startzeitpunkt</th>
+            <th>Endzeitpunkt</th>
+            <th>Tarifanwendungsfall</th>
+        </tr>
+        <tr>
+            <td>@StateService.CurrentDataResult.Begin.ToFormatedString()</td>
+            <td>@StateService.CurrentDataResult.End.ToFormatedString()</td>
+            <td>@StateService.CurrentDataResult.TafId.TafToFriendlyName()</td>
+        </tr>
+        }
+    }
+    else
+    {
+        <tr>
+            <th>Startzeitpunkt</th>
+            <th>Endzeitpunkt</th>
+            <th>Tarifanwendungsfall</th>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td>@StateService.CurrentDataResult.TafId.TafToFriendlyName()</td>
+        </tr>
+    }
+
+    <tr>
+        <th>Smart Meter Gateway</th>
+        <th></th>
+        <th>Energieart</th>
+    </tr>
+
+    <tr>
+        <td>@StateService.CurrentDataResult.Model.Smgw.SmgwId.ToFormattedDeviceId()</td>
+        <td></td>
+        <td>@StateService.CurrentDataResult.Model.ServiceCategory.Kind.ToServiceCategoryString()</td>
+    </tr>
+
+</table>
+
+@if (meterReadings.MeterReadings != null && meterReadings.MeterReadings.Count > 0)
+{
+<table class="table">
+    <tr>
+        <th>Register</th>
+        <th>Wert</th>
+        <th>Einheit</th>
+        <th>Status</th>
+        <th>Beschreibung</th>
+    </tr>
+
+    @foreach (var reading in meterReadings.MeterReadings)
+            {
+                var obisId = new ObisId(reading.ReadingType.ObisCode);
+                var status = reading.IntervalBlocks.FirstOrDefault()?.IntervalReadings.FirstOrDefault();
+
+        <tr class="@status.ToStatusBackground()">
+            <td>@obisId.ToString()</td>
+            <td>
+                @reading.IntervalBlocks.FirstOrDefault()?.IntervalReadings.FirstOrDefault()?.Value.GetDisplayValue(reading.ReadingType.Uom ?? Uom.Not_Applicable, reading.ReadingType.PowerOfTenMultiplier ?? PowerOfTenMultiplier.None, reading.ReadingType.Scaler)
+            </td>
+            <td>@reading.ReadingType.Uom.GetDisplayUnit(@reading.ReadingType.PowerOfTenMultiplier ?? PowerOfTenMultiplier.None)</td>
+            <td><i class="@status.ToStatusIcon()"></i> @status.ToStatusString()</td>
+            <td>@obisId.GetLabel()</td>
+        </tr>
+            }
+</table>
+}

@@ -3,35 +3,52 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+
     using TRuDI.Models;
     using TRuDI.Models.BasicData;
     using TRuDI.Models.CheckData;
     using TRuDI.TafAdapter.Interface;
+    using TRuDI.TafAdapter.Interface.Taf2;
+    using TRuDI.TafAdapter.Taf2.Components;
 
+    /// <inheritdoc />
     /// <summary>
     /// Default Taf-1 implementation.
     /// </summary>
     public class TafAdapterTaf1 : ITafAdapter
     {
+        private List<OriginalValueList> originalValueLists;
+
+        /// <inheritdoc />
         /// <summary>
         /// Calculates the derived register for Taf1.
         /// </summary>
         /// <param name="device">Date from the SMGW. There should be just original value lists.</param>
         /// <param name="supplier">The calculation data from the supplier.</param>
-        /// <returns>An IAccountingPeriod instance. The object contains the calculated data.</returns>
-        public IAccountingPeriod Calculate(UsagePointAdapterTRuDI device, UsagePointLieferant supplier)
+        /// <returns>An ITaf2Data instance. The object contains the calculated data.</returns>
+        public TafAdapterData Calculate(UsagePointAdapterTRuDI device, UsagePointLieferant supplier)
         {
-            var originalValueList = new List<MeterReading>();
-            device.MeterReadings.Where(mr => mr.IsOriginalValueList()).ToList().ForEach(mr => originalValueList.Add(mr));
+            this.originalValueLists =
+                device.MeterReadings.Where(mr => mr.IsOriginalValueList()).Select(mr => new OriginalValueList(mr)).ToList();
 
-            CheckOriginalValueList(originalValueList, supplier, device.MeterReadings.Count);
+            if (!this.originalValueLists.Any())
+            {
+                throw new InvalidOperationException("TAF-7 calculation error: Invalid MeterReading instance. No original value list.");
+            }
 
-            var accountingPeriod = new AccountingPeriod(supplier.GetRegister());
+            var originalValueList = new List<MeterReading>(device.MeterReadings.Where(mr => mr.IsOriginalValueList()));
+
+            this.CheckOriginalValueList(originalValueList, supplier, device.MeterReadings.Count);
+
+            var registers = supplier.GetRegister();
+            this.UpdateReadingTypeFromOriginalValueList(registers);
+
+            var accountingPeriod = new Taf1Data(registers, supplier.AnalysisProfile.TariffStages);
             accountingPeriod.SetDate(supplier.AnalysisProfile.BillingPeriod.Start, supplier.AnalysisProfile.BillingPeriod.GetEnd());
 
             var dayProfiles = supplier.AnalysisProfile.TariffChangeTrigger.TimeTrigger.DayProfiles;
 
-            foreach (MeterReading meterReading in originalValueList)
+            foreach (var meterReading in originalValueList)
             {
                 var currentDate = meterReading.IntervalBlocks.First().Interval.Start;
                 var end = meterReading.IntervalBlocks.Last().Interval.GetEnd();
@@ -54,7 +71,7 @@
                     .SpecialDayProfiles.Where(s => s.DayId == dayId)
                     .OrderBy(s => s.SpecialDayDate.GetDate());
 
-                var hasOnlyOneDayId = CheckDayIdInPeriod(specialDayProfiles.ToList(), dayId);
+                var hasOnlyOneDayId = this.CheckDayIdInPeriod(specialDayProfiles.ToList(), dayId);
                 if (!hasOnlyOneDayId)
                 {
                     throw new InvalidOperationException("Taf1: A tariff change is not allowed.");
@@ -63,7 +80,7 @@
                 var startReading = meterReading.GetIntervalReadingFromDate(currentDate);
                 while (currentDate < end)
                 {
-                    var result = GetSection(supplier, meterReading, startReading, currentDate, end, tariffId);
+                    var result = this.GetSection(supplier, meterReading, startReading, currentDate, end, tariffId);
                     currentDate = result.currentDate;
                     accountingPeriod.Add(result.section);
                 }
@@ -71,11 +88,11 @@
                 accountingPeriod.AddInitialReading(new Reading()
                 {
                     Amount = accountingPeriod.AccountingSections.First(s => s.Reading.ObisCode == meterReading.ReadingType.ObisCode).Reading.Amount,
-                    ObisCode = meterReading.ReadingType.ObisCode
+                    ObisCode = new ObisId(meterReading.ReadingType.ObisCode)
                 });
             }
             
-            return accountingPeriod;
+            return new TafAdapterData(typeof(Taf2SummaryView), typeof(Taf2DetailView), accountingPeriod);
         }
 
         /// <summary>
@@ -90,9 +107,12 @@
         /// <returns>The calculated AccountingSection</returns>
         public (AccountingMonth section, DateTime currentDate) GetSection(UsagePointLieferant supplier, MeterReading meterReading, IntervalReading startReading, DateTime currentDate, DateTime end, ushort tariffId)
         {
-            var section = new AccountingMonth(supplier.GetRegister())
+            var registers = supplier.GetRegister();
+            this.UpdateReadingTypeFromOriginalValueList(registers);
+
+            var section = new AccountingMonth(registers)
             {
-                Reading = new Reading() { Amount = startReading.Value, ObisCode = meterReading.ReadingType.ObisCode }
+                Reading = new Reading() { Amount = startReading.Value, ObisCode = new ObisId(meterReading.ReadingType.ObisCode) }
             };
 
             var reading = meterReading.GetIntervalReadingFromDate(currentDate.AddMonths(1));
@@ -180,6 +200,26 @@
             }
 
             return true;
-        } 
+        }
+
+        /// <summary>
+        /// Adds the corresponding reading type to the specified registers.
+        /// </summary>
+        /// <param name="registers">The registers to add the reading type.</param>
+        private void UpdateReadingTypeFromOriginalValueList(List<Register> registers)
+        {
+            foreach (var register in registers)
+            {
+                var ovl = this.originalValueLists.FirstOrDefault(
+                    o => o.Obis.A == register.ObisCode.A && o.Obis.B == register.ObisCode.B
+                         && o.Obis.C == register.ObisCode.C && o.Obis.D == register.ObisCode.D && o.Obis.E == 0
+                         && o.Obis.F == register.ObisCode.F);
+
+                if (ovl != null)
+                {
+                    register.SourceType = ovl.MeterReading.ReadingType;
+                }
+            }
+        }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace TRuDI.TafAdapter.Interface
+﻿namespace TRuDI.TafAdapter.Interface.Taf2
 {
     using System;
     using System.Collections.Generic;

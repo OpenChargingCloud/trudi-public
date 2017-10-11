@@ -5,6 +5,7 @@ namespace TRuDI.TafAdapter.Taf2
     using System;
     using TRuDI.Models.BasicData;
     using TRuDI.TafAdapter.Interface;
+    using TRuDI.TafAdapter.Interface.Taf2;
 
     public class MeasuringRange : IMeasuringRange
     {

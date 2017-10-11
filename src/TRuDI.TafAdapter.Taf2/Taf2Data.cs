@@ -3,22 +3,30 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using TRuDI.TafAdapter.Interface;
 
-    public class AccountingPeriod : IAccountingPeriod
+    using TRuDI.HanAdapter.Interface;
+    using TRuDI.Models.CheckData;
+    using TRuDI.TafAdapter.Interface.Taf2;
+
+    public class Taf2Data : ITaf2Data
     {
         private List<AccountingDay> accountingDays = new List<AccountingDay>();
-        private List<Register> summaryRegister = new List<Register>();
-        private List<Reading> initialReadings = new List<Reading>();
+        private readonly List<Register> summaryRegister;
+        private readonly List<Reading> initialReadings = new List<Reading>();
 
-        public AccountingPeriod(IList<Register> summaryRegister)
+        public Taf2Data(IList<Register> summaryRegister, IReadOnlyList<TariffStage> tariffStages)
         {
             this.summaryRegister = new List<Register>(summaryRegister);
+            this.TariffStages = tariffStages;
         }
+
+        public TafId TafId => TafId.Taf2;
 
         public DateTime Begin { get; set; }
 
         public DateTime End { get; set; }
+
+        public IReadOnlyList<TariffStage> TariffStages { get; }
 
         public void Add(AccountingDay day)
         {
@@ -32,13 +40,13 @@
 
         public void AddInitialReading(Reading reading)
         {
-            if(this.initialReadings.Count < 1)
+            if (this.initialReadings.Count < 1)
             {
                 this.initialReadings.Add(reading);
             }
             else
             {
-                if (initialReadings.FirstOrDefault(ir => ir.ObisCode == reading.ObisCode) == null)
+                if (this.initialReadings.FirstOrDefault(ir => ir.ObisCode == reading.ObisCode) == null)
                 {
                     this.initialReadings.Add(reading);
                 }
@@ -47,7 +55,7 @@
 
         public void OrderSections()
         {
-            if(this.accountingDays.Count > 1)
+            if (this.accountingDays.Count > 1)
             {
                 this.accountingDays = this.accountingDays.OrderBy(day => day.Start).ToList();
             }

@@ -1,10 +1,10 @@
 ﻿@using System.Globalization
-@using TRuDI.Backend.Application
 @using TRuDI.Models
-@inject ApplicationState StateService
-@{
-    var data = StateService.CurrentSupplierFile.AccountingPeriod;
+@using TRuDI.TafAdapter.Interface.Taf2
+@using TRuDI.TafAdapter.Taf2.Components
+@model TariffDataViewModel
 
+@{
     var colors = new Dictionary<int, string> {
         { 1, "#00baad" },
         { 2, "#ff5733" },
@@ -47,25 +47,25 @@
     }
 </style>
 
-@foreach (var sec in data.AccountingSections.Where(s => s.Start == Model))
+@foreach (var sec in Model.Data.AccountingSections.Where(s => s.Start == Model.Timestamp))
 {
-    var importDirection = sec.Reading.ObisCode.ToUpperInvariant() == "0100010800FF";
+    var importDirection = sec.Reading.ObisCode.C == 1;
 
     <div style="clear: both; overflow: auto;">
         
         @if (importDirection)
         {
-            <h3>Bezug am @Model.ToString("dd.MM.yyyy")</h3>
+            <h3>Bezug am @Model.Timestamp.ToString("dd.MM.yyyy")</h3>
         }
         else
         {
-            <h3>Lieferung am @Model.ToString("dd.MM.yyyy")</h3>
+            <h3>Lieferung am @Model.Timestamp.ToString("dd.MM.yyyy")</h3>
         }
 
         <div>
             @{
-                var ovl = StateService.CurrentDataResult.OriginalValueLists.FirstOrDefault(o => o.Obis.A == sec.SummaryRegister.First().ObisCode.A && o.Obis.B == sec.SummaryRegister.First().ObisCode.B && o.Obis.C == sec.SummaryRegister.First().ObisCode.C && o.Obis.D == sec.SummaryRegister.First().ObisCode.D && o.Obis.E == 0 && o.Obis.F == sec.SummaryRegister.First().ObisCode.F);
-                var unit = ovl.Uom.GetDisplayUnit(ovl.PowerOfTenMultiplier);
+                var sourceType = @Model.Data.SummaryRegister.First().SourceType;
+                var unit = sourceType.Uom.GetDisplayUnit(sourceType.PowerOfTenMultiplier.Value);
 
                 int minPeriodLength = 96;
                 foreach (var mr in sec.MeasuringRanges)
@@ -90,7 +90,7 @@
 
                         <div>
                             Tarif @mr.TariffId von @mr.Start.ToString("HH:mm") Uhr bis @(mr.End.Hour == 0 && mr.End.Minute == 0 ? "24:00" : mr.End.ToString("HH:mm")) Uhr<br/>
-                            <strong>@mr.Amount.GetDisplayValue(ovl.Uom, ovl.PowerOfTenMultiplier, ovl.Scaler) @unit</strong>
+                            <strong>@mr.Amount.GetDisplayValue(sourceType) @unit</strong>
                         </div>
                     </div>
                 }
@@ -113,7 +113,7 @@
 
                     @foreach (var register in sec.SummaryRegister.Where(s => s.ObisCode.C == (importDirection ? 1 : 2)))
                     {
-                        var tariffDescription = StateService.CurrentSupplierFile.Model.AnalysisProfile?.TariffStages?.FirstOrDefault(ts => new ObisId(ts.ObisCode) == register.ObisCode)?.Description;
+                        var tariffDescription = Model.Data.TariffStages.FirstOrDefault(ts => new ObisId(ts.ObisCode) == register.ObisCode)?.Description;
                         if (!string.IsNullOrWhiteSpace(tariffDescription) && register.TariffId != 63)
                         {
                             tariffDescription = $"{tariffDescription} (Tarif {register.TariffId})";
@@ -131,9 +131,9 @@
                         <tr>
                             <td>@tariffDescription</td>
                             <td class="text-right">
-                                @register.Amount.GetDisplayValue(ovl.Uom, ovl.PowerOfTenMultiplier, ovl.Scaler)
+                                @register.Amount.GetDisplayValue(sourceType)
                             </td>
-                            <td>@ovl.Uom.GetDisplayUnit(ovl.PowerOfTenMultiplier)</td>
+                            <td>@unit</td>
                         </tr>
                     }
 
@@ -141,9 +141,9 @@
                     <tr>
                         <td><strong>Gesamt</strong></td>
                         <td class="text-right">
-                            <strong>@totalAmount.GetDisplayValue(ovl.Uom, ovl.PowerOfTenMultiplier, ovl.Scaler)</strong>
+                            <strong>@totalAmount.GetDisplayValue(sourceType)</strong>
                         </td>
-                        <td><strong>@ovl.Uom.GetDisplayUnit(ovl.PowerOfTenMultiplier)</strong></td>
+                        <td><strong>@unit</strong></td>
                     </tr>
 
                 </table>

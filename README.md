@@ -293,14 +293,14 @@ Verbraucher relevanten Verträge zu erhalten.
 Feld | Beschreibung|XML|Beispiel
 ---  | --- | --- | ---
 TafId| Nummer des TAF | | TAF-1, TAF-2, TAF-6, TAF-7
-TafName|Eindeutige Identifikation des TAF | | TAF-2-ID
-Description|Kurze Beschreibung des TAF | tariffName |HT/NT Tarif
-Meters|Liste der mit dem TAF verbundenen Zähler | meterId
-MeteringPointId|Zählpunktbezeichnung | usagePointId | DE00000000000000000000000000000001
-SupplierId|ID des Lieferanten | invoicingPartyId | EMT-BDEW
-ConsumerId|ObjectID des Letztverbrauchers, dem die die Daten zugeordnet werden (Cosem Logical Device ohne .sm) | customerId | userID-001
-Begin|Startzeitpunkt des Vertrags|||
-End|Endzeitpunkt des Vertrags|||
+TafName|Eindeutige Identifikation des TAF, **muss geliefert werden**| tariffName | TAF-2-ID
+Description|Kurze Beschreibung des TAF, **optional** | |HT/NT Tarif
+Meters|Liste der mit dem TAF verbundenen Zähler, **muss geliefert werden**| meterId
+MeteringPointId|Zählpunktbezeichnung, **muss geliefert werden**| usagePointId | DE00000000000000000000000000000001
+SupplierId|ID des Lieferanten, **muss geliefert werden** | invoicingPartyId | EMT-BDEW
+ConsumerId|ObjectID des Letztverbrauchers, dem die die Daten zugeordnet werden (Cosem Logical Device ohne .sm), **muss geliefert werden** | customerId | userID-001
+Begin|Startzeitpunkt des Vertrags, **muss geliefert werden**|||
+End|Endzeitpunkt des Vertrags, **optional**|||
 
 
 #### TAF-6

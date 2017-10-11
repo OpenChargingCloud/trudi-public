@@ -132,12 +132,17 @@
         /// <returns>Der gerundete Zeitstempel</returns>
         public static DateTime GetSmoothCaptureTime(this DateTime dateTime, DateTime captureTime)
         {
-            if(captureTime.Second > 58)
-            {
-                return captureTime.GetDateWithoutSeconds().AddMinutes(1);
-            }
+            if(captureTime.Second > 30)
+                captureTime = captureTime.GetDateWithoutSeconds().AddMinutes(1);
+            else if (captureTime.Second > 0)
+                captureTime = captureTime.GetDateWithoutSeconds();
 
-            return captureTime.GetDateWithoutSeconds();
+            if (captureTime.Minute % 15 > 7)
+                captureTime = captureTime.AddMinutes(15 - (captureTime.Minute % 15));
+            else if (captureTime.Minute % 15 > 0)
+                captureTime = captureTime.AddMinutes(- (captureTime.Minute % 15));
+
+            return captureTime;
         }
 
 

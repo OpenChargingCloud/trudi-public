@@ -1,23 +1,22 @@
 ﻿namespace TRuDI.Backend.Components
 {
-    using System;
-
     using Microsoft.AspNetCore.Mvc;
 
     using TRuDI.Backend.Application;
+    using TRuDI.Models;
 
-    public class TariffDataView : ViewComponent
+    public class OriginalValueListErrorsView : ViewComponent
     {
         private readonly ApplicationState applicationState;
 
-        public TariffDataView(ApplicationState applicationState)
+        public OriginalValueListErrorsView(ApplicationState applicationState)
         {
             this.applicationState = applicationState;
         }
 
-        public IViewComponentResult Invoke(DateTime timestamp)
+        public IViewComponentResult Invoke(OriginalValueList ovl)
         {
-            return this.View(timestamp);
+            return this.View(ovl);
         }
     }
 }
