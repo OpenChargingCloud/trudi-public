@@ -23,6 +23,11 @@ namespace TRuDI.HanAdapter.Interface
         NoDataInSelectedTimeRange,
 
         /// <summary>
+        /// There is no TAF profile for the consumer.
+        /// </summary>
+        NoTafProfileForUser,
+
+        /// <summary>
         /// Received an error message from the device.
         /// </summary>
         DeviceError,

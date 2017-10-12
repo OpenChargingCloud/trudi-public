@@ -13,6 +13,7 @@
     using System.Net.Sockets;
     using System.Text;
     using System.Threading;
+    using System.Globalization;
 
     using TRuDI.Backend.Application;
 
@@ -114,6 +115,9 @@
                     Log.Warning("Configuration file not found: {0}", testConfigFile);
                 }
             }
+
+            var cultureInfo = new CultureInfo("de-DE");
+            CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
 
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 

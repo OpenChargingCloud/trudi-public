@@ -176,7 +176,7 @@
 
                 return false;
             },
-            "Ungültige Geräte-ID"
+            "Ungültige Identifikationsnummer"
         );
 
         $.validator.addMethod(
@@ -188,6 +188,18 @@
             "Ungültige IP-Adresse"
         );
 
+        $.validator.addMethod(
+            "portRangeValidator",
+            function (value, element) {
+                if (value >= 1 && value <= 65535) {
+                    return true;
+                }
+
+                return false;
+            },
+            "Ungültiger Port"
+        );
+
         $("#connectForm").validate({
             rules: {
                 DeviceId: {
@@ -196,6 +208,10 @@
 
                 Address: {
                     ipAddressValidator: true,
+                },
+
+                Port: {
+                    portRangeValidator: true,
                 },
             }
         });

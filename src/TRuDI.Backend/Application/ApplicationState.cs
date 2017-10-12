@@ -268,7 +268,6 @@
 
                             Log.Information("Loading TAF-7 data from SMGW");
                             this.LoadData(this.CurrentSupplierFile.Ctx);
-                            await this.LoadNextPageAfterProgress("/Progress");
                         }
                     }
                     catch (OperationCanceledException)
@@ -313,6 +312,10 @@
                     this.LastErrorMessages.Add("Anmeldung am Smart Meter Gateway fehlgeschlagen.");
                     break;
 
+                case ErrorType.NoTafProfileForUser:
+                    this.LastErrorMessages.Add($"Für den Benutzer {(this.ConnectData.AuthMode == AuthMode.UserPassword ? this.ConnectData.Username : this.ClientCert.Subject)} sind keine Vertragsdaten im Smart Meter Gateway vorhanden.");
+                    return;
+                
                 case ErrorType.DeviceError:
                     this.LastErrorMessages.Add("Fehler während der Kommunikation mit dem Smart Meter Gateway. Das Smart Meter Gateway lieferte folgenden Fehler zurück:");
                     break;

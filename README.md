@@ -11,7 +11,7 @@ Ansprechpartner:
 
 ### Microsoft .Net Core
 
-- Visual Studio 2017 15.3: https://www.visualstudio.com/de/vs/
+- Visual Studio 2017 15.4: https://www.visualstudio.com/de/vs/
 - .Net Core SDK 2.0: https://www.microsoft.com/net/core/
 - Alternativ zu Visual Studio kann auch Visual Studio Code verwendet werden: https://code.visualstudio.com/
 
@@ -26,12 +26,12 @@ Ansprechpartner:
 
 System           | Download
 ---              | ---
-Windows (64-Bit) | http://www.ivu-software.de/apps/TRuDI/TRuDI-Setup-1.0.2.exe
+Windows (64-Bit) | http://www.ivu-software.de/apps/TRuDI/TRuDI-Setup-1.0.8.exe
 Windows (32-Bit) | 
-Linux ([AppImage](https://de.wikipedia.org/wiki/AppImage), 64-Bit) | http://www.ivu-software.de/apps/TRuDI/TRuDI-1.0.0-x86_64.AppImage
-Linux (deb, 64-Bit) | 
+Linux ([AppImage](https://de.wikipedia.org/wiki/AppImage), 64-Bit) | http://www.ivu-software.de/apps/TRuDI/TRuDI-1.0.8-x86_64.AppImage
+Linux (deb, 64-Bit) | http://www.ivu-software.de/apps/TRuDI/TRuDI-1.0.8_amd64.deb
 
-## Namenskonvention
+## Namenskonvention HAN-Adapter
 
 Assemblies müssen folgendermaßen benannt werden, z.B.:
 
@@ -55,8 +55,7 @@ namespace TRuDI.HanAdapter.Example
 
 ## Einbinden von IHanAdapter
 
-Das Interface muss über das NuGet-Paket "TRuDI.HanAdapter.Interface.1.0.0.nupkg" in das jeweilige Projekt eingebunden werden.
-Im Repository ist ebenfalls das zugehörige Projekt zu finden. Dieses dient allerdings nur zur Dokumentation der Schnittstelle und sollte nicht direkt verwendet werden.
+Das Interface ist im Projekt ```TRuDI.HanAdapter.Interface``` zu finden.
 
 ## HTTPS
 
@@ -329,3 +328,9 @@ Lädt die aktuellen Registerwerte (Wichtig: die abgeleiteten Register!) des ange
 Dieser Adapter dient zum Simulieren eines SMGWs und ist wärend der normalen Progammausführung nicht aktiv.
 
 Um diesen zu aktivieren, muss das Programm mit dem Paramter ``--test=<Konfigurations-Datei>`` aufgerufen werden.
+
+## TAF-Adapter
+
+TAF-Adapter implementieren das Interface ```ITafAdapter``` aus dem Projekt ```TRuDI.TafAdapter.Interface```.
+
+Ein TAF-Adapter liefert neben den berechneten Daten auch jeweils eine View-Komponente für die Zusammenfassung und Detail-Ansicht.
