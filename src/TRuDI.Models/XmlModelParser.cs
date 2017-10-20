@@ -408,17 +408,17 @@
 
             foreach (var meterReading in usagePoint.MeterReadings)
             {
-                meterReading.IntervalBlocks.Sort((a, b) => a.Interval.Start.CompareTo(b.Interval.Start));
+                meterReading.IntervalBlocks.Sort((a, b) => a.Interval.Start.ToUniversalTime().CompareTo(b.Interval.Start.ToUniversalTime()));
 
                 foreach (var block in meterReading.IntervalBlocks)
                 {
-                    block.IntervalReadings.Sort((a, b) => a.TimePeriod.Start.CompareTo(b.TimePeriod.Start));
+                    block.IntervalReadings.Sort((a, b) => a.TimePeriod.Start.ToUniversalTime().CompareTo(b.TimePeriod.Start.ToUniversalTime()));
                 }
             }
 
             if (usagePoint?.LogEntries != null && usagePoint.LogEntries.Any())
             {
-                usagePoint.LogEntries.Sort((a, b) => a.LogEvent.Timestamp.CompareTo(b.LogEvent.Timestamp));
+                usagePoint.LogEntries.Sort((a, b) => a.LogEvent.Timestamp.ToUniversalTime().CompareTo(b.LogEvent.Timestamp.ToUniversalTime()));
             }
 
             return usagePoint;

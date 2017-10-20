@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <MvcRazorCompileOnPublish>true</MvcRazorCompileOnPublish>
-    <RuntimeIdentifiers>win-x64;win7-x64;win10-x64;ubuntu.16.10-x64</RuntimeIdentifiers>
+    <RuntimeIdentifiers>win7-x86;win7-x64;linux-x64</RuntimeIdentifiers>
     <AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
     <UserSecretsId>aspnet-TRuDI.HanAdapter.UiTest-49A490D1-55E7-44CF-93EE-45F9EBEA9A38</UserSecretsId>
     <AssemblyName>TRuDI.Backend</AssemblyName>
@@ -14,9 +14,9 @@
 
   <PropertyGroup>
     <RestoreSources>$(RestoreSources);../../private-packages;https://api.nuget.org/v3/index.json</RestoreSources>
-    <AssemblyVersion>1.0.8.0</AssemblyVersion>
-    <FileVersion>1.0.8.0</FileVersion>
-    <Version>1.0.8</Version>
+    <AssemblyVersion>1.0.14.0</AssemblyVersion>
+    <FileVersion>1.0.14.0</FileVersion>
+    <Version>1.0.14</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -30,8 +30,6 @@
     <PackageReference Include="Serilog.Sinks.Trace" Version="2.1.0" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="4.4.0" />
     <PackageReference Include="WebSocketManager" Version="1.0.1" />
-    <PackageReference Include="IVU.BouncyCastle.Crypto" Version="2.0.0" />
-    <PackageReference Include="IVU.Http" Version="1.0.10" />
     <PackageReference Include="Serilog.Sinks.ColoredConsole" Version="3.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.ViewCompilation" Version="2.0.0" />
   </ItemGroup>
@@ -45,6 +43,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\IVU.BouncyCastle.Crypto\IVU.BouncyCastle.Crypto.csproj" />
+    <ProjectReference Include="..\IVU.Http\IVU.Http.csproj" />
     <ProjectReference Include="..\TRuDI.HanAdapter.Example\TRuDI.HanAdapter.Example.csproj" />
     <ProjectReference Include="..\TRuDI.HanAdapter.Interface\TRuDI.HanAdapter.Interface.csproj" />
     <ProjectReference Include="..\TRuDI.Models\TRuDI.Models.csproj" />

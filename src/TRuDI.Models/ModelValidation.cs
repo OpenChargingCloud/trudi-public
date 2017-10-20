@@ -82,6 +82,7 @@
             }
 
             ValidateAnalysisProfile(usagePoint.AnalysisProfile, exceptions);
+            ValidateTaf7SupplierDayProfiles(usagePoint, exceptions);
 
             if (exceptions.Any())
             {
@@ -439,17 +440,27 @@
         }
 
         // Validation of an Interval instance
-        private static void ValidateInterval(Interval interval, string name, List<Exception> exceptions)
+        private static bool ValidateInterval(Interval interval, string name, List<Exception> exceptions)
         {
             if (!interval.Duration.HasValue)
             {
                 exceptions.Add(new InvalidOperationException($"The element Duration in {name} is null. "));
+                return false;
             }
 
             if (interval.Start == null)
             {
                 exceptions.Add(new InvalidOperationException($"The element Start in {name} is null. "));
+                return false;
             }
+
+            if (interval.Start == DateTime.MinValue)
+            {
+                exceptions.Add(new InvalidOperationException($"The element Start in {name} is not specified. "));
+                return false;
+            }
+
+            return true;
         }
 
         // Validation of an IntervalReading instance
@@ -550,10 +561,44 @@
                 ValidateTariffChangeTrigger(analysisProfile.TariffChangeTrigger, exceptions);
             }
 
-            ValidateInterval(analysisProfile.BillingPeriod, "Billing Period", exceptions);
+            if (ValidateInterval(analysisProfile.BillingPeriod, "Billing Period", exceptions))
+            {
+                //Validate if we have at least one full day in the BillingPeriod
+                if ((analysisProfile.BillingPeriod.GetEnd().Date - analysisProfile.BillingPeriod.Start.Date).Days < 1)
+                {
+                    exceptions.Add(new InvalidOperationException("Die Abrechnungsperiode in der Tarifdatei muss mindestens einen vollen Tag umfassen."));
+                }
+            }
 
             ValidateAnalysisProfileTariffUseCase(analysisProfile.TariffUseCase, exceptions);
+        }
 
+        // Taf-7: Validate if the supplier periods have a duration of 15 minutes
+        private static void ValidateTaf7SupplierDayProfiles(UsagePointLieferant supplier, List<Exception> exceptions)
+        {
+            var profiles = supplier.AnalysisProfile.TariffChangeTrigger.TimeTrigger.DayProfiles;
+
+            foreach (DayProfile profile in profiles)
+            {
+                var dtProfiles = profile.DayTimeProfiles;
+                for (int i = 0; i < dtProfiles.Count; i++)
+                {
+                    if (i + 1 == dtProfiles.Count)
+                    {
+                        break;
+                    }
+
+                    var current = new TimeSpan((int)dtProfiles[i].StartTime.Hour, (int)dtProfiles[i].StartTime.Minute, 0);
+                    var next = new TimeSpan((int)dtProfiles[i + 1].StartTime.Hour, (int)dtProfiles[i + 1].StartTime.Minute, 0);
+
+                    if ((int)(next - current).TotalSeconds == 900)
+                    {
+                        continue;
+                    }
+
+                    exceptions.Add(new InvalidOperationException($"TAF-7: Die Tarifschaltzeiten für Tagesprofil {profile.DayId} in der Tarifdatei des Lieferanten sind nicht für jede 15-Minuten-Messperiode angegeben: {current} zu {next}"));
+                }
+            }
         }
 
         // Validate if the TariffUseCase of AnalysisProfile is valid

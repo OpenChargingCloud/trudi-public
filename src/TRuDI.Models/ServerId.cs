@@ -23,7 +23,7 @@
             }
 
             serverId = serverId.ToUpperInvariant();
-            var match = Regex.Match(serverId, @"([0-9E]{1})\s*([A-Z]{3})\s*([0-9]{2})\s*([0-9]{8})");
+            var match = Regex.Match(serverId.ToUpperInvariant(), @"([0-9E]{1})\s*([A-Z]{3})\s*([0-9]{2})\s*([0-9]{8})");
             if (match.Success)
             {
                 this.Id = serverId;
@@ -35,7 +35,7 @@
                 return;
             }
 
-            match = Regex.Match(serverId, "^0A0[0-9E]{1}[0-9A-F]{16}$");
+            match = Regex.Match(serverId.ToUpperInvariant(), "^0A0[0-9E]{1}[0-9A-F]{16}$");
             if (match.Success)
             {
                 this.Medium = (ObisMedium)byte.Parse(serverId.Substring(3, 1), NumberStyles.HexNumber, CultureInfo.InvariantCulture);

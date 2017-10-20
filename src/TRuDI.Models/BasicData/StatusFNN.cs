@@ -9,7 +9,11 @@
 
         public StatusFNN(string status)
         {
-            this.Status = status;
+            this.Status = status.PadLeft(16, '0');
+            var smgwStat = Convert.ToInt64(this.Status.Substring(0, 8), 16);
+            var bzStat = Convert.ToInt64(this.Status.Substring(8), 16);
+            this.SmgwStatusWord = (SmgwStatusWord)smgwStat;
+            this.BzStatusWord = (BzStatusWord)bzStat;
         }
 
         public string Status
@@ -35,13 +39,13 @@
                 return StatusPTB.Fatal_Error;
             }
 
-            if (!this.SmgwStatusWord.HasFlag(SmgwStatusWord.Systemtime_Valid) ||
+            if (this.SmgwStatusWord.HasFlag(SmgwStatusWord.Systemtime_Invalid) ||
                 this.SmgwStatusWord.HasFlag(SmgwStatusWord.PTB_Temp_Error_is_invalid))
             {
                 return StatusPTB.Temp_Error_is_invalid;
             }
 
-            if (!this.SmgwStatusWord.HasFlag(SmgwStatusWord.PTB_Temp_Error_signed_invalid))
+            if (this.SmgwStatusWord.HasFlag(SmgwStatusWord.PTB_Temp_Error_signed_invalid))
             {
                 return StatusPTB.Warning;
             }
@@ -57,7 +61,7 @@
         Transparency_Bit = 2,
         BitPos2 = 4,
         Fatal_Error = 256,
-        Systemtime_Valid = 512,
+        Systemtime_Invalid = 512,
         PTB_Warning = 4096,
         PTB_Temp_Error_signed_invalid = 8192,
         PTB_Temp_Error_is_invalid = 16384,

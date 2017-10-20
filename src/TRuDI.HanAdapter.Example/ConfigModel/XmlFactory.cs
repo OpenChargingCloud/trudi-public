@@ -46,10 +46,10 @@
                                                new XAttribute(XNamespace.Xmlns + "atom", Namespaces.FirstOrDefault(ns => ns.name == "atom").ns),
                                                    BuildUsagePoint(false));
 
-            if (HanConfiguration.Contract.TafId == TafId.Taf7)
-            {
-                BuildSupplierXml(BuildUsagePoint(true));
-            }
+            //if (HanConfiguration.Contract.TafId == TafId.Taf7)
+            //{
+            //    BuildSupplierXml(BuildUsagePoint(true));
+            //}
 
             return new XDocument(UsagePoints);
         }

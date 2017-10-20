@@ -121,7 +121,9 @@
         /// <returns>Das gekürzute DateTime Objekt</returns>
         public static DateTime GetDateWithoutSeconds(this DateTime dateTime)
         {
-            return new DateTime(dateTime.Year, dateTime.Month, dateTime.Day, dateTime.Hour, dateTime.Minute, 0, dateTime.Kind);
+            var utcConvertedTime = dateTime.ToUniversalTime();
+            var utcWithoutSeconds = new DateTime(utcConvertedTime.Year, utcConvertedTime.Month, utcConvertedTime.Day, utcConvertedTime.Hour, utcConvertedTime.Minute, 0, DateTimeKind.Utc);
+            return dateTime.Kind == DateTimeKind.Utc ? utcWithoutSeconds : utcWithoutSeconds.ToLocalTime();
         }
 
         /// <summary>
@@ -143,19 +145,6 @@
                 captureTime = captureTime.AddMinutes(- (captureTime.Minute % 15));
 
             return captureTime;
-        }
-
-
-        /// <summary>
-        /// Teilt den FNN Status hex String in die beiden Enumerationen SmgwStatusWord und BzStatusWord auf
-        /// </summary>
-        /// <param name="statusFNN"></param>
-        public static void SplitStringToEnums(this StatusFNN statusFNN)
-        {
-            var smgwStat = Convert.ToInt64(statusFNN.Status.Substring(0, 8), 16);
-            var bzStat = Convert.ToInt64(statusFNN.Status.Substring(8), 16);
-            statusFNN.SmgwStatusWord = (SmgwStatusWord)smgwStat;
-            statusFNN.BzStatusWord = (BzStatusWord)bzStat;
         }
 
         /// <summary>

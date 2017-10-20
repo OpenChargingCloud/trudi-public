@@ -6,6 +6,7 @@
 @{
     var data = StateService.CurrentSupplierFile.Model;
     var tariffData = StateService.CurrentSupplierFile.TafData.Data;
+    var deviceData = StateService.CurrentDataResult.Model;
 }
 
 <table class="table">
@@ -16,9 +17,9 @@
     </tr>
 
     <tr>
-        <td>@data.Customer.CustomerId</td>
-        <td>@data.InvoicingParty.InvoicingPartyId</td>
-        <td>@data.TariffName</td>
+        <td>@deviceData?.Customer?.CustomerId</td>
+        <td>@data?.InvoicingParty?.InvoicingPartyId</td>
+        <td>@data?.TariffName</td>
     </tr>
 
     <tr>

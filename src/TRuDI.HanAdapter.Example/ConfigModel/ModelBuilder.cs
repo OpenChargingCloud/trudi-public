@@ -215,28 +215,29 @@
 
             var value = meterReadingConfig.OMLInitValue;
             var preValue = value;
-            var timestamp = intervalBlock.Interval.Start;
+            var timestamp = intervalBlock.Interval.Start.ToUniversalTime();
 
-            while (timestamp <= intervalBlock.Interval.GetEnd().GetDateWithoutSeconds())
+            var end = intervalBlock.Interval.GetEnd().GetDateWithoutSeconds().ToUniversalTime();
+            while (timestamp <= end)
             {
                 var ir = new IntervalReading()
                 {
                     TimePeriod = new Interval()
                     {
                         Duration = 0,
-                        Start = timestamp
+                        Start = timestamp.ToLocalTime()
                     },
                     Value = value
                 };
 
                 if (preValue != value)
                 {
-                    taf2.Data.Add((timestamp, GetRandomNumber(0, meterReadingConfig.Taf2TariffStages), value - preValue));
+                    taf2.Data.Add((timestamp.ToLocalTime(), GetRandomNumber(0, meterReadingConfig.Taf2TariffStages), value - preValue));
                 }
 
                 preValue = value;
                 value = value + GetRandomNumber(1, hanConfiguration.XmlConfig.MaxConsumptionValue);
-                timestamp = timestamp.AddSeconds((double)meterReadingConfig.PeriodSeconds).GetDateWithoutSeconds();
+                timestamp = timestamp.AddSeconds(meterReadingConfig.PeriodSeconds.Value).GetDateWithoutSeconds();
                 SetStatusWord(ir, meterReadingConfig);
                 ir.IntervalBlock = intervalBlock;
                 intervalBlock.IntervalReadings.Add(ir);
@@ -400,9 +401,20 @@
             return $"{obisCode}.{iD}.sm";
         }
 
+        /// <summary>
+        /// Im Durchschnitt, wird alle 6 Tage ein fataler Fehler, und alle 2 Tage eine Warnung vorkommen
+        /// </summary>
+        /// <returns></returns>
         private static string GetStatusFNN()
         {
-            return "0000010500100504";
+            var rand = GetRandomNumber(0, 6 * 96 + 1); //6-tage-lang von Intervallen
+
+            if (rand % (6 * 96) == 0)
+                return "210500000004"; //Fataler Fehler
+            else if (rand % (2 * 96) == 0)
+                return "200500000004"; //Warnung
+            else
+                return "0500000004";   //Kein Fehler
         }
 
         private static int GetRandomNumber(int min, int max)

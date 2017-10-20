@@ -56,7 +56,6 @@
             ValidateSupplierModelTariffStageCount(supplierModel, exceptions);
             ValidateSpecialDayProfilesWithinBillingPeriod(supplierModel, exceptions);
             ValidateSupplierModelCompletelyEnrolledCalendar(usagePoint, supplierModel, exceptions);
-            ValidateTaf7SupplierDayProfiles(supplierModel, exceptions);
             ValidateTarifStageOccurence(supplierModel, exceptions);
             ValidateSupplierModelDayProfileOccurence(supplierModel, exceptions);
 
@@ -229,18 +228,18 @@
             TimeSpan greatestPeriod = new TimeSpan(1096, 0, 0, 0);
             var intervalReadings = usagePoint.MeterReadings[0].IntervalBlocks[0].IntervalReadings;
 
-            intervalReadings = intervalReadings.OrderBy(i => i.TimePeriod.Start).ToList();
+            intervalReadings = intervalReadings.OrderBy(i => i.TimePeriod.Start.ToUniversalTime()).ToList();
 
             for (int index = 0; index < intervalReadings.Count - 1; index++)
             {
-                var before = intervalReadings[index].TimePeriod.Start.GetDateWithoutSeconds();
-                var next = intervalReadings[index + 1].TimePeriod.Start.GetDateWithoutSeconds();
+                var before = intervalReadings[index].TimePeriod.Start.GetDateWithoutSeconds().ToUniversalTime();
+                var next = intervalReadings[index + 1].TimePeriod.Start.GetDateWithoutSeconds().ToUniversalTime();
 
                 var currentPeriod = next - before;
 
                 if (currentPeriod < smallestPeriod || currentPeriod > greatestPeriod)
                 {
-                    exceptions.Add(new InvalidOperationException($"TAF-7: Ungültige Messperiode: {currentPeriod.TotalMinutes:F2} Minuten"));
+                    exceptions.Add(new InvalidOperationException($"TAF-7: Ungültige Messperiode: {before} zu {next}: {currentPeriod.TotalMinutes:F2} Minuten"));
                 }
                 else if ((long)currentPeriod.TotalSeconds % (long)smallestPeriod.TotalSeconds != 0)
                 {
@@ -333,34 +332,6 @@
             if (model.TariffName != supplier.TariffName)
             {
                 exceptions.Add(new InvalidOperationException($"TAF-7: Der Tarifname \"{model.TariffName}\" stimmt nicht mit dem Tariffnamen \"{supplier.TariffName}\" aus der Tarifdatei des Lieferanten überein."));
-            }
-        }
-
-        // Taf-7: Validate if the supplier periods have a duration of 15 minutes
-        private static void ValidateTaf7SupplierDayProfiles(UsagePointLieferant supplier, List<Exception> exceptions)
-        {
-            var profiles = supplier.AnalysisProfile.TariffChangeTrigger.TimeTrigger.DayProfiles;
-
-            foreach (DayProfile profile in profiles)
-            {
-                var dtProfiles = profile.DayTimeProfiles;
-                for (int i = 0; i < dtProfiles.Count; i++)
-                {
-                    if (i + 1 == dtProfiles.Count)
-                    {
-                        break;
-                    }
-
-                    var current = new TimeSpan((int)dtProfiles[i].StartTime.Hour, (int)dtProfiles[i].StartTime.Minute, 0);
-                    var next = new TimeSpan((int)dtProfiles[i + 1].StartTime.Hour, (int)dtProfiles[i + 1].StartTime.Minute, 0);
-
-                    if ((int)(next - current).TotalSeconds == 900)
-                    {
-                        continue;
-                    }
-
-                    exceptions.Add(new InvalidOperationException("TAF-7: Die Tarifschaltzeiten in der Tarifdatei des Lieferanten sind nicht für jede 15-Minuten-Messperiode angegeben."));
-                }
             }
         }
 
@@ -496,7 +467,7 @@
 
             if (counter == 0)
             {
-                exceptions.Add(new InvalidOperationException("Die Tarifdatei des Lieferanten enthält keine Tagesprofile für die Abrechnungsperiode."));
+                exceptions.Add(new InvalidOperationException("Die Abrechnungsperiode in der Tarifdatei des Lieferanten umfasst keinen vollen Tagesprofil."));
             }
         }
     }

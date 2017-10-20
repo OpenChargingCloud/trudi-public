@@ -18,7 +18,6 @@
         public ReadingType SourceType { get; set; }
 
         public ObisId ObisCode { get; set; }
-
         public ushort TariffId { get; set; }
     
         public long? Amount

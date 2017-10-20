@@ -13,7 +13,16 @@
     var hasParamErrors = false;
 
     <div class="panel panel-primary">
-    <div class="panel-heading">Zählpunkt @cnt.Contract.MeteringPointId</div>
+    
+        @if (!string.IsNullOrWhiteSpace(cnt.Contract.MeteringPointId))
+        {
+            <div class="panel-heading">Zählpunkt @cnt.Contract.MeteringPointId</div>
+        }
+        else
+        {
+            hasParamErrors = true;
+            <div class="error">Zählpunkt: (Parameterierung nicht vollständig)</div>
+        }
     <div class="panel-body">
 
     <table class="table">

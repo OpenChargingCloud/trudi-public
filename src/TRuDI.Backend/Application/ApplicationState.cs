@@ -401,7 +401,11 @@
 
                             try
                             {
-                                this.UpdateRegisterValuesFromXml(rawCurrentRegisters, ctx);
+                                
+                                if (rawCurrentRegisters != null) // that will only be NULL in case of example HAN adapter, until the Getregisters function is implemented
+                                {
+                                    this.UpdateRegisterValuesFromXml(rawCurrentRegisters, ctx);
+                                }
                             }
                             catch
                             {

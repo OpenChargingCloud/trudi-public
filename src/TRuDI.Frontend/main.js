@@ -15,7 +15,7 @@ const fs = require('fs');
 // Set platform-specific parameters of the backend application
 const backendPathWindows32 = '../TRuDI.Backend/bin/dist/win7-x86';
 const backendPathWindows64 = '../TRuDI.Backend/bin/dist/win7-x64';
-const backendPathLinux = '../TRuDI.Backend/bin/dist/ubuntu.16.10-x64';
+const backendPathLinux = '../TRuDI.Backend/bin/dist/linux-x64';
 
 let backendCheckFailed = false;
 
@@ -40,6 +40,8 @@ const backendConfig = {
     certCommonName: "",
 };
 
+console.log(`Running on plattform ${os.platform()}, arch ${os.arch()}`);
+
 if (os.platform() === 'linux') {
     backendConfig.workPath = path.join(__dirname, backendPathLinux);
     backendConfig.executablePath = path.join(__dirname, backendPathLinux, 'TRuDI.Backend');
@@ -54,7 +56,7 @@ else if (os.platform() === 'win32' && os.arch() === 'x64') {
     backendConfig.checksums = JSON.parse(fs.readFileSync(path.join(__dirname, "checksums-win32-x64.json"), 'utf-8'));
     backendConfig.certCommonName = backendConfig.checksums.find(function (f) { return f.path === "\\TRuDI.Backend.dll" }).hash;
 }
-else if (os.platform() === 'win32' && os.arch() === 'x86') {
+else if (os.platform() === 'win32' && os.arch() === 'ia32') {
     backendConfig.workPath = path.join(__dirname, backendPathWindows32);
     backendConfig.executablePath = path.join(__dirname, backendPathWindows32, 'TRuDI.Backend.exe');
     backendConfig.mainAssembly = path.join(__dirname, backendPathWindows32, 'TRuDI.Backend.dll');

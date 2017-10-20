@@ -10,7 +10,7 @@
   "profiles": {
     "TRuDI.Backend": {
       "commandName": "Project",
-      "commandLineArgs": "--loglevel=verbose",
+      "commandLineArgs": "--loglevel=verbose --test=\"D:\\Projekte\\DZG\\TRuDI\\bitbucket-trudi-han-adapter\\doc\\HAN-Test-Adapter\\Taf7_1OML_UseCaseTaf2.json\"",
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"

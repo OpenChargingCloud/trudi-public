@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.16
+VisualStudioVersion = 15.0.27004.2002
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TRuDI.HanAdapter.Interface", "TRuDI.HanAdapter.Interface\TRuDI.HanAdapter.Interface.csproj", "{A8C045F9-D593-407B-8C6B-B528C48CF0B9}"
 EndProject
@@ -39,6 +39,12 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TRuDI.Backend.Tests", "TRuDI.Backend.Tests\TRuDI.Backend.Tests.csproj", "{5ED1362B-8242-484F-BAF1-CE80D40F63A8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TRuDI.TafAdapter.Taf1.Tests", "TRuDI.TafAdapter.Taf1.Tests\TRuDI.TafAdapter.Taf1.Tests.csproj", "{2C146F0C-66E3-4C6D-BD92-91B187BFF223}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IVU.BouncyCastle.Crypto", "IVU.BouncyCastle.Crypto\IVU.BouncyCastle.Crypto.csproj", "{8E10C53E-E7C6-4E63-9A03-A9F6CAAD9B3E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IVU.Common.Tls", "IVU.Common.Tls\IVU.Common.Tls.csproj", "{8793B9C0-91B1-45BE-9B53-0E12205E9DB7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IVU.Http", "IVU.Http\IVU.Http.csproj", "{10D87D2F-B414-45FE-B38C-AB67C6F7CCA5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -98,6 +104,18 @@ Global
 		{2C146F0C-66E3-4C6D-BD92-91B187BFF223}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2C146F0C-66E3-4C6D-BD92-91B187BFF223}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2C146F0C-66E3-4C6D-BD92-91B187BFF223}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E10C53E-E7C6-4E63-9A03-A9F6CAAD9B3E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E10C53E-E7C6-4E63-9A03-A9F6CAAD9B3E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E10C53E-E7C6-4E63-9A03-A9F6CAAD9B3E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E10C53E-E7C6-4E63-9A03-A9F6CAAD9B3E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8793B9C0-91B1-45BE-9B53-0E12205E9DB7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8793B9C0-91B1-45BE-9B53-0E12205E9DB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8793B9C0-91B1-45BE-9B53-0E12205E9DB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8793B9C0-91B1-45BE-9B53-0E12205E9DB7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{10D87D2F-B414-45FE-B38C-AB67C6F7CCA5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10D87D2F-B414-45FE-B38C-AB67C6F7CCA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10D87D2F-B414-45FE-B38C-AB67C6F7CCA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10D87D2F-B414-45FE-B38C-AB67C6F7CCA5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
