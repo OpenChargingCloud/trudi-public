@@ -1,12 +1,15 @@
 ﻿namespace TRuDI.Models
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
 
     using TRuDI.Models.BasicData;
 
     public static class MeterReadingExtensions
     {
+        private static readonly int[] MeasuringPeriods = { 900, 60, 120, 180, 240, 300, 600, 1800, 2400, 3600, 5400, 7200, 3 * 3600, 4 * 3600, 6 * 3600, 8 * 3600, 12 * 3600, 24 * 3600, 2592000 };
+
         public static bool IsOriginalValueList(this MeterReading meterReading)
         {
             var meterId = meterReading.Meters.FirstOrDefault()?.MeterId;
@@ -24,36 +27,85 @@
             return parts[1] == meterId;
         }
 
-        public static TimeSpan GetMeasurementPeriod(this MeterReading meterReading)
+        /// <summary>
+        /// Determines the measurement period of the specified interval reading list.
+        /// </summary>
+        /// <param name="meterReading">The meter reading with interval readings to check.</param>
+        /// <param name="checkAll">If set to <c>true</c>, check all interval readings.</param>
+        /// <returns>The most frequently found interval or <c>TimeSpan.Zero</c> if no valid interval was found.</returns>
+        public static TimeSpan GetMeasurementPeriod(this MeterReading meterReading, bool checkAll = false)
         {
-            var minimalSpan = TimeSpan.FromMinutes(15);
-            var intervalSpan = TimeSpan.MaxValue;
-
             foreach (var block in meterReading.IntervalBlocks)
             {
-                for (int i = 1; i < block.IntervalReadings.Count; i++)
+                var period = block.IntervalReadings.GetMeasurementPeriod();
+                if (period != TimeSpan.Zero)
                 {
-                    var span = block.IntervalReadings[i].TimePeriod.Start
-                               - block.IntervalReadings[i - 1].TimePeriod.Start;
+                    return period;
+                }
+            }
 
-                    if (span == minimalSpan)
-                    {
-                        return span;
-                    }
+            return TimeSpan.Zero;
+        }
 
-                    if (span < intervalSpan)
+        /// <summary>
+        /// Determines the measurement period of the specified interval reading list.
+        /// </summary>
+        /// <param name="readings">The interval readings to check.</param>
+        /// <param name="checkAll">If set to <c>true</c>, check all interval readings.</param>
+        /// <returns>The most frequently found interval or <c>TimeSpan.Zero</c> if no valid interval was found.</returns>
+        public static TimeSpan GetMeasurementPeriod(this List<IntervalReading> readings, bool checkAll = false)
+        {
+            var stats = new Dictionary<int, int>();
+
+            for (int i = 1; i < readings.Count; i++)
+            {
+                var span = (int)(readings[i].TimePeriod.Start - readings[i - 1].TimePeriod.Start).TotalSeconds;
+
+                var period = GetMatchingMeasurementPeriod(span);
+                if (period == 0)
+                {
+                    continue;
+                }
+
+                if (!stats.ContainsKey(period))
+                {
+                    stats[period] = 1;
+                }
+                else
+                {
+                    stats[period]++;
+                    if (!checkAll && stats[period] == 10)
                     {
-                        intervalSpan = span;
+                        // if we don't have to check all: stop after the first period reaches 10
+                        return TimeSpan.FromSeconds(period);
                     }
                 }
             }
 
-            if (intervalSpan == TimeSpan.MaxValue)
+            if (stats.Count == 0)
             {
                 return TimeSpan.Zero;
             }
 
-            return intervalSpan;
+            var list = stats.ToList();
+            list.Sort((a, b) => a.Value.CompareTo(b.Value));
+            return TimeSpan.FromSeconds(list.Last().Key);
+        }
+
+        public static int GetMatchingMeasurementPeriod(int span)
+        {
+            for (int i = 0; i < MeasuringPeriods.Length; i++)
+            {
+                int period = MeasuringPeriods[i];
+                int window = (period / 100 * 2);
+
+                if (span == period || span > period - window && span < period + window)
+                {
+                    return period;
+                }
+            }
+
+            return 0;
         }
 
         public static int GetGapCount(this IntervalBlock block, TimeSpan measurementPeriod)
@@ -129,8 +181,8 @@
 
         public static IntervalReading GetIntervalReadingFromDate(this MeterReading reading, DateTime date)
         {
-           return reading.IntervalBlocks?.FirstOrDefault(ib => ib.Interval.IsDateInIntervalBlock(date))
-                .IntervalReadings?.FirstOrDefault(ir => ir.TimePeriod.Start == date);
+            return reading.IntervalBlocks?.FirstOrDefault(ib => ib.Interval.IsDateInIntervalBlock(date))
+                 .IntervalReadings?.FirstOrDefault(ir => ir.TimePeriod.Start == date);
         }
     }
 }

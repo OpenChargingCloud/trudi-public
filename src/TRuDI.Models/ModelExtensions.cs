@@ -1,6 +1,7 @@
 ﻿namespace TRuDI.Models
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Security.Cryptography.X509Certificates;
 
@@ -38,7 +39,24 @@
         /// <returns>Den Endzeitpunkt des Intervals</returns>
         public static DateTime GetEnd(this Interval interval)
         {
-            return interval.Start.AddSeconds(Convert.ToDouble(interval.Duration));
+            if (interval.Start.Kind != DateTimeKind.Utc)
+            {
+                var startTimeUtc = interval.Start.ToUniversalTime();
+                return (startTimeUtc.AddSeconds(Convert.ToDouble(interval.Duration))).ToLocalTime();
+            }
+            else
+            {
+                return interval.Start.AddSeconds(Convert.ToDouble(interval.Duration));
+            }
+        }
+
+        /// <summary>
+        /// Funktion zur Berechung des Endzeitpunkts des Intervals
+        /// </summary>
+        /// <returns>Den Endzeitpunkt des Intervals</returns>
+        public static DateTime GetCaptureTimeEnd(this Interval interval)
+        {
+            return interval.CaptureTime.AddSeconds(Convert.ToDouble(interval.Duration));
         }
 
         /// <summary>
@@ -129,23 +147,83 @@
         /// <summary>
         /// Die Funktion liefert den "geglätteten" captureTime Zeitstempel zurück
         /// </summary>
-        /// <param name="dateTime">Dem Element wird der geglättete Wert zugewisen</param>
         /// <param name="captureTime">Der zu glättende Zeitwert</param>
+        /// <param name="interval">The period interval.</param>
         /// <returns>Der gerundete Zeitstempel</returns>
-        public static DateTime GetSmoothCaptureTime(this DateTime dateTime, DateTime captureTime)
+        public static DateTime GetSmoothCaptureTime(DateTime captureTime, int interval = 900)
         {
-            if(captureTime.Second > 30)
-                captureTime = captureTime.GetDateWithoutSeconds().AddMinutes(1);
-            else if (captureTime.Second > 0)
-                captureTime = captureTime.GetDateWithoutSeconds();
+            if (interval < 86400)
+            {
+                var isUtc = captureTime.Kind == DateTimeKind.Utc;
+                var captureTimeUtc = captureTime.ToUniversalTime();
 
-            if (captureTime.Minute % 15 > 7)
-                captureTime = captureTime.AddMinutes(15 - (captureTime.Minute % 15));
-            else if (captureTime.Minute % 15 > 0)
-                captureTime = captureTime.AddMinutes(- (captureTime.Minute % 15));
+                var diffSpan = (int)(captureTimeUtc - captureTimeUtc.Date).TotalSeconds;
+                var diff = interval - (diffSpan % interval);
+                if (diff == 0 || diff == interval)
+                {
+                    return isUtc ? captureTimeUtc : captureTimeUtc.ToLocalTime();
+                }
+
+                var a = captureTimeUtc.Date.AddSeconds((diffSpan / interval) * interval);
+                var window = interval == 900 ? 450 : interval / 100;
+                captureTimeUtc = (captureTimeUtc - a).TotalSeconds <= window ? a : a.AddSeconds(interval);
+                return isUtc ? captureTimeUtc : captureTimeUtc.ToLocalTime();
+            }
+
+            if (interval == 86400)
+            {
+                if (captureTime.Hour == 23 && captureTime.Minute >= 45)
+                {
+                    return captureTime.Date.AddDays(1);
+                }
+
+                if (captureTime.Hour == 0 && captureTime.Minute < 15)
+                {
+                    return captureTime.Date;
+                }
+            }
 
             return captureTime;
         }
+
+        /// <summary>
+        /// Returns true if the specified timestamp is valid for the specified interval.
+        /// </summary>
+        /// <param name="timestamp">The timestmap to check.</param>
+        /// <param name="interval">The period interval.</param>
+        /// <returns><c>true</c> if the timestamp is valid.</returns>
+        public static bool IsValidMeasurementPeriodTimestamp(this DateTime timestamp, int interval = 900)
+        {
+            var diffSpan = (int)(timestamp - timestamp.Date).TotalSeconds;
+            var diff = interval - (diffSpan % interval);
+            if (diff == 0 || diff == interval)
+            {
+                return true;
+            }
+
+            var window = interval == 900 ? 240 : interval / 100;
+            
+            return diff <= window || diff >= (interval - window);
+        }
+
+        /// <summary>
+        /// Removes readings not valid for the specified interval. Only the first interval reading isn't checked.
+        /// </summary>
+        /// <param name="readings">List of readings.</param>
+        /// <param name="interval">The measurement period.</param>
+        public static void FilterIntervalReadings(this List<IntervalReading> readings, int interval)
+        {
+            for (int i = 1; i < readings.Count; i++)
+            {
+                var reading = readings[i];
+                if (!reading.TimePeriod.Start.IsValidMeasurementPeriodTimestamp(interval))
+                {
+                    readings.RemoveAt(i);
+                    i--;
+                }
+            }
+        }
+
 
         /// <summary>
         /// Validiert den FNNStatus 
@@ -177,7 +255,7 @@
             return true;
         }
 
-        public static DateTime GetDateTimeFromSpecialDayProfile(this DateTime dt, SpecialDayProfile sdp, DayTimeProfile dtp)
+        public static DateTime GetDateTimeFromSpecialDayProfile(SpecialDayProfile sdp, DayTimeProfile dtp)
         {
             return new DateTime((int)sdp.SpecialDayDate.Year,
                                 (int)sdp.SpecialDayDate.Month,
@@ -194,7 +272,7 @@
 
         public static bool IsDateInIntervalBlock(this Interval interval, DateTime date)
         {
-            if(date >= interval.Start && date <= interval.GetEnd())
+            if (date >= interval.Start && date <= interval.GetEnd())
             {
                 return true;
             }
@@ -204,7 +282,7 @@
 
         public static bool IsPeriodInIntervalBlock(this Interval interval, DateTime start, DateTime end)
         {
-            if(start >= interval.Start && end <= interval.GetEnd())
+            if (start >= interval.Start && end <= interval.GetEnd())
             {
                 return true;
             }

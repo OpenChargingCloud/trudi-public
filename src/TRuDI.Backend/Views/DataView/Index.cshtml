@@ -27,16 +27,29 @@
 
 <div>
     <ul class="nav nav-tabs" role="tablist">
-        <li role="presentation" class="active"><a href="#tab_logdata" aria-controls="tab_logdata" role="tab" data-toggle="tab">Logbuchdaten</a></li>
-        
+        @if (StateService.CurrentSupplierFile?.TafData != null)
+        {
+            <li role="presentation" class="active"><a href="#tab_tariffdata" aria-controls="tab_tariffdata" role="tab" data-toggle="tab">Tarifdaten</a></li>
+        }
+       
         @if (originalValueLists.Count == 1)
         {
             var ovl = originalValueLists.First();
+            <li role="presentation" class="@(StateService.CurrentSupplierFile?.TafData == null ? "active" : "")"><a href="#tab_hvl_@ovl.GetOriginalValueListIdent()" aria-controls="tab_hvl_@ovl.GetOriginalValueListIdent()" role="tab" data-toggle="tab">Historische Verbrauchswerte</a></li>
             <li role="presentation"><a href="#tab_@ovl.GetOriginalValueListIdent()" aria-controls="tab_@ovl.GetOriginalValueListIdent()" role="tab" data-toggle="tab">Originäre Messwertliste</a></li>
-            <li role="presentation"><a href="#tab_hvl_@ovl.GetOriginalValueListIdent()" aria-controls="tab_hvl_@ovl.GetOriginalValueListIdent()" role="tab" data-toggle="tab">Historische Messwerte</a></li>
         }
         else
         {
+            <li role="presentation" class="dropdown @(StateService.CurrentSupplierFile?.TafData == null ? "active" : "")">
+                <a href="#" class="dropdown-toggle" id="tab-dropdown-hvl" data-toggle="dropdown" aria-controls="tab-dropdown-contents" aria-expanded="false">Historische Messwerte<span class="caret"></span></a>
+                <ul class="dropdown-menu" aria-labelledby="tab-dropdown-hvl" id="tab-dropdown-hvl-contents">
+                    @foreach (var ovl in originalValueLists)
+                    {
+                        <li class="@(StateService.CurrentSupplierFile?.TafData == null && originalValueLists.First() == ovl ? "active" : "")"><a href="#tab_hvl_@ovl.GetOriginalValueListIdent()" id="#tab_hvl_@ovl.GetOriginalValueListIdent()-tab" aria-expanded="false" aria-controls="tab_hvl_@ovl.GetOriginalValueListIdent()" role="tab" data-toggle="tab">@ovl.Meter.ToFormattedDeviceId() (@ovl.Obis.ToString())</a></li>
+                    }
+                </ul>
+            </li>
+
             <li role="presentation" class="dropdown">
                 <a href="#" class="dropdown-toggle" id="tab-dropdown-ovl" data-toggle="dropdown" aria-controls="tab-dropdown-contents" aria-expanded="false">Originäre Messwertliste<span class="caret"></span></a>
                 <ul class="dropdown-menu" aria-labelledby="tab-dropdown-ovl" id="tab-dropdown-ovl-contents">
@@ -46,27 +59,14 @@
                     }
                 </ul>
             </li>
-
-            <li role="presentation" class="dropdown">
-                <a href="#" class="dropdown-toggle" id="tab-dropdown-hvl" data-toggle="dropdown" aria-controls="tab-dropdown-contents" aria-expanded="false">Historische Messwerte<span class="caret"></span></a>
-                <ul class="dropdown-menu" aria-labelledby="tab-dropdown-hvl" id="tab-dropdown-hvl-contents">
-                    @foreach (var ovl in originalValueLists)
-                    {
-                        <li class=""><a href="#tab_hvl_@ovl.GetOriginalValueListIdent()" id="#tab_hvl_@ovl.GetOriginalValueListIdent()-tab" aria-expanded="false" aria-controls="tab_hvl_@ovl.GetOriginalValueListIdent()" role="tab" data-toggle="tab">@ovl.Meter.ToFormattedDeviceId() (@ovl.Obis.ToString())</a></li>
-                    }
-                </ul>
-            </li>
         }
 
-        @if (StateService.CurrentSupplierFile?.TafData != null)
-        {
-            <li role="presentation"><a href="#tab_tariffdata" aria-controls="tab_tariffdata" role="tab" data-toggle="tab">Tarifdaten</a></li>
-        }
+        <li role="presentation"><a href="#tab_logdata" aria-controls="tab_logdata" role="tab" data-toggle="tab">Logbuchdaten</a></li>
     </ul>
 
     <div class="tab-content">
 
-        <div role="tabpanel" class="tab-pane active" id="tab_logdata">
+        <div role="tabpanel" class="tab-pane" id="tab_logdata">
             <div class="panel panel-primary">
                 <div class="panel-heading">Logbuchdaten</div>
                 <div class="panel-body">
@@ -207,7 +207,7 @@
                             <tr>
                                 <th>Zähler</th>
                                 <th>Messperiode</th>
-                                <th>OBIS</th>
+                                <th>Register</th>
                                 <th>Werte</th>
                             </tr>
                             <tr>
@@ -390,9 +390,9 @@
 
         @foreach (var ovl in originalValueLists)
         {
-            <div role="tabpanel" class="tab-pane" id="tab_hvl_@ovl.GetOriginalValueListIdent()">
+            <div role="tabpanel" class="tab-pane @(StateService.CurrentSupplierFile?.TafData == null && originalValueLists.First() == ovl ? "active" : "")" id="tab_hvl_@ovl.GetOriginalValueListIdent()">
                 <div class="panel panel-primary">
-                    <div class="panel-heading">Historische Messwerte @ovl.Meter.ToFormattedDeviceId() (@ovl.Obis.ToString())</div>
+                    <div class="panel-heading">Historische Verbrauchswerte @ovl.Meter.ToFormattedDeviceId() (@ovl.Obis.ToString())</div>
                     <div class="panel-body">
                         <div id="hvl_@ovl.Meter">
                             @await Component.InvokeAsync("HistoricValueListView", new { ovl })
@@ -404,7 +404,7 @@
 
         @if (StateService.CurrentSupplierFile?.TafData?.Data != null)
         {
-            <div role="tabpanel" class="tab-pane" id="tab_tariffdata">
+            <div role="tabpanel" class="tab-pane active" id="tab_tariffdata">
                 <div class="panel panel-primary">
                     <div class="panel-heading">Tarifdaten</div>
                     <div class="panel-body">

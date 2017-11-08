@@ -14,13 +14,13 @@
     <div class="panel-body">
         <table class="table">
             <tr>
-                <th>Rechnungssteller ID</th>
-                <td>@data.InvoicingParty.InvoicingPartyId</td>
+                <th>ID des Kunden</th>
+                <td>@data.Customer?.CustomerId</td>
             </tr>
 
             <tr>
-                <th>Kunden ID</th>
-                <td>@data.Customer?.CustomerId</td>
+                <th>ID des Rechnungsstellers</th>
+                <td>@data.InvoicingParty.InvoicingPartyId</td>
             </tr>
 
             <tr>

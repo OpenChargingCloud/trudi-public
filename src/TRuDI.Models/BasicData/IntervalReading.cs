@@ -1,11 +1,13 @@
 ﻿namespace TRuDI.Models.BasicData
 {
     using System;
+    using System.Diagnostics;
 
     /// <summary>
     /// Die Klasse IntervalReading repräsentiert die Daten zu einem konkreten Messwert. Jede 
     /// Nachricht muss mindestens eine Instanz der Klasse IntervalReading enthalten.
     /// </summary>
+    [DebuggerDisplay("Start: {TimePeriod.Start}, Value: {Value}")]
     public class IntervalReading
     {
         /// <summary>

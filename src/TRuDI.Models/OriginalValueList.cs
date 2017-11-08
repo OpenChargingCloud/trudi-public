@@ -197,17 +197,24 @@
             for (int i = 0; i < daysGoingBack; i++)
             {
                 if (lastDayEnd < this.Start)
+                {
                     break;
+                }
 
                 var startTime = lastDayEnd.AddDays(-1);
                 var startReading = this.GetReading(startTime);
                 var endReading = this.GetReading(lastDayEnd);
 
-                retList.Add(new HistoricConsumption(startReading, endReading, startTime, lastDayEnd, TimeUnit.Day));
+                var val = new HistoricConsumption(startReading, endReading, startTime, lastDayEnd, TimeUnit.Day);
+                if (val.Value != null)
+                {
+                    retList.Add(val);
+                }
+                
                 lastDayEnd = lastDayEnd.AddDays(-1);
             }
 
-            //Weekly
+            // Weekly
             int weeksGoingBack = 4;
             var lastSundayEnd = this.End.Date;
 
@@ -219,43 +226,69 @@
             for (int i = 0; i < weeksGoingBack; i++)
             {
                 if (lastSundayEnd < this.Start)
+                {
                     break;
+                }
 
                 var startTime = lastSundayEnd.AddDays(-7);
                 var startReading = this.GetReading(startTime);
                 var endReading = this.GetReading(lastSundayEnd);
 
-                retList.Add(new HistoricConsumption(startReading, endReading, startTime, lastSundayEnd, TimeUnit.Week));
+                var val = new HistoricConsumption(startReading, endReading, startTime, lastSundayEnd, TimeUnit.Week);
+                if (val.Value != null)
+                {
+                    retList.Add(val);
+                }
+
                 lastSundayEnd = lastSundayEnd.AddDays(-7);
             }
 
-            //Monthly
+            // Monthly
             int monthsGoingBack = 36;
-            var lastMonthEnd = new DateTime(this.End.Year, this.End.Month, 1);
+            var lastMonthEnd = new DateTime(this.End.Year, this.End.Month, 1, 0, 0, 0, DateTimeKind.Local);
 
             for (int i = 0; i < monthsGoingBack; i++)
             {
                 if (lastMonthEnd < this.Start)
+                {
                     break;
+                }
 
                 var startTime = lastMonthEnd.AddMonths(-1);
                 var startReading = this.GetReading(startTime);
                 var endReading = this.GetReading(lastMonthEnd);
 
-                retList.Add(new HistoricConsumption(startReading, endReading, startTime, lastMonthEnd, TimeUnit.Month));
+                var val = new HistoricConsumption(startReading, endReading, startTime, lastMonthEnd, TimeUnit.Month);
+                if (val.Value != null)
+                {
+                    retList.Add(val);
+                }
+
                 lastMonthEnd = lastMonthEnd.AddMonths(-1);
             }
 
-            //Last calendar year
-            // TODO: last 3 years
-            var lastYearEnd = new DateTime(this.End.Year, 1, 1);
-            if (lastYearEnd < this.Start || lastYearEnd.AddYears(-1) < this.Start)
+            // Yearly
+            int yearsGoingBack = 3;
+            var lastYearEnd = new DateTime(this.End.Year, 1, 1, 0, 0, 0, DateTimeKind.Local);
+
+            for (int i = 0; i < yearsGoingBack; i++)
             {
+                if (lastYearEnd < this.Start)
+                {
+                    break;
+                }
+
                 var startTime = lastYearEnd.AddYears(-1);
                 var startReading = this.GetReading(startTime);
                 var endReading = this.GetReading(lastYearEnd);
 
-                retList.Add(new HistoricConsumption(startReading, endReading, startTime, lastYearEnd, TimeUnit.Year));
+                var val = new HistoricConsumption(startReading, endReading, startTime, lastYearEnd, TimeUnit.Year);
+                if (val.Value != null)
+                {
+                    retList.Add(val);
+                }
+
+                lastYearEnd = lastYearEnd.AddYears(-1);
             }
 
             return retList;

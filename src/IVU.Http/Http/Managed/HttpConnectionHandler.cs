@@ -100,7 +100,7 @@ namespace IVU.Http.Headers.Managed
             {
                 tlsSession.Close();
                 logger.ErrorException("Failed to establish TLS connection: {0}", ex, ex.Message);
-                throw new HttpRequestException("Failed to establish TLS connection", ex);
+                throw new TlsConnectFailed("Failed to establish TLS connection", ex);
             }
 
             return new TlsStream(tlsSession);

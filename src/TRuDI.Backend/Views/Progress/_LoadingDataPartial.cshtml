@@ -46,13 +46,13 @@
             </tr>
 
             <tr>
-                <th>Gültig ab</th>
-                <td>@contract.Begin.ToFormatedString()</td>
+                <th>Startzeitpunkt</th>
+                <td>@StateService.CurrentAdapterContext.Start.ToFormatedString()</td>
             </tr>
 
             <tr>
-                <th>Gültig bis</th>
-                <td>@contract.End.ToFormatedString()</td>
+                <th>Endzeitpunkt</th>
+                <td>@StateService.CurrentAdapterContext.End.ToFormatedString()</td>
             </tr>
 
             <tr>

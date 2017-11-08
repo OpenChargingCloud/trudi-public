@@ -7,7 +7,6 @@ namespace TRuDI.TafAdapter.Taf2.Tests
 
     using TRuDI.Models;
     using TRuDI.Models.BasicData;
-    using TRuDI.TafAdapter.Interface;
     using TRuDI.TafAdapter.Interface.Taf2;
 
     [TestClass]
@@ -540,27 +539,6 @@ namespace TRuDI.TafAdapter.Taf2.Tests
         }
         
         [TestMethod]
-        public void TestFindNextValidTime()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void TestFindLastValidTime()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void TestGetDayData()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void TestGetValidDayProfilesForMeterReading()
-        {
-            throw new NotImplementedException();
-        }
-
-        [TestMethod]
         [DeploymentItem(@"Data\trudiXmlTaf7_2OML_4TS_UCTaf2.xml")]
         [DeploymentItem(@"Data\supplierXml_2OML_4TS_UCTaf2.xml")]
         public void TestImportExportDirections()
@@ -573,6 +551,501 @@ namespace TRuDI.TafAdapter.Taf2.Tests
 
             var target = new TafAdapterTaf2();
             var result = target.Calculate(deviceModel, supplierModel);
+
+            Assert.AreEqual("2017-01-01T00:00:00+01:00", result.Data.Begin.ToString("yyyy-MM-ddTHH:mm:ssK"));
+            Assert.AreEqual("2017-09-01T01:00:00+02:00", result.Data.End.ToString("yyyy-MM-ddTHH:mm:ssK"));
+
+            var data = result.Data as Taf2Data;
+
+            Assert.AreEqual(6, data.SummaryRegister.Count);
+            Assert.AreEqual("1-0:1.8.1*255", data.SummaryRegister[0].ObisCode.ToString());
+            Assert.AreEqual(205027, data.SummaryRegister[0].Amount);
+            Assert.AreEqual(1, data.SummaryRegister[0].TariffId);
+
+            Assert.AreEqual("1-0:1.8.2*255", data.SummaryRegister[1].ObisCode.ToString());
+            Assert.AreEqual(210990, data.SummaryRegister[1].Amount);
+            Assert.AreEqual(2, data.SummaryRegister[1].TariffId);
+
+            Assert.AreEqual("1-0:2.8.1*255", data.SummaryRegister[2].ObisCode.ToString());
+            Assert.AreEqual(258279, data.SummaryRegister[2].Amount);
+            Assert.AreEqual(3, data.SummaryRegister[2].TariffId);
+
+            Assert.AreEqual("1-0:2.8.2*255", data.SummaryRegister[3].ObisCode.ToString());
+            Assert.AreEqual(160851, data.SummaryRegister[3].Amount);
+            Assert.AreEqual(4, data.SummaryRegister[3].TariffId);
+
+            Assert.AreEqual("1-0:1.8.63*255", data.SummaryRegister[4].ObisCode.ToString());
+            Assert.AreEqual(0, data.SummaryRegister[4].Amount);
+            Assert.AreEqual(63, data.SummaryRegister[4].TariffId);
+
+            Assert.AreEqual("1-0:2.8.63*255", data.SummaryRegister[5].ObisCode.ToString());
+            Assert.AreEqual(0, data.SummaryRegister[5].Amount);
+            Assert.AreEqual(63, data.SummaryRegister[5].TariffId);
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"Data\result_single_day.xml")]
+        [DeploymentItem(@"Data\supplier_single_day.xml")]
+        public void TestSingleDayWithoutGaps()
+        {
+            var deviceXml = XDocument.Load(@"Data\result_single_day.xml");
+            var deviceModel = XmlModelParser.ParseHanAdapterModel(deviceXml.Root.Descendants());
+
+            var supplierXml = XDocument.Load(@"Data\supplier_single_day.xml");
+            var supplierModel = XmlModelParser.ParseSupplierModel(supplierXml.Root.Descendants());
+
+            var target = new TafAdapterTaf2();
+            var result = target.Calculate(deviceModel, supplierModel);
+
+            Assert.AreEqual("2017-11-04T00:00:00+01:00", result.Data.Begin.ToString("yyyy-MM-ddTHH:mm:ssK"));
+            Assert.AreEqual("2017-11-05T00:00:00+01:00", result.Data.End.ToString("yyyy-MM-ddTHH:mm:ssK"));
+
+            var data = result.Data as Taf2Data;
+
+            Assert.AreEqual(3, data.SummaryRegister.Count);
+            Assert.AreEqual("1-0:1.8.1*255", data.SummaryRegister[0].ObisCode.ToString());
+            Assert.AreEqual(360, data.SummaryRegister[0].Amount);
+            Assert.AreEqual(1, data.SummaryRegister[0].TariffId);
+
+            Assert.AreEqual("1-0:1.8.2*255", data.SummaryRegister[1].ObisCode.ToString());
+            Assert.AreEqual(600, data.SummaryRegister[1].Amount);
+            Assert.AreEqual(2, data.SummaryRegister[1].TariffId);
+
+            Assert.AreEqual("1-0:1.8.63*255", data.SummaryRegister[2].ObisCode.ToString());
+            Assert.AreEqual(0, data.SummaryRegister[2].Amount);
+            Assert.AreEqual(63, data.SummaryRegister[2].TariffId);
+        }
+
+        /// <summary>
+        /// Gap appears in measurement data around a tariffstage switch
+        /// (missing interfalls from 5:00 to 6:45)
+        /// </summary>
+        [TestMethod]
+        [DeploymentItem(@"Data\result_single_day_2h-gap.xml")]
+        [DeploymentItem(@"Data\supplier_single_day.xml")]
+        public void TestSingleDayWithGapOnTariffChange()
+        {
+            var deviceXml = XDocument.Load(@"Data\result_single_day_2h-gap.xml");
+            var deviceModel = XmlModelParser.ParseHanAdapterModel(deviceXml.Root.Descendants());
+
+            var supplierXml = XDocument.Load(@"Data\supplier_single_day.xml");
+            var supplierModel = XmlModelParser.ParseSupplierModel(supplierXml.Root.Descendants());
+
+            var target = new TafAdapterTaf2();
+            var result = target.Calculate(deviceModel, supplierModel);
+
+            Assert.AreEqual("2017-11-04T00:00:00+01:00", result.Data.Begin.ToString("yyyy-MM-ddTHH:mm:ssK"));
+            Assert.AreEqual("2017-11-05T00:00:00+01:00", result.Data.End.ToString("yyyy-MM-ddTHH:mm:ssK"));
+
+            var data = result.Data as Taf2Data;
+
+            Assert.AreEqual(3, data.SummaryRegister.Count);
+            Assert.AreEqual("1-0:1.8.1*255", data.SummaryRegister[0].ObisCode.ToString());
+            Assert.AreEqual(310, data.SummaryRegister[0].Amount);
+            Assert.AreEqual(1, data.SummaryRegister[0].TariffId);
+
+            Assert.AreEqual("1-0:1.8.2*255", data.SummaryRegister[1].ObisCode.ToString());
+            Assert.AreEqual(560, data.SummaryRegister[1].Amount);
+            Assert.AreEqual(2, data.SummaryRegister[1].TariffId);
+
+            Assert.AreEqual("1-0:1.8.63*255", data.SummaryRegister[2].ObisCode.ToString());
+            Assert.AreEqual(90, data.SummaryRegister[2].Amount);
+            Assert.AreEqual(63, data.SummaryRegister[2].TariffId);
+        }
+
+        /// <summary>
+        /// Gap appears in measurement data inside one single tariffstage
+        /// It should not affect the calculated result
+        /// </summary>
+        [TestMethod]
+        [DeploymentItem(@"Data\result_single_day_simple_gap.xml")]
+        [DeploymentItem(@"Data\supplier_single_day.xml")]
+        public void TestSingleDayWithGap()
+        {
+            var deviceXml = XDocument.Load(@"Data\result_single_day_simple_gap.xml");
+            var deviceModel = XmlModelParser.ParseHanAdapterModel(deviceXml.Root.Descendants());
+
+            var supplierXml = XDocument.Load(@"Data\supplier_single_day.xml");
+            var supplierModel = XmlModelParser.ParseSupplierModel(supplierXml.Root.Descendants());
+
+            var target = new TafAdapterTaf2();
+            var result = target.Calculate(deviceModel, supplierModel);
+
+            Assert.AreEqual("2017-11-04T00:00:00+01:00", result.Data.Begin.ToString("yyyy-MM-ddTHH:mm:ssK"));
+            Assert.AreEqual("2017-11-05T00:00:00+01:00", result.Data.End.ToString("yyyy-MM-ddTHH:mm:ssK"));
+
+            var data = result.Data as Taf2Data;
+
+            Assert.AreEqual(3, data.SummaryRegister.Count);
+            Assert.AreEqual("1-0:1.8.1*255", data.SummaryRegister[0].ObisCode.ToString());
+            Assert.AreEqual(360, data.SummaryRegister[0].Amount);
+            Assert.AreEqual(1, data.SummaryRegister[0].TariffId);
+
+            Assert.AreEqual("1-0:1.8.2*255", data.SummaryRegister[1].ObisCode.ToString());
+            Assert.AreEqual(600, data.SummaryRegister[1].Amount);
+            Assert.AreEqual(2, data.SummaryRegister[1].TariffId);
+
+            Assert.AreEqual("1-0:1.8.63*255", data.SummaryRegister[2].ObisCode.ToString());
+            Assert.AreEqual(0, data.SummaryRegister[2].Amount);
+            Assert.AreEqual(63, data.SummaryRegister[2].TariffId);
+        }
+
+
+        /// <summary>
+        /// Gap appears for one measuring period a 6:00 (tariff switch)
+        /// </summary>
+        [TestMethod]
+        [DeploymentItem(@"Data\result_single_day_1_missing_period_at_tariff_switch.xml")]
+        [DeploymentItem(@"Data\supplier_single_day.xml")]
+        public void TestSingleDayWithOnePeriodGapAtTariffSwitch()
+        {
+            var deviceXml = XDocument.Load(@"Data\result_single_day_1_missing_period_at_tariff_switch.xml");
+            var deviceModel = XmlModelParser.ParseHanAdapterModel(deviceXml.Root.Descendants());
+
+            var supplierXml = XDocument.Load(@"Data\supplier_single_day.xml");
+            var supplierModel = XmlModelParser.ParseSupplierModel(supplierXml.Root.Descendants());
+
+            var target = new TafAdapterTaf2();
+            var result = target.Calculate(deviceModel, supplierModel);
+
+            Assert.AreEqual("2017-11-04T00:00:00+01:00", result.Data.Begin.ToString("yyyy-MM-ddTHH:mm:ssK"));
+            Assert.AreEqual("2017-11-05T00:00:00+01:00", result.Data.End.ToString("yyyy-MM-ddTHH:mm:ssK"));
+
+            var data = result.Data as Taf2Data;
+
+            Assert.AreEqual(3, data.SummaryRegister.Count);
+            Assert.AreEqual("1-0:1.8.1*255", data.SummaryRegister[0].ObisCode.ToString());
+            Assert.AreEqual(350, data.SummaryRegister[0].Amount);
+            Assert.AreEqual(1, data.SummaryRegister[0].TariffId);
+
+            Assert.AreEqual("1-0:1.8.2*255", data.SummaryRegister[1].ObisCode.ToString());
+            Assert.AreEqual(590, data.SummaryRegister[1].Amount);
+            Assert.AreEqual(2, data.SummaryRegister[1].TariffId);
+
+            Assert.AreEqual("1-0:1.8.63*255", data.SummaryRegister[2].ObisCode.ToString());
+            Assert.AreEqual(20, data.SummaryRegister[2].Amount);
+            Assert.AreEqual(63, data.SummaryRegister[2].TariffId);
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"Data\result_single_day_dst_oct.xml")]
+        [DeploymentItem(@"Data\supplier_single_day_dst_oct.xml")]
+        public void TestSingleDay_SummerToWinterTime()
+        {
+            var deviceXml = XDocument.Load(@"Data\result_single_day_dst_oct.xml");
+            var deviceModel = XmlModelParser.ParseHanAdapterModel(deviceXml.Root.Descendants());
+
+            var supplierXml = XDocument.Load(@"Data\supplier_single_day_dst_oct.xml");
+            var supplierModel = XmlModelParser.ParseSupplierModel(supplierXml.Root.Descendants());
+
+            var target = new TafAdapterTaf2();
+            var result = target.Calculate(deviceModel, supplierModel);
+
+            Assert.AreEqual("2017-10-29T00:00:00+02:00", result.Data.Begin.ToString("yyyy-MM-ddTHH:mm:ssK"));
+            Assert.AreEqual("2017-10-30T00:00:00+01:00", result.Data.End.ToString("yyyy-MM-ddTHH:mm:ssK"));
+
+            var data = result.Data as Taf2Data;
+
+            Assert.AreEqual(3, data.SummaryRegister.Count);
+            Assert.AreEqual("1-0:1.8.1*255", data.SummaryRegister[0].ObisCode.ToString());
+            Assert.AreEqual(360, data.SummaryRegister[0].Amount);
+            Assert.AreEqual(1, data.SummaryRegister[0].TariffId);
+
+            Assert.AreEqual("1-0:1.8.2*255", data.SummaryRegister[1].ObisCode.ToString());
+            Assert.AreEqual(600, data.SummaryRegister[1].Amount);
+            Assert.AreEqual(2, data.SummaryRegister[1].TariffId);
+
+            Assert.AreEqual("1-0:1.8.63*255", data.SummaryRegister[2].ObisCode.ToString());
+            Assert.AreEqual(0, data.SummaryRegister[2].Amount);
+            Assert.AreEqual(63, data.SummaryRegister[2].TariffId);
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"Data\result_single_day_dst_march.xml")]
+        [DeploymentItem(@"Data\supplier_single_day_dst_march.xml")]
+        public void TestSingleDay_WinterToSummerTime()
+        {
+            var deviceXml = XDocument.Load(@"Data\result_single_day_dst_march.xml");
+            var deviceModel = XmlModelParser.ParseHanAdapterModel(deviceXml.Root.Descendants());
+
+            var supplierXml = XDocument.Load(@"Data\supplier_single_day_dst_march.xml");
+            var supplierModel = XmlModelParser.ParseSupplierModel(supplierXml.Root.Descendants());
+
+            var target = new TafAdapterTaf2();
+            var result = target.Calculate(deviceModel, supplierModel);
+
+            Assert.AreEqual("2017-03-26T00:00:00+01:00", result.Data.Begin.ToString("yyyy-MM-ddTHH:mm:ssK"));
+            Assert.AreEqual("2017-03-27T00:00:00+02:00", result.Data.End.ToString("yyyy-MM-ddTHH:mm:ssK"));
+
+            var data = result.Data as Taf2Data;
+
+            Assert.AreEqual(3, data.SummaryRegister.Count);
+            Assert.AreEqual("1-0:1.8.1*255", data.SummaryRegister[0].ObisCode.ToString());
+            Assert.AreEqual(320, data.SummaryRegister[0].Amount); 
+            Assert.AreEqual(1, data.SummaryRegister[0].TariffId);
+
+            Assert.AreEqual("1-0:1.8.2*255", data.SummaryRegister[1].ObisCode.ToString());
+            Assert.AreEqual(600, data.SummaryRegister[1].Amount);
+            Assert.AreEqual(2, data.SummaryRegister[1].TariffId);
+
+            Assert.AreEqual("1-0:1.8.63*255", data.SummaryRegister[2].ObisCode.ToString());
+            Assert.AreEqual(0, data.SummaryRegister[2].Amount);
+            Assert.AreEqual(63, data.SummaryRegister[2].TariffId);
+        }
+
+        /// <summary>
+        /// Checks a 3 day data file against a supplier file that contains only the first day of the data file.
+        /// </summary>
+        [TestMethod]
+        [DeploymentItem(@"Data\result_3_days.xml")]
+        [DeploymentItem(@"Data\supplier_single_day.xml")]
+        public void Test3DayDataFirstDayTariffFile()
+        {
+            var deviceXml = XDocument.Load(@"Data\result_3_days.xml");
+            var deviceModel = XmlModelParser.ParseHanAdapterModel(deviceXml.Root.Descendants());
+
+            var supplierXml = XDocument.Load(@"Data\supplier_single_day.xml");
+            var supplierModel = XmlModelParser.ParseSupplierModel(supplierXml.Root.Descendants());
+
+            var target = new TafAdapterTaf2();
+            var result = target.Calculate(deviceModel, supplierModel);
+
+            Assert.AreEqual("2017-11-04T00:00:00+01:00", result.Data.Begin.ToString("yyyy-MM-ddTHH:mm:ssK"));
+            Assert.AreEqual("2017-11-05T00:00:00+01:00", result.Data.End.ToString("yyyy-MM-ddTHH:mm:ssK"));
+
+            var data = result.Data as Taf2Data;
+
+            Assert.AreEqual(3, data.SummaryRegister.Count);
+            Assert.AreEqual("1-0:1.8.1*255", data.SummaryRegister[0].ObisCode.ToString());
+            Assert.AreEqual(400, data.SummaryRegister[0].Amount);
+            Assert.AreEqual(1, data.SummaryRegister[0].TariffId);
+
+            Assert.AreEqual("1-0:1.8.2*255", data.SummaryRegister[1].ObisCode.ToString());
+            Assert.AreEqual(600, data.SummaryRegister[1].Amount);
+            Assert.AreEqual(2, data.SummaryRegister[1].TariffId);
+
+            Assert.AreEqual("1-0:1.8.63*255", data.SummaryRegister[2].ObisCode.ToString());
+            Assert.AreEqual(0, data.SummaryRegister[2].Amount);
+            Assert.AreEqual(63, data.SummaryRegister[2].TariffId);
+        }
+
+        /// <summary>
+        /// Checks a 3 day data file against a supplier file that contains only the second day of the data file.
+        /// </summary>
+        [TestMethod]
+        [DeploymentItem(@"Data\result_3_days.xml")]
+        [DeploymentItem(@"Data\supplier_single_day_2.xml")]
+        public void Test3DayDataSecondDayTariffFile()
+        {
+            var deviceXml = XDocument.Load(@"Data\result_3_days.xml");
+            var deviceModel = XmlModelParser.ParseHanAdapterModel(deviceXml.Root.Descendants());
+
+            var supplierXml = XDocument.Load(@"Data\supplier_single_day_2.xml");
+            var supplierModel = XmlModelParser.ParseSupplierModel(supplierXml.Root.Descendants());
+
+            var target = new TafAdapterTaf2();
+            var result = target.Calculate(deviceModel, supplierModel);
+
+            Assert.AreEqual("2017-11-05T00:00:00+01:00", result.Data.Begin.ToString("yyyy-MM-ddTHH:mm:ssK"));
+            Assert.AreEqual("2017-11-06T00:00:00+01:00", result.Data.End.ToString("yyyy-MM-ddTHH:mm:ssK"));
+
+            var data = result.Data as Taf2Data;
+
+            Assert.AreEqual(3, data.SummaryRegister.Count);
+            Assert.AreEqual("1-0:1.8.1*255", data.SummaryRegister[0].ObisCode.ToString());
+            Assert.AreEqual(400, data.SummaryRegister[0].Amount);
+            Assert.AreEqual(1, data.SummaryRegister[0].TariffId);
+
+            Assert.AreEqual("1-0:1.8.2*255", data.SummaryRegister[1].ObisCode.ToString());
+            Assert.AreEqual(600, data.SummaryRegister[1].Amount);
+            Assert.AreEqual(2, data.SummaryRegister[1].TariffId);
+
+            Assert.AreEqual("1-0:1.8.63*255", data.SummaryRegister[2].ObisCode.ToString());
+            Assert.AreEqual(0, data.SummaryRegister[2].Amount);
+            Assert.AreEqual(63, data.SummaryRegister[2].TariffId);
+        }
+
+        /// <summary>
+        /// Checks a 3 day data file against a supplier file that contains only the last day of the data file.
+        /// </summary>
+        [TestMethod]
+        [DeploymentItem(@"Data\result_3_days.xml")]
+        [DeploymentItem(@"Data\supplier_single_day_3.xml")]
+        public void Test3DayDataLastDayTariffFile()
+        {
+            var deviceXml = XDocument.Load(@"Data\result_3_days.xml");
+            var deviceModel = XmlModelParser.ParseHanAdapterModel(deviceXml.Root.Descendants());
+
+            var supplierXml = XDocument.Load(@"Data\supplier_single_day_3.xml");
+            var supplierModel = XmlModelParser.ParseSupplierModel(supplierXml.Root.Descendants());
+
+            var target = new TafAdapterTaf2();
+            var result = target.Calculate(deviceModel, supplierModel);
+
+            Assert.AreEqual("2017-11-06T00:00:00+01:00", result.Data.Begin.ToString("yyyy-MM-ddTHH:mm:ssK"));
+            Assert.AreEqual("2017-11-07T00:00:00+01:00", result.Data.End.ToString("yyyy-MM-ddTHH:mm:ssK"));
+
+            var data = result.Data as Taf2Data;
+
+            Assert.AreEqual(3, data.SummaryRegister.Count);
+            Assert.AreEqual("1-0:1.8.1*255", data.SummaryRegister[0].ObisCode.ToString());
+            Assert.AreEqual(360, data.SummaryRegister[0].Amount);
+            Assert.AreEqual(1, data.SummaryRegister[0].TariffId);
+
+            Assert.AreEqual("1-0:1.8.2*255", data.SummaryRegister[1].ObisCode.ToString());
+            Assert.AreEqual(600, data.SummaryRegister[1].Amount);
+            Assert.AreEqual(2, data.SummaryRegister[1].TariffId);
+
+            Assert.AreEqual("1-0:1.8.63*255", data.SummaryRegister[2].ObisCode.ToString());
+            Assert.AreEqual(0, data.SummaryRegister[2].Amount);
+            Assert.AreEqual(63, data.SummaryRegister[2].TariffId);
+        }
+
+        /// <summary>
+        /// Checks a 3 day data file against a supplier file that contains first 2 days of the data file.
+        /// </summary>
+        [TestMethod]
+        [DeploymentItem(@"Data\result_3_days.xml")]
+        [DeploymentItem(@"Data\supplier_2_day.xml")]
+        public void Test3DayData2DayTariffFile()
+        {
+            var deviceXml = XDocument.Load(@"Data\result_3_days.xml");
+            var deviceModel = XmlModelParser.ParseHanAdapterModel(deviceXml.Root.Descendants());
+
+            var supplierXml = XDocument.Load(@"Data\supplier_2_day.xml");
+            var supplierModel = XmlModelParser.ParseSupplierModel(supplierXml.Root.Descendants());
+
+            var target = new TafAdapterTaf2();
+            var result = target.Calculate(deviceModel, supplierModel);
+
+            Assert.AreEqual("2017-11-04T00:00:00+01:00", result.Data.Begin.ToString("yyyy-MM-ddTHH:mm:ssK"));
+            Assert.AreEqual("2017-11-06T00:00:00+01:00", result.Data.End.ToString("yyyy-MM-ddTHH:mm:ssK"));
+
+            var data = result.Data as Taf2Data;
+
+            Assert.AreEqual(3, data.SummaryRegister.Count);
+            Assert.AreEqual("1-0:1.8.1*255", data.SummaryRegister[0].ObisCode.ToString());
+            Assert.AreEqual(800, data.SummaryRegister[0].Amount);
+            Assert.AreEqual(1, data.SummaryRegister[0].TariffId);
+
+            Assert.AreEqual("1-0:1.8.2*255", data.SummaryRegister[1].ObisCode.ToString());
+            Assert.AreEqual(1200, data.SummaryRegister[1].Amount);
+            Assert.AreEqual(2, data.SummaryRegister[1].TariffId);
+
+            Assert.AreEqual("1-0:1.8.63*255", data.SummaryRegister[2].ObisCode.ToString());
+            Assert.AreEqual(0, data.SummaryRegister[2].Amount);
+            Assert.AreEqual(63, data.SummaryRegister[2].TariffId);
+        }
+
+        /// <summary>
+        /// Checks a 3 day data file against a supplier file that contains first 2 days of the data file. 
+        /// The measuring period 2017-11-05 00:00:00 is missing.
+        /// </summary>
+        [TestMethod]
+        [DeploymentItem(@"Data\result_3_days_gap_day_change_1.xml")]
+        [DeploymentItem(@"Data\supplier_2_day.xml")]
+        public void Test3DayData2DayTariffFileGap1()
+        {
+            var deviceXml = XDocument.Load(@"Data\result_3_days_gap_day_change_1.xml");
+            var deviceModel = XmlModelParser.ParseHanAdapterModel(deviceXml.Root.Descendants());
+
+            var supplierXml = XDocument.Load(@"Data\supplier_2_day.xml");
+            var supplierModel = XmlModelParser.ParseSupplierModel(supplierXml.Root.Descendants());
+
+            var target = new TafAdapterTaf2();
+            var result = target.Calculate(deviceModel, supplierModel);
+
+            Assert.AreEqual("2017-11-04T00:00:00+01:00", result.Data.Begin.ToString("yyyy-MM-ddTHH:mm:ssK"));
+            Assert.AreEqual("2017-11-06T00:00:00+01:00", result.Data.End.ToString("yyyy-MM-ddTHH:mm:ssK"));
+
+            var data = result.Data as Taf2Data;
+
+            Assert.AreEqual(3, data.SummaryRegister.Count);
+            Assert.AreEqual("1-0:1.8.1*255", data.SummaryRegister[0].ObisCode.ToString());
+            Assert.AreEqual(800, data.SummaryRegister[0].Amount);
+            Assert.AreEqual(1, data.SummaryRegister[0].TariffId);
+
+            Assert.AreEqual("1-0:1.8.2*255", data.SummaryRegister[1].ObisCode.ToString());
+            Assert.AreEqual(1200, data.SummaryRegister[1].Amount);
+            Assert.AreEqual(2, data.SummaryRegister[1].TariffId);
+
+            Assert.AreEqual("1-0:1.8.63*255", data.SummaryRegister[2].ObisCode.ToString());
+            Assert.AreEqual(0, data.SummaryRegister[2].Amount);
+            Assert.AreEqual(63, data.SummaryRegister[2].TariffId);
+        }
+        
+        /// <summary>
+        /// Checks a 3 day data file against a supplier file that contains first 2 days of the data file. 
+        /// The measuring periods 2017-11-05 00:00:00 to 2017-11-05 00:15:00 are missing.
+        /// </summary>
+        [TestMethod]
+        [DeploymentItem(@"Data\result_3_days_gap_day_change_2.xml")]
+        [DeploymentItem(@"Data\supplier_2_day.xml")]
+        public void Test3DayData2DayTariffFileGap2()
+        {
+            var deviceXml = XDocument.Load(@"Data\result_3_days_gap_day_change_2.xml");
+            var deviceModel = XmlModelParser.ParseHanAdapterModel(deviceXml.Root.Descendants());
+
+            var supplierXml = XDocument.Load(@"Data\supplier_2_day.xml");
+            var supplierModel = XmlModelParser.ParseSupplierModel(supplierXml.Root.Descendants());
+
+            var target = new TafAdapterTaf2();
+            var result = target.Calculate(deviceModel, supplierModel);
+
+            Assert.AreEqual("2017-11-04T00:00:00+01:00", result.Data.Begin.ToString("yyyy-MM-ddTHH:mm:ssK"));
+            Assert.AreEqual("2017-11-06T00:00:00+01:00", result.Data.End.ToString("yyyy-MM-ddTHH:mm:ssK"));
+
+            var data = result.Data as Taf2Data;
+
+            Assert.AreEqual(3, data.SummaryRegister.Count);
+            Assert.AreEqual("1-0:1.8.1*255", data.SummaryRegister[0].ObisCode.ToString());
+            Assert.AreEqual(800, data.SummaryRegister[0].Amount);
+            Assert.AreEqual(1, data.SummaryRegister[0].TariffId);
+
+            Assert.AreEqual("1-0:1.8.2*255", data.SummaryRegister[1].ObisCode.ToString());
+            Assert.AreEqual(1200, data.SummaryRegister[1].Amount);
+            Assert.AreEqual(2, data.SummaryRegister[1].TariffId);
+
+            Assert.AreEqual("1-0:1.8.63*255", data.SummaryRegister[2].ObisCode.ToString());
+            Assert.AreEqual(0, data.SummaryRegister[2].Amount);
+            Assert.AreEqual(63, data.SummaryRegister[2].TariffId);
+        }
+
+        /// <summary>
+        /// Checks a 3 day data file against a supplier file that contains first 2 days of the data file. 
+        /// The measuring periods 2017-11-04 23:45:00 to 2017-11-05 00:15:00 are missing.
+        /// </summary>
+        [TestMethod]
+        [DeploymentItem(@"Data\result_3_days_gap_day_change_3.xml")]
+        [DeploymentItem(@"Data\supplier_2_day.xml")]
+        public void Test3DayData2DayTariffFileGap3()
+        {
+            var deviceXml = XDocument.Load(@"Data\result_3_days_gap_day_change_3.xml");
+            var deviceModel = XmlModelParser.ParseHanAdapterModel(deviceXml.Root.Descendants());
+
+            var supplierXml = XDocument.Load(@"Data\supplier_2_day.xml");
+            var supplierModel = XmlModelParser.ParseSupplierModel(supplierXml.Root.Descendants());
+
+            var target = new TafAdapterTaf2();
+            var result = target.Calculate(deviceModel, supplierModel);
+
+            Assert.AreEqual("2017-11-04T00:00:00+01:00", result.Data.Begin.ToString("yyyy-MM-ddTHH:mm:ssK"));
+            Assert.AreEqual("2017-11-06T00:00:00+01:00", result.Data.End.ToString("yyyy-MM-ddTHH:mm:ssK"));
+
+            var data = result.Data as Taf2Data;
+
+            Assert.AreEqual(3, data.SummaryRegister.Count);
+            Assert.AreEqual("1-0:1.8.1*255", data.SummaryRegister[0].ObisCode.ToString());
+            Assert.AreEqual(800, data.SummaryRegister[0].Amount);
+            Assert.AreEqual(1, data.SummaryRegister[0].TariffId);
+
+            Assert.AreEqual("1-0:1.8.2*255", data.SummaryRegister[1].ObisCode.ToString());
+            Assert.AreEqual(1200, data.SummaryRegister[1].Amount);
+            Assert.AreEqual(2, data.SummaryRegister[1].TariffId);
+
+            Assert.AreEqual("1-0:1.8.63*255", data.SummaryRegister[2].ObisCode.ToString());
+            Assert.AreEqual(0, data.SummaryRegister[2].Amount);
+            Assert.AreEqual(63, data.SummaryRegister[2].TariffId);
         }
     }
 }

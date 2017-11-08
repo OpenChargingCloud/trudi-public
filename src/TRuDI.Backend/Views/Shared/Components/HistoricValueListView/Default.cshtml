@@ -2,9 +2,11 @@
 @using TRuDI.Models
 @model OriginalValueList
 
+<p></p>
+
 @if (Model.HistoricValues == null || Model.HistoricValues.Count == 0)
 {
-    <p>Es konnten keine Werte berechnet werden.</p>
+    <p>Zur Berechnung von historsichen Verbrauchswerten liegen nicht genügend Daten vor.</p>
 }
 else
 {
@@ -23,13 +25,6 @@ else
                     <td>@entry.ToHistoricValueDescription()</td>
                     <td>@entry.Value.GetDisplayValue(Model.Uom, Model.PowerOfTenMultiplier, Model.Scaler)</td>
                     <td>@Model.DisplayUnit</td>
-                </tr>
-            }
-            else
-            {
-                <tr>
-                    <td>@entry.ToHistoricValueDescription()</td>
-                    <td colspan="2"><span><i class="fa fa-warning"></i> kein Messwert vorhanden</span></td>
                 </tr>
             }
         }

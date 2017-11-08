@@ -97,6 +97,7 @@ namespace IVU.Common.Tls.RecordLayer
                 if (this.rcvBuffer.Count < 5)
                 {
                     await Task.Delay(5, token);
+                    needsMoreData = true;
                     continue;
                 }
 

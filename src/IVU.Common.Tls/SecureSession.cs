@@ -690,7 +690,7 @@ namespace IVU.Common.Tls
             {
                 // Fatal alerts don't need close notify
                 _recordStream.Close();
-                throw new Exception("Received a fatal alert");
+                throw new AlertException(AlertDescription.ReceivedFatalAlert, "Received a fatal alert");
             }
         }
 

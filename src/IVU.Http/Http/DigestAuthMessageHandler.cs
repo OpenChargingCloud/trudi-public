@@ -247,7 +247,7 @@
         
         private static string CalculateMd5Hash(string input)
         {
-            var inputBytes = Encoding.ASCII.GetBytes(input);
+            var inputBytes = Encoding.UTF8.GetBytes(input);
             var hash = MD5.Create().ComputeHash(inputBytes);
             var sb = new StringBuilder();
             foreach (var b in hash)
@@ -259,7 +259,7 @@
 
         private static string CalculateSha256Hash(string input)
         {
-            var inputBytes = Encoding.ASCII.GetBytes(input);
+            var inputBytes = Encoding.UTF8.GetBytes(input);
             var hash = SHA256.Create().ComputeHash(inputBytes);
             var sb = new StringBuilder();
             foreach (var b in hash)

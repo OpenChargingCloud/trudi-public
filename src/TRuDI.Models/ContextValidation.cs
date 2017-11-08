@@ -46,7 +46,6 @@
         // Validation of additional requirements with additional supplier xml (only Taf-7)
         public static void ValidateContext(UsagePointAdapterTRuDI usagePoint, UsagePointLieferant supplierModel, AdapterContext ctx)
         {
-
             ValidateContext(usagePoint, ctx);
 
             var exceptions = new List<Exception>();
@@ -184,17 +183,10 @@
             var queryStart = ctx.Start;
             var queryEnd = ctx.End;
 
-            if (queryEnd == null)
+            // 3 years have 94694400 seconds
+            if (queryEnd - queryStart > TimeSpan.FromDays(1096))
             {
-                return;
-            }
-            else
-            {
-                // 3 years have 94694400 seconds
-                if ((queryEnd - queryStart).TotalSeconds > 94694400)
-                {
-                    exceptions.Add(new InvalidOperationException("The maximum time span of 3 years was exceeded."));
-                }
+                exceptions.Add(new InvalidOperationException("Maximale Zeitspanne von 3 Jahren für eine Ablesung wurde überschritten."));
             }
         }
 
@@ -224,27 +216,14 @@
         // Taf-7: Validate if the periods between the IntervalReadings match with 15 minutes or a multiple of 15 minutes
         private static void ValidateTaf7minRegisterPeriod(UsagePointAdapterTRuDI usagePoint, List<Exception> exceptions)
         {
-            TimeSpan smallestPeriod = new TimeSpan(0, 15, 0);
-            TimeSpan greatestPeriod = new TimeSpan(1096, 0, 0, 0);
-            var intervalReadings = usagePoint.MeterReadings[0].IntervalBlocks[0].IntervalReadings;
-
-            intervalReadings = intervalReadings.OrderBy(i => i.TimePeriod.Start.ToUniversalTime()).ToList();
-
-            for (int index = 0; index < intervalReadings.Count - 1; index++)
+            var period = usagePoint.MeterReadings[0].GetMeasurementPeriod(true);
+            if (period == TimeSpan.Zero)
             {
-                var before = intervalReadings[index].TimePeriod.Start.GetDateWithoutSeconds().ToUniversalTime();
-                var next = intervalReadings[index + 1].TimePeriod.Start.GetDateWithoutSeconds().ToUniversalTime();
-
-                var currentPeriod = next - before;
-
-                if (currentPeriod < smallestPeriod || currentPeriod > greatestPeriod)
-                {
-                    exceptions.Add(new InvalidOperationException($"TAF-7: Ungültige Messperiode: {before} zu {next}: {currentPeriod.TotalMinutes:F2} Minuten"));
-                }
-                else if ((long)currentPeriod.TotalSeconds % (long)smallestPeriod.TotalSeconds != 0)
-                {
-                    exceptions.Add(new InvalidOperationException($"TAF-7: Die Messperiode ist kein vielfaches von 15 Minuten: {currentPeriod.TotalMinutes:F2} Minuten"));
-                }
+                exceptions.Add(new InvalidOperationException($"TAF-7: Ungültige Messperiode: es konnte keine Messperiode aus den Daten ermittelt werden."));
+            }
+            else if (period < TimeSpan.FromMinutes(15))
+            {
+                exceptions.Add(new InvalidOperationException($"TAF-7: Ungültige Messperiode: ermittelte Messperiode ist kleiner als 15 Minuten."));
             }
         }
 
@@ -265,22 +244,20 @@
         {
             var originalValueLists = model.MeterReadings.Where(mr => mr.IsOriginalValueList());
 
-            foreach (MeterReading reading in originalValueLists)
+            foreach (var reading in originalValueLists)
             {
-                foreach (IntervalBlock ib in reading.IntervalBlocks)
+                foreach (var ib in reading.IntervalBlocks)
                 {
-                    //when capture times don't match intended read times we need to override the IntervalBlock duration
-                    var intervalBlockEnd = ib.Interval.GetEnd();
-                    if (ib.Interval.CaptureTime != ib.Interval.Start)
+                    var intervalBlockEnd = ib.Interval.GetCaptureTimeEnd();
+                    foreach (var ir in ib.IntervalReadings)
                     {
-                        intervalBlockEnd = intervalBlockEnd.AddSeconds((ib.Interval.CaptureTime - ib.Interval.Start).TotalSeconds);
-                    }
-
-                    foreach (IntervalReading ir in ib.IntervalReadings)
-                    {
-                        if (ir.TimePeriod.Start < ib.Interval.Start || ir.TimePeriod.GetEnd() > intervalBlockEnd)
+                        if (ir.TimePeriod.CaptureTime.ToUniversalTime() < ib.Interval.CaptureTime.ToUniversalTime())
                         {
-                            exceptions.Add(new InvalidOperationException("TAF-7: The TimePeriod of an IntervalReading is outside of the enclosing IntervalBlock"));
+                            exceptions.Add(new InvalidOperationException($"TAF-7: IntervalReading befindet sich nicht innerhalb des Zeitbereichs eines IntervalBlocks: Start des IntervalBlocks: {ib.Interval.Start}, Zeitpunkt des IntervalReading: {ir.TimePeriod.CaptureTime}, Kennziffer: {reading.ReadingType.ObisCode}"));
+                        }
+                        else if (ir.TimePeriod.CaptureTime.ToUniversalTime() > intervalBlockEnd.ToUniversalTime())
+                        {
+                            exceptions.Add(new InvalidOperationException($"TAF-7: IntervalReading befindet sich nicht innerhalb des Zeitbereichs eines IntervalBlocks: Ende des IntervalBlocks: {intervalBlockEnd}, Zeitpunkt des IntervalReading: {ir.TimePeriod.GetCaptureTimeEnd()}, Kennziffer: {reading.ReadingType.ObisCode}"));
                         }
                     }
                 }
@@ -316,7 +293,7 @@
 
             if (model.InvoicingParty.InvoicingPartyId != supplier.InvoicingParty.InvoicingPartyId)
             {
-                exceptions.Add(new InvalidOperationException($"TAF-7: Die Rechnungssteller-ID \"{model.InvoicingParty.InvoicingPartyId}\" stimmt nicht mit der Rechnungssteller-ID \"{supplier.InvoicingParty.InvoicingPartyId}\" aus der Tarifdatei des Lieferanten überein."));
+                exceptions.Add(new InvalidOperationException($"TAF-7: Die ID des Rechnungsstellers \"{model.InvoicingParty.InvoicingPartyId}\" stimmt nicht mit der ID des Rechnungssteller \"{supplier.InvoicingParty.InvoicingPartyId}\" aus der Tarifdatei des Lieferanten überein."));
             }
 
             if (model.ServiceCategory.Kind != supplier.ServiceCategory.Kind)

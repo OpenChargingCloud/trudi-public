@@ -123,7 +123,7 @@
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-primary">Verbinden</button>
+                <button type="submit" class="btn btn-primary" id="connectButton">Verbinden</button>
 
             </form>
 
@@ -153,6 +153,11 @@
 
 <script language="javascript" type="text/javascript">
     $(document).ready(function () {
+        $("#connectForm").submit(function () {
+            $("#connectButton").attr("disabled", true);
+            return true;
+        });
+
         $.validator.addMethod(
             "dinDeviceId",
             function (value, element) {

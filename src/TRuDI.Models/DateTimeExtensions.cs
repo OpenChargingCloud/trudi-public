@@ -40,6 +40,11 @@
             return new DateTime(value.Year, value.Month, value.Day, value.Hour, value.Minute - diff, 0, value.Kind);
         }
 
+        public static string ToIso8601Local(this DateTime timestamp)
+        {
+            return timestamp.ToString("yyyy-MM-ddTHH:mm:ssK");
+        }
+
         public static string ToIso8601(this DateTime timestamp)
         {
             return timestamp.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ");

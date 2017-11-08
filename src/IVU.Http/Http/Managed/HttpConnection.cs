@@ -1148,7 +1148,7 @@ namespace IVU.Http.Headers.Managed
                 // and it's simple to transform this one into ContinueWith.
                 return t.ContinueWith((completed, state) =>
                     ((HttpConnection)state)._readLength = completed.GetAwaiter().GetResult(),
-                    this, CancellationToken.None, TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
+                    this, cancellationToken, TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
             }
         }
 

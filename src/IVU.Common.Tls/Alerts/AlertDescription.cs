@@ -57,5 +57,6 @@ namespace IVU.Common.Tls.Alerts
 		UserCanceled            = 90,
 		NoRenegotiation         = 100,
 		UnsupportedExtension    = 101, // TLSv1.2 only, shouldn't be used on earlier versions
+        ReceivedFatalAlert      = 200,
 	}
 }
