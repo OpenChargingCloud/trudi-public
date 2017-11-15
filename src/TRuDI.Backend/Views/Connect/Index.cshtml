@@ -86,47 +86,55 @@
                 <div class="panel panel-primary">
                     <div class="panel-heading">Verbindungsparameter</div>
                     <div class="panel-body">
-                        <div class="form-group">
-                            <label asp-for="DeviceId">Identifikationsnummer:</label>
-                            @if (StateService.OperationMode == OperationMode.DisplayFunction || string.IsNullOrWhiteSpace(Model.DeviceId))
-                            {
-                                <input class="form-control" asp-for="DeviceId" />
-                            }
-                            else
-                            {
-                                <input class="form-control" asp-for="DeviceId" disabled />
-                                <input type="hidden" asp-for="DeviceId" />
-                            }
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="DeviceId">Identifikationsnummer:</label>
+                                    @if (StateService.OperationMode == OperationMode.DisplayFunction || string.IsNullOrWhiteSpace(Model.DeviceId))
+                                    {
+                                        <input class="form-control" asp-for="DeviceId" placeholder="z.B. EABC0112345678" />
+                                    }
+                                    else
+                                    {
+                                        <input class="form-control" asp-for="DeviceId" disabled />
+                                        <input type="hidden" asp-for="DeviceId" />
+                                    }
+                                </div>
+
+                                <div class="form-group">
+                                    <label asp-for="Address">IP-Adresse:</label>
+                                    <input class="form-control" asp-for="Address" placeholder="z.B. 192.168.1.200" />
+                                </div>
+
+                                <div class="form-group">
+                                    <label asp-for="Port">Port:</label>
+                                    <input class="form-control" asp-for="Port" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <p>Die Identifikationnummer finden Sie in Ihren Vertragsunterlagen sowie aufgedruckt auf dem Smart Meter Gateway. Sie beginnt mit einem "E" gefolgt von drei weiteren Buchstaben und 10 Ziffern.</p>
+                                <p>Die IP-Adresse sowie den Port finden Sie in Ihren Vertragsunterlagen. Sie erkennen die IP-Adresse an den vier durch Punkten getrennten Zählenblöcken.</p>
+                                <p>Achtung: Es muss ggf. auch die Netzwerkkonfiguration des PCs angepasst werden!</p>
+                            </div>
                         </div>
 
-                        <div class="form-group">
-                            <label asp-for="Address">IP-Adresse:</label>
-                            <input class="form-control" asp-for="Address" />
-                        </div>
-
-                        <div class="form-group">
-                            <label asp-for="Port">Port:</label>
-                            <input class="form-control" asp-for="Port" />
-                        </div>
                     </div>
+                </div>
 
-
-                    <div id="manufacturer-parameters">
-                        @if (StateService?.ActiveHanAdapter?.ManufacturerParametersView != null)
-                        {
-                            @await Html.PartialAsync("_ManufacturerParametersFormPartial", Model.DeviceId, new ViewDataDictionary(ViewData) { { "ManufacturerParametersViewName", StateService?.ActiveHanAdapter?.ManufacturerParametersView } });
-                        }
-                        else
-                        {
-                            @await Html.PartialAsync("_ManufacturerParametersFormEmptyPartial", Model.DeviceId, new ViewDataDictionary(ViewData) { { "ManufacturerParametersViewName", string.Empty } });
-                        }
-                    </div>
+                <div id="manufacturer-parameters">
+                    @if (StateService?.ActiveHanAdapter?.ManufacturerParametersView != null)
+                    {
+                        @await Html.PartialAsync("_ManufacturerParametersFormPartial", Model.DeviceId, new ViewDataDictionary(ViewData) { { "ManufacturerParametersViewName", StateService?.ActiveHanAdapter?.ManufacturerParametersView } });
+                    }
+                    else
+                    {
+                        @await Html.PartialAsync("_ManufacturerParametersFormEmptyPartial", Model.DeviceId, new ViewDataDictionary(ViewData) { { "ManufacturerParametersViewName", string.Empty } });
+                    }
                 </div>
 
                 <button type="submit" class="btn btn-primary" id="connectButton">Verbinden</button>
 
             </form>
-
         </div>
 
         <div role="tabpanel" class="tab-pane" id="loadFromFile">
@@ -147,15 +155,22 @@
                 </div>
             </form>
         </div>
-
     </div>
+
 </div>
 
+
 <script language="javascript" type="text/javascript">
+    var currentDeviceId = "";
+
     $(document).ready(function () {
         $("#connectForm").submit(function () {
-            $("#connectButton").attr("disabled", true);
-            return true;
+            if ($("#connectForm").valid()) {
+                $("#connectButton").attr("disabled", true);
+                return true;
+            }
+
+            return false;
         });
 
         $.validator.addMethod(
@@ -173,9 +188,14 @@
                         return false;
                     }
 
-                    $('#manufacturer-parameters').load(
-                        '@Url.Action("ManufacturerConnectForm", "Connect")',
+                    if (currentDeviceId !== value) {
+                        currentDeviceId = value;
+
+                        $('#manufacturer-parameters').load(
+                            '@Url.Action("ManufacturerConnectForm", "Connect")',
                         { deviceId: value });
+
+                    }
                     return true;
                 }
 

@@ -23,12 +23,12 @@
         {
             if (timestamp == null)
             {
-                return DateTime.UtcNow;
+                return DateTime.Now;
             }
 
             if (timestamp.Value.ToUniversalTime() > DateTime.UtcNow)
             {
-                return DateTime.UtcNow;
+                return DateTime.Now;
             }
 
             return timestamp.Value;
@@ -40,6 +40,24 @@
             return new DateTime(value.Year, value.Month, value.Day, value.Hour, value.Minute - diff, 0, value.Kind);
         }
 
+        public static DateTime DayStart(this DateTime value)
+        {
+            return new DateTime(value.Year, value.Month, value.Day, 0, 0, 0, value.Kind);
+        }
+
+        public static DateTime DayEnd(this DateTime value)
+        {
+            return new DateTime(value.Year, value.Month, value.Day, 23, 59, 59, value.Kind);
+        }
+        public static DateTime NextDayStart(this DateTime value)
+        {
+            value = value.Kind == DateTimeKind.Utc
+                        ? value.ToUniversalTime().AddDays(1)
+                        : value.ToUniversalTime().AddDays(1).ToLocalTime();
+
+            return new DateTime(value.Year, value.Month, value.Day, 0, 0, 0, value.Kind);
+        }
+        
         public static string ToIso8601Local(this DateTime timestamp)
         {
             return timestamp.ToString("yyyy-MM-ddTHH:mm:ssK");
@@ -58,6 +76,17 @@
             }
 
             return timestamp.Value.ToIso8601();
+        }
+
+        public static DateTime AddUtcSeconds(this DateTime t, double seconds)
+        {
+            if (t.Kind != DateTimeKind.Utc)
+            {
+                var timeUtc = t.ToUniversalTime();
+                return timeUtc.AddSeconds(seconds).ToLocalTime();
+            }
+
+            return t.AddSeconds(seconds);
         }
     }
 }

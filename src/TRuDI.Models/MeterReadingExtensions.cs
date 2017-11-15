@@ -124,12 +124,12 @@
             return count;
         }
 
-        public static (int Ok, int Warning, int TempError1, int TempError2, int FatalError) GetStatusCount(this IntervalBlock block)
+        public static (int Ok, int Warning, int TempError, int CriticalTempError, int FatalError) GetStatusCount(this IntervalBlock block)
         {
             int ok = 0;
             int warning = 0;
-            int tempError1 = 0;
-            int tempError2 = 0;
+            int tempError = 0;
+            int criticalTempError = 0;
             int fatalError = 0;
 
             for (int i = 0; i < block.IntervalReadings.Count; i++)
@@ -140,7 +140,7 @@
 
                 switch (statusPtb)
                 {
-                    case StatusPTB.No_Error:
+                    case StatusPTB.NoError:
                         ok++;
                         break;
 
@@ -148,15 +148,15 @@
                         warning++;
                         break;
 
-                    case StatusPTB.Temp_Error_signed_invalid:
-                        tempError1++;
+                    case StatusPTB.TemporaryError:
+                        tempError++;
                         break;
 
-                    case StatusPTB.Temp_Error_is_invalid:
-                        tempError2++;
+                    case StatusPTB.CriticalTemporaryError:
+                        criticalTempError++;
                         break;
 
-                    case StatusPTB.Fatal_Error:
+                    case StatusPTB.FatalError:
                         fatalError++;
                         break;
 
@@ -165,7 +165,7 @@
                 }
             }
 
-            return (ok, warning, tempError1, tempError2, fatalError);
+            return (ok, warning, tempError, criticalTempError, fatalError);
         }
 
         public static Interval GetMeterReadingInterval(this MeterReading reading)
@@ -174,15 +174,23 @@
 
             var start = blocks.FirstOrDefault().Interval.Start;
             var end = blocks.LastOrDefault().Interval.GetEnd();
-            var duration = (end - start).TotalSeconds;
+            var duration = (end.ToUniversalTime() - start.ToUniversalTime()).TotalSeconds;
 
             return new Interval() { Start = start, Duration = (uint)duration };
         }
 
         public static IntervalReading GetIntervalReadingFromDate(this MeterReading reading, DateTime date)
         {
-            return reading.IntervalBlocks?.FirstOrDefault(ib => ib.Interval.IsDateInIntervalBlock(date))
-                 .IntervalReadings?.FirstOrDefault(ir => ir.TimePeriod.Start == date);
+            IntervalReading result = null;
+
+            var blocks = reading.IntervalBlocks?.FirstOrDefault(ib => ib.Interval.IsDateInIntervalBlock(date));
+
+            if(blocks != null)
+            {
+                result = blocks.IntervalReadings?.FirstOrDefault(ir => ir.TimePeriod.Start == date);
+            }
+
+            return result;
         }
     }
 }

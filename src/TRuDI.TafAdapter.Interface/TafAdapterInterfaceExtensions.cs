@@ -111,12 +111,12 @@
 
             if (mrObisId == default(ObisId) || tariffStages == null)
             {
-                throw new ArgumentNullException("The parameter mrObisId or tariffStages is null.");
+                throw new ArgumentNullException("Die ObisId ist nicht gesetzt oder es sind keine Tarifstufen vorhanden.");
             }
 
             if(tariffStages.Count < 1 || dayProfiles.Count < 1)
             {
-                throw new ArgumentException("The parameter tariffStages or the parameter dayProfiles contains 0 elements.");
+                throw new ArgumentException("Es wurden keine Tarifstufen oder Tagesprofile gefunden.");
             }
 
             foreach (TariffStage stage in tariffStages)

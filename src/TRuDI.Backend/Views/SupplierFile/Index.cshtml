@@ -16,11 +16,14 @@
     <div class="tab-content">
         <div role="tabpanel" class="tab-pane active" id="loadFromFile">
             <div class="panel panel-primary">
-                <div class="panel-heading">Datei laden</div>
+                <div class="panel-heading">Tarifdaten aus lokaler Datei laden</div>
                 <div class="panel-body">
 
                     <p>
-
+                        Erfolgt die Tarifierung nicht im Smart Meter Gateway selbst, sondern anhand einer Zählerstandsgangmessung
+                        bei Ihrem Lieferanten, erhalten Sie von diesem eine Datei mit Tarifierungsinformationen. Mittels dieser Datei
+                        kann TRuDI die zur Rechnungsprüfung benötitgten Daten aus dem Smart Meter Gateway laden, die Tarifregister 
+                        berechnen und anzeigen.
                     </p>
 
                     <form id="xmlFileForm">
@@ -39,10 +42,17 @@
 
         <div role="tabpanel" class="tab-pane" id="loadFromWeb">
             <div class="panel panel-primary">
-                <div class="panel-heading">Datei laden</div>
+                <div class="panel-heading">Tarifdaten aus dem Internet laden</div>
                 <div class="panel-body">
+                    
+                    <p>
+                        Erfolgt die Tarifierung nicht im Smart Meter Gateway selbst, sondern anhand einer Zählerstandsgangmessung
+                        bei Ihrem Lieferanten, erhalten Sie von diesem eine Datei mit Tarifierungsinformationen. Mittels dieser Datei
+                        kann TRuDI die zur Rechnungsprüfung benötitgten Daten aus dem Smart Meter Gateway laden, die Tarifregister 
+                        berechnen und anzeigen.
+                    </p>
 
-                    <p></p>
+                    <p>Sollten Sie von Ihrem Lieferanten einen Download-Link erhalten haben, kann dieser hier in das Feld Download-Adresse eingefügt werden.</p>
 
                     <form id="webFileForm">
                         <div>

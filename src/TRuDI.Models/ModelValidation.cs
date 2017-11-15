@@ -521,13 +521,13 @@
         {
             switch (statusPtb)
             {
-                case StatusPTB.Fatal_Error:
+                case StatusPTB.FatalError:
                     break;
-                case StatusPTB.No_Error:
+                case StatusPTB.NoError:
                     break;
-                case StatusPTB.Temp_Error_is_invalid:
+                case StatusPTB.CriticalTemporaryError:
                     break;
-                case StatusPTB.Temp_Error_signed_invalid:
+                case StatusPTB.TemporaryError:
                     break;
                 case StatusPTB.Warning:
                     break;

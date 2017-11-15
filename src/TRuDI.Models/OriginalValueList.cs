@@ -37,8 +37,8 @@
                 var statusCount = block.GetStatusCount();
                 this.OkCount += statusCount.Ok;
                 this.WarningCount += statusCount.Warning;
-                this.TempError1Count += statusCount.TempError1;
-                this.TempError2Count += statusCount.TempError2;
+                this.TempErrorCount += statusCount.TempError;
+                this.CriticalTempErrorCount += statusCount.CriticalTempError;
                 this.FatalErrorCount += statusCount.FatalError;
             }
 
@@ -55,13 +55,13 @@
         public int GapCount { get; }
         public int ValueCount { get; }
         public int FatalErrorCount { get; set; }
-        public int TempError2Count { get; set; }
-        public int TempError1Count { get; set; }
+        public int CriticalTempErrorCount { get; set; }
+        public int TempErrorCount { get; set; }
         public int WarningCount { get; set; }
         public int OkCount { get; set; }
 
-        public bool HasErrors => this.FatalErrorCount > 0 || this.WarningCount > 0 || this.TempError1Count > 0
-                                 || this.TempError2Count > 0 || this.WarningCount > 0;
+        public bool HasErrors => this.FatalErrorCount > 0 || this.WarningCount > 0 || this.TempErrorCount > 0
+                                 || this.CriticalTempErrorCount > 0 || this.WarningCount > 0;
 
         public TimeSpan MeasurementPeriod { get; }
 
@@ -136,7 +136,7 @@
                 
                 switch (reading.StatusPTB ?? reading.StatusFNN.MapToStatusPtb())
                 {
-                    case StatusPTB.No_Error:
+                    case StatusPTB.NoError:
                         currentDay.OkCount++;
                         break;
 
@@ -144,15 +144,15 @@
                         currentDay.WarningCount++;
                         break;
 
-                    case StatusPTB.Temp_Error_signed_invalid:
-                        currentDay.TempError1Count++;
+                    case StatusPTB.TemporaryError:
+                        currentDay.TempErrorCount++;
                         break;
 
-                    case StatusPTB.Temp_Error_is_invalid:
-                        currentDay.TempError2Count++;
+                    case StatusPTB.CriticalTemporaryError:
+                        currentDay.CriticalTempErrorCount++;
                         break;
 
-                    case StatusPTB.Fatal_Error:
+                    case StatusPTB.FatalError:
                         currentDay.FatalErrorCount++;
                         break;
 

@@ -1,5 +1,6 @@
 ﻿@using TRuDI.Backend.Utils
 @using TRuDI.Models
+@using TRuDI.Models.BasicData
 @model OriginalValueList
     
 <h3>Übersicht über fehlende Messwerte und Stati</h3>    
@@ -37,11 +38,11 @@
                 }
 
                 <tr>
-                    <td><a style="cursor: pointer;" onclick="selectOvlDay('@Model.GetOriginalValueListIdent()', moment('@timestamp.ToIso8601()'));">@entry.Timestamp.ToString("dd.MM.yyyy")</a></td>
-                    <td>
+                    <td style="vertical-align: top;"><a style="cursor: pointer;" onclick="selectOvlDay('@Model.GetOriginalValueListIdent()', moment('@timestamp.ToIso8601()'));">@entry.Timestamp.ToString("dd.MM.yyyy")</a></td>
+                    <td style="vertical-align: top;">
                         @if (entry.OkCount == entry.ValueCount)
                         {
-                            <span>keine Fehler</span>
+                            <span></span>
                         }
                         else
                         {
@@ -50,27 +51,27 @@
                                 <div>
                                     <span>
                                         <i class="fa fa-times-circle"></i>
-                                        @entry.FatalErrorCount @(entry.FatalErrorCount == 1 ? "fataler Fehler" : "fatale Fehler")
+                                        @entry.FatalErrorCount @(StatusPTB.FatalError.GetStatusString(entry.FatalErrorCount))
                                     </span>
                                 </div>
                             }
 
-                            if (entry.TempError1Count > 0)
-                            {
-                                <div>
-                                    <span>
-                                        <i class="fa fa-exclamation-circle"></i>
-                                        @(entry.TempError1Count) @(entry.TempError1Count == 1 ? "temporärer Fehler 1" : "temporäre Fehler 1")
-                                    </span>
-                                </div>
-                            }
-
-                            if (entry.TempError2Count > 0)
+                            if (entry.CriticalTempErrorCount > 0)
                             {
                                 <div>
                                     <span>
                                         <i class="fa fa-exclamation-triangle"></i>
-                                        @(entry.TempError2Count) @(entry.TempError2Count == 1 ? "temporärer Fehler 2" : "temporäre Fehler 2")
+                                        @(entry.CriticalTempErrorCount) @(StatusPTB.CriticalTemporaryError.GetStatusString(entry.CriticalTempErrorCount))
+                                    </span>
+                                </div>
+                            }
+
+                            if (entry.TempErrorCount > 0)
+                            {
+                                <div>
+                                    <span>
+                                        <i class="fa fa-exclamation-circle"></i>
+                                        @(entry.TempErrorCount) @(StatusPTB.TemporaryError.GetStatusString(entry.TempErrorCount))
                                     </span>
                                 </div>
                             }
@@ -80,17 +81,17 @@
                                 <div>
                                     <span>
                                         <i class="fa fa-check-circle"></i>
-                                        @entry.WarningCount @(entry.WarningCount == 1 ? "Warnung" : "Warnungen")
+                                        @entry.WarningCount @(StatusPTB.Warning.GetStatusString(entry.WarningCount))
                                     </span>
                                 </div>
                             }
                         }
                     </td>
 
-                    <td>
+                    <td style="vertical-align: top;">
                         @if (entry.GapCount == 0)
                         {
-                            <text>keine</text>
+                            <text></text>
                         }
                         else
                         {

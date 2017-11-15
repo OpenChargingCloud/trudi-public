@@ -9,7 +9,7 @@ namespace IVU.Http
     using System;
 
     [SuppressMessage("Microsoft.Serialization", "CA2229")]
-    public class TlsConnectFailed : HttpRequestException 
+    public class TlsConnectFailed : HttpRequestException
     {
         public TlsConnectFailed()
             : this(null, null)

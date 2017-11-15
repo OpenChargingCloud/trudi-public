@@ -99,6 +99,42 @@
         }
 
         [TestMethod]
+        public void TestAddUtcSeconds()
+        {
+            DateTime t = new DateTime(2017, 3, 26, 0, 0, 0, DateTimeKind.Local);
+
+            double offset = (double)(6 * 3600);
+
+            Assert.IsTrue(t.AddUtcSeconds(offset).Kind == DateTimeKind.Local);
+            Assert.IsTrue(t.AddUtcSeconds(offset).Hour == 7);
+            Assert.IsTrue(t.AddUtcSeconds(offset).Minute == 0);
+            Assert.IsTrue(t.AddUtcSeconds(offset).IsDaylightSavingTime());
+
+            t = new DateTime(2017, 10, 29, 0, 0, 0, DateTimeKind.Unspecified);
+
+            Assert.IsTrue(t.AddUtcSeconds(offset).Kind == DateTimeKind.Local);
+            Assert.IsTrue(t.AddUtcSeconds(offset).Hour == 5);
+            Assert.IsTrue(t.AddUtcSeconds(offset).Minute == 0);
+            Assert.IsFalse(t.AddUtcSeconds(offset).IsDaylightSavingTime());
+
+
+            t = new DateTime(2017, 3, 26, 0, 0, 0, DateTimeKind.Utc);
+
+            Assert.IsTrue(t.AddUtcSeconds(offset).Kind == DateTimeKind.Utc);
+            Assert.IsTrue(t.AddUtcSeconds(offset).Hour == 6);
+            Assert.IsTrue(t.AddUtcSeconds(offset).Minute == 0);
+            Assert.IsFalse(t.AddUtcSeconds(offset).IsDaylightSavingTime()); //always FALSE for UTC Time
+
+            t = new DateTime(2017, 10, 29, 0, 0, 0, DateTimeKind.Utc);
+
+            Assert.IsTrue(t.AddUtcSeconds(offset).Kind == DateTimeKind.Utc);
+            Assert.IsTrue(t.AddUtcSeconds(offset).Hour == 6);
+            Assert.IsTrue(t.AddUtcSeconds(offset).Minute == 0);
+            Assert.IsFalse(t.AddUtcSeconds(offset).IsDaylightSavingTime()); //always FALSE for UTC Time
+
+        }
+
+        [TestMethod]
         public void TestFilterIntervalReadings()
         {
             var readings = new List<IntervalReading>();

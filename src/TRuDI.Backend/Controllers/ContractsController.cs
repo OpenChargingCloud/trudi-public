@@ -7,6 +7,7 @@
 
     using TRuDI.Backend.Application;
     using TRuDI.HanAdapter.Interface;
+    using TRuDI.Models;
 
     public class ContractsController : Controller
     {
@@ -49,6 +50,16 @@
                 End = endTime,
             };
 
+            if (ctx.BillingPeriod.End == null || ctx.BillingPeriod.End != ctx.End)
+            {
+                ctx.End = ctx.End.NextDayStart();
+            }
+
+            if (ctx.BillingPeriod.Begin != ctx.Start)
+            {
+                ctx.Start = ctx.Start.DayStart();
+            }
+
             ctx.WithLogdata = true;
             this.applicationState.LoadData(ctx);
 
@@ -66,8 +77,8 @@
                           {
                               Contract = contractContainer.Contract,
                               BillingPeriod = null,
-                              Start = startTime,
-                              End = endTime,
+                              Start = startTime.DayStart(),
+                              End = endTime.NextDayStart(),
                           };
 
             ctx.WithLogdata = true;

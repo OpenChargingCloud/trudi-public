@@ -16,6 +16,7 @@
     using TRuDI.Backend.Models;
     using TRuDI.Backend.Utils;
     using TRuDI.HanAdapter.Interface;
+    using TRuDI.Models;
 
     public class SupplierFileController : Controller
     {
@@ -145,6 +146,16 @@
                               Start = startTime,
                               End = endTime,
                           };
+
+            if (ctx.Start != this.applicationState.CurrentSupplierFile.Model.AnalysisProfile.BillingPeriod.Start)
+            {
+                ctx.Start = ctx.Start.DayStart();
+            }
+
+            if (ctx.End != this.applicationState.CurrentSupplierFile.Model.AnalysisProfile.BillingPeriod.GetEnd())
+            {
+                ctx.End = ctx.End.NextDayStart();
+            }
 
             ctx.WithLogdata = true;
 

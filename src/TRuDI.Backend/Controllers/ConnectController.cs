@@ -37,9 +37,9 @@
         {
             try
             {
-                this.applicationState.LoadAdapter(deviceId);
+                var hanAdapter = HanAdapterRepository.LoadAdapter(deviceId);
 
-                var manufacturerParametersView = this.applicationState.ActiveHanAdapter.ManufacturerParametersView;
+                var manufacturerParametersView = hanAdapter.ManufacturerParametersView;
                 if (manufacturerParametersView != null)
                 {
                     this.ViewData["ManufacturerParametersViewName"] = manufacturerParametersView;

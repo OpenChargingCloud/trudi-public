@@ -178,8 +178,8 @@ namespace TRuDI.Models.Tests
             Assert.IsFalse(errors[0].HasErrors);
             Assert.AreEqual(0, errors[0].FatalErrorCount);
             Assert.AreEqual(0, errors[0].WarningCount);
-            Assert.AreEqual(0, errors[0].TempError1Count);
-            Assert.AreEqual(0, errors[0].TempError2Count);
+            Assert.AreEqual(0, errors[0].TempErrorCount);
+            Assert.AreEqual(0, errors[0].CriticalTempErrorCount);
             Assert.AreEqual(96, errors[0].OkCount);
             Assert.AreEqual("2017-11-04T00:00:00+01:00", errors[0].Timestamp.ToIso8601Local());
 
@@ -188,8 +188,8 @@ namespace TRuDI.Models.Tests
             Assert.IsTrue(errors[1].HasErrors);
             Assert.AreEqual(3, errors[1].FatalErrorCount);
             Assert.AreEqual(1, errors[1].WarningCount);
-            Assert.AreEqual(2, errors[1].TempError1Count);
-            Assert.AreEqual(3, errors[1].TempError2Count);
+            Assert.AreEqual(2, errors[1].TempErrorCount);
+            Assert.AreEqual(3, errors[1].CriticalTempErrorCount);
             Assert.AreEqual(86, errors[1].OkCount);
             Assert.AreEqual("2017-11-05T00:00:00+01:00", errors[1].Timestamp.ToIso8601Local());
 
@@ -198,8 +198,8 @@ namespace TRuDI.Models.Tests
             Assert.IsTrue(errors[2].HasErrors);
             Assert.AreEqual(1, errors[2].FatalErrorCount);
             Assert.AreEqual(0, errors[2].WarningCount);
-            Assert.AreEqual(0, errors[2].TempError1Count);
-            Assert.AreEqual(0, errors[2].TempError2Count);
+            Assert.AreEqual(0, errors[2].TempErrorCount);
+            Assert.AreEqual(0, errors[2].CriticalTempErrorCount);
             Assert.AreEqual(95, errors[2].OkCount);
             Assert.AreEqual("2017-11-06T00:00:00+01:00", errors[2].Timestamp.ToIso8601Local());
 
@@ -208,8 +208,8 @@ namespace TRuDI.Models.Tests
             Assert.IsFalse(errors[0].HasErrors);
             Assert.AreEqual(0, errors[3].FatalErrorCount);
             Assert.AreEqual(0, errors[3].WarningCount);
-            Assert.AreEqual(0, errors[3].TempError1Count);
-            Assert.AreEqual(0, errors[3].TempError2Count);
+            Assert.AreEqual(0, errors[3].TempErrorCount);
+            Assert.AreEqual(0, errors[3].CriticalTempErrorCount);
             Assert.AreEqual(1, errors[3].OkCount);
             Assert.AreEqual("2017-11-07T00:00:00+01:00", errors[3].Timestamp.ToIso8601Local());
         }

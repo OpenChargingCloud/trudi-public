@@ -413,12 +413,21 @@
 
             analysisProfile.Add(new XElement(ar + "tariffUseCase", HanConfiguration.XmlConfig.TariffUseCase));
             analysisProfile.Add(new XElement(ar + "tariffId", HanConfiguration.XmlConfig.TariffName));
-            analysisProfile.Add(GetInterval("billingPeriod",
-                new Interval()
-                {
-                    Start = HanConfiguration.BillingPeriod.Begin,
-                    Duration = (uint)(HanConfiguration.BillingPeriod.End - HanConfiguration.BillingPeriod.Begin)?.TotalSeconds
-                }, ar));
+
+            if (this.HanConfiguration.BillingPeriod.End != null)
+            {
+                analysisProfile.Add(
+                    GetInterval(
+                        "billingPeriod",
+                        new Interval()
+                            {
+                                Start = HanConfiguration.BillingPeriod.Begin,
+                                Duration = (uint)(HanConfiguration.BillingPeriod.End.Value.ToUniversalTime()
+                                                  - HanConfiguration.BillingPeriod.Begin.ToUniversalTime())
+                                    .TotalSeconds
+                            },
+                        ar));
+            }
 
             TariffStages(ar).ForEach(ts => analysisProfile.Add(ts));
             analysisProfile.Add(new XElement(ar + "defaultTariffNumber", HanConfiguration.XmlConfig.DefaultTariffNumber));

@@ -22,6 +22,8 @@
 
         private static readonly ConcurrentDictionary<string, AuthorizationParameter> _authorizationCache = new ConcurrentDictionary<string, AuthorizationParameter>();
 
+        private static Random random = new Random();
+
         public DigestAuthMessageHandler(HttpMessageHandler innerHandler, string username, string password)
             : base(innerHandler)
         {
@@ -152,7 +154,7 @@
                 algorithm = "MD5";
             }
 
-            cnonce = new Random().Next(123400, 9999999).ToString();
+            cnonce = random.Next(123400, 9999999).ToString();
             cnonceDate = DateTime.Now;
         }
 

@@ -108,12 +108,12 @@
     $(function() {
         $("#dtpStart").datetimepicker({
             locale: 'de',
-            stepping: 15
+            format: 'DD.MM.YYYY'
         });
         $("#dtpEnd").datetimepicker({
             useCurrent: false,
             locale: 'de',
-            stepping: 15
+            format: 'DD.MM.YYYY'
         });
 
         $("#dtpStart").data("DateTimePicker").maxDate(moment('@data.AnalysisProfile.BillingPeriod.Start.ToIso8601()'));

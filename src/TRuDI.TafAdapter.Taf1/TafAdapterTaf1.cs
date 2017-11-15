@@ -18,6 +18,8 @@
     public class TafAdapterTaf1 : ITafAdapter
     {
         private List<OriginalValueList> originalValueLists;
+        private DateTime billingPeriodStart;
+        private DateTime billingPeriodEnd;
 
         /// <inheritdoc />
         /// <summary>
@@ -33,79 +35,70 @@
 
             if (!this.originalValueLists.Any())
             {
-                throw new InvalidOperationException("TAF-7 calculation error: Invalid MeterReading instance. No original value list.");
+                throw new InvalidOperationException("Es ist keine originäre Messwertliste verfügbar.");
             }
 
-            var originalValueList = new List<MeterReading>(device.MeterReadings.Where(mr => mr.IsOriginalValueList()));
-
-            this.CheckOriginalValueList(originalValueList, supplier, device.MeterReadings.Count);
-
+            this.ValidateOriginalValueLists(originalValueLists, supplier, device.MeterReadings.Count);
+            
             var registers = supplier.GetRegister();
             this.UpdateReadingTypeFromOriginalValueList(registers);
 
             var accountingPeriod = new Taf1Data(registers, supplier.AnalysisProfile.TariffStages);
             accountingPeriod.SetDate(supplier.AnalysisProfile.BillingPeriod.Start, supplier.AnalysisProfile.BillingPeriod.GetEnd());
+            this.SetTotalBillingPeriod(accountingPeriod);
+
+            ValidateBillingPeriod();
 
             var dayProfiles = supplier.AnalysisProfile.TariffChangeTrigger.TimeTrigger.DayProfiles;
 
-            foreach (var meterReading in originalValueList)
+            foreach(OriginalValueList ovl in originalValueLists)
             {
-                var currentDate = meterReading.IntervalBlocks.First().Interval.Start;
-                var end = meterReading.IntervalBlocks.Last().Interval.GetEnd();
-                var validDayProfiles = dayProfiles.GetValidDayProfilesForMeterReading(new ObisId(meterReading.ReadingType.ObisCode),
-                    supplier.AnalysisProfile.TariffStages);
-                if (validDayProfiles.Count != 1)
+                var startReading = ovl.MeterReading.GetIntervalReadingFromDate(billingPeriodStart);
+                var endReading = ovl.MeterReading.GetIntervalReadingFromDate(billingPeriodEnd);
+
+                if(startReading == null)
                 {
-                    throw new InvalidOperationException("Invalid DayProfiles Count.");
+                    throw new InvalidOperationException($"Zu dem Zeitpunkt {billingPeriodStart} wurde kein Wert gefunden.");
                 }
 
-                var dayId = validDayProfiles.First().GetValueOrDefault(1);
+                if (endReading == null)
+                {
+                    throw new InvalidOperationException($"Zu dem Zeitpunkt {billingPeriodEnd} wurde kein Wert gefunden.");
+                }
+
+                var dayProfile = this.GetDayProfileNumber(dayProfiles, new ObisId(ovl.MeterReading.ReadingType.ObisCode), 
+                    supplier.AnalysisProfile);
 
                 var tariffStages = supplier.AnalysisProfile.TariffStages;
-                var tariffId = tariffStages.First(t => t.TariffNumber == dayProfiles.First(dp => dp.DayId == dayId).DayTimeProfiles.First().TariffNumber).TariffNumber;
+                var tariffId = this.GetTariffId(tariffStages, dayProfiles, dayProfile);
 
-                var specialDayProfiles = supplier
-                    .AnalysisProfile
-                    .TariffChangeTrigger
-                    .TimeTrigger
-                    .SpecialDayProfiles.Where(s => s.DayId == dayId)
-                    .OrderBy(s => s.SpecialDayDate.GetDate());
+                CheckValidSupplierFile(supplier, dayProfile, tariffId);
 
-                var hasOnlyOneDayId = this.CheckDayIdInPeriod(specialDayProfiles.ToList(), dayId);
-                if (!hasOnlyOneDayId)
-                {
-                    throw new InvalidOperationException("Taf1: A tariff change is not allowed.");
-                }
+                var result = this.GetSection(supplier, ovl.MeterReading, startReading, endReading, tariffId);
 
-                var startReading = meterReading.GetIntervalReadingFromDate(currentDate);
-                while (currentDate < end)
-                {
-                    var result = this.GetSection(supplier, meterReading, startReading, currentDate, end, tariffId);
-                    currentDate = result.currentDate;
-                    accountingPeriod.Add(result.section);
-                }
+                accountingPeriod.Add(result);
 
                 accountingPeriod.AddInitialReading(new Reading()
                 {
-                    Amount = accountingPeriod.AccountingSections.First(s => s.Reading.ObisCode == meterReading.ReadingType.ObisCode).Reading.Amount,
-                    ObisCode = new ObisId(meterReading.ReadingType.ObisCode)
+                    Amount = accountingPeriod.AccountingSections.First(s => s.Reading.ObisCode == ovl.MeterReading.ReadingType.ObisCode).Reading.Amount,
+                    ObisCode = new ObisId(ovl.MeterReading.ReadingType.ObisCode)
                 });
+
             }
-            
+
             return new TafAdapterData(typeof(Taf2SummaryView), typeof(Taf2DetailView), accountingPeriod);
         }
 
         /// <summary>
-        /// The main calculation method for every section in the billing period.
+        /// The main calculation method for the accounting period in Taf-1.
         /// </summary>
         /// <param name="supplier">Contains the calculation data.</param>
         /// <param name="meterReading">The MeterReading instance with the raw data.</param>
         /// <param name="startReading">The intervalReading at the beginning of the section.</param>
-        /// <param name="currentDate">The date on which the section starts.</param>
-        /// <param name="end">The date on which the billing period ends.</param>
+        /// <param name="endReading">The intervalReading at the end of the section.</param>
         /// <param name="tariffId">The valid tariffId.</param>
         /// <returns>The calculated AccountingSection</returns>
-        public (AccountingMonth section, DateTime currentDate) GetSection(UsagePointLieferant supplier, MeterReading meterReading, IntervalReading startReading, DateTime currentDate, DateTime end, ushort tariffId)
+        public AccountingMonth GetSection(UsagePointLieferant supplier, MeterReading meterReading, IntervalReading startReading, IntervalReading endReading, ushort tariffId)
         {
             var registers = supplier.GetRegister();
             this.UpdateReadingTypeFromOriginalValueList(registers);
@@ -115,71 +108,40 @@
                 Reading = new Reading() { Amount = startReading.Value, ObisCode = new ObisId(meterReading.ReadingType.ObisCode) }
             };
 
-            var reading = meterReading.GetIntervalReadingFromDate(currentDate.AddMonths(1));
-            if (reading != null)
-            {
-                var range = new MeasuringRange(currentDate, currentDate.AddMonths(1), tariffId, (long)(reading.Value - startReading.Value));
-                section.Add(range);
-                section.Start = currentDate;
-                currentDate = currentDate.AddMonths(1);
-                startReading = reading;
-            }
-            else
-            {
-                var searchForValue = true;
-                var startDate = currentDate;
-                while (searchForValue)
-                {
-                    currentDate = currentDate.AddMonths(1);
-                    reading = meterReading.GetIntervalReadingFromDate(currentDate.AddMonths(1));
-                    if (reading != null)
-                    {
-                        var range = new MeasuringRange(startDate, currentDate.AddMonths(1), tariffId, (long)(reading.Value - startReading.Value));
-                        section.Add(range);
-                        section.Start = currentDate;
-                        currentDate = currentDate.AddMonths(1);
-                        startReading = reading;
-                        searchForValue = false;
-                    }
-                    else
-                    {
-                        if (currentDate.AddMonths(1) >= end)
-                        {
-                            reading = meterReading.GetIntervalReadingFromDate(end);
-                            var range = new MeasuringRange(startDate, end, tariffId, (long)(reading.Value - startReading.Value));
-                            section.Add(range);
-                            section.Start = currentDate;
-                            currentDate = end;
-                            startReading = reading;
-                            searchForValue = false;
-                        }
-                    }
-                }
-            }
-            return (section, currentDate);
+            var start = startReading.TimePeriod.Start;
+            var end = endReading.TimePeriod.Start;
+            long amount = (long)(endReading.Value - startReading.Value);
+
+            var range = new MeasuringRange(start, end, tariffId, amount);
+
+            section.Add(range);
+            section.Start = start;
+
+            return (section);
         }
 
         /// <summary>
-        /// Check if the originalValueList is valid.
+        /// Check if the count of the original value lists are valid and if all meterReadings are original value lists.
+        /// The TariffStages count is also checked. The max is one TariffStage per original value list.
         /// </summary>
-        /// <param name="originalValueList">The list to check.</param>
+        /// <param name="originalValueList">The list with all original value lists.</param>
         /// <param name="supplier">raw data from the supplier.</param>
-        public void CheckOriginalValueList(List<MeterReading> originalValueList, UsagePointLieferant supplier, int meterReadingsCount)
+        public void ValidateOriginalValueLists(List<OriginalValueList> originalValueLists, UsagePointLieferant supplier, int meterReadingsCount)
         {
-            if (originalValueList.Count > 3)
+            if (originalValueLists.Count > 3)
             {
-                throw new InvalidOperationException("The maximum of three source meters was exceeded.");
+                throw new InvalidOperationException("Es werden maximal 3 originäre Messwertlisten unterstützt.");
             }
 
-            if(originalValueList.Count != meterReadingsCount)
+            if(originalValueLists.Count != meterReadingsCount)
             {
-                throw new InvalidOperationException("Taf7 calculation error: Invalid MeterReading instance. No original value list.");
+                throw new InvalidOperationException("Es sind nur originäre Messwertlisten zulässig.");
             }
 
 
-            if (supplier.AnalysisProfile.TariffStages.Count > originalValueList.Count)
+            if (supplier.AnalysisProfile.TariffStages.Count > originalValueLists.Count)
             {
-                throw new InvalidOperationException("The calculation of Taf-1 allows just one tariff stage for each source meter.");
+                throw new InvalidOperationException("Die Anzahl der Tarifstufen darf die Anzahl der originären Messwertlisten nicht überschreiten.");
             }
         }
 
@@ -221,5 +183,103 @@
                 }
             }
         }
+
+        /// <summary>
+        /// Set billingPeriodStart and -End. accountingPeriod.Begin and accountingPeriod.End can not be null 
+        /// due to the validation process. There must be a billing period.
+        /// </summary>
+        /// <param name="accountingPeriod"></param>
+        public void SetTotalBillingPeriod(Taf1Data accountingPeriod)
+        {
+            billingPeriodStart = accountingPeriod.Begin;
+            billingPeriodEnd = accountingPeriod.End;
+        }
+
+        /// <summary>
+        /// Check if the given billing period is within supported time spans and whether the start date is the beginning of a month.
+        /// </summary>
+        public void ValidateBillingPeriod()
+        {
+            if(billingPeriodStart.Day != 1)
+            {
+                throw new InvalidOperationException($"Die Abrechnungsperiode {billingPeriodStart} startet nicht am Monatsanfang.");
+            }
+
+            if(billingPeriodStart.AddMonths(1) == billingPeriodEnd)      { return; }
+            else if(billingPeriodStart.AddMonths(2) == billingPeriodEnd) { return; }
+            else if(billingPeriodStart.AddMonths(3) == billingPeriodEnd) { return; }
+            else if(billingPeriodStart.AddMonths(6) == billingPeriodEnd) { return; }
+            else if(billingPeriodStart.AddYears(1) == billingPeriodEnd)  { return; }
+            else
+            {
+                throw new InvalidOperationException($"Die angegebene Abrechnungsperiode von {(billingPeriodEnd - billingPeriodStart).TotalDays} Tagen ist ungültigt. Unterstütz werden 1, 2, 3, 6 oder 12 Monate.");
+            }
+        }
+
+        /// <summary>
+        /// For each original value list exactly one dayProfile number is allowed. 
+        /// </summary>
+        /// <param name="dayProfiles">The list of DayProfiles.</param>
+        /// <param name="obisId">The corresponding obisId.</param>
+        /// <param name="analysisProfile">The AnalysisProfile which contain the needed tariff stages.</param>
+        /// <returns></returns>
+        public ushort GetDayProfileNumber(List<DayProfile> dayProfiles, ObisId obisId, AnalysisProfile analysisProfile)
+        {
+            var profileList = dayProfiles.GetValidDayProfilesForMeterReading(obisId, analysisProfile.TariffStages);
+
+            if(profileList == null || profileList.Count != 1)
+            {
+                throw new InvalidOperationException($"Es sind {profileList?.Count} Tagesprofile vorhanden. Es ist genau 1 Tagesprofil erlaubt.");
+            }
+
+            return (ushort)profileList.First();
+        }
+
+        /// <summary>
+        /// This Method delivers the tariff id corresponding to the dayProfile.
+        /// </summary>
+        /// <param name="tariffStages">The list of tariff stages to look at.</param>
+        /// <param name="dayProfiles">A dayProfiles list.</param>
+        /// <param name="dayProfile">The current dayProfile number. Default value is 1.</param>
+        /// <returns>The tariff id</returns>
+        public ushort GetTariffId(List<TariffStage> tariffStages, List<DayProfile> dayProfiles, ushort dayProfile = 1)
+        {
+            var tariffId = tariffStages.First(t => t.TariffNumber == dayProfiles.First(dp => dp.DayId == dayProfile)
+            .DayTimeProfiles.First().TariffNumber).TariffNumber;
+
+            return tariffId;
+        }
+        
+       /// <summary>
+       /// Returns the SpecialDayProfiles which are needed. 
+       /// </summary>
+       /// <param name="supplier">The supplier object which contains the SpecialDayProfiles</param>
+       /// <param name="dayProfile">The dayId</param>
+       /// <returns>The SpecialDayProfiles corresponding to the dayProfile</returns>
+       public List<SpecialDayProfile> GetSpecialDayProfiles(UsagePointLieferant supplier, ushort dayProfile)
+       {
+            var trigger = supplier.AnalysisProfile.TariffChangeTrigger.TimeTrigger;
+
+            return trigger.SpecialDayProfiles.Where(s => s.DayId == dayProfile)
+                .OrderBy(s => s.SpecialDayDate.GetDate()).ToList();
+       }
+
+       /// <summary>
+       /// In Taf 1 a tariff change is not allowed. This will be checked in this method.
+       /// </summary>
+       /// <param name="supplier">The supplier object which is checked</param>
+       /// <param name="dayProfile">The current day profile number</param>
+       public void CheckValidSupplierFile(UsagePointLieferant supplier, ushort dayProfile, ushort tariff)
+       {
+            var profiles = this.GetSpecialDayProfiles(supplier, dayProfile);
+
+            var days = (int)(billingPeriodEnd - billingPeriodStart).TotalDays;
+
+            if(profiles.Count % days != 0)
+            {
+                throw new InvalidOperationException($"Die Anzahl der SpecialDayProfile Objekte muss einem vielfachen von {days} entsprechen.");
+            }
+       }
+
     }
 }

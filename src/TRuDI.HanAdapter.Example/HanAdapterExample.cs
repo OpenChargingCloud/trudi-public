@@ -134,7 +134,7 @@
 
             for(int i = 0; i < config.Contracts.Count; i++)
             {
-                progressCallback(new ProgressInfo(i * (100/config.Contracts.Count), $"Vertrag {i+1} von {config.Contracts.Count}..."));
+                progressCallback(new ProgressInfo(i * (100/config.Contracts.Count), $"Vertragsdaten werden geladen..."));
 
                 if(config.Contracts[i].TafName == config.XmlConfig.TariffName)
                 {

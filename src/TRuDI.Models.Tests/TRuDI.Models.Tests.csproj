@@ -41,6 +41,9 @@
     <None Update="Data\IF_Adapter_TRuDI_DatenTAF7.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Data\result_DrNeuhausBugNo10.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Data\result_historic_consumption.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

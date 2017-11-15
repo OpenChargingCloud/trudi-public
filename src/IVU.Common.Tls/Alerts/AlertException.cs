@@ -29,7 +29,7 @@ using System;
 
 namespace IVU.Common.Tls.Alerts
 {
-	internal class AlertException : Exception
+	public class AlertException : Exception
 	{
 		private AlertDescription _description;
 		

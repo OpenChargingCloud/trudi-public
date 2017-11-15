@@ -176,10 +176,7 @@
         {
             Log.Information("Connecting to the SMGW and loading TAF contracts");
 
-            if (this.activeHanAdapter == null)
-            {
-                this.LoadAdapter(this.ConnectData.DeviceId);
-            }
+            this.LoadAdapter(this.ConnectData.DeviceId);
 
             this.CurrentProgressState.Reset("Verbindungsaufbau", "_ConnectingPartial");
             this.cts = new CancellationTokenSource();
@@ -301,8 +298,9 @@
             switch (ex.AdapterError.Type)
             {
                 case ErrorType.TcpConnectFailed:
-                    this.LastErrorMessages.Add("Netzwerkverbindung konnte nicht hergestellt werden.");
-                    break;
+                    this.LastErrorMessages.Add("Netzwerkverbindung zum Smart Meter Gateway konnte nicht hergestellt werden.");
+                    this.LastErrorMessages.Add("Bitte überprüfen Sie die IP-Addresse sowie den Port.");
+                    return;
 
                 case ErrorType.TlsConnectFailed:
                     this.LastErrorMessages.Add("TLS-Verbindung zum Smart Meter Gateway konnte nicht hergestellt werden.");
@@ -360,7 +358,7 @@
 
         public void LoadData(AdapterContext ctx)
         {
-            Log.Information("Loading data for metering point {0}, TAF name: {1} ", ctx.Contract.MeteringPointId, ctx.Contract.TafName);
+            Log.Information("Loading data for metering point {0}, TAF name: {1}, Start: {2}, End: {3}", ctx.Contract.MeteringPointId, ctx.Contract.TafName, ctx.Start, ctx.End);
             Log.Verbose("Adapter context: {@AdapterContext}", ctx);
 
             if (this.activeHanAdapter == null)
@@ -557,17 +555,32 @@
                 new AnalysisProfile { TariffUseCase = ctx.Contract.TafId, TariffId = ctx.Contract.TafName, };
 
             var lowestTariffId = ushort.MaxValue;
-            foreach (var mr in this.CurrentDataResult.MeterReadings)
+
+            if (this.CurrentDataResult.MeterReadings.Count == 0)
             {
                 var ts = new TariffStage
                 {
-                    ObisCode = mr.ReadingType.ObisCode,
-                    TariffNumber = new ObisId(mr.ReadingType.ObisCode).E,
+                    ObisCode = "010000000FF",
+                    TariffNumber = 0,
                     Description = string.Empty
                 };
-
-                lowestTariffId = Math.Min(lowestTariffId, ts.TariffNumber);
+                lowestTariffId = 0;
                 this.CurrentDataResult.Model.AnalysisProfile.TariffStages.Add(ts);
+            }
+            else
+            {
+                foreach (var mr in this.CurrentDataResult.MeterReadings)
+                {
+                    var ts = new TariffStage
+                    {
+                        ObisCode = mr.ReadingType.ObisCode,
+                        TariffNumber = new ObisId(mr.ReadingType.ObisCode).E,
+                        Description = string.Empty
+                    };
+
+                    lowestTariffId = Math.Min(lowestTariffId, ts.TariffNumber);
+                    this.CurrentDataResult.Model.AnalysisProfile.TariffStages.Add(ts);
+                }
             }
 
             this.CurrentDataResult.Model.AnalysisProfile.DefaultTariffNumber = lowestTariffId;

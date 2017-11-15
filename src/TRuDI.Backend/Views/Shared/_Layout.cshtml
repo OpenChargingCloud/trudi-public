@@ -48,11 +48,14 @@
 
                 @if (!isProgressPage)
                 {
-                    <text><ul class="breadcrumb"></text>
+                    <text><ul class="breadcrumb">
+                        </text>
                 }
                 else
                 {
-                    <text><ul class="breadcrumb" style="opacity: 0.4;"></text>
+                    <text>
+                    <ul class="breadcrumb" style="opacity: 0.4;">
+                        </text>
                 }
 
                 @foreach (var item in StateService.BreadCrumbTrail.Items)
@@ -78,30 +81,10 @@
                     }
                 }
             </ul>
-
     </div>
 
-
-
     <div id="navbar" class="navbar-collapse collapse">
-
-
-        @*<div class="nav navbar-nav navbar-left">
-                <ul class="breadcrumb">
-                    @foreach (var item in StateService.BreadCrumbTrail.Items)
-                    {
-                        if (isProgressPage)
-                        {
-                            <li><span style="none; opacity: 0.5;">@item.Name</span></li>
-                        }
-                        else
-                        {
-                            <li><a href="/BreadCrumb?id=@item.Id">@item.Name</a></li>
-                        }
-                    }
-                </ul>
-            </div>*@
-    </div><!--/.nav-collapse -->
+    </div>
 </div>
 </nav>
 
@@ -134,6 +117,33 @@
 
     $(window).resize(adjust_body_offset);
     $(document).ready(adjust_body_offset);
+
+    function showSaveFileDialog(url) {
+        var remote = require('electron').remote;
+        var dialog = remote.dialog;
+
+        dialog.showSaveDialog({
+            filters: [
+                { name: 'XML-Datei', extensions: ['xml'] },
+            ]
+        }, function (fileName) {
+
+            if (fileName === undefined) {
+                return;
+            }
+
+            $.ajax({
+                url: url,
+                type: "POST",
+                data: "filename=" + encodeURIComponent(fileName),
+                contentType: 'application/x-www-form-urlencoded',
+                processData: false,
+                success: function(result) {},
+                error: function(err) {}
+            });
+
+        });
+    }
 </script>
 
 @RenderSection("Scripts", required: false)
@@ -162,7 +172,16 @@
                         }
                         else
                         {
-                            <div><a href="@menuItem.Link">@menuItem.Name</a></div>
+                            <div>
+                                @if (menuItem.UseOnClick)
+                                {
+                                    <a onclick="@menuItem.Link" style="cursor:pointer;">@menuItem.Name</a>
+                                }
+                                else
+                                {
+                                    <a href="@menuItem.Link">@menuItem.Name</a>
+                                }
+                            </div>
                         }
                     }
                 </div>

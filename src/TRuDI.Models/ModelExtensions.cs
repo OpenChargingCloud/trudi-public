@@ -39,15 +39,12 @@
         /// <returns>Den Endzeitpunkt des Intervals</returns>
         public static DateTime GetEnd(this Interval interval)
         {
-            if (interval.Start.Kind != DateTimeKind.Utc)
+            if (interval.Duration == null)
             {
-                var startTimeUtc = interval.Start.ToUniversalTime();
-                return (startTimeUtc.AddSeconds(Convert.ToDouble(interval.Duration))).ToLocalTime();
+                return interval.Start;
             }
-            else
-            {
-                return interval.Start.AddSeconds(Convert.ToDouble(interval.Duration));
-            }
+
+            return interval.Start.AddUtcSeconds(interval.Duration.Value);
         }
 
         /// <summary>
@@ -56,7 +53,12 @@
         /// <returns>Den Endzeitpunkt des Intervals</returns>
         public static DateTime GetCaptureTimeEnd(this Interval interval)
         {
-            return interval.CaptureTime.AddSeconds(Convert.ToDouble(interval.Duration));
+            if (interval.Duration == null)
+            {
+                return interval.Start;
+            }
+
+            return interval.CaptureTime.AddUtcSeconds(interval.Duration.Value);
         }
 
         /// <summary>
@@ -268,6 +270,11 @@
         public static DateTime GetDate(this DayVarType date)
         {
             return new DateTime((int)date.Year, (int)date.Month, (int)date.DayOfMonth);
+        }
+
+        public static TimeSpan GetTime(this DayTimeProfile time)
+        {
+            return new TimeSpan((int)time.StartTime.Hour, (int)time.StartTime.Minute, (int)time.StartTime.Second);
         }
 
         public static bool IsDateInIntervalBlock(this Interval interval, DateTime date)

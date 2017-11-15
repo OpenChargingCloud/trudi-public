@@ -17,7 +17,14 @@
         @if (StateService.CurrentDataResult?.Raw != null)
         {
             <p>
-                <a asp-action="DownloadXml">XML-Datei speichern</a>
+                @if (ViewData.ContainsKey("Debug"))
+                {
+                    <a asp-action="DownloadXml" asp-controller="DataView">XML-Datei speichern</a>
+                }
+                else
+                {
+                    <a onclick="showSaveFileDialog('/DataView/DownloadXml')" style="cursor:pointer;">XML-Datei speichern</a>
+                }
             </p>
         }
     </div>

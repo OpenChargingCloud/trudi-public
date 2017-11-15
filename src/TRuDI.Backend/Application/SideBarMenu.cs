@@ -8,9 +8,9 @@
 
         public IReadOnlyList<BreadCrumbTrailItem> Items => this.items;
 
-        public void Add(string name, string link, bool staticItem = false)
+        public void Add(string name, string link, bool staticItem = false, bool useOnClick = false)
         {
-            this.items.Add(new BreadCrumbTrailItem(this.items.Count, name, link) { Static = staticItem });
+            this.items.Add(new BreadCrumbTrailItem(this.items.Count, name, link) { Static = staticItem, UseOnClick = useOnClick });
         }
 
         public void Clear()

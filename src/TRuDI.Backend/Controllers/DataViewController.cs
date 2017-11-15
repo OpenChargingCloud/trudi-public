@@ -25,19 +25,40 @@
             this.applicationState.SideBarMenu.Clear();
             this.applicationState.SideBarMenu.Add(null, null);
             this.applicationState.SideBarMenu.Add("Zertifikate", "/CertificateDetails");
+#if DEBUG
             this.applicationState.SideBarMenu.Add("Daten exportieren", "/DataView/DownloadXml");
-
+#else
+            this.applicationState.SideBarMenu.Add("Daten exportieren", "showSaveFileDialog('/DataView/DownloadXml')", useOnClick:true);
+#endif
             return this.View();
         }
 
         public FileResult DownloadXml()
         {
             var ms = new MemoryStream();
-            this.applicationState.CurrentDataResult.Raw.Save(ms);
+            this.applicationState.CurrentDataResult.VersionedExportXml.Save(ms);
             ms.Position = 0;
 
             this.Response.Headers.Add("Content-Disposition", "attachment; filename=result.xml");
             return new FileStreamResult(ms, "text/xml");
+        }
+
+        [HttpPost]
+        public IActionResult DownloadXml(string filename)
+        {
+            try
+            {
+                var ms = new MemoryStream();
+                this.applicationState.CurrentDataResult.VersionedExportXml.Save(ms);
+                ms.Position = 0;
+
+                System.IO.File.WriteAllBytes(filename, ms.ToArray());
+            }
+            catch (Exception ex)
+            {
+            }
+
+            return this.Ok();
         }
 
         public ViewComponentResult FilterLog(DateTime startTime, DateTime endTime, string filterText, string filterLevel)
@@ -50,7 +71,7 @@
             var ovl = this.applicationState.CurrentDataResult.OriginalValueLists.FirstOrDefault(
                 l => l.GetOriginalValueListIdent() == ovlId);
 
-            return this.ViewComponent(typeof(OriginalValueListView), new { ovl, startTime});
+            return this.ViewComponent(typeof(OriginalValueListView), new { ovl, startTime });
         }
 
         public ViewComponentResult ShowErrorsList(string ovlId)

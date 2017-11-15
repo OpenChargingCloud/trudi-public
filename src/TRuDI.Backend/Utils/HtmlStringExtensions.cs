@@ -1,19 +1,16 @@
 ﻿namespace TRuDI.Backend.Utils
 {
     using System;
-    using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
-
-    using Microsoft.AspNetCore.Html;
     using System.Security.Cryptography;
     using System.Text;
+
+    using Microsoft.AspNetCore.Html;
 
     using TRuDI.HanAdapter.Interface;
     using TRuDI.Models;
     using TRuDI.Models.BasicData;
-    using TRuDI.TafAdapter.Interface;
-    using TRuDI.TafAdapter.Interface.Taf2;
 
     public static class HtmlStringExtensions
     {
@@ -102,27 +99,7 @@
             }
 
             var status = reading.StatusPTB ?? reading.StatusFNN.MapToStatusPtb();
-
-            switch (status)
-            {
-                case StatusPTB.No_Error:
-                    return "kein Fehler";
-
-                case StatusPTB.Warning:
-                    return "Warnung";
-
-                case StatusPTB.Temp_Error_signed_invalid:
-                    return "temporärer Fehler 1";
-
-                case StatusPTB.Temp_Error_is_invalid:
-                    return "temporärer Fehler 2";
-
-                case StatusPTB.Fatal_Error:
-                    return "fataler Fehler";
-
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            return status.GetStatusString();
         }
 
         public static string ToStatusBackground(this IntervalReading reading)
@@ -146,20 +123,44 @@
 
             switch (status)
             {
-                case StatusPTB.No_Error:
+                case StatusPTB.NoError:
                     return string.Empty;
 
                 case StatusPTB.Warning:
                     return "bg-warning";
 
-                case StatusPTB.Temp_Error_signed_invalid:
+                case StatusPTB.TemporaryError:
                     return "bg-warning";
 
-                case StatusPTB.Temp_Error_is_invalid:
+                case StatusPTB.CriticalTemporaryError:
                     return "bg-warning";
 
-                case StatusPTB.Fatal_Error:
+                case StatusPTB.FatalError:
                     return "bg-danger";
+
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        public static string GetStatusString(this StatusPTB status, int count = 0)
+        {
+            switch (status)
+            {
+                case StatusPTB.NoError:
+                    return "keine Fehler";
+
+                case StatusPTB.Warning:
+                    return count == 1 ? "Warnung" : "Warnungen";
+
+                case StatusPTB.TemporaryError:
+                    return count == 1 ? "temporärer Fehler" : "temporäre Fehler";
+
+                case StatusPTB.CriticalTemporaryError:
+                    return count == 1 ? "kritischer temporärer Fehler" : "kritische temporäre Fehler";
+
+                case StatusPTB.FatalError:
+                    return count == 1 ? "fataler Fehler" : "fatale Fehler";
 
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -177,19 +178,19 @@
 
             switch (status)
             {
-                case StatusPTB.No_Error:
+                case StatusPTB.NoError:
                     return "fa fa-check-circle-o";
 
                 case StatusPTB.Warning:
                     return "fa fa-check-circle";
 
-                case StatusPTB.Temp_Error_signed_invalid:
+                case StatusPTB.TemporaryError:
                     return "fa fa-exclamation-circle";
 
-                case StatusPTB.Temp_Error_is_invalid:
+                case StatusPTB.CriticalTemporaryError:
                     return "fa fa-exclamation-triangle";
 
-                case StatusPTB.Fatal_Error:
+                case StatusPTB.FatalError:
                     return "fa fa-times-circle";
 
                 default:

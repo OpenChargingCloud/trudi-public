@@ -244,24 +244,24 @@
         $(function () {
             $("#@dtpIdStart").datetimepicker({
                 locale: 'de',
-                stepping: 15
+                format: 'DD.MM.YYYY'
             });
             $("#@dtpIdEnd").datetimepicker({
                 useCurrent: false,
                 locale: 'de',
-                stepping: 15
+                format: 'DD.MM.YYYY'
             });
 
             @if (cnt.Contract.TafId == TafId.Taf7)
             {
                 <text>
                     $("#@dtpIdStart").data("DateTimePicker").minDate(moment('@cnt.Contract.Begin.ToIso8601()'));
-                    $("#@dtpIdStart").data("DateTimePicker").maxDate(moment('@cnt.Contract.End.GetEndTimeOrNow().RoundDown(15).ToIso8601()'));
-                    $("#@dtpIdStart").data("DateTimePicker").date(moment('@cnt.Contract.Begin.ToIso8601()'));
+                    $("#@dtpIdStart").data("DateTimePicker").maxDate(moment('@cnt.Contract.End.GetEndTimeOrNow().DayStart().ToIso8601()'));
+                    $("#@dtpIdStart").data("DateTimePicker").date(moment('@cnt.Contract.Begin.DayStart().ToIso8601()'));
 
                     $("#@dtpIdEnd").data("DateTimePicker").minDate(moment('@cnt.Contract.Begin.ToIso8601()'));
-                    $("#@dtpIdEnd").data("DateTimePicker").maxDate(moment('@cnt.Contract.End.GetEndTimeOrNow().RoundDown(15).ToIso8601()'));
-                    $("#@dtpIdEnd").data("DateTimePicker").date(moment('@cnt.Contract.End.GetEndTimeOrNow().RoundDown(15).ToIso8601()'));
+                    $("#@dtpIdEnd").data("DateTimePicker").maxDate(moment('@cnt.Contract.End.GetEndTimeOrNow().DayEnd().ToIso8601()'));
+                    $("#@dtpIdEnd").data("DateTimePicker").date(moment('@cnt.Contract.End.GetEndTimeOrNow().DayEnd().ToIso8601()'));
                 </text>
             }
         });

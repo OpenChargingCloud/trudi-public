@@ -11,7 +11,7 @@
         des MsbG (insbesondere §35, §62), der PTB-A50.8 erfüllt und die im Rahmen der Vorgaben des
         Bundesamts für Sicherheit in der Informationstechnik nutzbar ist.
     </p>
-    
+
     <p>
         <a href="/Help">Mehr dazu...</a>
     </p>
@@ -22,9 +22,12 @@
     <div class="panel-heading">Anzeigefunktion</div>
     <div class="panel-body">
         <p>
-            Für TAF-1/2/6 stellt TRuDI eine Anzeige-Funktion (gemäß PTB-A50.8) zur Verfügung, d.h. die Messwerte,
-            die vom SMGW bereitgestellt werden, werden lediglich visualisiert. Eine Kontrolle oder weiterführende
-            Verrechnung dieser Werte findet nicht statt.
+            Über die Anzeigefunktion können Sie sich jederzeit die aktuellen Registerstände, Zählerstandsgänge
+            sowie Meldugen des Smart Meter Gateways anzeigen lassen.
+        </p>
+        <p>
+            Erfolgt die Tarifierung direkt im Smart Meter Gateway, können die angezeiten Registerstände zur
+            Rechnungsprüfung verwendet werden.
         </p>
         <p>
             <a class="btn btn-primary" asp-controller="OperatingModeSelection" asp-action="StartDisplayFunction" role="button">Weiter</a>
@@ -36,10 +39,10 @@
     <div class="panel-heading">Transparenzfunktion</div>
     <div class="panel-body">
         <p>
-            Für TAF-7 und eine nachgelagerte Tarifierung beim Lieferanten stellt TRuDI eine
-            Transparenz-Funktion (gemäß PTB-A50.8) zur Verfügung, d.h. die vom SMGW bereitgestellten
-            Messwerte werden mit einer vom Lieferanten bereitgestellten Tarifierungsinformation verrechnet.
-            Das Ergebnis wird dem Letztverbraucher zur Rechnungsprüfung angezeigt.
+            Erfolgt die Tarifierung nicht im Smart Meter Gateway selbst, sondern anhand einer Zählerstandsgangmessung
+            bei Ihrem Lieferanten, erhalten Sie von diesem eine Datei mit Tarifierungsinformationen. Mittels dieser Datei
+            kann TRuDI die zur Rechnungsprüfung benötitgten Daten aus dem Smart Meter Gateway laden, die Tarifregister 
+            berechnen und anzeigen.
         </p>
         <p>
             <a class="btn btn-primary" asp-controller="OperatingModeSelection" asp-action="StartTransparencyFunction" role="button">Weiter</a>

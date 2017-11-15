@@ -9,6 +9,14 @@
     var meterReadings = StateService.CurrentDataResult;
 }
 
+<script type="text/javascript">
+
+    var ovlStatusVisible = false;
+
+</script>
+
+
+
 <div class="panel panel-primary">
     <div class="panel-heading">Zählpunkt @StateService.CurrentDataResult.Model.UsagePointId</div>
     <div class="panel-body">
@@ -31,7 +39,7 @@
         {
             <li role="presentation" class="active"><a href="#tab_tariffdata" aria-controls="tab_tariffdata" role="tab" data-toggle="tab">Tarifdaten</a></li>
         }
-       
+
         @if (originalValueLists.Count == 1)
         {
             var ovl = originalValueLists.First();
@@ -41,7 +49,7 @@
         else
         {
             <li role="presentation" class="dropdown @(StateService.CurrentSupplierFile?.TafData == null ? "active" : "")">
-                <a href="#" class="dropdown-toggle" id="tab-dropdown-hvl" data-toggle="dropdown" aria-controls="tab-dropdown-contents" aria-expanded="false">Historische Messwerte<span class="caret"></span></a>
+                <a href="#" class="dropdown-toggle" id="tab-dropdown-hvl" data-toggle="dropdown" aria-controls="tab-dropdown-contents" aria-expanded="false">Historische Verbrauchswerte<span class="caret"></span></a>
                 <ul class="dropdown-menu" aria-labelledby="tab-dropdown-hvl" id="tab-dropdown-hvl-contents">
                     @foreach (var ovl in originalValueLists)
                     {
@@ -73,13 +81,9 @@
 
                     @if (StateService.CurrentDataResult.Model.LogEntries.Any())
                     {
-                        var logBegin = StateService.CurrentDataResult.Model.LogEntries.First().LogEvent.Timestamp;
-                        var logEnd = StateService.CurrentDataResult.Model.LogEntries.Last().LogEvent.Timestamp;
-                        var logSelectedEnd = logEnd;
-                        if ((logEnd - logBegin) > TimeSpan.FromDays(1))
-                        {
-                            logSelectedEnd = logBegin + TimeSpan.FromDays(1);
-                        }
+                        var logBegin = StateService.CurrentDataResult.Model.LogEntries.First().LogEvent.Timestamp.DayStart();
+                        var logEnd = StateService.CurrentDataResult.Model.LogEntries.Last().LogEvent.Timestamp.DayEnd();
+                        var logSelectedEnd = logBegin.DayEnd();
 
                         <table class="table-condensed">
                             <tr>
@@ -141,20 +145,22 @@
                         <script type="text/javascript">
                             $(function() {
                                 $("#logStart").datetimepicker({
-                                    locale: 'de'
+                                    locale: 'de',
+                                    format: 'DD.MM.YYYY'
                                 });
                                 $("#logEnd").datetimepicker({
                                     useCurrent: false,
                                     locale: 'de',
+                                    format: 'DD.MM.YYYY'
                                 });
 
-                                $("#logStart").data("DateTimePicker").minDate(moment('@logBegin.ToIso8601()'));
-                                $("#logStart").data("DateTimePicker").maxDate(moment('@logEnd.ToIso8601()'));
-                                $("#logStart").data("DateTimePicker").date(moment('@logBegin.ToIso8601()'));
+                                $("#logStart").data("DateTimePicker").minDate(moment('@logBegin.DayStart().ToIso8601()'));
+                                $("#logStart").data("DateTimePicker").maxDate(moment('@logEnd.DayEnd().ToIso8601()'));
+                                $("#logStart").data("DateTimePicker").date(moment('@logBegin.DayStart().ToIso8601()'));
 
-                                $("#logEnd").data("DateTimePicker").minDate(moment('@logBegin.ToIso8601()'));
-                                $("#logEnd").data("DateTimePicker").maxDate(moment('@logEnd.ToIso8601()'));
-                                $("#logEnd").data("DateTimePicker").date(moment('@logSelectedEnd.ToIso8601()'));
+                                $("#logEnd").data("DateTimePicker").minDate(moment('@logBegin.DayStart().ToIso8601()'));
+                                $("#logEnd").data("DateTimePicker").maxDate(moment('@logEnd.DayEnd().ToIso8601()'));
+                                $("#logEnd").data("DateTimePicker").date(moment('@logSelectedEnd.DayEnd().ToIso8601()'));
                             });
 
                             function filterLog() {
@@ -208,74 +214,68 @@
                                 <th>Zähler</th>
                                 <th>Messperiode</th>
                                 <th>Register</th>
-                                <th>Werte</th>
+                                <th>Beschreibung</th>
                             </tr>
                             <tr>
                                 <td>@ovl.Meter.ToFormattedDeviceId()</td>
                                 <td>@ovl.MeasurementPeriod.TotalSeconds Sekunden</td>
                                 <td>@ovl.Obis.ToString()</td>
-                                <td>@ovl.ValueCount</td>
+                                <td>@ovl.Obis.GetLabel()</td>
                             </tr>
 
                             <tr>
                                 <th>Startzeitpunkt</th>
                                 <th>Endzeitpunkt</th>
-                                <th>Lücken</th>
-                                <th>Fehler</th>
+                                <th>Werte</th>
+                                <th>Lücken/Fehler</th>
                             </tr>
 
                             <tr>
                                 <td>@ovl.Start.ToFormatedString()</td>
                                 <td>@ovl.End.ToFormatedString()</td>
-                                <td>
-                                    @if (ovl.GapCount == 0)
-                                    {
-                                        <span>
-                                            keine Lücken vorhanden
-                                        </span>
-                                    }
-                                    else
-                                    {
-                                        <span>
-                                            <i class="fa fa-warning"></i>
-                                            @ovl.GapCount Lücken gefunden
-                                        </span>
-                                    }
-                                </td>
+                                <td>@ovl.ValueCount</td>
 
                                 <td>
-                                    @if (!ovl.HasErrors)
+                                    @if (!ovl.HasErrors && ovl.GapCount == 0)
                                     {
                                         <span>keine Fehler</span>
                                     }
                                     else
                                     {
+                                        if (ovl.GapCount > 0)
+                                        {
+                                            <span>
+                                                <i class="fa fa-warning"></i>
+                                                @ovl.GapCount @(ovl.GapCount == 1 ? "Lücke" : "Lücken") gefunden
+                                            </span>
+                                        }
+
                                         if (ovl.FatalErrorCount > 0)
                                         {
                                             <div>
                                                 <span>
                                                     <i class="fa fa-times-circle"></i>
-                                                    @ovl.FatalErrorCount @(ovl.FatalErrorCount == 1 ? "fataler Fehler" : "fatale Fehler")
+                                                    @ovl.FatalErrorCount @(StatusPTB.FatalError.GetStatusString(ovl.FatalErrorCount))
                                                 </span>
                                             </div>
                                         }
 
-                                        if (ovl.TempError1Count > 0)
-                                        {
-                                            <div>
-                                                <span>
-                                                    <i class="fa fa-exclamation-circle"></i>
-                                                    @(ovl.TempError1Count) @(ovl.TempError1Count == 1 ? "temporärer Fehler 1" : "temporäre Fehler 1")
-                                                </span>
-                                            </div>
-                                        }
-
-                                        if (ovl.TempError2Count > 0)
+                                        if (ovl.CriticalTempErrorCount > 0)
                                         {
                                             <div>
                                                 <span>
                                                     <i class="fa fa-exclamation-triangle"></i>
-                                                    @(ovl.TempError2Count) @(ovl.TempError2Count == 1 ? "temporärer Fehler 2" : "temporäre Fehler 2")
+                                                    @(ovl.CriticalTempErrorCount) @(StatusPTB.CriticalTemporaryError.GetStatusString(ovl.CriticalTempErrorCount))
+                                                </span>
+                                            </div>
+                                        }
+
+                                        if (ovl.TempErrorCount > 0)
+                                        {
+                                            <div>
+                                                <span>
+                                                    <i class="fa fa-exclamation-circle"></i>
+                                                    @(ovl.TempErrorCount) @(StatusPTB.TemporaryError.GetStatusString(ovl.TempErrorCount))
                                                 </span>
                                             </div>
                                         }
@@ -285,40 +285,39 @@
                                             <div>
                                                 <span>
                                                     <i class="fa fa-check-circle"></i>
-                                                    @ovl.WarningCount @(ovl.WarningCount == 1 ? "Warnung" : "Warnungen")
+                                                    @ovl.WarningCount @(StatusPTB.Warning.GetStatusString(ovl.WarningCount))
                                                 </span>
                                             </div>
                                         }
                                     }
+
                                 </td>
 
                             </tr>
                         </table>
 
-                        <table class="table-condensed">
+                        <table style="width: 100%">
                             <tr>
                                 <td>
-                                    <div class="form-group">
-                                        <div class='input-group date' id="dp_start_@ovl.GetOriginalValueListIdent()">
-                                            <input type='text' class="form-control" />
-                                            <span class="input-group-addon">
-                                                <span class="glyphicon glyphicon-calendar"></span>
-                                            </span>
-                                        </div>
+                                    <div class='input-group date' id="dp_start_@ovl.GetOriginalValueListIdent()" style="width: auto;">
+                                        <input type='text' class="form-control" />
+                                        <span class="input-group-addon" style="width: auto;">
+                                            <span class="glyphicon glyphicon-calendar"></span>
+                                        </span>
                                     </div>
                                 </td>
-
                                 <td>
-                                    <div class="form-group">
+                                    <div class="text-right">
                                         <button type="button" class="btn btn-default" id="btnFilterOvlErrors_@ovl.GetOriginalValueListIdent()" onclick="showErrorsList('@ovl.GetOriginalValueListIdent()');">Status-Übersicht anzeigen</button>
                                     </div>
                                 </td>
                             </tr>
                         </table>
-                        
+
                         <div id="ovl_@ovl.GetOriginalValueListIdent()">
                             @await Component.InvokeAsync("OriginalValueListView", new { ovl, startTime = ovlBegin })
                         </div>
+
 
                         <script type="text/javascript">
                             $(function() {
@@ -330,6 +329,14 @@
                                 $("#dp_start_@ovl.GetOriginalValueListIdent()").on("dp.change", function (e) {
                                     loadOvlDay("@ovl.GetOriginalValueListIdent()");
                                 });
+
+                                $("#dp_start_@ovl.GetOriginalValueListIdent()").on("dp.hide", function (e) {
+                                    if (ovlStatusVisible) {
+                                        loadOvlDay("@ovl.GetOriginalValueListIdent()");
+                                        ovlStatusVisible = false;
+                                    }
+                                });
+
 
                                 $("#dp_start_@ovl.GetOriginalValueListIdent()").data("DateTimePicker").minDate(moment('@ovlBegin.Date.ToIso8601()'));
                                 $("#dp_start_@ovl.GetOriginalValueListIdent()").data("DateTimePicker").maxDate(moment('@ovlEnd.ToIso8601()'));
@@ -344,45 +351,47 @@
 
         <script type="text/javascript">
 
-                            function loadOvlDay(ovlId) {
-                                $.ajax({
-                                    url: '/DataView/FilterOvl',
-                                    type: "POST",
-                                    data: "startTime=" +
-                                    encodeURIComponent($("#dp_start_" + ovlId).data("DateTimePicker").date().toISOString()) +
-                                    "&ovlId=" +
-                                    encodeURIComponent(ovlId),
-                                    contentType: 'application/x-www-form-urlencoded',
-                                    processData: false,
-                                    success: function (result) {
-                                        $("#ovl_" + ovlId).html(result);
-                                    },
-                                    error: function (err) { }
-                                });
-                            };
+            function loadOvlDay(ovlId) {
+                $.ajax({
+                    url: '/DataView/FilterOvl',
+                    type: "POST",
+                    data: "startTime=" +
+                        encodeURIComponent($("#dp_start_" + ovlId).data("DateTimePicker").date().toISOString()) +
+                        "&ovlId=" +
+                        encodeURIComponent(ovlId),
+                    contentType: 'application/x-www-form-urlencoded',
+                    processData: false,
+                    success: function (result) {
+                        $("#ovl_" + ovlId).html(result);
+                    },
+                    error: function (err) { }
+                });
+            };
 
-                            function selectOvlDay(ovlId, timestamp) {
-                                var currentDate = $("#dp_start_" + ovlId).data("DateTimePicker").date();
-                                if (currentDate.isSame(timestamp)) {
-                                    loadOvlDay(ovlId);
-                                } else {
-                                    $("#dp_start_" + ovlId).data("DateTimePicker").date(timestamp);    
-                                }
-                            };
+            function selectOvlDay(ovlId, timestamp) {
+                var currentDate = $("#dp_start_" + ovlId).data("DateTimePicker").date();
+                if (currentDate.isSame(timestamp)) {
+                    loadOvlDay(ovlId);
+                } else {
+                    $("#dp_start_" + ovlId).data("DateTimePicker").date(timestamp);
+                }
+            };
 
-                            function showErrorsList(ovlId) {
-                                $.ajax({
-                                    url: '/DataView/ShowErrorsList',
-                                    type: "POST",
-                                    data: "ovlId=" + encodeURIComponent(ovlId),
-                                    contentType: 'application/x-www-form-urlencoded',
-                                    processData: false,
-                                    success: function (result) {
-                                        $("#ovl_" + ovlId).html(result);
-                                    },
-                                    error: function (err) { }
-                                });
-                            };
+            function showErrorsList(ovlId) {
+                ovlStatusVisible = true;
+
+                $.ajax({
+                    url: '/DataView/ShowErrorsList',
+                    type: "POST",
+                    data: "ovlId=" + encodeURIComponent(ovlId),
+                    contentType: 'application/x-www-form-urlencoded',
+                    processData: false,
+                    success: function (result) {
+                        $("#ovl_" + ovlId).html(result);
+                    },
+                    error: function (err) { }
+                });
+            };
 
         </script>
 

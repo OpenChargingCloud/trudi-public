@@ -190,6 +190,31 @@
         }
 
         [TestMethod]
+        [DeploymentItem(@"Data\result_DrNeuhausBugNo10.xml")]
+        public void TestDrNeuhausError()
+        {
+            var xml = XDocument.Load(@"Data\result_DrNeuhausBugNo10.xml");
+
+            var ctx = new AdapterContext()
+            {
+                Start = new DateTime(2017, 10, 29, 2, 30, 0),
+                End = new DateTime(2017, 11, 7, 10, 30, 0),
+                Contract = new ContractInfo() { TafId = TafId.Taf7 }
+            };
+
+            var model = RunValidations(xml, ctx);
+
+            Assert.IsNotNull(model);
+
+            Assert.IsTrue(model.MeterReadings.Count == 1 && model.MeterReadings[0].IntervalBlocks.Count == 1);
+
+            var irs = model.MeterReadings[0].IntervalBlocks[0].IntervalReadings;
+
+            //check the 1st measurement with the skewed timestamp
+            CheckIntervalReading(irs[0], "2017-10-29T02:45:00+02:00", "2017-10-29T02:45:00+02:00", 741092);
+        }
+
+        [TestMethod]
         [DeploymentItem(@"Data\taf7_oml_1day_values_1.xml")]
         public void Taf7OmlGas1DayValues1()
         {

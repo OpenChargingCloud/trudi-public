@@ -36,53 +36,58 @@
             if (this.BzStatusWord.HasFlag(BzStatusWord.Fatal_Error) ||
                 this.SmgwStatusWord.HasFlag(SmgwStatusWord.Fatal_Error))
             {
-                return StatusPTB.Fatal_Error;
+                return StatusPTB.FatalError;
             }
 
             if (this.SmgwStatusWord.HasFlag(SmgwStatusWord.Systemtime_Invalid) ||
                 this.SmgwStatusWord.HasFlag(SmgwStatusWord.PTB_Temp_Error_is_invalid))
             {
-                return StatusPTB.Temp_Error_is_invalid;
+                return StatusPTB.CriticalTemporaryError;
             }
 
             if (this.SmgwStatusWord.HasFlag(SmgwStatusWord.PTB_Temp_Error_signed_invalid))
             {
+                return StatusPTB.TemporaryError;
+            }
+
+            if (this.SmgwStatusWord.HasFlag(SmgwStatusWord.PTB_Warning))
+            {
                 return StatusPTB.Warning;
             }
 
-            return StatusPTB.No_Error;
+            return StatusPTB.NoError;
         }
     }
 
     [Flags]
     public enum SmgwStatusWord : uint
     {
-        Identification_LSB = 1,
-        Transparency_Bit = 2,
-        BitPos2 = 4,
-        Fatal_Error = 256,
-        Systemtime_Invalid = 512,
-        PTB_Warning = 4096,
-        PTB_Temp_Error_signed_invalid = 8192,
-        PTB_Temp_Error_is_invalid = 16384,
+        Identification_LSB = 0x1,
+        Transparency_Bit = 0x2,
+        BitPos2 = 0x4,
+        Fatal_Error = 0x100,
+        Systemtime_Invalid = 0x200,
+        PTB_Warning = 0x1000,
+        PTB_Temp_Error_signed_invalid = 0x2000,
+        PTB_Temp_Error_is_invalid = 0x4000,
     }
 
     [Flags]
     public enum BzStatusWord : uint
     {
-        BitPos2 = 4,
-        Start_Up = 256,
-        Magnetically_Influenced = 512,
-        Manipulation_KD_PS = 1024,
-        Sum_Energiedirection_neg = 2048,
-        Energiedirection_L1_neg = 4096,
-        Energiedirection_L2_neg = 8192,
-        Energiedirection_L3_neg = 16384,
-        PhaseSequenz_RotatingField_Not_L1_L2_L3 = 32768,
-        BackStop_Active = 65536,
-        Fatal_Error = 131072,
-        Lead_Voltage_L1_existent = 262144,
-        Lead_Voltage_L2_existent = 524288,
-        Lead_Voltage_L3_existent = 1048576
+        BitPos2 = 0x4,
+        Start_Up = 0x100,
+        Magnetically_Influenced = 0x200,
+        Manipulation_KD_PS = 0x400,
+        Sum_Energiedirection_neg = 0x800,
+        Energiedirection_L1_neg = 0x1000,
+        Energiedirection_L2_neg = 0x2000,
+        Energiedirection_L3_neg = 0x4000,
+        PhaseSequenz_RotatingField_Not_L1_L2_L3 = 0x8000,
+        BackStop_Active = 0x10000,
+        Fatal_Error = 0x20000,
+        Lead_Voltage_L1_existent = 0x40000,
+        Lead_Voltage_L2_existent = 0x80000,
+        Lead_Voltage_L3_existent = 0x100000
     }
 }

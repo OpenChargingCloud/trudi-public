@@ -47,5 +47,24 @@
         /// Gets the TAF identifier from the analysis profile if it exists within the data.
         /// </summary>
         public TafId? TafId => this.Model?.AnalysisProfile?.TariffUseCase;
+
+        /// <summary>
+        /// Gets the Raw XML with an XML comment element on top, containing the TRuDI Version information
+        /// </summary>
+        public XDocument VersionedExportXml
+        {
+            get
+            {
+                if (this.Raw != null)
+                {
+                    var versionText = $" TRuDI {Microsoft.Extensions.PlatformAbstractions.PlatformServices.Default.Application.ApplicationVersion} on {System.Runtime.InteropServices.RuntimeInformation.OSDescription}";
+                    var versionedXml = new XDocument(this.Raw);
+                    versionedXml.Root.AddBeforeSelf(new XComment(versionText));
+                    return versionedXml;
+                }
+
+                return this.Raw;
+            }
+        }
     }
 }
