@@ -1,10 +1,12 @@
 namespace TRuDI.HanAdapter.Interface
 {
     using System;
+    using System.Diagnostics;
 
     /// <summary>
     /// Represents a timerange of a single billing period.
     /// </summary>
+    [DebuggerDisplay("{Begin} - {End}")]
     public class BillingPeriod
     {
         /// <summary>

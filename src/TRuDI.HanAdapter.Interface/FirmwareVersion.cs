@@ -1,8 +1,11 @@
 ﻿namespace TRuDI.HanAdapter.Interface
 {
+    using System.Diagnostics;
+
     /// <summary>
     /// Represents the version of a SMGW firmware component.
     /// </summary>
+    [DebuggerDisplay("{Component}, {Version}")]
     public class FirmwareVersion
     {
         /// <summary>

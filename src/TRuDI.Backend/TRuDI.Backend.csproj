@@ -53,6 +53,27 @@
     <ProjectReference Include="..\TRuDI.TafAdapter.Taf2\TRuDI.TafAdapter.Taf2.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="TRuDI.HanAdapter.DrNeuhaus">
+      <HintPath>..\..\han-adapters\TRuDI.HanAdapter.DrNeuhaus.dll</HintPath>
+    </Reference>
+    <Reference Include="TRuDI.HanAdapter.Efr">
+      <HintPath>..\..\han-adapters\TRuDI.HanAdapter.Efr.dll</HintPath>
+    </Reference>
+    <Reference Include="TRuDI.HanAdapter.Kiwigrid">
+      <HintPath>..\..\han-adapters\TRuDI.HanAdapter.Kiwigrid.dll</HintPath>
+    </Reference>
+    <Reference Include="TRuDI.HanAdapter.LandisGyr">
+      <HintPath>..\..\han-adapters\TRuDI.HanAdapter.LandisGyr.dll</HintPath>
+    </Reference>
+    <Reference Include="TRuDI.HanAdapter.Ppc">
+      <HintPath>..\..\han-adapters\TRuDI.HanAdapter.Ppc.dll</HintPath>
+    </Reference>
+    <Reference Include="TRuDI.HanAdapter.ThebenAG">
+      <HintPath>..\..\han-adapters\TRuDI.HanAdapter.ThebenAG.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
   <Target Name="SetMVCRazorOutputPath">
     <PropertyGroup>
       <MvcRazorOutputPath>$(OutputPath)</MvcRazorOutputPath>

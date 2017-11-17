@@ -2,10 +2,12 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
 
     /// <summary>
     /// Represents the data of a tariff contract (corresponds to a TAF).
     /// </summary>
+    [DebuggerDisplay("{TafId}: {TafName}, Begin: {Begin}")]
     public class ContractInfo
     {
         /// <summary>
