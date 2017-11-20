@@ -3,11 +3,11 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net40</TargetFrameworks>
     <Version>2.1.0</Version>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors />
     <Company>IVU Softwareentwicklung GmbH</Company>
     <Description>Fork of https://github.com/bcgit/bc-csharp: Added BrainPool curves.</Description>
-    <PackageOutputPath>..\..\bin</PackageOutputPath>
+    <PackageOutputPath>..\..\private-packages</PackageOutputPath>
     <AssemblyVersion>2.1.0.0</AssemblyVersion>
     <FileVersion>2.1.0.0</FileVersion>
   </PropertyGroup>

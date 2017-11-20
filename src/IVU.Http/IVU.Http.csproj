@@ -4,11 +4,12 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <AssemblyName>IVU.Http</AssemblyName>
     <RootNamespace>IVU.Http</RootNamespace>
-    <Version>1.0.12</Version>
+    <Version>1.0.13</Version>
     <Description>IVU HTTP client based on CoreFX</Description>
     <Authors />
     <Company>IVU Softwareentwicklung</Company>
-    <PackageOutputPath>..\..\bin</PackageOutputPath>
+    <PackageOutputPath>..\..\private-packages</PackageOutputPath>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -22,7 +23,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="IVU.BouncyCastle.Crypto" Version="2.0.0" />
     <PackageReference Include="Microsoft.CSharp" Version="4.4.0" />
   </ItemGroup>
 

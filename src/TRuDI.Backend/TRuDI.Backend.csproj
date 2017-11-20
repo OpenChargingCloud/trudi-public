@@ -24,14 +24,24 @@
     <Content Remove="Data\**" />
     <EmbeddedResource Remove="Data\**" />
     <None Remove="Data\**" />
-    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.3" />
     <PackageReference Include="Microsoft.Extensions.CommandLineUtils" Version="1.1.1" />
     <PackageReference Include="Serilog.Sinks.File" Version="3.2.0" />
     <PackageReference Include="Serilog.Sinks.Trace" Version="2.1.0" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="4.4.0" />
     <PackageReference Include="WebSocketManager" Version="1.0.1" />
     <PackageReference Include="Serilog.Sinks.ColoredConsole" Version="3.0.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.ViewCompilation" Version="2.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.ViewCompilation" Version="2.0.1" />
+    
+    <PackageReference Include="IVU.Http" Version="1.0.13" />
+    <PackageReference Include="IVU.Common.Tls" Version="2.1.1" />
+    <PackageReference Include="IVU.BouncyCastle.Crypto" Version="2.1.0" />
+    <PackageReference Include="TRuDI.HanAdapter.DrNeuhaus" Version="1.0.1" />
+    <PackageReference Include="TRuDI.HanAdapter.Efr" Version="0.0.2" />
+    <PackageReference Include="TRuDI.HanAdapter.Kiwigrid" Version="1.0.0" />
+    <PackageReference Include="TRuDI.HanAdapter.LandisGyr" Version="1.0.1" />
+    <PackageReference Include="TRuDI.HanAdapter.Ppc" Version="1.0.0" />
+    <PackageReference Include="TRuDI.HanAdapter.ThebenAG" Version="1.0.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -43,35 +53,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\IVU.BouncyCastle.Crypto\IVU.BouncyCastle.Crypto.csproj" />
-    <ProjectReference Include="..\IVU.Http\IVU.Http.csproj" />
     <ProjectReference Include="..\TRuDI.HanAdapter.Example\TRuDI.HanAdapter.Example.csproj" />
     <ProjectReference Include="..\TRuDI.HanAdapter.Interface\TRuDI.HanAdapter.Interface.csproj" />
     <ProjectReference Include="..\TRuDI.Models\TRuDI.Models.csproj" />
     <ProjectReference Include="..\TRuDI.TafAdapter.Interface\TRuDI.TafAdapter.Interface.csproj" />
     <ProjectReference Include="..\TRuDI.TafAdapter.Taf1\TRuDI.TafAdapter.Taf1.csproj" />
     <ProjectReference Include="..\TRuDI.TafAdapter.Taf2\TRuDI.TafAdapter.Taf2.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="TRuDI.HanAdapter.DrNeuhaus">
-      <HintPath>..\..\han-adapters\TRuDI.HanAdapter.DrNeuhaus.dll</HintPath>
-    </Reference>
-    <Reference Include="TRuDI.HanAdapter.Efr">
-      <HintPath>..\..\han-adapters\TRuDI.HanAdapter.Efr.dll</HintPath>
-    </Reference>
-    <Reference Include="TRuDI.HanAdapter.Kiwigrid">
-      <HintPath>..\..\han-adapters\TRuDI.HanAdapter.Kiwigrid.dll</HintPath>
-    </Reference>
-    <Reference Include="TRuDI.HanAdapter.LandisGyr">
-      <HintPath>..\..\han-adapters\TRuDI.HanAdapter.LandisGyr.dll</HintPath>
-    </Reference>
-    <Reference Include="TRuDI.HanAdapter.Ppc">
-      <HintPath>..\..\han-adapters\TRuDI.HanAdapter.Ppc.dll</HintPath>
-    </Reference>
-    <Reference Include="TRuDI.HanAdapter.ThebenAG">
-      <HintPath>..\..\han-adapters\TRuDI.HanAdapter.ThebenAG.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
   <Target Name="SetMVCRazorOutputPath">
