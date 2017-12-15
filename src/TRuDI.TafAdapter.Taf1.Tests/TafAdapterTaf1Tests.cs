@@ -391,7 +391,7 @@ namespace TRuDI.TafAdapter.Taf1.Tests
             var start = supplierModel.AnalysisProfile.BillingPeriod.Start;
 
             var ex = Assert.ThrowsException<InvalidOperationException>(() => target.Calculate(deviceModel, supplierModel));
-            Assert.AreEqual($"Zu dem Zeitpunkt {start} wurde kein Wert gefunden.", ex.Message);
+            Assert.AreEqual($"Zu dem Zeitpunkt {start} ist kein Wert vorhanden oder der Status kritisch oder fatal.", ex.Message);
         }
 
         /// <summary>
@@ -413,8 +413,54 @@ namespace TRuDI.TafAdapter.Taf1.Tests
             var end = supplierModel.AnalysisProfile.BillingPeriod.GetEnd();
 
             var ex = Assert.ThrowsException<InvalidOperationException>(() => target.Calculate(deviceModel, supplierModel));
-            Assert.AreEqual($"Zu dem Zeitpunkt {end} wurde kein Wert gefunden.", ex.Message);
+            Assert.AreEqual($"Zu dem Zeitpunkt {end} ist kein Wert vorhanden oder der Status kritisch oder fatal.", ex.Message);
         }
+
+        /// <summary>
+        /// This exception is thrown if the PTB status if the start value is 3(time critcal) or 4(fatal).
+        /// </summary>
+        [TestMethod]
+        [DeploymentItem(@"Data\result_1_month_start_statusPTB4.xml")]
+        [DeploymentItem(@"Data\supplier_1_month.xml")]
+        public void TestTaf1ExceptionStartValuePTBStatus4()
+        {
+            var deviceXml = XDocument.Load(@"Data\result_1_month_start_statusPTB4.xml");
+            var deviceModel = XmlModelParser.ParseHanAdapterModel(deviceXml.Root.Descendants());
+
+            var supplierXml = XDocument.Load(@"Data\supplier_1_month.xml");
+            var supplierModel = XmlModelParser.ParseSupplierModel(supplierXml.Root.Descendants());
+
+            var target = new TafAdapterTaf1();
+
+            var start = supplierModel.AnalysisProfile.BillingPeriod.Start;
+
+            var ex = Assert.ThrowsException<InvalidOperationException>(() => target.Calculate(deviceModel, supplierModel));
+            Assert.AreEqual($"Zu dem Zeitpunkt {start} ist kein Wert vorhanden oder der Status kritisch oder fatal.", ex.Message);
+        }
+
+        /// <summary>
+        /// This exception is thrown if the PTB status if the end value is 3(time critcal) or 4(fatal).
+        /// </summary>
+        [TestMethod]
+        [DeploymentItem(@"Data\result_1_month_end_statusPTB4.xml")]
+        [DeploymentItem(@"Data\supplier_1_month.xml")]
+        public void TestTaf1ExceptionEndValuePTBStatus4()
+        {
+            var deviceXml = XDocument.Load(@"Data\result_1_month_end_statusPTB4.xml");
+            var deviceModel = XmlModelParser.ParseHanAdapterModel(deviceXml.Root.Descendants());
+
+            var supplierXml = XDocument.Load(@"Data\supplier_1_month.xml");
+            var supplierModel = XmlModelParser.ParseSupplierModel(supplierXml.Root.Descendants());
+
+            var target = new TafAdapterTaf1();
+
+            var end = supplierModel.AnalysisProfile.BillingPeriod.GetEnd();
+
+            var ex = Assert.ThrowsException<InvalidOperationException>(() => target.Calculate(deviceModel, supplierModel));
+            Assert.AreEqual($"Zu dem Zeitpunkt {end} ist kein Wert vorhanden oder der Status kritisch oder fatal.", ex.Message);
+        }
+
+
 
         /// <summary>
         /// This exception is thrown if the number of the special day profiles are invalid.

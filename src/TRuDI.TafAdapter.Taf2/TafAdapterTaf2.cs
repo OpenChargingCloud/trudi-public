@@ -11,6 +11,7 @@ namespace TRuDI.TafAdapter.Taf2
     using TRuDI.TafAdapter.Interface.Taf2;
     using TRuDI.TafAdapter.Taf2.Components;
 
+    /// <inheritdoc />
     /// <summary>
     /// Default TAF-2 implementation.
     /// </summary>
@@ -30,7 +31,7 @@ namespace TRuDI.TafAdapter.Taf2
         public TafAdapterData Calculate(UsagePointAdapterTRuDI device, UsagePointLieferant supplier)
         {
             this.originalValueLists =
-                device.MeterReadings.Where(mr => mr.IsOriginalValueList()).Select(mr => new OriginalValueList(mr)).ToList();
+                device.MeterReadings.Where(mr => mr.IsOriginalValueList()).Select(mr => new OriginalValueList(mr, device.ServiceCategory.Kind ?? Kind.Electricity)).ToList();
 
             if (!this.originalValueLists.Any())
             {
@@ -41,13 +42,20 @@ namespace TRuDI.TafAdapter.Taf2
             this.UpdateReadingTypeFromOriginalValueList(registers);
 
             var accountingPeriod = new Taf2Data(registers, supplier.AnalysisProfile.TariffStages);
-            accountingPeriod.SetDates(supplier.AnalysisProfile.BillingPeriod.Start, supplier.AnalysisProfile.BillingPeriod.GetEnd());
-            SetTotalBillingPeriod(accountingPeriod);            
-
             var dayProfiles = supplier.AnalysisProfile.TariffChangeTrigger.TimeTrigger.DayProfiles;
 
             foreach (var ovl in this.originalValueLists)
             {
+                var bpStart = ovl.MeterReading.GetFirstReadingTimestamp(supplier.AnalysisProfile.BillingPeriod.Start, supplier.AnalysisProfile.BillingPeriod.GetEnd());
+                var bpEnd = ovl.MeterReading.GetLastReadingTimestamp(supplier.AnalysisProfile.BillingPeriod.Start, supplier.AnalysisProfile.BillingPeriod.GetEnd());
+                if (bpEnd == null || bpStart == null || bpStart == bpEnd)
+                {
+                    throw new InvalidOperationException("Keine Messwerte innerhalb des Abbrechnungszeitraums gefunden.");
+                }
+                
+                accountingPeriod.SetDates(bpStart.Value, bpEnd.Value);
+                this.SetTotalBillingPeriod(accountingPeriod);
+
                 var validDayProfiles = dayProfiles.GetValidDayProfilesForMeterReading(ovl.Obis, supplier.AnalysisProfile.TariffStages);
                 var specialDayProfiles = this.GetSpecialDayProfiles(supplier, validDayProfiles, accountingPeriod.Begin, accountingPeriod.End);
                 long latestReading = 0;
@@ -56,14 +64,14 @@ namespace TRuDI.TafAdapter.Taf2
                 // Check if the lists validDayProfiles and special DayProfiles are null or empty
                 if (!this.CheckUsedLists(validDayProfiles, specialDayProfiles)) { continue; }
 
-                // Check if start and end of the current billing period have a corresponding IntervalReading object
-                this.CheckBillingPeriodStartAndEnd(ovl, accountingPeriod);
-
                 // Calculation of the single days (latestReading and latestTariffId are needed for days across gap detection)
                 foreach (SpecialDayProfile profile in specialDayProfiles)
                 {
                     var currentDayData = this.GetDayData(profile, dayProfiles, ovl.MeterReading, supplier, latestReading, latestTariffId);
-                    accountingPeriod.Add(currentDayData.day);
+                    if (!(currentDayData.day.Start == DateTime.MinValue) || currentDayData.day.MeasuringRanges.Count != 0)
+                    {
+                        accountingPeriod.Add(currentDayData.day);
+                    }
                     latestReading = currentDayData.latestReading;
                     latestTariffId = currentDayData.tariffId;
                 }
@@ -75,9 +83,6 @@ namespace TRuDI.TafAdapter.Taf2
                     ObisCode = ovl.Obis
                 });
 
-                // Reset for the next original value list
-                latestReading = 0;
-                latestTariffId = 63;
             }
 
             accountingPeriod.OrderSections();
@@ -91,6 +96,8 @@ namespace TRuDI.TafAdapter.Taf2
         /// <param name="dayProfiles">A List of all DayProfiles</param>
         /// <param name="meterReading">The MeterReading instance with the raw data.</param>
         /// <param name="supplier">Contains the calculation data.</param>
+        /// <param name="latestReading">The last valid value of an IntervalReading.</param>
+        /// <param name="latestTariffId">The last vaild tariff.</param>
         /// <returns>The calculated AccountingSection</returns>
         public (AccountingDay day, long latestReading, ushort tariffId) GetDayData(SpecialDayProfile profile, List<DayProfile> dayProfiles, 
             MeterReading meterReading, UsagePointLieferant supplier, long latestReading, ushort latestTariffId)
@@ -99,22 +106,24 @@ namespace TRuDI.TafAdapter.Taf2
             this.UpdateReadingTypeFromOriginalValueList(registers);
 
             var currentDay = new AccountingDay(registers);
+            
+            // Every SpecialDayProfile is linked to a dayProfile which contains dayTimeProfiles.
+            // This dayTimeProfiles are needed because they contain the tariff change information of the day.
             var dayTimeProfiles = GetValidDayTimeProfiles(dayProfiles, profile);
 
             var start = ModelExtensions.GetDateTimeFromSpecialDayProfile(profile, dayTimeProfiles[0]);
-            var end = start;
             var index = 1;
             var startReading = meterReading.GetIntervalReadingFromDate(start);
             
             // If the current day has a gap at 00:00
-            if (startReading == null)
+            if (startReading == null || !IsStatusValid(startReading))
             {
                 var startData = this.GetStartReading(start, dayTimeProfiles, profile, 
                     meterReading, currentDay, index, latestReading, latestTariffId);
 
                 index = startData.index;
                 startReading = startData.startReading;
-                start = startData.startReading != null ? startData.startReading.TimePeriod.Start : start;
+                start = startData.startReading != null && IsStatusValid(startData.startReading) ? startData.startReading.TimePeriod.Start : start;
                 latestTariffId = startData.tariffId;
                 latestReading = startData.latestReading;
             }
@@ -122,15 +131,16 @@ namespace TRuDI.TafAdapter.Taf2
             // Check whether dayTimeProfiles is null or empty
             this.CheckInitSettings(dayTimeProfiles);
 
-            if(startReading != null)
+            if(startReading != null && IsStatusValid(startReading))
             {
                 currentDay.Reading = new Reading() { Amount = startReading.Value, ObisCode = new ObisId(meterReading.ReadingType.ObisCode) };
                 currentDay.Start = profile.SpecialDayDate.GetDate();
             }
                         
-            var endReading = this.SetConcreteIntervalReading(null, DateTime.MinValue);
+            var endReading = SetConcreteIntervalReading(null, DateTime.MinValue);
             for (var i = index; i < dayTimeProfiles.Count; i++)
             {
+                DateTime end;
                 // Check if the tariff number changes
                 if (dayTimeProfiles[i-1].TariffNumber != dayTimeProfiles[i].TariffNumber)
                 {
@@ -138,9 +148,10 @@ namespace TRuDI.TafAdapter.Taf2
                     end = ModelExtensions.GetDateTimeFromSpecialDayProfile(profile, dayTimeProfiles[i]);
                     endReading = SetIntervalReading(meterReading, end, i, dayTimeProfiles.Count);
 
-                    var rangeData = GetNextRange(endReading.reading, endReading.end, 
-                                                 startReading, start, end, 
+                    var rangeData = GetNextRange(endReading.reading, endReading.end,
+                                                 startReading, start, end,
                                                  dayTimeProfiles, meterReading, profile, currentDay, i, latestReading, latestTariffId);
+                  
 
                     latestReading = rangeData.latestReading;
                     start = rangeData.reading.TimePeriod.Start;
@@ -157,7 +168,7 @@ namespace TRuDI.TafAdapter.Taf2
                 // If there is no tariff change at the current timestamp
                 else
                 {
-                    //  Check if it is the last value of the  current day
+                    //  Check if it is the last value of the current day
                     if (i == dayTimeProfiles.Count - 1)
                     {
                         end = ModelExtensions.GetDateTimeFromSpecialDayProfile(profile, dayTimeProfiles[i]);
@@ -193,7 +204,7 @@ namespace TRuDI.TafAdapter.Taf2
         /// <param name="profile">The used SpecialDayProfile instance.</param>
         /// <param name="dayTimeProfiles">The used DayTime profile.</param>
         /// <param name="meterReading">The raw data.</param>
-        /// <param name="index">For marking the parent loop index.</param>
+        /// <param name="index">Start index for iterating over the measurement list.</param>
         /// <returns>The matching DateTime and the new index for the parent loop.</returns>
         public (DateTime end, int index) FindLastValidTime(DateTime start, DateTime end, SpecialDayProfile profile,
             List<DayTimeProfile> dayTimeProfiles, MeterReading meterReading, int index)
@@ -221,13 +232,18 @@ namespace TRuDI.TafAdapter.Taf2
 
                 var reading = meterReading.GetIntervalReadingFromDate(result);
            
-                if (reading != null)
+                if (reading != null && IsStatusValid(reading))
                 {
                     match = true;
                 }
                 else
                 {
                     helpindex--;
+                    if (helpindex < 0)
+                    {
+                        throw new InvalidOperationException(
+                            "Die PTB oder FNN Stati aller Messwerte sind kritisch oder fatal.");
+                    }
                 }
             }
 
@@ -261,7 +277,7 @@ namespace TRuDI.TafAdapter.Taf2
                 result = ModelExtensions.GetDateTimeFromSpecialDayProfile(profile, dayTimeProfiles[helpindex]);
                 var reading = meterReading.GetIntervalReadingFromDate(result);
                
-                if (reading != null)
+                if (reading != null && IsStatusValid(reading))
                 {
                     match = true;
                 }
@@ -286,7 +302,7 @@ namespace TRuDI.TafAdapter.Taf2
             var reading = meterReading.GetIntervalReadingFromDate(date);
             
             // If there is a gap at 0:00 o'clock the next day
-            if (date > end && reading == null)
+            if (date > end && (reading == null || !IsStatusValid(reading)))
             {
                 date = end;
                 reading = meterReading.GetIntervalReadingFromDate(date);
@@ -296,6 +312,8 @@ namespace TRuDI.TafAdapter.Taf2
 
             DateTime LocalSetLastReading(DateTime time, int idx, int dtpCount)
             {
+                
+                // Checked the TimeOfDay Value. In every case a value from DayTimeProfiles is used. 
                 if (idx == dtpCount-1 && time.TimeOfDay == new TimeSpan(23, 45, 00))
                 {
                     return time.AddSeconds(900);
@@ -308,7 +326,7 @@ namespace TRuDI.TafAdapter.Taf2
         /// This method is used to create an empty endReading object
         /// </summary>
         /// <returns></returns>
-        public (IntervalReading reading, DateTime end) SetConcreteIntervalReading(IntervalReading reading, DateTime end)
+        public static (IntervalReading reading, DateTime end) SetConcreteIntervalReading(IntervalReading reading, DateTime end)
         {
             return (reading, end);
         }
@@ -320,8 +338,8 @@ namespace TRuDI.TafAdapter.Taf2
         /// <param name="accountingPeriod"></param>
         public void SetTotalBillingPeriod(Taf2Data accountingPeriod)
         {
-            billingPeriodStart = accountingPeriod.Begin;
-            billingPeriodEnd = accountingPeriod.End;
+            this.billingPeriodStart = accountingPeriod.Begin;
+            this.billingPeriodEnd = accountingPeriod.End;
         }
 
         /// <summary>
@@ -332,6 +350,8 @@ namespace TRuDI.TafAdapter.Taf2
         /// <returns>The needed dayTimeProfiles for the calculation.</returns>
         public List<DayTimeProfile> GetValidDayTimeProfiles(List<DayProfile> dayProfiles, SpecialDayProfile profile)
         {
+
+            // NullReferenceException due to Parsing not possible. See Test: TestWrongDayIdSupplierFileParsingException()
             var dayTimeProfiles = dayProfiles.FirstOrDefault(p => p.DayId == profile.DayId).DayTimeProfiles;
 
             // Is the start of the billing period in this SpecialDayProfile
@@ -369,7 +389,7 @@ namespace TRuDI.TafAdapter.Taf2
         {
             var result = latestReading;
 
-            if(reading != null)
+            if(reading != null && IsStatusValid(reading))
             {
                 if (reading.Value.HasValue)
                 {
@@ -400,33 +420,46 @@ namespace TRuDI.TafAdapter.Taf2
             DateTime endCurrentReading, IntervalReading startReading, DateTime start, DateTime end, List<DayTimeProfile> dayTimeProfiles, 
             MeterReading meterReading, SpecialDayProfile profile, AccountingDay currentDay, int i, long latestReading, ushort latestTariffId)
         {
-            var endReading = this.SetConcreteIntervalReading(reading, endCurrentReading);
+            var endReading = SetConcreteIntervalReading(reading, endCurrentReading);
             var range = new MeasuringRange();
            
-            if (endReading.reading != null)
+            // Normal situation: reading is valid.
+            if (endReading.reading != null && IsStatusValid(endReading.reading))
             {
                 range = new MeasuringRange(start, endReading.end, (ushort)dayTimeProfiles[i - 1].TariffNumber, 
-                    (long)(endReading.reading.Value - startReading.Value));
+                    (endReading.reading.Value.Value - startReading.Value.Value));
             }
-            else
+            else // A gap was found
             {
+                // Looking for the next valid IntervalReading 
                 var result = FindLastValidTime(start, end, profile, dayTimeProfiles, meterReading, i - 1);
                 endReading = SetIntervalReading(meterReading, result.end, result.index, dayTimeProfiles.Count);
 
-                if (result.end < end)
+                if (result.end < end && endReading.reading != null) // An IntervalReading was found which is bigger than startReading but smaller than the detected gap.
                 {
                     range = new MeasuringRange(start, endReading.end, (ushort)dayTimeProfiles[result.index].TariffNumber, 
-                        (long)(endReading.reading.Value - startReading.Value));
+                        (endReading.reading.Value.Value - startReading.Value.Value));
                 }
                 else
                 {
                     // Count in error register
-                    range = new MeasuringRange(start, endReading.end, (long)(endReading.reading.Value - startReading.Value));
+                    if (endReading.reading != null && IsStatusValid(endReading.reading))
+                    {
+                        range = new MeasuringRange(start, endReading.end,(endReading.reading.Value.Value - startReading.Value.Value));
+                    }
+                    else
+                    {
+                            // No closing valid IntervalReading for the current day was found (There was a gap at the last tariff change)
+                            latestTariffId = 63;
+                            endReading.reading = startReading; // No valid IntervalReading was found. Reset range to mark it as invalid.
+                    }
+                    
                 }
 
+                // 1 Measurement period at tariff change is missing
                 if ((i - 1) == result.index)
                 {
-                    // 1 Measurement period at tariff change is missing
+                 
                     latestReading = this.GetLatestReading(latestReading, endReading.reading);
                     latestTariffId = range.TariffId;
 
@@ -434,41 +467,41 @@ namespace TRuDI.TafAdapter.Taf2
                     var j = result.index;
                     var nextDate = ModelExtensions.GetDateTimeFromSpecialDayProfile(profile, dayTimeProfiles[j + 1]);
                     var nextReading = SetIntervalReading(meterReading, nextDate, j + 1, dayTimeProfiles.Count);
-                    while (nextReading.reading == null)
+                    while (nextReading.reading == null || !IsStatusValid(nextReading.reading))
                     {
                         j++;
                         if (j < dayTimeProfiles.Count - 1)
                         {
-                            nextDate = ModelExtensions.GetDateTimeFromSpecialDayProfile(profile, dayTimeProfiles[j + 1]);
+                            nextDate = ModelExtensions.GetDateTimeFromSpecialDayProfile(profile,
+                                dayTimeProfiles[j + 1]);
                             nextReading = SetIntervalReading(meterReading, nextDate, j + 1, dayTimeProfiles.Count);
                         }
                         else
-                        {
-                            // Measurement period at day change is missing
-                            nextDate = ModelExtensions.GetDateTimeFromSpecialDayProfile(profile, dayTimeProfiles[j]);
-                            nextReading = SetIntervalReading(meterReading, nextDate, j, dayTimeProfiles.Count);
-                            if (nextReading.reading == null)
-                            {
-                                nextReading = endReading;
-                                break;
-                            }
+                        {   
+                                nextDate = ModelExtensions.GetDateTimeFromSpecialDayProfile(profile,
+                                    dayTimeProfiles[j]);
+                                nextReading = SetIntervalReading(meterReading, nextDate, j, dayTimeProfiles.Count);
+                            
+                                if (nextReading.reading == null || !IsStatusValid(endReading.reading))
+                                {
+                                    nextReading = endReading;
+                                    break;
+                                }
                         }
                     }
 
                     // Count in error register
-                    range = new MeasuringRange(endReading.end, nextReading.end, (long)(nextReading.reading.Value - endReading.reading.Value));
+                    range = new MeasuringRange(endReading.end, nextReading.end, (nextReading.reading.Value.Value - endReading.reading.Value.Value));
                     endReading = nextReading;
                     result.index = j + 1;
                 }
 
-                i = result.index - 1;
+                // Protect for the special case i == dayTimeProfiles.Count -1 because it could lead to an endless loop.
+                if (i != dayTimeProfiles.Count - 1) { i = result.index; }     
             }
 
             // Check if the range object is empty 
-            if(this.IsRangeEmpty(range))
-            {
-                range.TariffId = latestTariffId;
-            }
+            if(this.IsRangeEmpty(range)) { range.TariffId = latestTariffId; }
 
             return (endReading.reading, range, i, latestReading);
         }
@@ -504,17 +537,17 @@ namespace TRuDI.TafAdapter.Taf2
                 }
 
                 // Checks if a startReading is found
-                if (startReading != null)
+                if (startReading != null && IsStatusValid(startReading))
                 {
                     currentDay.Add(new MeasuringRange()
                     {
                         Start = dayStart,
                         End = start,
-                        Amount = (long)(startReading.Value - latestReading),
+                        Amount = (startReading.Value.Value - latestReading),
                         TariffId = lastTariffId
                     }, new ObisId(meterReading.ReadingType.ObisCode));
 
-                    index = i+1;
+                    index = i;
                     latestReading = GetLatestReading(latestReading, startReading);
                     lastTariffId = (ushort)dayTimeProfiles[i].TariffNumber;
                     break;
@@ -526,19 +559,19 @@ namespace TRuDI.TafAdapter.Taf2
             }
 
             // if no startReading for the whole day was found, set index to 96 
-            if(startReading == null && index == dayTimeProfiles.Count - 1)
+            if((startReading == null || !IsStatusValid(startReading)) && index == dayTimeProfiles.Count - 1)
             {
-                var nextDay0oClock = start.AddSeconds(900);
-                startReading = meterReading.GetIntervalReadingFromDate(nextDay0oClock);
+                var nextDay0OClock = start.AddSeconds(900);
+                startReading = meterReading.GetIntervalReadingFromDate(nextDay0OClock);
 
                 // Check if a value for the next day at 0:00 o Clock exists
-                if (startReading != null)
+                if (startReading != null && IsStatusValid(startReading))
                 {
                     currentDay.Add(new MeasuringRange()
                     {
                         Start = dayStart,
-                        End = nextDay0oClock,
-                        Amount = (long)(startReading.Value - latestReading),
+                        End = nextDay0OClock,
+                        Amount = startReading.Value.Value - latestReading,
                         TariffId = lastTariffId
                     }, new ObisId(meterReading.ReadingType.ObisCode));
                 }
@@ -618,22 +651,6 @@ namespace TRuDI.TafAdapter.Taf2
         }
 
         /// <summary>
-        /// Check if there are values for start and end of the billingPeriod.
-        /// </summary>
-        /// <param name="ovl">The current original value list.</param>
-        /// <param name="accountingPeriod">The current Taf2Data object.</param>
-        public void CheckBillingPeriodStartAndEnd(OriginalValueList ovl, Taf2Data accountingPeriod)
-        {
-            var start = ovl.MeterReading.GetIntervalReadingFromDate(accountingPeriod.Begin);
-            var end = ovl.MeterReading.GetIntervalReadingFromDate(accountingPeriod.End);
-            
-            if(start == null || end == null)
-            {
-                throw new InvalidOperationException("Zum Start- oder Endzeitpunkt wurde kein gültiger Wert gefunden.");
-            }
-        }
-
-        /// <summary>
         /// Adds the corresponding reading type to the specified registers.
         /// </summary>
         /// <param name="registers">The registers to add the reading type.</param>
@@ -651,6 +668,27 @@ namespace TRuDI.TafAdapter.Taf2
                     register.SourceType = ovl.MeterReading.ReadingType;
                 }
             }
+        }
+
+        /// <summary>
+        /// Check if the IntervalReading instance has an valid status
+        /// </summary>
+        /// <param name="reading">The IntervalReading object to check.</param>
+        /// <returns>True if the status is valid.</returns>
+        private bool IsStatusValid(IntervalReading reading)
+        {
+            if (reading != null)
+            {
+                var fnnStatusToPtbStatus = reading.StatusFNN?.MapToStatusPtb();
+                var ptbStatus = reading.StatusPTB;
+
+                return fnnStatusToPtbStatus != StatusPTB.CriticalTemporaryError && 
+                       fnnStatusToPtbStatus != StatusPTB.FatalError && 
+                       ptbStatus != StatusPTB.CriticalTemporaryError && 
+                       ptbStatus != StatusPTB.FatalError;
+            }
+
+            return false;
         }
     }
 }

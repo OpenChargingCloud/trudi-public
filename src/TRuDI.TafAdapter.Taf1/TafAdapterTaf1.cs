@@ -31,7 +31,7 @@
         public TafAdapterData Calculate(UsagePointAdapterTRuDI device, UsagePointLieferant supplier)
         {
             this.originalValueLists =
-                device.MeterReadings.Where(mr => mr.IsOriginalValueList()).Select(mr => new OriginalValueList(mr)).ToList();
+                device.MeterReadings.Where(mr => mr.IsOriginalValueList()).Select(mr => new OriginalValueList(mr, device.ServiceCategory.Kind ?? Kind.Electricity)).ToList();
 
             if (!this.originalValueLists.Any())
             {
@@ -56,14 +56,14 @@
                 var startReading = ovl.MeterReading.GetIntervalReadingFromDate(billingPeriodStart);
                 var endReading = ovl.MeterReading.GetIntervalReadingFromDate(billingPeriodEnd);
 
-                if(startReading == null)
+                if(startReading == null || !IsStatusValid(startReading)) 
                 {
-                    throw new InvalidOperationException($"Zu dem Zeitpunkt {billingPeriodStart} wurde kein Wert gefunden.");
+                    throw new InvalidOperationException($"Zu dem Zeitpunkt {billingPeriodStart} ist kein Wert vorhanden oder der Status kritisch oder fatal.");
                 }
 
-                if (endReading == null)
+                if (endReading == null || !IsStatusValid(endReading))
                 {
-                    throw new InvalidOperationException($"Zu dem Zeitpunkt {billingPeriodEnd} wurde kein Wert gefunden.");
+                    throw new InvalidOperationException($"Zu dem Zeitpunkt {billingPeriodEnd} ist kein Wert vorhanden oder der Status kritisch oder fatal.");
                 }
 
                 var dayProfile = this.GetDayProfileNumber(dayProfiles, new ObisId(ovl.MeterReading.ReadingType.ObisCode), 
@@ -281,5 +281,25 @@
             }
        }
 
+        /// <summary>
+        /// Check if the IntervalReading instance has an valid status
+        /// </summary>
+        /// <param name="reading">The IntervalReading object to check.</param>
+        /// <returns>True if the status is valid.</returns>
+        private bool IsStatusValid(IntervalReading reading)
+        {
+            if (reading != null)
+            {
+                var fnnStatusToPtbStatus = reading.StatusFNN?.MapToStatusPtb();
+                var ptbStatus = reading.StatusPTB;
+
+                return fnnStatusToPtbStatus != StatusPTB.CriticalTemporaryError &&
+                       fnnStatusToPtbStatus != StatusPTB.FatalError &&
+                       ptbStatus != StatusPTB.CriticalTemporaryError &&
+                       ptbStatus != StatusPTB.FatalError;
+            }
+
+            return false;
+        }
     }
 }
