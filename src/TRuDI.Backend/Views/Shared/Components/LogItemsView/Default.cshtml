@@ -1,4 +1,5 @@
-﻿@using TRuDI.Models.BasicData
+﻿@using TRuDI.Backend.Utils
+@using TRuDI.Models.BasicData
 @model IEnumerable<LogEntry>
 
 
@@ -16,8 +17,14 @@
         <tr>
             <td>@entry.RecordNumber</td>
             <td>@entry.LogEvent.Timestamp</td>
-            <td>@entry.LogEvent.Level</td>
-            <td>@entry.LogEvent.Text</td>
+            <td>@entry.LogEvent.Level.GetLogLevelString()</td>
+            <td>
+                <p>@entry.LogEvent.Text</p>
+                @if (entry.LogEvent.Outcome != null)
+                {
+                    <p>Status: @entry.LogEvent.Outcome.GetOutcomeString()</p>
+                }
+            </td>
         </tr>
     }
 

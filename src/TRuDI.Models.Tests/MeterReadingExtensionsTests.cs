@@ -52,6 +52,19 @@ namespace TRuDI.Models.Tests
             readings.Add(new IntervalReading { TimePeriod = new Interval { Start = DateTime.Parse("2017-09-06T03:07:01+01:00") } });
             readings.Add(new IntervalReading { TimePeriod = new Interval { Start = DateTime.Parse("2017-09-08T00:01:01+01:00") } });
             Assert.AreEqual(1440, (int)readings.GetMeasurementPeriod().TotalMinutes);
+
+            readings = new List<IntervalReading>();
+            readings.Add(new IntervalReading { TimePeriod = new Interval { Start = DateTime.Parse("2017-10-28T14:00:01+02:00") }, StatusPTB = StatusPTB.CriticalTemporaryError });
+            readings.Add(new IntervalReading { TimePeriod = new Interval { Start = DateTime.Parse("2017-10-28T16:00:01+02:00") }, StatusPTB = StatusPTB.CriticalTemporaryError });
+            readings.Add(new IntervalReading { TimePeriod = new Interval { Start = DateTime.Parse("2017-10-28T18:00:01+02:00") }, StatusPTB = StatusPTB.CriticalTemporaryError });
+            readings.Add(new IntervalReading { TimePeriod = new Interval { Start = DateTime.Parse("2017-10-28T20:00:01+02:00") }, StatusPTB = StatusPTB.CriticalTemporaryError });
+            readings.Add(new IntervalReading { TimePeriod = new Interval { Start = DateTime.Parse("2017-10-28T22:00:01+02:00") }, StatusPTB = StatusPTB.CriticalTemporaryError });
+            readings.Add(new IntervalReading { TimePeriod = new Interval { Start = DateTime.Parse("2017-10-29T00:00:01+02:00") }, StatusPTB = StatusPTB.CriticalTemporaryError });
+            readings.Add(new IntervalReading { TimePeriod = new Interval { Start = DateTime.Parse("2017-10-29T01:00:01+02:00") } });
+            readings.Add(new IntervalReading { TimePeriod = new Interval { Start = DateTime.Parse("2017-10-29T02:00:01+02:00") } });
+            readings.Add(new IntervalReading { TimePeriod = new Interval { Start = DateTime.Parse("2017-10-29T02:00:00+01:00") } });
+            readings.Add(new IntervalReading { TimePeriod = new Interval { Start = DateTime.Parse("2017-10-29T03:00:01+01:00") } });
+            Assert.AreEqual(60, (int)readings.GetMeasurementPeriod().TotalMinutes);
         }
 
         [TestMethod]

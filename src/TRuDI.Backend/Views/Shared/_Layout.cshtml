@@ -37,9 +37,13 @@
                 {
                     <div class="navbar-brand">TRuDI Anzeigefunktion</div>
                 }
-                else
+                else if (StateService.OperationMode == OperationMode.TransparencyFunction)
                 {
                     <div class="navbar-brand">TRuDI Transparenzfunktion</div>
+                }
+                else
+                {
+                    <div style="height: 8px;"></div>
                 }
 
                 <div>

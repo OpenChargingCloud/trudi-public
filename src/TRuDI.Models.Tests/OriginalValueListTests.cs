@@ -1,13 +1,13 @@
 namespace TRuDI.Models.Tests
 {
     using System;
-    using System.Diagnostics;
     using System.Linq;
     using System.Xml.Linq;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using TRuDI.Models;
+    using TRuDI.Models.BasicData;
 
     [TestClass]
     public class OriginalValueListTests
@@ -19,7 +19,7 @@ namespace TRuDI.Models.Tests
             var xml = XDocument.Load(@"Data\IF_Adapter_TRuDI_DatenTAF2.xml");
             var model = XmlModelParser.ParseHanAdapterModel(xml.Root.Descendants());
 
-            var target = new OriginalValueList(model.MeterReadings[0]);
+            var target = new OriginalValueList(model.MeterReadings[0], Kind.Electricity);
         }
 
         [TestMethod]
@@ -29,7 +29,7 @@ namespace TRuDI.Models.Tests
             var xml = XDocument.Load(@"Data\IF_Adapter_TRuDI_DatenTAF7.xml");
             var model = XmlModelParser.ParseHanAdapterModel(xml.Root.Descendants());
 
-            var target = new OriginalValueList(model.MeterReadings[0]);
+            var target = new OriginalValueList(model.MeterReadings[0], Kind.Electricity);
 
             Assert.AreEqual("1-0:1.8.0*255", target.Obis.ToString());
             Assert.AreEqual(0, target.GapCount);
@@ -46,13 +46,37 @@ namespace TRuDI.Models.Tests
         }
 
         [TestMethod]
+        [DeploymentItem(@"Data\result_oml_gas_0_period.xml")]
+        public void TestIsOriginalValueListGasZeroMeasurementPeriod()
+        {
+            var xml = XDocument.Load(@"Data\result_oml_gas_0_period.xml");
+            var model = XmlModelParser.ParseHanAdapterModel(xml.Root.Descendants());
+
+            var target = new OriginalValueList(model.MeterReadings[0], Kind.Gas);
+
+            Assert.AreEqual("7-0:3.1.0*255", target.Obis.ToString());
+            Assert.AreEqual(3, target.GapCount);
+
+            Assert.AreEqual(DateTime.Parse("2017-11-29T17:09:00+01:00"), target.Start);
+            Assert.AreEqual(DateTime.Parse("2017-11-30T06:05:44+01:00"), target.End);
+
+            var items = target.GetReadings(DateTime.MinValue, DateTime.MaxValue).ToList();
+            Assert.AreEqual(4, items.Count);
+
+            Assert.AreEqual(DateTime.Parse("2017-11-29T17:09:00+01:00"), items[0].TimePeriod.Start);
+            Assert.AreEqual(DateTime.Parse("2017-11-30T00:04:46+01:00"), items[1].TimePeriod.Start);
+            Assert.AreEqual(DateTime.Parse("2017-11-30T05:20:22+01:00"), items[2].TimePeriod.Start);
+            Assert.AreEqual(DateTime.Parse("2017-11-30T06:05:44+01:00"), items[3].TimePeriod.Start);
+        }
+
+        [TestMethod]
         [DeploymentItem(@"Data\IF_Adapter_TRuDI_DatenTAF7_With_Gaps.xml")]
         public void TestIsOriginalValueListTaf7WithGaps()
         {
             var xml = XDocument.Load(@"Data\IF_Adapter_TRuDI_DatenTAF7_With_Gaps.xml");
             var model = XmlModelParser.ParseHanAdapterModel(xml.Root.Descendants());
 
-            var target = new OriginalValueList(model.MeterReadings[0]);
+            var target = new OriginalValueList(model.MeterReadings[0], Kind.Electricity);
 
             Assert.AreEqual("1-0:1.8.0*255", target.Obis.ToString());
             Assert.AreEqual(3, target.GapCount);
@@ -167,7 +191,7 @@ namespace TRuDI.Models.Tests
             var xml = XDocument.Load(@"Data\result_3_days_geterrorlist.xml");
             var model = XmlModelParser.ParseHanAdapterModel(xml.Root.Descendants());
 
-            var target = new OriginalValueList(model.MeterReadings[0]);
+            var target = new OriginalValueList(model.MeterReadings[0], Kind.Electricity);
 
             var errors = target.GetErrorsList();
 
@@ -221,7 +245,7 @@ namespace TRuDI.Models.Tests
             var xml = XDocument.Load(@"Data\result_historic_consumption.xml");
             var model = XmlModelParser.ParseHanAdapterModel(xml.Root.Descendants());
 
-            var target = new OriginalValueList(model.MeterReadings[0]);
+            var target = new OriginalValueList(model.MeterReadings[0], Kind.Electricity);
 
             var values = target.HistoricValues;
 
@@ -284,6 +308,47 @@ namespace TRuDI.Models.Tests
                 Assert.AreEqual(item.End.ToIso8601Local(), end);
                 Assert.AreEqual(item.UnitOfTime, unitOfTime);
             }
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"Data\result_oml_winter_to_summer_time.xml")]
+        public void TestIsOriginalValueListWinterToSummerTimeGap()
+        {
+            var xml = XDocument.Load(@"Data\result_oml_winter_to_summer_time.xml");
+            var model = XmlModelParser.ParseHanAdapterModel(xml.Root.Descendants());
+
+            var target = new OriginalValueList(model.MeterReadings[0], Kind.Electricity);
+
+            Assert.AreEqual("1-0:1.8.0*255", target.Obis.ToString());
+            Assert.AreEqual(0, target.GapCount);
+
+            Assert.AreEqual(DateTime.Parse("2017-03-26T00:00:00+01:00"), target.Start);
+            Assert.AreEqual(DateTime.Parse("2017-03-26T06:00:00+02:00"), target.End);
+
+            var items = target.GetReadings(DateTime.MinValue, DateTime.MaxValue).ToList();
+            Assert.AreEqual(21, items.Count);
+
+            Assert.AreEqual(DateTime.Parse("2017-03-26T00:00:00+01:00"), items[0].TimePeriod.Start);
+            Assert.AreEqual(DateTime.Parse("2017-03-26T00:15:00+01:00"), items[1].TimePeriod.Start);
+            Assert.AreEqual(DateTime.Parse("2017-03-26T00:30:00+01:00"), items[2].TimePeriod.Start);
+            Assert.AreEqual(DateTime.Parse("2017-03-26T00:45:00+01:00"), items[3].TimePeriod.Start);
+            Assert.AreEqual(DateTime.Parse("2017-03-26T01:00:00+01:00"), items[4].TimePeriod.Start);
+            Assert.AreEqual(DateTime.Parse("2017-03-26T01:15:00+01:00"), items[5].TimePeriod.Start);
+            Assert.AreEqual(DateTime.Parse("2017-03-26T01:30:00+01:00"), items[6].TimePeriod.Start);
+            Assert.AreEqual(DateTime.Parse("2017-03-26T01:45:00+01:00"), items[7].TimePeriod.Start);
+            Assert.AreEqual(DateTime.Parse("2017-03-26T03:00:00+02:00"), items[8].TimePeriod.Start);
+            Assert.AreEqual(DateTime.Parse("2017-03-26T03:15:00+02:00"), items[9].TimePeriod.Start);
+            Assert.AreEqual(DateTime.Parse("2017-03-26T03:30:00+02:00"), items[10].TimePeriod.Start);
+            Assert.AreEqual(DateTime.Parse("2017-03-26T03:45:00+02:00"), items[11].TimePeriod.Start);
+            Assert.AreEqual(DateTime.Parse("2017-03-26T04:00:00+02:00"), items[12].TimePeriod.Start);
+            Assert.AreEqual(DateTime.Parse("2017-03-26T04:15:00+02:00"), items[13].TimePeriod.Start);
+            Assert.AreEqual(DateTime.Parse("2017-03-26T04:30:00+02:00"), items[14].TimePeriod.Start);
+            Assert.AreEqual(DateTime.Parse("2017-03-26T04:45:00+02:00"), items[15].TimePeriod.Start);
+            Assert.AreEqual(DateTime.Parse("2017-03-26T05:00:00+02:00"), items[16].TimePeriod.Start);
+            Assert.AreEqual(DateTime.Parse("2017-03-26T05:15:00+02:00"), items[17].TimePeriod.Start);
+            Assert.AreEqual(DateTime.Parse("2017-03-26T05:30:00+02:00"), items[18].TimePeriod.Start);
+            Assert.AreEqual(DateTime.Parse("2017-03-26T05:45:00+02:00"), items[19].TimePeriod.Start);
+            Assert.AreEqual(DateTime.Parse("2017-03-26T06:00:00+02:00"), items[20].TimePeriod.Start);
         }
     }
 }

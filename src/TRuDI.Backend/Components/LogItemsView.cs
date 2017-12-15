@@ -6,6 +6,7 @@
     using Microsoft.AspNetCore.Mvc;
 
     using TRuDI.Backend.Application;
+    using TRuDI.Backend.Utils;
     using TRuDI.Models;
 
     public class LogItemsView : ViewComponent
@@ -17,31 +18,7 @@
             this.applicationState = applicationState;
         }
 
-        private int MinLogLevel(string filterLogLevel)
-        {
-            if (String.IsNullOrEmpty(filterLogLevel))
-            {
-                return 1;
-            }
-
-            if (filterLogLevel.Contains("all"))
-            {
-                return 1;
-            }
-            if (filterLogLevel.Contains("warn"))
-            {
-                return 2;
-            }
-
-            if (filterLogLevel.Contains("error"))
-            {
-                return 3;
-            }
-
-            return 1;
-        }
-
-        public IViewComponentResult Invoke(DateTime startTime, DateTime endTime, string filterText, string filterLevel)
+        public IViewComponentResult Invoke(DateTime startTime, DateTime endTime, string filterText)
         {
             startTime = startTime.DayStart();
 
@@ -59,12 +36,11 @@
                 filterText = filterText.ToLowerInvariant();
             }
 
-            return this.View(
-                this.applicationState.CurrentDataResult.Model.LogEntries.Where(
-                    e => e.LogEvent != null
-                         && e.LogEvent.Timestamp >= startTime && e.LogEvent.Timestamp <= endTime
-                         && (string.IsNullOrWhiteSpace(filterText) || e.LogEvent.Text.ToLowerInvariant().Contains(filterText))
-                         && (string.IsNullOrWhiteSpace(filterLevel) || (int)e.LogEvent.Level >= this.MinLogLevel(filterLevel))));
+            return this.View(this.applicationState.CurrentDataResult.Model.LogEntries.Where(
+                e => e.LogEvent != null && e.LogEvent.Timestamp >= startTime && e.LogEvent.Timestamp <= endTime
+                     && (string.IsNullOrWhiteSpace(filterText)
+                         || (e.LogEvent.Text.ToLowerInvariant().Contains(filterText) || e.LogEvent.Level
+                                 .GetLogLevelString().ToLowerInvariant().Contains(filterText)))));
         }
     }
 }

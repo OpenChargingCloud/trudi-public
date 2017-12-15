@@ -48,7 +48,7 @@
         /// <summary>
         /// Gets or sets the current active operation mode (display or transparency function).
         /// </summary>
-        public OperationMode OperationMode { get; set; }
+        public OperationMode OperationMode { get; set; } = OperationMode.NotSelected;
 
         /// <summary>
         /// Gets the bread crumb trail.
@@ -138,10 +138,9 @@
         public ApplicationState(NotificationsMessageHandler notificationsMessageHandler)
         {
             this.notificationsMessageHandler = notificationsMessageHandler;
-            this.ConnectData = new ConnectData();
+
             this.BreadCrumbTrail.Add("Start", "/OperatingModeSelection", false);
-            this.SideBarMenu.Add("Über TRuDI", "/About", true);
-            this.SideBarMenu.Add("Beschreibung", "/Help", true);
+            this.Reset();
         }
 
         /// <summary>
@@ -318,6 +317,10 @@
                     this.LastErrorMessages.Add("Fehler während der Kommunikation mit dem Smart Meter Gateway. Das Smart Meter Gateway lieferte folgenden Fehler zurück:");
                     break;
 
+                case ErrorType.SensorNotConnected:
+                    this.LastErrorMessages.Add("Das Smart Meter Gateway konnte keine Kommunikationsverbindung zum Zähler aufbauen.");
+                    return;
+
                 case ErrorType.NoDataInSelectedTimeRange:
                     if (this.CurrentAdapterContext != null)
                     {
@@ -395,12 +398,29 @@
                         if (ctx.BillingPeriod?.End == null)
                         {
                             Log.Information("Billing period not completetd: get current register values", this.ConnectData.DeviceId);
-                            var rawCurrentRegisters = await this.activeHanAdapter.GetCurrentRegisterValues(ctx, ct, this.ProgressCallback);
+
+                            XDocument rawCurrentRegisters = null;
+
+                            try
+                            {
+                                rawCurrentRegisters =
+                                    await this.activeHanAdapter.GetCurrentRegisterValues(
+                                        ctx,
+                                        ct,
+                                        this.ProgressCallback);
+                            }
+                            catch (HanAdapterException ex)
+                            {
+                                if (ex.AdapterError.Type != ErrorType.SensorNotConnected)
+                                {
+                                    throw;
+                                }
+                            }
 
                             try
                             {
                                 
-                                if (rawCurrentRegisters != null) // that will only be NULL in case of example HAN adapter, until the Getregisters function is implemented
+                                if (rawCurrentRegisters != null)
                                 {
                                     this.UpdateRegisterValuesFromXml(rawCurrentRegisters, ctx);
                                 }
@@ -513,7 +533,7 @@
             }
 
             this.CurrentDataResult.OriginalValueLists =
-                this.CurrentDataResult.Model.MeterReadings.Where(mr => mr.IsOriginalValueList()).Select(mr => new OriginalValueList(mr)).ToList();
+                this.CurrentDataResult.Model.MeterReadings.Where(mr => mr.IsOriginalValueList()).Select(mr => new OriginalValueList(mr, this.CurrentDataResult.Model.ServiceCategory.Kind ?? Kind.Electricity)).ToList();
 
             foreach (var ovl in this.CurrentDataResult.OriginalValueLists)
             {
@@ -699,6 +719,32 @@
             Log.Debug("Next page after progress: {0}", page);
             this.CurrentProgressState.NextPageAfterProgress = page;
             await this.notificationsMessageHandler.LoadNextPage(page);
+        }
+
+        /// <summary>
+        /// Resets the application state in case of an internal error.
+        /// </summary>
+        public void Reset()
+        {
+            this.ConnectData = new ConnectData();
+            this.BreadCrumbTrail.Reset();
+
+            this.SideBarMenu.Clear();
+            this.SideBarMenu.Add("Über TRuDI", "/About", true);
+            this.SideBarMenu.Add("Beschreibung", "/Help", true);
+
+            this.activeHanAdapter = null;
+            this.CurrentDataResult = null;
+            this.CurrentSupplierFile = null;
+            this.CurrentAdapterContext = null;
+            this.CurrentProgressState.Reset();
+            this.Contracts = null;
+            this.CurrentSupplierFile = null;
+            this.ClientCert = null;
+            this.LastConnectResult = null;
+            this.LastErrorMessages.Clear();
+            this.ManufacturerParameters = null;
+            this.OperationMode = OperationMode.NotSelected;
         }
     }
 }

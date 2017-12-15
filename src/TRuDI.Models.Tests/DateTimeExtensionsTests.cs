@@ -91,5 +91,15 @@ namespace TRuDI.Models.Tests
             target = new DateTime(2017, 1, 2, 3, 4, 5, DateTimeKind.Utc);
             Assert.AreEqual("2017-01-02T04:04:20+01:00", target.AddUtcSeconds(15).ToLocalTime().ToIso8601Local());
         }
+
+        [TestMethod]
+        public void TestGetDateTimePickerEndDate()
+        {
+            DateTime target = new DateTime(2017, 1, 2, 3, 4, 5, DateTimeKind.Local);
+            Assert.AreEqual("2017-01-02T03:04:05+01:00", target.GetDateTimePickerEndDate().ToIso8601Local());
+
+            target = new DateTime(2017, 1, 2, 0, 0, 0, DateTimeKind.Local);
+            Assert.AreEqual("2017-01-01T23:59:59+01:00", target.GetDateTimePickerEndDate().ToIso8601Local());
+        }
     }
 }

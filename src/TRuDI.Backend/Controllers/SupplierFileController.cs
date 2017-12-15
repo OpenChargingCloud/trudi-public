@@ -12,6 +12,8 @@
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
 
+    using Serilog;
+
     using TRuDI.Backend.Application;
     using TRuDI.Backend.Models;
     using TRuDI.Backend.Utils;
@@ -82,7 +84,9 @@
             }
             catch (Exception ex)
             {
-                return this.BadRequest(ex.Message);
+                Log.Error(ex, "Failed to XML file: {0}", ex.Message);
+                this.applicationState.CurrentSupplierFile.Xml = null;
+                return this.BadRequest("Datei konnte nicht geladen werden.");
             }
 
             return this.Ok();

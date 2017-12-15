@@ -1,6 +1,6 @@
 {
   "name": "TRuDI",
-  "version": "1.0.25",
+  "version": "1.0.33",
   "description": "TRuDI - Transparenz- und Display-Software für Smart Meter Gateways",
   "author": {
     "name": "IVU Softwareentwicklung GmbH",
@@ -16,7 +16,7 @@
   },
   "devDependencies": {
     "electron": "1.7.9",
-    "electron-builder": "^19.37.2"
+    "electron-builder": "^19.48.2"
   },
   "scripts": {
     "start": "electron .",

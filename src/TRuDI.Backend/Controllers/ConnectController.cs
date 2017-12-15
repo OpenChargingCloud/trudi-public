@@ -103,6 +103,8 @@
         [HttpPost]
         public async Task<IActionResult> UploadXmlFile(List<IFormFile> files)
         {
+            this.applicationState.BreadCrumbTrail.Add("Verbinden", "/Connect", true);
+
             var file = Request?.Form?.Files?.FirstOrDefault();
             if (file == null)
             {
@@ -118,6 +120,7 @@
                 }
                 catch (Exception ex)
                 {
+                    this.applicationState.CurrentDataResult.Raw = null;
                     return this.BadRequest();
                 }
             }
@@ -162,6 +165,8 @@
         [HttpPost]
         public IActionResult Connect(ConnectData connectData)
         {
+            this.applicationState.BreadCrumbTrail.Add("Verbinden", "/Connect", true);
+
             this.applicationState.ManufacturerParameters = this.GetManufacturerParametersFromRequest();
 
             connectData.DeviceId = connectData.DeviceId.Trim();

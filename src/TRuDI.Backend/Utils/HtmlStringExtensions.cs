@@ -91,7 +91,7 @@
             return billingPeriod.End == null ? "nein" : "ja";
         }
 
-        public static string ToStatusString(this IntervalReading reading)
+        public static string ToStatusString(this IntervalReading reading, int count = 1)
         {
             if (reading == null || (reading.StatusPTB == null && reading.StatusFNN == null))
             {
@@ -99,7 +99,7 @@
             }
 
             var status = reading.StatusPTB ?? reading.StatusFNN.MapToStatusPtb();
-            return status.GetStatusString();
+            return status.GetStatusString(count);
         }
 
         public static string ToStatusBackground(this IntervalReading reading)
@@ -175,7 +175,11 @@
             }
 
             var status = reading.StatusPTB ?? reading.StatusFNN.MapToStatusPtb();
+            return status.ToStatusIcon();
+        }
 
+        public static string ToStatusIcon(this StatusPTB status)
+        {
             switch (status)
             {
                 case StatusPTB.NoError:
@@ -212,28 +216,28 @@
 
             switch (kind.Value)
             {
-                case Kind.electricity:
+                case Kind.Electricity:
                     return "Strom";
 
-                case Kind.gas:
+                case Kind.Gas:
                     return "Gas";
 
-                case Kind.water:
+                case Kind.Water:
                     return "Wasser";
 
-                case Kind.pressure:
+                case Kind.Pressure:
                     return "Druck";
 
-                case Kind.heat:
+                case Kind.Heat:
                     return "Wärme";
 
-                case Kind.cold:
+                case Kind.Cold:
                     return "Kälte";
 
-                case Kind.communication:
+                case Kind.Communication:
                     return "Kommunikation";
 
-                case Kind.time:
+                case Kind.Time:
                     return "Zeit";
 
                 default:
@@ -316,6 +320,97 @@
 
                 default:
                     throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        public static string GetLogLevelString(this Level level)
+        {
+            switch (level)
+            {
+                case Level.INFO:
+                    return "Info";
+
+                case Level.WARNING:
+                    return "Warnung";
+
+                case Level.ERROR:
+                    return "Fehler";
+
+                case Level.FATAL:
+                    return "Fataler Fehler";
+
+                case Level.EXTENSION:
+                    return "Erweiterung";
+
+                default:
+                    return level.ToString();
+            }
+        }
+
+        public static string GetOutcomeString(this Outcome? outcome)
+        {
+            if (outcome == null)
+            {
+                return string.Empty;
+            }
+
+            switch (outcome)
+            {
+                case Outcome.SUCCESS:
+                    return "Erfolgreich";
+
+                case Outcome.FAILURE:
+                    return "Fehlgeschlagen";
+
+                case Outcome.EXTENSION:
+                    return "Erweiterung";
+
+                default:
+                    return outcome.ToString();
+            }
+        }
+
+        public static string GetMeasurementPeriodString(this TimeSpan measurementPeriod)
+        {
+            switch (measurementPeriod.TotalSeconds)
+            {
+                case 0:
+                    return "unbekannt";
+
+                case 900:
+                    return "15 Minuten";
+
+                case 1800:
+                    return "30 Minuten";
+
+                case 3600:
+                    return "1 Stunde";
+
+                case 86400:
+                    return "1 Tag";
+
+                case 86400 * 28:
+                case 86400 * 29:
+                case 86400 * 30:
+                case 86400 * 31:
+                    return "1 Monat";
+
+                case 86400 * 365:
+                case 86400 * 366:
+                    return "1 Jahr";
+
+                default:
+                    if ((int)measurementPeriod.TotalSeconds % 3600 == 0)
+                    {
+                        return $"{measurementPeriod.TotalSeconds / 3600} Stunden";
+                    }
+
+                    if ((int)measurementPeriod.TotalSeconds % 60 == 0)
+                    {
+                        return $"{measurementPeriod.TotalSeconds / 60} Minuten";
+                    }
+
+                    return $"{measurementPeriod.TotalSeconds} Sekunden";
             }
         }
     }

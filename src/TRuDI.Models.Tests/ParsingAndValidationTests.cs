@@ -31,7 +31,7 @@
             var irs = model.MeterReadings[0].IntervalBlocks[0].IntervalReadings;
 
             //check the 1st measurement with the skewed timestamp
-            CheckIntervalReading(irs[0], "2017-07-10T08:45:00+02:00", "2017-07-10T08:48:22+02:00", 41853);
+            CheckIntervalReading(irs[0], "2017-07-10T08:48:22+02:00", "2017-07-10T08:48:22+02:00", 41853);
 
             //checking some more readings
             CheckIntervalReading(irs[1], "2017-07-10T11:45:00+02:00", "2017-07-10T11:45:00+02:00", 41916);

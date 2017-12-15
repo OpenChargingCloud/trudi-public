@@ -40,7 +40,7 @@ const backendConfig = {
     certCommonName: "",
 };
 
-console.log(`Running on plattform ${os.platform()}, arch ${os.arch()}`);
+writeLog(`Running on plattform ${os.platform()}, arch ${os.arch()}`);
 
 if (os.platform() === 'linux') {
     backendConfig.workPath = path.join(__dirname, backendPathLinux);
@@ -91,7 +91,7 @@ function generateRipeMd160(filename, callback) {
         var fileStream = fs.ReadStream(filename);
 
         fileStream.on('error', function(err) {
-            console.log("Error on file '" + filename + "', error message: " + err);
+            writeLog("Error on file '" + filename + "', error message: " + err);
             var digest = hash.digest('hex');
             callback(null, digest);
         });
@@ -163,7 +163,7 @@ function generateChecksumsForTree(dir, done) {
 
 // Check if the backend has the expected digest values
 function checkIntegrity() {
-    console.log("Checking application integrity...");
+    writeLog("Checking application integrity...");
 
     generateChecksumsForTree(backendConfig.workPath,
         function (err, results) {
@@ -177,12 +177,12 @@ function checkIntegrity() {
 
             if (results.length !== backendConfig.checksums.length) {
                 backendCheckFailed = true;
-                console.log("Integrity check failed: length of digest arrays differ");
+                writeLog("Integrity check failed: length of digest arrays differ");
 
                 var minLength = Math.min(results.length, backendConfig.checksums.length);
                 for (var i = 0; i < minLength; i++) {
                     if (results[i].path !== backendConfig.checksums[i].path) {
-                        console.log("Integrity check failed: index %i: found file \"%s\", expected file \"%s\"",
+                        writeLog("Integrity check failed: index %i: found file \"%s\", expected file \"%s\"",
                             i,
                             results[i].path,
                             backendConfig.checksums[i].path);
@@ -203,7 +203,7 @@ function checkIntegrity() {
             for (var i = 0; i < results.length; i++) {
                 if (results[i].path !== backendConfig.checksums[i].path) {
                     backendCheckFailed = true;
-                    console.log("Integrity check failed: index %i: found file \"%s\", expected file \"%s\"",
+                    writeLog("Integrity check failed: index %i: found file \"%s\", expected file \"%s\"",
                         i,
                         results[i].path,
                         backendConfig.checksums[i].path);
@@ -219,7 +219,7 @@ function checkIntegrity() {
 
                 if (results[i].hash !== backendConfig.checksums[i].hash) {
                     backendCheckFailed = true;
-                    console.log("Integrity check failed: different digest value: file \"%s\", calculated: %s expected %s",
+                    writeLog("Integrity check failed: different digest value: file \"%s\", calculated: %s expected %s",
                         i,
                         results[i].path,
                         results[i].hash,
@@ -235,7 +235,7 @@ function checkIntegrity() {
                 }
             }
 
-            console.log("Integrity check passed!");
+            writeLog("Integrity check passed!");
         });
 }
 
@@ -248,7 +248,7 @@ app.on('certificate-error',
         }
         else {
             callback(false);
-            console.log("Integrity check failed: invalid CommonName used in TLS certificate");
+            writeLog("Integrity check failed: invalid CommonName used in TLS certificate");
 
             mainWindow.loadURL(url.format({
                 pathname: path.join(__dirname, 'integrity_check_failed.html'),
@@ -282,7 +282,7 @@ function createWindow() {
     });
 
     mainWindow.webContents.on("did-fail-load", function () {
-        console.log("did-fail-load");
+        writeLog("did-fail-load: %d, %s", arguments[1], arguments[3]);
         if (!backendCheckFailed) {
             mainWindow.loadURL(url.format({
                 pathname: path.join(__dirname, 'backend_connect_failed.html'),
@@ -299,7 +299,7 @@ function connectToBackend(port) {
         return;
     }
 
-    console.log("Connecting to backend on port %s", port);
+    writeLog("Connecting to backend on port %s", port);
     mainWindow.loadURL("https://127.0.0.1:" + port);
 }
 
@@ -340,9 +340,13 @@ function startBackendService() {
         var match = s.match("##### TRUDI\-BACKEND\-PORT: ([0-9]+) #####");
         if (match) {
             var backendPort = match[1];
-            console.log("Backend-Port: %s", backendPort);
+            writeLog("Backend-Port: %s", backendPort);
             connectToBackend(backendPort);
         }
+    });
+
+    backendServiceProcess.on('exit', function () {
+        writeLog('Backend process exited');
     });
 }
 
@@ -352,6 +356,6 @@ process.on('exit', function () {
     backendServiceProcess.kill();
 });
 
-function writeLog(msg) {
-    console.log(msg);
+function writeLog(msg, ...args) {
+    console.log((new Date()).toISOString() + " - " + msg, ...args);
 }

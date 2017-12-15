@@ -18,5 +18,12 @@
             this.applicationState.SideBarMenu.Clear();
             return this.View();
         }
+
+        public IActionResult InternalError()
+        {
+            this.ViewData["InternalError"] = true;
+            this.applicationState.Reset();
+            return this.View("~/Views/OperatingModeSelection/Index.cshtml");
+        }
     }
 }

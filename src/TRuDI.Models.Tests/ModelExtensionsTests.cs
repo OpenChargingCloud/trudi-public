@@ -52,6 +52,222 @@
             actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2016, 12, 31, 23, 53, 5, DateTimeKind.Local), 86400);
             Assert.AreEqual(expected, actual);
             Assert.AreEqual(expected.Kind, actual.Kind);
+
+            
+            // Periode von 2 Stunden (7200 Sekunden) Toleranzbereich 72 Sekunden (Sommerzeit)
+
+            var period = 7200;
+            expected = new DateTime(2017, 8, 1, 0, 0, 0, DateTimeKind.Local);
+            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 8, 1, 0, 1, 12, DateTimeKind.Local), period);
+            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(expected.Kind, actual.Kind);
+
+            expected = new DateTime(2017, 8, 1, 0, 0, 0, DateTimeKind.Local);
+            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 8, 1, 0, 1, 11, DateTimeKind.Local), period);
+            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(expected.Kind, actual.Kind);
+
+            expected = new DateTime(2017, 8, 1, 0, 0, 0, DateTimeKind.Local);
+            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 7, 31, 23, 58, 48, DateTimeKind.Local), period);
+            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(expected.Kind, actual.Kind);
+
+            expected = new DateTime(2017, 8, 1, 0, 0, 0, DateTimeKind.Local);
+            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 7, 31, 23, 58, 49, DateTimeKind.Local), period);
+            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(expected.Kind, actual.Kind);
+
+            expected = new DateTime(2017, 8, 1, 0, 1, 13, DateTimeKind.Local);
+            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 8, 1, 0, 1, 13, DateTimeKind.Local), period);
+            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(expected.Kind, actual.Kind);
+
+            expected = new DateTime(2017, 7, 31, 23, 58, 47, DateTimeKind.Local);
+            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 7, 31, 23, 58, 47, DateTimeKind.Local), period);
+            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(expected.Kind, actual.Kind);
+
+            // Periode von 3 Stunden (10800 Sekunden) Toleranzbereich 108 Sekunden (Sommerzeit)
+
+            period = 10800;
+            expected = new DateTime(2017, 8, 1, 0, 0, 0, DateTimeKind.Local);
+            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 8, 1, 0, 1, 48, DateTimeKind.Local), period);
+            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(expected.Kind, actual.Kind);
+
+            expected = new DateTime(2017, 8, 1, 0, 0, 0, DateTimeKind.Local);
+            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 8, 1, 0, 1, 47, DateTimeKind.Local), period);
+            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(expected.Kind, actual.Kind);
+
+            expected = new DateTime(2017, 8, 1, 0, 0, 0, DateTimeKind.Local);
+            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 7, 31, 23, 58, 12, DateTimeKind.Local), period);
+            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(expected.Kind, actual.Kind);
+
+            expected = new DateTime(2017, 8, 1, 0, 0, 0, DateTimeKind.Local);
+            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 7, 31, 23, 58, 13, DateTimeKind.Local), period);
+            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(expected.Kind, actual.Kind);
+
+            expected = new DateTime(2017, 8, 1, 0, 1, 49, DateTimeKind.Local);
+            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 8, 1, 0, 1, 49, DateTimeKind.Local), period);
+            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(expected.Kind, actual.Kind);
+
+            expected = new DateTime(2017, 7, 31, 23, 58, 11, DateTimeKind.Local);
+            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 7, 31, 23, 58, 11, DateTimeKind.Local), period);
+            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(expected.Kind, actual.Kind);
+
+            // Periode von 6 Stunden (21600 Sekunden) Toleranzbereich 216 Sekunden (Sommerzeit)
+
+            period = 21600;
+            expected = new DateTime(2017, 8, 1, 0, 0, 0, DateTimeKind.Local);
+            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 8, 1, 0, 3, 36, DateTimeKind.Local), period);
+            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(expected.Kind, actual.Kind);
+
+            expected = new DateTime(2017, 8, 1, 0, 0, 0, DateTimeKind.Local);
+            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 8, 1, 0, 3, 35, DateTimeKind.Local), period);
+            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(expected.Kind, actual.Kind);
+
+            expected = new DateTime(2017, 8, 1, 0, 0, 0, DateTimeKind.Local);
+            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 7, 31, 23, 56, 24, DateTimeKind.Local), period);
+            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(expected.Kind, actual.Kind);
+
+            expected = new DateTime(2017, 8, 1, 0, 0, 0, DateTimeKind.Local);
+            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 7, 31, 23, 56, 25, DateTimeKind.Local), period);
+            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(expected.Kind, actual.Kind);
+
+            expected = new DateTime(2017, 8, 1, 0, 3, 37, DateTimeKind.Local);
+            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 8, 1, 0, 3, 37, DateTimeKind.Local), period);
+            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(expected.Kind, actual.Kind);
+
+            expected = new DateTime(2017, 7, 31, 23, 56, 23, DateTimeKind.Local);
+            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 7, 31, 23, 56, 23, DateTimeKind.Local), period);
+            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(expected.Kind, actual.Kind);
+
+            // Periode von 2 Stunden (7200 Sekunden) Toleranzbereich 72 Sekunden (Winterzeit)
+
+            period = 7200;
+            expected = new DateTime(2017, 11, 1, 0, 0, 0, DateTimeKind.Local);
+            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 11, 1, 0, 1, 12, DateTimeKind.Local), period);
+            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(expected.Kind, actual.Kind);
+
+            expected = new DateTime(2017, 11, 1, 0, 0, 0, DateTimeKind.Local);
+            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 11, 1, 0, 1, 11, DateTimeKind.Local), period);
+            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(expected.Kind, actual.Kind);
+
+            expected = new DateTime(2017, 11, 1, 0, 0, 0, DateTimeKind.Local);
+            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 10, 31, 23, 58, 48, DateTimeKind.Local), period);
+            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(expected.Kind, actual.Kind);
+
+            expected = new DateTime(2017, 11, 1, 0, 0, 0, DateTimeKind.Local);
+            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 10, 31, 23, 58, 49, DateTimeKind.Local), period);
+            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(expected.Kind, actual.Kind);
+
+            expected = new DateTime(2017, 11, 1, 0, 1, 13, DateTimeKind.Local);
+            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 11, 1, 0, 1, 13, DateTimeKind.Local), period);
+            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(expected.Kind, actual.Kind);
+
+            expected = new DateTime(2017, 10, 31, 23, 58, 47, DateTimeKind.Local);
+            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 10, 31, 23, 58, 47, DateTimeKind.Local), period);
+            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(expected.Kind, actual.Kind);
+
+            // Periode von 3 Stunden (10800 Sekunden) Toleranzbereich 108 Sekunden (Winterzeit)
+
+            period = 10800;
+            expected = new DateTime(2017, 11, 1, 0, 0, 0, DateTimeKind.Local);
+            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 11, 1, 0, 1, 48, DateTimeKind.Local), period);
+            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(expected.Kind, actual.Kind);
+
+            expected = new DateTime(2017, 11, 1, 0, 0, 0, DateTimeKind.Local);
+            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 11, 1, 0, 1, 47, DateTimeKind.Local), period);
+            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(expected.Kind, actual.Kind);
+
+            expected = new DateTime(2017, 11, 1, 0, 0, 0, DateTimeKind.Local);
+            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 10, 31, 23, 58, 12, DateTimeKind.Local), period);
+            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(expected.Kind, actual.Kind);
+
+            expected = new DateTime(2017, 11, 1, 0, 0, 0, DateTimeKind.Local);
+            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 10, 31, 23, 58, 13, DateTimeKind.Local), period);
+            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(expected.Kind, actual.Kind);
+
+            expected = new DateTime(2017, 11, 1, 0, 1, 49, DateTimeKind.Local);
+            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 11, 1, 0, 1, 49, DateTimeKind.Local), period);
+            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(expected.Kind, actual.Kind);
+
+            expected = new DateTime(2017, 10, 31, 23, 58, 11, DateTimeKind.Local);
+            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 10, 31, 23, 58, 11, DateTimeKind.Local), period);
+            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(expected.Kind, actual.Kind);
+
+            // Periode von 6 Stunden (21600 Sekunden) Toleranzbereich 216 Sekunden (Winterzeit)
+
+            period = 21600;
+            expected = new DateTime(2017, 11, 1, 0, 0, 0, DateTimeKind.Local);
+            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 11, 1, 0, 3, 36, DateTimeKind.Local), period);
+            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(expected.Kind, actual.Kind);
+
+            expected = new DateTime(2017, 11, 1, 0, 0, 0, DateTimeKind.Local);
+            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 11, 1, 0, 3, 35, DateTimeKind.Local), period);
+            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(expected.Kind, actual.Kind);
+
+            expected = new DateTime(2017, 11, 1, 0, 0, 0, DateTimeKind.Local);
+            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 10, 31, 23, 56, 24, DateTimeKind.Local), period);
+            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(expected.Kind, actual.Kind);
+
+            expected = new DateTime(2017, 11, 1, 0, 0, 0, DateTimeKind.Local);
+            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 10, 31, 23, 56, 25, DateTimeKind.Local), period);
+            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(expected.Kind, actual.Kind);
+
+            expected = new DateTime(2017, 11, 1, 0, 3, 37, DateTimeKind.Local);
+            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 11, 1, 0, 3, 37, DateTimeKind.Local), period);
+            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(expected.Kind, actual.Kind);
+
+            expected = new DateTime(2017, 10, 31, 23, 56, 23, DateTimeKind.Local);
+            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 10, 31, 23, 56, 23, DateTimeKind.Local), period);
+            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(expected.Kind, actual.Kind);
+
+
+            // Umstellung auf Sommerzeit 2017 
+
+            period = 900;
+            expected = new DateTime(2017, 3, 26, 2, 30, 0, DateTimeKind.Local);
+            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 3, 26, 2, 30, 0, DateTimeKind.Local), period);
+            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(expected.Kind, actual.Kind);
+
+            // Umstellung auf Winterzeit 2017 
+
+            expected = new DateTime(2017, 10, 29, 3, 0, 0, DateTimeKind.Local);
+            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 10, 29, 3, 0, 0, DateTimeKind.Local), period);
+            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(expected.Kind, actual.Kind);
+
         }
 
         [TestMethod]

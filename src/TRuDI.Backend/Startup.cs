@@ -4,9 +4,9 @@
 
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
+    using Microsoft.AspNetCore.Mvc.Razor;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.AspNetCore.Mvc.Razor;
     using Microsoft.Extensions.FileProviders;
 
     using Serilog;
@@ -62,15 +62,7 @@
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider serviceProvider)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-                app.UseBrowserLink();
-            }
-            else
-            {
-                app.UseExceptionHandler("/Home/Error");
-            }
+            app.UseExceptionHandler("/Error/InternalError");
 
             if (Log.IsEnabled(LogEventLevel.Debug))
             {

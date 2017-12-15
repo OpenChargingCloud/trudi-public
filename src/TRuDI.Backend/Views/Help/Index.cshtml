@@ -1,4 +1,6 @@
 ﻿@using TRuDI.Backend.Application
+@using TRuDI.Backend.Utils
+@using TRuDI.Models.BasicData
 @inject ApplicationState StateService
 @{
     ViewData["Title"] = "Beschreibung und Glossar";
@@ -42,21 +44,21 @@
     </tr>
     
     <tr>
-        <td><i class="fa fa-check-circle-o"></i></td>
+        <td><i class="@StatusPTB.NoError.ToStatusIcon()"></i></td>
         <td>OK</td>
         <td>0</td>
         <td>Kein Fehler.</td>
     </tr>
     
     <tr>
-        <td><i class="fa fa-check-circle"></i></td>
+        <td><i class="@StatusPTB.Warning.ToStatusIcon()"></i></td>
         <td>Warnung</td>
         <td>1</td>
         <td>Warnung, keine (eichrechtliche) Aktion notwendig, Messwert gültig.</td>
     </tr>
     
     <tr>
-        <td><i class="fa fa-exclamation-circle"></i></td>
+        <td><i class="@StatusPTB.TemporaryError.ToStatusIcon()"></i></td>
         <td>temp. Fehler</td>
         <td>2</td>
         <td>
@@ -67,7 +69,7 @@
     </tr>
     
     <tr>
-        <td><i class="fa fa-exclamation-triangle"></i></td>
+        <td><i class="@StatusPTB.CriticalTemporaryError.ToStatusIcon()"></i></td>
         <td>kritischer temp. Fehler</td>
         <td>3</td>
         <td>
@@ -77,7 +79,7 @@
     </tr>
     
     <tr>
-        <td><i class="fa fa-times-circle"></i></td>
+        <td><i class="@StatusPTB.FatalError.ToStatusIcon()"></i></td>
         <td>fataler Fehler</td>
         <td>4</td>
         <td>Fataler Fehler (Zähler defekt), der aktuell gesendete und alle zukünftigen Messwerte sind ungültig.</td>

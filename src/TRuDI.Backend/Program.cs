@@ -1,19 +1,20 @@
 ﻿namespace TRuDI.Backend
 {
     using System;
-
-    using Microsoft.AspNetCore;
-    using Microsoft.AspNetCore.Hosting;
-    using Microsoft.Extensions.CommandLineUtils;
-    using Serilog;
-    using Serilog.Core;
-    using Serilog.Events;
+    using System.Globalization;
     using System.IO;
     using System.Net;
     using System.Net.Sockets;
     using System.Text;
     using System.Threading;
-    using System.Globalization;
+
+    using Microsoft.AspNetCore;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.Extensions.CommandLineUtils;
+
+    using Serilog;
+    using Serilog.Core;
+    using Serilog.Events;
 
     using TRuDI.Backend.Application;
 
@@ -73,6 +74,8 @@
 
             if (logFileOption.HasValue())
             {
+                Console.WriteLine("Using log file: {0}", logFileOption.Value());
+
                 Log.Logger = new LoggerConfiguration()
                     .MinimumLevel.ControlledBy(logLevelSwitch)
 #if DEBUG
@@ -121,14 +124,26 @@
 
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
-            var webhost = BuildWebHost(args);
+            var webhost = BuildWebHost();
 
             var doneEvent = new ManualResetEventSlim(false);
             using (var cts = new CancellationTokenSource())
             {
+                Log.Information("Using backend port: {0}", backendServerPort);
+
                 AttachCtrlcSigtermShutdown(cts, doneEvent);
 
-                webhost.Start();
+                try
+                {
+                    webhost.Start();
+                }
+                catch (Exception ex)
+                {
+                    Log.Error("Failed to start backend: {0}", ex.Message);
+                    Console.WriteLine($"##### TRUDI-BACKEND-ERROR: {ex.Message} #####");
+                    doneEvent.Set();
+                    return;
+                }
 
                 // If the webhost is listening on the port: send it to the Electron frontend
                 Console.WriteLine($"##### TRUDI-BACKEND-PORT: {backendServerPort} #####");
@@ -173,8 +188,8 @@
             return port;
         }
 
-        public static IWebHost BuildWebHost(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
+        public static IWebHost BuildWebHost() =>
+            WebHost.CreateDefaultBuilder()
                 .UseKestrel(
                     options =>
                         {
