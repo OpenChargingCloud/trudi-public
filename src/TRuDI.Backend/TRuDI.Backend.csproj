@@ -14,9 +14,12 @@
 
   <PropertyGroup>
     <RestoreSources>$(RestoreSources);../../private-packages;https://api.nuget.org/v3/index.json</RestoreSources>
-    <AssemblyVersion>1.0.25.0</AssemblyVersion>
-    <FileVersion>1.0.25.0</FileVersion>
-    <Version>1.0.25</Version>
+    <AssemblyVersion>1.0.33.0</AssemblyVersion>
+    <FileVersion>1.0.33.0</FileVersion>
+    <Version>1.0.33</Version>
+    <Product>Transparenz- und Display-Software (TRuDI)</Product>
+    <Authors />
+    <Company>Arbeitskreis Bundesdisplay</Company>
   </PropertyGroup>
 
   <ItemGroup>
@@ -26,7 +29,7 @@
     <None Remove="Data\**" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.3" />
     <PackageReference Include="Microsoft.Extensions.CommandLineUtils" Version="1.1.1" />
-    <PackageReference Include="Serilog.Sinks.File" Version="3.2.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="4.0.0" />
     <PackageReference Include="Serilog.Sinks.Trace" Version="2.1.0" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="4.4.0" />
     <PackageReference Include="WebSocketManager" Version="1.0.1" />
