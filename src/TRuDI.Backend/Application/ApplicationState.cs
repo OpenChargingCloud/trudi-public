@@ -377,7 +377,7 @@
                     catch (OperationCanceledException)
                     {
                         Log.Warning("Loading data canceled");
-                        await this.LoadNextPageAfterProgress(this.BreadCrumbTrail.Items.Last().Link);
+                        await this.LoadNextPageAfterProgress(this.BreadCrumbTrail.Items.Last(i => i.IsSelected).Link);
                     }
                     catch (HanAdapterException ex)
                     {
