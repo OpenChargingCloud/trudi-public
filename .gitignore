@@ -35,3 +35,4 @@ node_modules/
 checksums-linux.json
 checksums-win32-x64.json
 checksums-win32-x86.json
+package-lock.json

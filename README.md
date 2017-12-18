@@ -12,15 +12,18 @@ Ansprechpartner:
 ### Microsoft .Net Core
 
 - Visual Studio 2017 15.4: https://www.visualstudio.com/de/vs/
-- .Net Core SDK 2.0: https://www.microsoft.com/net/core/
+- .Net Core SDK 2.1.2: https://www.microsoft.com/net/core/
 - Alternativ zu Visual Studio kann auch Visual Studio Code verwendet werden: https://code.visualstudio.com/
 
 ### Electron
 
-- Node.js 6.11: https://nodejs.org/
-- npm-Pakete:
-  npm install electron-builder -g
+- Node.js 8.9: https://nodejs.org/
 
+### Build
+
+Sind das .Net Core SDK sowie Node.js installiert:
+- build.cmd unter Windows oder 
+- build.sh unter Linux
 
 ## Installations-Pakete
 

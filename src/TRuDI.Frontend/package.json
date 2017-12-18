@@ -1,14 +1,15 @@
 {
   "name": "TRuDI",
-  "version": "1.0.33",
+  "version": "1.0.34",
   "description": "TRuDI - Transparenz- und Display-Software für Smart Meter Gateways",
   "author": {
     "name": "IVU Softwareentwicklung GmbH",
     "email": "info@ivu-software.de"
   },
   "homepage": "http://www.ivu-software.de",
-  "repository": "",
+  "repository": "https://bitbucket.org/dzgtrudi/trudi-public",
   "main": "main.js",
+  "license": "(MIT AND Apache-2.0)",
   "dependencies": {
     "bootstrap": "^3.3.7",
     "jquery": "^3.2.1",
@@ -16,7 +17,7 @@
   },
   "devDependencies": {
     "electron": "1.7.9",
-    "electron-builder": "^19.48.2"
+    "electron-builder": "^19.49.0"
   },
   "scripts": {
     "start": "electron .",
@@ -55,7 +56,7 @@
     "nsis": {
       "oneClick": false,
       "allowElevation": false,
-      "artifactName": "${productName}-Setup-${version}-${arch}.${ext}"
+      "artifactName": "NSIS_OUTPUT_${productName}-Setup-${version}-${arch}.${ext}"
     }
   }
 }
