@@ -1,7 +1,16 @@
 ﻿namespace TRuDI.Backend.Application
 {
+    /// <summary>
+    /// Item within the <see cref="BreadCrumbTrail"/>.
+    /// </summary>
     public class BreadCrumbTrailItem
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BreadCrumbTrailItem"/> class.
+        /// </summary>
+        /// <param name="id">The identifier.</param>
+        /// <param name="name">The name shown in the UI.</param>
+        /// <param name="link">The link.</param>
         public BreadCrumbTrailItem(int id, string name, string link)
         {
             this.Id = id;

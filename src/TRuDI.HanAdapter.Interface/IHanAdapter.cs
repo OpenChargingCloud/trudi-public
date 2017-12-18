@@ -22,7 +22,7 @@ namespace TRuDI.HanAdapter.Interface
         /// <param name="manufacturerSettings">Optional manufacturer specific settings (coming from UI and going to driver).</param>
         /// <param name="timeout">Connect timeout.</param>
         /// <param name="ct">Token for user initiated cancellation.</param>
-        /// <param name="progressCallback">This callback must be called regularly. At the latest before the specified timeout occurs and the connection is still in progress to get established.</param>
+        /// <param name="progressCallback">This callback must be called regularly.</param>
         /// <returns>Cert is filled with the gateway's TLS certificate when the connection is established. Otherwise the error object exists.</returns>
         Task<(ConnectResult result, AdapterError error)> Connect(
             string deviceId,
@@ -44,7 +44,7 @@ namespace TRuDI.HanAdapter.Interface
         /// <param name="manufacturerSettings">Optional manufacturer settings.</param>
         /// <param name="timeout">Connect timeout.</param>
         /// <param name="ct">Token for user initiated cancellation.</param>
-        /// <param name="progressCallback">This callback must be called regularly. At the latest before the specified timeout occurs and the connection is still in progress to get established.</param>
+        /// <param name="progressCallback">This callback must be called regularly.</param>
         /// <returns>Cert is filled with the gateway's TLS certificate when the connection is established. Otherwise the error object exists.</returns>
         Task<(ConnectResult result, AdapterError error)> Connect(
             string deviceId,
@@ -57,11 +57,11 @@ namespace TRuDI.HanAdapter.Interface
             Action<ProgressInfo> progressCallback);
 
         /// <summary>
-        /// Read contract information from the SMGW. This method is called after the successfull connect to the device.
+        /// Read contract information from the SMGW. This method is called after the successful connect to the device.
         /// </summary>
         /// <param name="ct">Token for user initiated cancellation.</param>
         /// <param name="progressCallback">This callback must be called regularly.</param>
-        /// <returns>List with contract informations. If there's no contract for the user, a empty list should be returned.</returns>
+        /// <returns>List with contract information. If there's no contract for the user, a empty list should be returned.</returns>
         Task<(IReadOnlyList<ContractInfo> contracts, AdapterError error)> LoadAvailableContracts(
             CancellationToken ct,
             Action<ProgressInfo> progressCallback);
@@ -72,7 +72,7 @@ namespace TRuDI.HanAdapter.Interface
         /// <param name="ctx">A set of parameters which specifies what exactly is to be read out.</param>
         /// <param name="ct">Token for user initiated cancellation.</param>
         /// <param name="progressCallback">This callback must be called regularly.</param>
-        /// <returns></returns>
+        /// <returns>On success, a XML document according to AR 2418-6.</returns>
         Task<(XDocument trudiXml, AdapterError error)> LoadData(
             AdapterContext ctx,
             CancellationToken ct,
@@ -85,7 +85,7 @@ namespace TRuDI.HanAdapter.Interface
         /// <param name="ct">Token for user initiated cancellation.</param>
         /// <param name="progressCallback">This callback must be called regularly.</param>
         /// <returns>
-        /// On success, a XML document containing a meter reading with the current tariff registers 
+        /// On success, a XML document according to AR 2418-6 containing a meter reading with the current tariff registers 
         /// (just like <see cref="LoadData"/>, but without original value list and log data).
         /// </returns>
         Task<(XDocument trudiXml, AdapterError error)> GetCurrentRegisterValues(

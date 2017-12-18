@@ -3,27 +3,28 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Reflection.Metadata.Ecma335;
 
     using TRuDI.Models.BasicData;
 
     /// <summary>
-    /// The class provides access to to orignial value lists.
+    /// The class provides access to to original value lists.
     /// </summary>
     public class OriginalValueList
     {
         /// <summary>
-        /// The meter reading which belongs to the orignial value list.
+        /// The meter reading which belongs to the original value list.
         /// </summary>
         public MeterReading MeterReading { get; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="OriginalValueList"/> class.
+        /// Initializes a new instance of the <see cref="OriginalValueList" /> class.
         /// </summary>
         /// <param name="meterReading">The meter reading.</param>
-        public OriginalValueList(MeterReading meterReading)
+        /// <param name="serviceCategory">The service category.</param>
+        public OriginalValueList(MeterReading meterReading, Kind serviceCategory)
         {
             this.MeterReading = meterReading;
+            this.ServiceCategory = serviceCategory;
 
             this.Obis = new ObisId(this.MeterReading.ReadingType.ObisCode);
             this.DisplayUnit = this.MeterReading.ReadingType.Uom.GetDisplayUnit(this.MeterReading.ReadingType.PowerOfTenMultiplier ?? PowerOfTenMultiplier.None);
@@ -49,6 +50,8 @@
 
             this.HistoricValues = this.CalculateHistoricConsumption();
         }
+
+        public Kind ServiceCategory { get; set; }
 
         public List<HistoricConsumption> HistoricValues { get; }
 
@@ -82,32 +85,68 @@
 
         public IEnumerable<IntervalReading> GetReadings(DateTime start, DateTime end)
         {
-            var currentTimestamp = this.Start;
+            start = start.ToUniversalTime();
+            end = end.ToUniversalTime();
 
-            foreach (var block in this.MeterReading.IntervalBlocks)
+            if (this.MeasurementPeriod != TimeSpan.Zero)
             {
-                foreach (var reading in block.IntervalReadings)
+                var currentTimestamp = this.Start.ToUniversalTime();
+
+                foreach (var block in this.MeterReading.IntervalBlocks)
                 {
-                    while (reading.TimePeriod.Start > currentTimestamp)
+                    foreach (var reading in block.IntervalReadings)
                     {
-                        if (currentTimestamp >= start && currentTimestamp <= end)
+                        while (reading.TimePeriod.Start.ToUniversalTime() > currentTimestamp)
                         {
-                            // found a gap: create the missing element with only the timestamp.
-                            yield return new IntervalReading { TimePeriod = new Interval { Start = currentTimestamp } };
+                            if (currentTimestamp >= start && currentTimestamp <= end)
+                            {
+                                // found a gap: create the missing element with only the timestamp.
+                                yield return new IntervalReading
+                                                 {
+                                                     TimePeriod =
+                                                         new Interval { Start = currentTimestamp.ToLocalTime() }
+                                                 };
+                            }
+
+                            currentTimestamp += this.MeasurementPeriod;
+                            if (this.MeasurementPeriod == TimeSpan.Zero)
+                            {
+                                yield break;
+                            }
                         }
 
-                        currentTimestamp += this.MeasurementPeriod;
-                    }
+                        if (reading.TimePeriod.Start.ToUniversalTime() > end)
+                        {
+                            yield break;
+                        }
 
-                    if (reading.TimePeriod.Start > end)
-                    {
-                        yield break;
+                        if (reading.TimePeriod.Start.ToUniversalTime() >= start && reading.TimePeriod.Start.ToUniversalTime() <= end)
+                        {
+                            yield return reading;
+                            currentTimestamp += this.MeasurementPeriod;
+                        }
                     }
-
-                    if (reading.TimePeriod.Start >= start && reading.TimePeriod.Start <= end)
+                }
+            }
+            else
+            {
+                foreach (var block in this.MeterReading.IntervalBlocks)
+                {
+                    foreach (var reading in block.IntervalReadings)
                     {
-                        yield return reading;
-                        currentTimestamp += this.MeasurementPeriod;
+                        if (reading.TimePeriod.Start.ToUniversalTime() < start)
+                        {
+                            continue;
+                        }
+
+                        if (reading.TimePeriod.Start.ToUniversalTime() <= end)
+                        {
+                            yield return reading;
+                        }
+                        else
+                        {
+                            yield break;
+                        }
                     }
                 }
             }
@@ -190,9 +229,16 @@
         {
             var retList = new List<HistoricConsumption>();
 
+            var dayStartHour = 0;
+            if (this.ServiceCategory == Kind.Gas)
+            {
+                dayStartHour = 6;
+            }
+
+
             // Dayly Historic Reads
             int daysGoingBack = 7;
-            var lastDayEnd = this.End.Date;
+            var lastDayEnd = new DateTime(this.End.Year, this.End.Month, this.End.Day, dayStartHour, 0, 0, DateTimeKind.Local);
 
             for (int i = 0; i < daysGoingBack; i++)
             {
@@ -216,7 +262,7 @@
 
             // Weekly
             int weeksGoingBack = 4;
-            var lastSundayEnd = this.End.Date;
+            var lastSundayEnd = new DateTime(this.End.Year, this.End.Month, this.End.Day, dayStartHour, 0, 0, DateTimeKind.Local);
 
             while (lastSundayEnd.DayOfWeek != DayOfWeek.Monday)
             {
@@ -245,7 +291,7 @@
 
             // Monthly
             int monthsGoingBack = 36;
-            var lastMonthEnd = new DateTime(this.End.Year, this.End.Month, 1, 0, 0, 0, DateTimeKind.Local);
+            var lastMonthEnd = new DateTime(this.End.Year, this.End.Month, 1, dayStartHour, 0, 0, DateTimeKind.Local);
 
             for (int i = 0; i < monthsGoingBack; i++)
             {
@@ -269,7 +315,7 @@
 
             // Yearly
             int yearsGoingBack = 3;
-            var lastYearEnd = new DateTime(this.End.Year, 1, 1, 0, 0, 0, DateTimeKind.Local);
+            var lastYearEnd = new DateTime(this.End.Year, 1, 1, dayStartHour, 0, 0, DateTimeKind.Local);
 
             for (int i = 0; i < yearsGoingBack; i++)
             {

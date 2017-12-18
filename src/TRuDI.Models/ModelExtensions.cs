@@ -158,18 +158,34 @@
             {
                 var isUtc = captureTime.Kind == DateTimeKind.Utc;
                 var captureTimeUtc = captureTime.ToUniversalTime();
+                if (!isUtc)
+                {
+                    captureTimeUtc += TimeZoneInfo.Local.GetUtcOffset(captureTime);
+                }
 
                 var diffSpan = (int)(captureTimeUtc - captureTimeUtc.Date).TotalSeconds;
                 var diff = interval - (diffSpan % interval);
                 if (diff == 0 || diff == interval)
                 {
-                    return isUtc ? captureTimeUtc : captureTimeUtc.ToLocalTime();
+                    return captureTime;
                 }
 
-                var a = captureTimeUtc.Date.AddSeconds((diffSpan / interval) * interval);
-                var window = interval == 900 ? 450 : interval / 100;
-                captureTimeUtc = (captureTimeUtc - a).TotalSeconds <= window ? a : a.AddSeconds(interval);
-                return isUtc ? captureTimeUtc : captureTimeUtc.ToLocalTime();
+                var previousPeriod = captureTimeUtc.Date.AddSeconds((diffSpan / interval) * interval);
+                var window = interval / 100;
+                if (diff <= window)
+                {
+                    captureTimeUtc = captureTimeUtc.AddSeconds(diff);
+                }
+                else if (interval - diff <= window)
+                {
+                    captureTimeUtc = captureTimeUtc.AddSeconds(diff - interval);
+                }
+                else
+                {
+                    return captureTime;
+                }
+
+                return isUtc ? captureTimeUtc : (captureTimeUtc - TimeZoneInfo.Local.GetUtcOffset(captureTime)).ToLocalTime();
             }
 
             if (interval == 86400)

@@ -1,20 +1,24 @@
 ﻿namespace TRuDI.Backend.Controllers
 {
     using System;
-    using System.Linq;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Threading.Tasks;
     using System.IO;
+    using System.Linq;
+    using System.Threading.Tasks;
     using System.Xml.Linq;
 
-    using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.Mvc;
 
     using TRuDI.Backend.Application;
     using TRuDI.Backend.Exceptions;
     using TRuDI.Backend.Models;
 
+    /// <summary>
+    /// The controller of the connect page.
+    /// </summary>
+    /// <seealso cref="Microsoft.AspNetCore.Mvc.Controller" />
     public class ConnectController : Controller
     {
         private readonly ApplicationState applicationState;
@@ -105,7 +109,7 @@
         {
             this.applicationState.BreadCrumbTrail.Add("Verbinden", "/Connect", true);
 
-            var file = Request?.Form?.Files?.FirstOrDefault();
+            var file = this.Request?.Form?.Files?.FirstOrDefault();
             if (file == null)
             {
                 return this.Error();

@@ -11,6 +11,7 @@
 
     /// <summary>
     /// Manages sending of messages using a web socket connection to the frontend.
+    /// This is used to update the progress status page.
     /// </summary>
     /// <seealso cref="WebSocketManager.WebSocketHandler" />
     public class NotificationsMessageHandler : WebSocketHandler
@@ -58,7 +59,7 @@
         {
             Trace.WriteLine($"LoadNextPage: \"{url}\"");
 
-            if(this.lastSocket == null)
+            if (this.lastSocket == null)
             {
                 return;
             }

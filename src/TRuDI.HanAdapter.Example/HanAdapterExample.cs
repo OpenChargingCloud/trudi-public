@@ -57,12 +57,12 @@
             var realEndpoint = new IPEndPoint(IPAddress.Parse(config.IPAddress), config.IPPort);
             if (!endpoint.Address.Equals(realEndpoint.Address) || endpoint.Port != realEndpoint.Port)
             {
-                return (null, new AdapterError(ErrorType.TcpConnectFailed, $"{endpoint} could not be found."));
+                return (null, new AdapterError(ErrorType.TcpConnectFailed, $"Verbindungsaufbau zu Adresse {endpoint} fehlgeschalgen."));
             }
             
             if(deviceId != config.DeviceId)
             {
-                return(null, new AdapterError(ErrorType.TcpConnectFailed, $"{deviceId} could not be found."));
+                return(null, new AdapterError(ErrorType.TcpConnectFailed, $"ID des Smart Meter Gateways \"{config.DeviceId}\" stimmt nicht mit der angegebenen ID \"{deviceId}\" überein."));
             }
             
             if (user == config.User && password == config.Password)
@@ -71,7 +71,7 @@
             }
             else
             {
-                return (null, new AdapterError(ErrorType.AuthenticationFailed, "user or password are invalid."));
+                return (null, new AdapterError(ErrorType.AuthenticationFailed, "Benutzername oder Passwort wurden vom Smart Meter Gateway nicht aktzeptiert."));
             }
         }
 
@@ -115,11 +115,11 @@
         {
             progressCallback(new ProgressInfo("Anmeldung am Gateway..."));
 
-            await Task.Delay(config.TimeToConnect);
+            await Task.Delay(config.TimeToConnect, ct);
 
             if(config.TimeToConnect > timeout)
             {
-                return (null, new AdapterError(ErrorType.Other, "Request timeout"));
+                return (null, new AdapterError(ErrorType.Other, "Das Smart Meter Gateway hat nicht innerhalb der erwarteten Zeit reagiert."));
             }
 
             progressCallback(new ProgressInfo(100, "Anmeldung am Gateway erfolgreich"));
@@ -143,12 +143,12 @@
                     contracts.Add(config.Contracts[i]);
                 }
 
-                await Task.Delay(1000);
+                await Task.Delay(1000, ct);
             }
 
             if (!dataForContractExists)
             {
-                return (null, new AdapterError(ErrorType.Other, "No Data found for the available contracts."));
+                return (null, new AdapterError(ErrorType.Other, "Für den gewählten Vertrag wurden keine Daten gefunden."));
             }
 
             progressCallback(new ProgressInfo(100, $"Alle Verträge geladen."));
@@ -159,7 +159,7 @@
         {
             progressCallback(new ProgressInfo(0, $"Daten werden abgerufen."));
 
-            await Task.Delay(1000);
+            await Task.Delay(1000, ct);
 
             if(ctx.WithLogdata != config.WithLogData)
             {
@@ -192,7 +192,7 @@
         {
             progressCallback(new ProgressInfo(0, $"Die Abrechnungsdaten werden abgerufen."));
 
-            await Task.Delay(1000);
+            await Task.Delay(1000, ct);
 
             progressCallback(new ProgressInfo(100, $"Abrechnungsdaten vollständig geladen."));
 
@@ -214,7 +214,7 @@
             CancellationToken ct,
             Action<ProgressInfo> progressCallback)
         {
-            await Task.Delay(500);
+            await Task.Delay(500, ct);
 
             return (null, null);
         }
@@ -225,7 +225,7 @@
         /// <returns></returns>
         public async Task Disconnect()
         {
-            await Task.Delay(1000);
+            await Task.Delay(500);
 
         }
 

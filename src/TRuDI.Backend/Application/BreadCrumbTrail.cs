@@ -8,10 +8,22 @@
     /// </summary>
     public class BreadCrumbTrail
     {
+        /// <summary>
+        /// The current items.
+        /// </summary>
         private readonly List<BreadCrumbTrailItem> items = new List<BreadCrumbTrailItem>();
 
+        /// <summary>
+        /// Gets the current items.
+        /// </summary>
         public IReadOnlyList<BreadCrumbTrailItem> Items => this.items;
 
+        /// <summary>
+        /// Adds a new bread crumb trail item. If the item already exists, it's marked as the active one.
+        /// </summary>
+        /// <param name="name">The name displayed to the user.</param>
+        /// <param name="link">The link.</param>
+        /// <param name="removeFollowingItems">if set to <c>true</c> items after this items are removed (otherwise just they are just marked as not active).</param>
         public void Add(string name, string link, bool removeFollowingItems)
         {
             var existingItem = this.items.FirstOrDefault(i => i.Link == link);
@@ -31,11 +43,20 @@
             }
         }
 
+        /// <summary>
+        /// Removes the unselected/inactive items.
+        /// </summary>
         public void RemoveUnselectedItems()
         {
             this.items.RemoveAll(i => !(i.IsActive || i.IsSelected));
         }
 
+        /// <summary>
+        /// Moves back to the item with the specified id.
+        /// </summary>
+        /// <param name="id">The identifier of the item.</param>
+        /// <param name="removeFollowingItems">if set to <c>true</c> items after this items are removed (otherwise just they are just marked as not active).</param>
+        /// <returns>The link text of the item.</returns>
         public string BackTo(int id, bool removeFollowingItems)
         {
             if (removeFollowingItems && this.items.Count > id + 1)
@@ -60,6 +81,9 @@
             return this.items[id].Link;
         }
 
+        /// <summary>
+        /// Removes all but the first item.
+        /// </summary>
         public void Reset()
         {
             this.BackTo(0, true);

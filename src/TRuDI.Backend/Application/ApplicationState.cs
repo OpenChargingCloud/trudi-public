@@ -21,7 +21,7 @@
 
     /// <summary>
     /// This class is used to manage the current state of the application.
-    /// It's instanciated as singelton instance.
+    /// It's instantiated as singleton instance.
     /// </summary>
     public class ApplicationState
     {
@@ -44,6 +44,18 @@
         /// The cancellation token that is used to cancel HAN adapter operations.
         /// </summary>
         private CancellationTokenSource cts;
+        
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ApplicationState" /> class.
+        /// </summary>
+        /// <param name="notificationsMessageHandler">The notifications message handler.</param>
+        public ApplicationState(NotificationsMessageHandler notificationsMessageHandler)
+        {
+            this.notificationsMessageHandler = notificationsMessageHandler;
+
+            this.BreadCrumbTrail.Add("Start", "/OperatingModeSelection", false);
+            this.Reset();
+        }
 
         /// <summary>
         /// Gets or sets the current active operation mode (display or transparency function).
@@ -96,7 +108,7 @@
         public ConnectResult LastConnectResult { get; private set; }
 
         /// <summary>
-        /// Gets or sets the current list of contracts read from the SMGW.
+        /// Gets the current list of contracts read from the SMGW.
         /// </summary>
         public IReadOnlyList<ContractContainer> Contracts { get; private set; }
 
@@ -122,6 +134,8 @@
         {
             get
             {
+                // Because calculation takes some time, calculate it 
+                // on demand to speed up application startup.
                 if (this.backendChecksums == null)
                 {
                     this.backendChecksums = new ApplicationChecksums();
@@ -129,18 +143,6 @@
 
                 return this.backendChecksums;
             }
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ApplicationState"/> class.
-        /// </summary>
-        /// <param name="notificationsMessageHandler">The notifications message handler.</param>
-        public ApplicationState(NotificationsMessageHandler notificationsMessageHandler)
-        {
-            this.notificationsMessageHandler = notificationsMessageHandler;
-
-            this.BreadCrumbTrail.Add("Start", "/OperatingModeSelection", false);
-            this.Reset();
         }
 
         /// <summary>
@@ -153,7 +155,7 @@
         }
 
         /// <summary>
-        /// Gets the specfied file from the embedded resources of the current active HAN adapter (e.g. for the SMGW image).
+        /// Gets the specified file from the embedded resources of the current active HAN adapter (e.g. for the SMGW image).
         /// </summary>
         /// <param name="path">The path to the resource file.</param>
         /// <returns>The file content and it's content type.</returns>
@@ -283,69 +285,6 @@
                         await this.LoadNextPageAfterProgress("/Error");
                     }
                 });
-        }
-
-        /// <summary>
-        /// Handles specified HAN adapter exception and adds a message to <see cref="LastErrorMessages"/>.
-        /// </summary>
-        /// <param name="ex">The ex.</param>
-        /// <exception cref="ArgumentOutOfRangeException">Unsupported <see cref="ErrorType"/>.</exception>
-        private void HandleHanAdapterException(HanAdapterException ex)
-        {
-            Log.Error("HAN adapter error: {0}, message: {1}", ex.AdapterError.Type, ex.AdapterError.Message);
-
-            switch (ex.AdapterError.Type)
-            {
-                case ErrorType.TcpConnectFailed:
-                    this.LastErrorMessages.Add("Netzwerkverbindung zum Smart Meter Gateway konnte nicht hergestellt werden.");
-                    this.LastErrorMessages.Add("Bitte überprüfen Sie die IP-Addresse sowie den Port.");
-                    return;
-
-                case ErrorType.TlsConnectFailed:
-                    this.LastErrorMessages.Add("TLS-Verbindung zum Smart Meter Gateway konnte nicht hergestellt werden.");
-                    break;
-
-                case ErrorType.AuthenticationFailed:
-                    this.LastErrorMessages.Add("Anmeldung am Smart Meter Gateway fehlgeschlagen.");
-                    break;
-
-                case ErrorType.NoTafProfileForUser:
-                    this.LastErrorMessages.Add($"Für den Benutzer {(this.ConnectData.AuthMode == AuthMode.UserPassword ? this.ConnectData.Username : this.ClientCert.Subject)} sind keine Vertragsdaten im Smart Meter Gateway vorhanden.");
-                    return;
-                
-                case ErrorType.DeviceError:
-                    this.LastErrorMessages.Add("Fehler während der Kommunikation mit dem Smart Meter Gateway. Das Smart Meter Gateway lieferte folgenden Fehler zurück:");
-                    break;
-
-                case ErrorType.SensorNotConnected:
-                    this.LastErrorMessages.Add("Das Smart Meter Gateway konnte keine Kommunikationsverbindung zum Zähler aufbauen.");
-                    return;
-
-                case ErrorType.NoDataInSelectedTimeRange:
-                    if (this.CurrentAdapterContext != null)
-                    {
-                        this.LastErrorMessages.Add(
-                            $"Im gewählten Zeitbereich ({this.CurrentAdapterContext.Start:G} bis {this.CurrentAdapterContext.End:G}) konnten keine Messdaten vom Smart Meter Gateway abgerufen werden.");
-                    }
-                    else
-                    {
-                        this.LastErrorMessages.Add(
-                            "Im gewählten Zeitbereich konnten keine Messdaten vom Smart Meter Gateway abgerufen werden.");
-                    }
-                    break;
-
-                case ErrorType.Other:
-                    this.LastErrorMessages.Add("Nicht spezifizierter Fehler.");
-                    break;
-
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-
-            if (!string.IsNullOrWhiteSpace(ex.AdapterError.Message))
-            {
-                this.LastErrorMessages.Add(ex.AdapterError.Message);
-            }
         }
 
         /// <summary>
@@ -484,6 +423,45 @@
             }
         }
 
+        public void CancelOperation()
+        {
+            Log.Information("Operation canceld by the user.");
+            this.cts?.Cancel();
+        }
+
+        public async Task LoadNextPageAfterProgress(string page)
+        {
+            Log.Debug("Next page after progress: {0}", page);
+            this.CurrentProgressState.NextPageAfterProgress = page;
+            await this.notificationsMessageHandler.LoadNextPage(page);
+        }
+
+        /// <summary>
+        /// Resets the application state in case of an internal error.
+        /// </summary>
+        public void Reset()
+        {
+            this.ConnectData = new ConnectData();
+            this.BreadCrumbTrail.Reset();
+
+            this.SideBarMenu.Clear();
+            this.SideBarMenu.Add("Über TRuDI", "/About", true);
+            this.SideBarMenu.Add("Beschreibung", "/Help", true);
+
+            this.activeHanAdapter = null;
+            this.CurrentDataResult = null;
+            this.CurrentSupplierFile = null;
+            this.CurrentAdapterContext = null;
+            this.CurrentProgressState.Reset();
+            this.Contracts = null;
+            this.CurrentSupplierFile = null;
+            this.ClientCert = null;
+            this.LastConnectResult = null;
+            this.LastErrorMessages.Clear();
+            this.ManufacturerParameters = null;
+            this.OperationMode = OperationMode.NotSelected;
+        }
+
         private void LoadDataFromXml(XDocument raw, AdapterContext ctx)
         {
             Log.Information("Loading XML file");
@@ -579,11 +557,11 @@
             if (this.CurrentDataResult.MeterReadings.Count == 0)
             {
                 var ts = new TariffStage
-                {
-                    ObisCode = "010000000FF",
-                    TariffNumber = 0,
-                    Description = string.Empty
-                };
+                             {
+                                 ObisCode = "010000000FF",
+                                 TariffNumber = 0,
+                                 Description = string.Empty
+                             };
                 lowestTariffId = 0;
                 this.CurrentDataResult.Model.AnalysisProfile.TariffStages.Add(ts);
             }
@@ -592,11 +570,11 @@
                 foreach (var mr in this.CurrentDataResult.MeterReadings)
                 {
                     var ts = new TariffStage
-                    {
-                        ObisCode = mr.ReadingType.ObisCode,
-                        TariffNumber = new ObisId(mr.ReadingType.ObisCode).E,
-                        Description = string.Empty
-                    };
+                                 {
+                                     ObisCode = mr.ReadingType.ObisCode,
+                                     TariffNumber = new ObisId(mr.ReadingType.ObisCode).E,
+                                     Description = string.Empty
+                                 };
 
                     lowestTariffId = Math.Min(lowestTariffId, ts.TariffNumber);
                     this.CurrentDataResult.Model.AnalysisProfile.TariffStages.Add(ts);
@@ -639,9 +617,9 @@
             foreach (var ts in this.CurrentDataResult.Model.AnalysisProfile.TariffStages)
             {
                 analysisProfile.Add(new XElement(ns + "TariffStage",
-                        new XElement(ns + "tariffNumber", ts.TariffNumber),
-                        new XElement(ns + "description", ts.Description),
-                        new XElement(ns + "obisCode", ts.ObisCode))
+                    new XElement(ns + "tariffNumber", ts.TariffNumber),
+                    new XElement(ns + "description", ts.Description),
+                    new XElement(ns + "obisCode", ts.ObisCode))
                 );
             }
 
@@ -708,43 +686,67 @@
             this.notificationsMessageHandler.ProgressUpdate(progressInfo.Message, progressInfo.Progress);
         }
 
-        public void CancelOperation()
-        {
-            Log.Information("Operation canceld by the user.");
-            this.cts?.Cancel();
-        }
-
-        public async Task LoadNextPageAfterProgress(string page)
-        {
-            Log.Debug("Next page after progress: {0}", page);
-            this.CurrentProgressState.NextPageAfterProgress = page;
-            await this.notificationsMessageHandler.LoadNextPage(page);
-        }
-
         /// <summary>
-        /// Resets the application state in case of an internal error.
+        /// Handles specified HAN adapter exception and adds a message to <see cref="LastErrorMessages"/>.
         /// </summary>
-        public void Reset()
+        /// <param name="ex">The ex.</param>
+        /// <exception cref="ArgumentOutOfRangeException">Unsupported <see cref="ErrorType"/>.</exception>
+        private void HandleHanAdapterException(HanAdapterException ex)
         {
-            this.ConnectData = new ConnectData();
-            this.BreadCrumbTrail.Reset();
+            Log.Error("HAN adapter error: {0}, message: {1}", ex.AdapterError.Type, ex.AdapterError.Message);
 
-            this.SideBarMenu.Clear();
-            this.SideBarMenu.Add("Über TRuDI", "/About", true);
-            this.SideBarMenu.Add("Beschreibung", "/Help", true);
+            switch (ex.AdapterError.Type)
+            {
+                case ErrorType.TcpConnectFailed:
+                    this.LastErrorMessages.Add("Netzwerkverbindung zum Smart Meter Gateway konnte nicht hergestellt werden.");
+                    this.LastErrorMessages.Add("Bitte überprüfen Sie die IP-Addresse sowie den Port.");
+                    return;
 
-            this.activeHanAdapter = null;
-            this.CurrentDataResult = null;
-            this.CurrentSupplierFile = null;
-            this.CurrentAdapterContext = null;
-            this.CurrentProgressState.Reset();
-            this.Contracts = null;
-            this.CurrentSupplierFile = null;
-            this.ClientCert = null;
-            this.LastConnectResult = null;
-            this.LastErrorMessages.Clear();
-            this.ManufacturerParameters = null;
-            this.OperationMode = OperationMode.NotSelected;
+                case ErrorType.TlsConnectFailed:
+                    this.LastErrorMessages.Add("TLS-Verbindung zum Smart Meter Gateway konnte nicht hergestellt werden.");
+                    break;
+
+                case ErrorType.AuthenticationFailed:
+                    this.LastErrorMessages.Add("Anmeldung am Smart Meter Gateway fehlgeschlagen.");
+                    break;
+
+                case ErrorType.NoTafProfileForUser:
+                    this.LastErrorMessages.Add($"Für den Benutzer {(this.ConnectData.AuthMode == AuthMode.UserPassword ? this.ConnectData.Username : this.ClientCert.Subject)} sind keine Vertragsdaten im Smart Meter Gateway vorhanden.");
+                    return;
+                
+                case ErrorType.DeviceError:
+                    this.LastErrorMessages.Add("Fehler während der Kommunikation mit dem Smart Meter Gateway. Das Smart Meter Gateway lieferte folgenden Fehler zurück:");
+                    break;
+
+                case ErrorType.SensorNotConnected:
+                    this.LastErrorMessages.Add("Das Smart Meter Gateway konnte keine Kommunikationsverbindung zum Zähler aufbauen.");
+                    return;
+
+                case ErrorType.NoDataInSelectedTimeRange:
+                    if (this.CurrentAdapterContext != null)
+                    {
+                        this.LastErrorMessages.Add(
+                            $"Im gewählten Zeitbereich ({this.CurrentAdapterContext.Start:G} bis {this.CurrentAdapterContext.End:G}) konnten keine Messdaten vom Smart Meter Gateway abgerufen werden.");
+                    }
+                    else
+                    {
+                        this.LastErrorMessages.Add(
+                            "Im gewählten Zeitbereich konnten keine Messdaten vom Smart Meter Gateway abgerufen werden.");
+                    }
+                    break;
+
+                case ErrorType.Other:
+                    this.LastErrorMessages.Add("Nicht spezifizierter Fehler.");
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            if (!string.IsNullOrWhiteSpace(ex.AdapterError.Message))
+            {
+                this.LastErrorMessages.Add(ex.AdapterError.Message);
+            }
         }
     }
 }

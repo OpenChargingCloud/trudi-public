@@ -33,6 +33,11 @@ namespace TRuDI.HanAdapter.Interface
         DeviceError,
 
         /// <summary>
+        /// The sensor isn't connected to the SMGW.
+        /// </summary>
+        SensorNotConnected,
+
+        /// <summary>
         /// Other error, not specified.
         /// </summary>
         Other = 255

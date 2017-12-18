@@ -84,7 +84,7 @@
                         }
                         else
                         {
-                            exceptions.Add(new InvalidOperationException("certContent is an invalid hex string."));
+                            exceptions.Add(new InvalidOperationException("Das Element \"certContent\" enthält keinen gültigen Wert."));
                         }
 
                         break;
@@ -172,6 +172,11 @@
                         usagePoint.MeterReadings.LastOrDefault()
                                   .ReadingType.QualifiedLogicalName = e.Value;
                         break;
+
+                    case "measurementPeriod":
+                        usagePoint.MeterReadings.LastOrDefault().ReadingType.MeasurementPeriod = uint.Parse(e.Value);
+                        break;
+
                     case "IntervalBlock":
                         usagePoint.MeterReadings.LastOrDefault()
                                   .IntervalBlocks.Add(new IntervalBlock());
@@ -248,6 +253,13 @@
                                   .IntervalBlocks.LastOrDefault()
                                   .IntervalReadings.LastOrDefault().TimePeriod = new Interval();
                         break;
+
+                    case "targetTime":
+                        usagePoint.MeterReadings.LastOrDefault()
+                            .IntervalBlocks.LastOrDefault()
+                            .IntervalReadings.LastOrDefault().TargetTime = Convert.ToDateTime(e.Value);
+                        break;
+
                     case "statusFNN":
                         if (e.Value.ValidateHexString())
                         {
@@ -257,7 +269,7 @@
                         }
                         else
                         {
-                            exceptions.Add(new InvalidOperationException("statusFNN is an invalid hex string."));
+                            exceptions.Add(new InvalidOperationException("Das Element \"statusFNN\" enthält einen ungültigen Wert."));
                         }
                         break;
                     case "statusPTB":
@@ -318,7 +330,7 @@
                         {
                             if (dayIdAlreadyExists)
                             {
-                                exceptions.Add(new InvalidOperationException("Only one dayId element in DayProfile is allowed."));
+                                exceptions.Add(new InvalidOperationException("Es ist nur ein Element \"dayId\" innerhalb des Elements \"DayProfile\" erlaubt."));
                             }
                             else
                             {
@@ -392,7 +404,12 @@
                         break;
 
                     default:
-                        exceptions.Add(new InvalidOperationException($"The element {e.Name.LocalName} could not be mapped."));
+                        if (usagePoint == null)
+                        {
+                            throw new InvalidOperationException("Keine gültige Datei.");
+                        }
+
+                        exceptions.Add(new InvalidOperationException($"Das Element \"{e.Name.LocalName}\" wird nicht unterstützt."));
                         break;
                 }
             }
@@ -503,7 +520,7 @@
                         }
                         else
                         {
-                            exceptions.Add(new InvalidOperationException("certContent is an invalid hex string."));
+                            exceptions.Add(new InvalidOperationException("Das Element \"certContent\" enthält keinen gültigen Wert."));
                         }
 
                         break;
@@ -566,7 +583,7 @@
                         {
                             if (dayIdAlreadyExists)
                             {
-                                exceptions.Add(new InvalidOperationException("Only one dayId element in DayProfile is allowed."));
+                                exceptions.Add(new InvalidOperationException("Es ist nur ein Element \"dayId\" innerhalb des Elements \"DayProfile\" erlaubt."));
                             }
                             else
                             {
@@ -639,7 +656,12 @@
                           .SpecialDayDate.DayOfMonth = Convert.ToByte(e.Value);
                         break;
                     default:
-                        exceptions.Add(new InvalidOperationException($"The element {e.Name.LocalName} could not be mapped."));
+                        if (usagePoint == null)
+                        {
+                            throw new InvalidOperationException("Keine gültige Datei.");
+                        }
+
+                        exceptions.Add(new InvalidOperationException($"Das Element \"{e.Name.LocalName}\" wird nicht unterstützt."));
                         break;
                 }
             }

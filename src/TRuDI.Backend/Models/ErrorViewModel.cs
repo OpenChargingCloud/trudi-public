@@ -1,5 +1,3 @@
-using System;
-
 namespace TRuDI.Backend.Models
 {
     public class ErrorViewModel

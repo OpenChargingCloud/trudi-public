@@ -12,24 +12,17 @@
     using TRuDI.Models;
     using TRuDI.Models.BasicData;
 
+    /// <summary>
+    /// Extension methods used to convert enum values to readable text or HTML.
+    /// </summary>
     public static class HtmlStringExtensions
     {
-        public static HtmlString AddLineBreak(this string source, int lineLength)
-        {
-            var sb = new StringBuilder();
-
-            for (int i = 0; i < source.Length; i++)
-            {
-                sb.Append(source[i]);
-                if ((i + 1) % lineLength == 0)
-                {
-                    sb.AppendLine("<br/>");
-                }
-            }
-
-            return new HtmlString(sb.ToString());
-        }
-
+        /// <summary>
+        /// Adds spaces after the specified number of characters.
+        /// </summary>
+        /// <param name="source">The source string.</param>
+        /// <param name="length">The length.</param>
+        /// <returns>The source string with inserted spaces.</returns>
         public static HtmlString AddSpace(this string source, int length)
         {
             var sb = new StringBuilder();
@@ -46,12 +39,22 @@
             return new HtmlString(sb.ToString());
         }
 
+        /// <summary>
+        /// Converts OIDs to friendly names.
+        /// </summary>
+        /// <param name="oid">The OID.</param>
+        /// <returns>The friendly name of the OID.</returns>
         public static string OidToFriendlyName(this string oid)
         {
             var o = new Oid(oid);
             return o.FriendlyName;
         }
 
+        /// <summary>
+        /// Converts the TAF id to a friendly name.
+        /// </summary>
+        /// <param name="id">The TAF identifier.</param>
+        /// <returns>The converted text.</returns>
         public static string TafToFriendlyName(this TafId? id)
         {
             if (id == null)
@@ -62,6 +65,11 @@
             return id.Value.TafToFriendlyName();
         }
 
+        /// <summary>
+        /// Converts the TAF id to a friendly name.
+        /// </summary>
+        /// <param name="id">The TAF identifier.</param>
+        /// <returns>The converted text.</returns>
         public static string TafToFriendlyName(this TafId id)
         {
             switch (id)
@@ -86,11 +94,22 @@
             }
         }
 
+        /// <summary>
+        /// Determines whether this billing period is completed.
+        /// </summary>
+        /// <param name="billingPeriod">The billing period.</param>
+        /// <returns>Returns "ja" or "nein".</returns>
         public static string IsCompleted(this BillingPeriod billingPeriod)
         {
             return billingPeriod.End == null ? "nein" : "ja";
         }
 
+        /// <summary>
+        /// Converts the status of the interval reading to the PTB status text.
+        /// </summary>
+        /// <param name="reading">The interval reading.</param>
+        /// <param name="count">The count used for the distinction between plural and singular.</param>
+        /// <returns>The status text.</returns>
         public static string ToStatusString(this IntervalReading reading, int count = 1)
         {
             if (reading == null || (reading.StatusPTB == null && reading.StatusFNN == null))
@@ -102,6 +121,11 @@
             return status.GetStatusString(count);
         }
 
+        /// <summary>
+        /// Gets the background color of the status from specified interval reading.
+        /// </summary>
+        /// <param name="reading">The interval reading.</param>
+        /// <returns>The CSS class.</returns>
         public static string ToStatusBackground(this IntervalReading reading)
         {
             if (reading == null)
@@ -143,6 +167,12 @@
             }
         }
 
+        /// <summary>
+        /// Gets the status string for the specified PTB status.
+        /// </summary>
+        /// <param name="status">The status.</param>
+        /// <param name="count">The count used for the distinction between plural and singular.</param>
+        /// <returns>The status text.</returns>
         public static string GetStatusString(this StatusPTB status, int count = 0)
         {
             switch (status)
@@ -167,6 +197,11 @@
             }
         }
 
+        /// <summary>
+        /// Gets the CSS class for the status icon from the specified interval reading.
+        /// </summary>
+        /// <param name="reading">The interval reading.</param>
+        /// <returns>The CSS class of the status icon.</returns>
         public static string ToStatusIcon(this IntervalReading reading)
         {
             if (reading == null || (reading.StatusPTB == null && reading.StatusFNN == null))
@@ -178,6 +213,11 @@
             return status.ToStatusIcon();
         }
 
+        /// <summary>
+        /// Gets the CSS class for the status icon from the specified PTB status.
+        /// </summary>
+        /// <param name="status">The PTB status.</param>
+        /// <returns>The CSS class of the status icon. </returns>
         public static string ToStatusIcon(this StatusPTB status)
         {
             switch (status)
@@ -202,11 +242,21 @@
             }
         }
 
+        /// <summary>
+        /// Generates an identification string for the specified original value list.
+        /// </summary>
+        /// <param name="ovl">The original value list.</param>
+        /// <returns>The generated identification string.</returns>
         public static string GetOriginalValueListIdent(this OriginalValueList ovl)
         {
             return $"ovl_{ovl.Meter}_{ovl.Obis.ToHexString()}_{ovl.MeasurementPeriod.TotalSeconds}";
         }
 
+        /// <summary>
+        /// Converts the service category kind to a readable string.
+        /// </summary>
+        /// <param name="kind">The service category kind.</param>
+        /// <returns>The text of the service category kind.</returns>
         public static string ToServiceCategoryString(this Kind? kind)
         {
             if (kind == null)
@@ -245,6 +295,11 @@
             }
         }
 
+        /// <summary>
+        /// Generates the description text for the specified historic value.
+        /// </summary>
+        /// <param name="value">The historic value.</param>
+        /// <returns>The formatted string.</returns>
         public static string ToHistoricValueDescription(this HistoricConsumption value)
         {
             switch (value.UnitOfTime)
@@ -268,6 +323,11 @@
             }
         }
 
+        /// <summary>
+        /// Convert the string to a formatted device id.
+        /// </summary>
+        /// <param name="value">The string value to format.</param>
+        /// <returns>The formatted string.</returns>
         public static string ToFormattedDeviceId(this string value)
         {
             try
@@ -281,6 +341,11 @@
             }
         }
 
+        /// <summary>
+        /// Gets the user readable medium from the contract (based on the meter server id).
+        /// </summary>
+        /// <param name="contract">The contract.</param>
+        /// <returns>The medium.</returns>
         public static string GetMedium(this ContractInfo contract)
         {
             var meter = contract.Meters?.FirstOrDefault();
@@ -323,6 +388,11 @@
             }
         }
 
+        /// <summary>
+        /// Converts the log level to a readable string.
+        /// </summary>
+        /// <param name="level">The log level.</param>
+        /// <returns>The converted string.</returns>
         public static string GetLogLevelString(this Level level)
         {
             switch (level)
@@ -347,6 +417,11 @@
             }
         }
 
+        /// <summary>
+        /// Converts the log entry outcome to a text string.
+        /// </summary>
+        /// <param name="outcome">The log entry outcome.</param>
+        /// <returns>The converted string.</returns>
         public static string GetOutcomeString(this Outcome? outcome)
         {
             if (outcome == null)
@@ -370,6 +445,11 @@
             }
         }
 
+        /// <summary>
+        /// Converts the measurement period time span to a formatted string.
+        /// </summary>
+        /// <param name="measurementPeriod">The measurement period.</param>
+        /// <returns>The formatted string.</returns>
         public static string GetMeasurementPeriodString(this TimeSpan measurementPeriod)
         {
             switch (measurementPeriod.TotalSeconds)

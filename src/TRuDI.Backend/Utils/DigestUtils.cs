@@ -2,12 +2,19 @@
 {
     using System;
     using System.IO;
-    using System.Text;
 
     using Org.BouncyCastle.Crypto.Digests;
 
+    /// <summary>
+    /// Provides methods to create digest values.
+    /// </summary>
     public static class DigestUtils
     {
+        /// <summary>
+        /// Gets the digest for the specified assembly.
+        /// </summary>
+        /// <param name="type">The type to get the assembly from.</param>
+        /// <returns>The digest string.</returns>
         public static string GetDigestFromAssembly(Type type)
         {
             var digest = new RipeMD160Digest();
@@ -21,6 +28,11 @@
             return BitConverter.ToString(result).Replace("-", "");
         }
 
+        /// <summary>
+        /// Gets the SHA3 digest from the specified data.
+        /// </summary>
+        /// <param name="data">The data.</param>
+        /// <returns>The digest string.</returns>
         public static string GetSha3(MemoryStream data)
         {
             var digest = new KeccakDigest();
@@ -32,6 +44,11 @@
             return BitConverter.ToString(result).Replace("-", "");
         }
 
+        /// <summary>
+        /// Gets the RIPEMD160 digest for the specified data.
+        /// </summary>
+        /// <param name="data">The data.</param>
+        /// <returns>The digest string.</returns>
         public static string GetRipemd160(MemoryStream data)
         {
             var digest = new RipeMD160Digest();
@@ -43,6 +60,11 @@
             return BitConverter.ToString(result).Replace("-", "");
         }
 
+        /// <summary>
+        /// Gets the RIPEMD160 digest for the specified filename.
+        /// </summary>
+        /// <param name="filename">The filename.</param>
+        /// <returns>The digest string.</returns>
         public static string GetRipemd160(string filename)
         {
             using (var fs = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Delete | FileShare.ReadWrite))

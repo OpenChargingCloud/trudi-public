@@ -15,7 +15,7 @@
         private XNamespace espi = XNamespace.Get("http://naesb.org/espi");
         private XNamespace atom = XNamespace.Get("http://www.w3.org/2005/Atom");
 
-        public ushort ServiceCategoryKind { get; set; }
+        public Kind ServiceCategoryKind { get; set; }
         public string CustomerId { get; set; }
         public string InvoicingPartyId { get; set; }
         public string SmgwId { get; set; }
@@ -58,7 +58,7 @@
             if (!this.HasAllProperties())
                 return new XDocument();
 
-            XElement serviceCategory = new XElement(this.espi + "ServiceCategory", new XElement(this.espi + "kind", this.ServiceCategoryKind));
+            XElement serviceCategory = new XElement(this.espi + "ServiceCategory", new XElement(this.espi + "kind", (ushort)this.ServiceCategoryKind));
             XElement customer = new XElement(this.ar + "Customer", new XElement(this.ar + "customerId", this.CustomerId));
             XElement invoicingParty = new XElement(this.ar + "InvoicingParty", new XElement(this.ar + "invoicingPartyId", this.InvoicingPartyId));
 
@@ -125,16 +125,33 @@
 
             foreach (MeterReading meterReading in this.MeterReadings)
             {
-                XElement mr = new XElement(this.ar + "MeterReading",
+
+                XElement mr = new XElement(
+                    this.ar + "MeterReading",
                     new XElement(this.ar + "Meter", new XElement(this.ar + "meterId", meterReading.Meters[0].MeterId)),
-                    new XElement(this.ar + "meterReadingId", meterReading.MeterReadingId),
-                    new XElement(this.ar + "ReadingType",
+                    new XElement(this.ar + "meterReadingId", meterReading.MeterReadingId));
+
+                if (meterReading.ReadingType.MeasurementPeriod == 0)
+                {
+                    mr.Add( new XElement(
+                        this.ar + "ReadingType",
                         new XElement(this.espi + "powerOfTenMultiplier", (short)meterReading.ReadingType.PowerOfTenMultiplier),
                         new XElement(this.espi + "uom", (ushort)meterReading.ReadingType.Uom),
                         new XElement(this.ar + "scaler", meterReading.ReadingType.Scaler),
                         new XElement(this.ar + "obisCode", meterReading.ReadingType.ObisCode),
-                        new XElement(this.ar + "qualifiedLogicalName", meterReading.ReadingType.QualifiedLogicalName.WithNameExtension())
-                    ));
+                        new XElement(this.ar + "qualifiedLogicalName", meterReading.ReadingType.QualifiedLogicalName.WithNameExtension())));
+                }
+                else
+                {
+                    mr.Add(new XElement(
+                        this.ar + "ReadingType",
+                        new XElement(this.espi + "powerOfTenMultiplier", (short)meterReading.ReadingType.PowerOfTenMultiplier),
+                        new XElement(this.espi + "uom", (ushort)meterReading.ReadingType.Uom),
+                        new XElement(this.ar + "scaler", meterReading.ReadingType.Scaler),
+                        new XElement(this.ar + "obisCode", meterReading.ReadingType.ObisCode),
+                        new XElement(this.ar + "qualifiedLogicalName", meterReading.ReadingType.QualifiedLogicalName.WithNameExtension()),
+                        new XElement(this.ar + "measurementPeriod", meterReading.ReadingType.MeasurementPeriod)));
+                }
 
                 foreach (IntervalBlock iBlock in meterReading.IntervalBlocks)
                 {

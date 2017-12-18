@@ -104,5 +104,6 @@
             get; set;
         }
 
+        public uint MeasurementPeriod { get; set; }
     }
 }

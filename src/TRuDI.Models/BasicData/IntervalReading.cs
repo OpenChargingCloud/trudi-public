@@ -38,6 +38,8 @@
             get; set;
         }
 
+        public DateTime? TargetTime { get; set; }
+
         /// <summary>
         /// Das Datenelement value repräsentiert den Wert der Messung. Dieser wird als ganzzahliger Wert definiert.
         /// 

@@ -68,6 +68,21 @@
             return timestamp.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ");
         }
 
+        /// <summary>
+        /// If the time is 00:00:00 this method returns 23:59:59  of the previous day.
+        /// </summary>
+        /// <param name="value">The date/time value to convert.</param>
+        /// <returns>The modified date/time.</returns>
+        public static DateTime GetDateTimePickerEndDate(this DateTime value)
+        {
+            if (value.Hour == 0 && value.Minute == 0 && value.Second == 0)
+            {
+                return value.AddSeconds(-1);
+            }
+
+            return value;
+        }
+
         public static string ToIso8601(this DateTime? timestamp)
         {
             if (timestamp == null)

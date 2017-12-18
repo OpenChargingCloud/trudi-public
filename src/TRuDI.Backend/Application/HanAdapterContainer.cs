@@ -14,29 +14,59 @@
     using TRuDI.Backend.Models;
     using TRuDI.HanAdapter.Interface;
 
+    /// <summary>
+    /// Wrapper class for HAN adapters.
+    /// </summary>
     public class HanAdapterContainer
     {
-        public IHanAdapter Adapter { get; }
+        /// <summary>
+        /// The HAN adapter information.
+        /// </summary>
+        private readonly HanAdapterInfo hanAdapterInfo;
 
-        private HanAdapterInfo hanAdapterInfo;
-
-        public string DeviceId { get; }
-
-        public string GatewayImageView => this.Adapter?.SmgwImageViewComponent?.Name;
-        public string ManufacturerParametersView => this.Adapter?.ManufacturerParametersViewComponent?.Name;
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="HanAdapterContainer"/> class.
+        /// </summary>
+        /// <param name="hanAdapterInfo">The HAN adapter information.</param>
+        /// <param name="deviceId">The device identifier.</param>
         public HanAdapterContainer(HanAdapterInfo hanAdapterInfo, string deviceId)
         {
             this.DeviceId = deviceId;
             this.hanAdapterInfo = hanAdapterInfo;
             this.Adapter = hanAdapterInfo.CreateInstance();
         }
-        
+
+        /// <summary>
+        /// Gets the HAN adapter instance.
+        /// </summary>
+        public IHanAdapter Adapter { get; }
+
+        /// <summary>
+        /// Gets the device identifier used for this HAN adapter.
+        /// </summary>
+        public string DeviceId { get; }
+
+        /// <summary>
+        /// Gets the gateway image view of the HAN adapter.
+        /// </summary>
+        public string GatewayImageView => this.Adapter?.SmgwImageViewComponent?.Name;
+
+        /// <summary>
+        /// Gets the manufacturer parameters view of the HAN adapter.
+        /// </summary>
+        public string ManufacturerParametersView => this.Adapter?.ManufacturerParametersViewComponent?.Name;
+
+        /// <summary>
+        /// Gets the resource file from the HAN adapter.
+        /// </summary>
+        /// <param name="path">The path to the resource file.</param>
+        /// <returns>Tuple with the content data and the content MIME type.</returns>
+        /// <exception cref="FileNotFoundException">Resource file wasn't found</exception>
         public (byte[] data, string contentType) GetResourceFile(string path)
         {
             var resourceName = this.hanAdapterInfo.BaseNamespace + "." + path.Replace('/', '.');
             var stream = this.hanAdapterInfo.Assembly.GetManifestResourceStream(resourceName);
-            if(stream == null)
+            if (stream == null)
             {
                 Log.Error("Resource file wasn't found: {0}, path: {1}", resourceName, path);
                 throw new FileNotFoundException("Resource file wasn't found", resourceName);
@@ -45,19 +75,29 @@
             var data = new byte[stream.Length];
             stream.Read(data, 0, data.Length);
 
-            string contentType = string.Empty;
-            if(path.EndsWith(".png"))
+            var contentType = string.Empty;
+            if (path.EndsWith(".png"))
             {
                 contentType = "image/png";
             }
-            else if(path.EndsWith(".jpg") || path.EndsWith(".jpeg"))
+            else if (path.EndsWith(".jpg") || path.EndsWith(".jpeg"))
             {
                 contentType = "image/jpeg";
             }
-            
+
             return (data, contentType);
         }
 
+        /// <summary>
+        /// Connects to the SMGW using this HAN adapter instance.
+        /// </summary>
+        /// <param name="connectData">The connect data.</param>
+        /// <param name="clientCert">The client cert.</param>
+        /// <param name="manufacturerParameters">The manufacturer parameters.</param>
+        /// <param name="ct">The cancellation token.</param>
+        /// <param name="progressCallback">The progress callback.</param>
+        /// <returns>The connect result.</returns>
+        /// <exception cref="HanAdapterException">AdapterError from the HAN adapter.</exception>
         public async Task<ConnectResult> Connect(
             ConnectData connectData,
             CertData clientCert,
@@ -106,6 +146,14 @@
             return connectResult.result;
         }
 
+        /// <summary>
+        /// Loads the data from the SMGW related to the specified adapter context.
+        /// </summary>
+        /// <param name="ctx">The adapter context with contract and billing period to read.</param>
+        /// <param name="ct">The cancellation token.</param>
+        /// <param name="progressCallback">The progress callback.</param>
+        /// <returns>The XML document according to AR 2418-6.</returns>
+        /// <exception cref="HanAdapterException">AdapterError from the HAN adapter.</exception>
         public async Task<XDocument> LoadData(AdapterContext ctx, CancellationToken ct, Action<ProgressInfo> progressCallback)
         {
             var result = await this.Adapter.LoadData(ctx, ct, progressCallback);
@@ -118,6 +166,14 @@
             return result.trudiXml;
         }
 
+        /// <summary>
+        /// Gets the current register values of the specified adapter context.
+        /// </summary>
+        /// <param name="ctx">The adapter context with contract and billing period to read.</param>
+        /// <param name="ct">The cancellation token.</param>
+        /// <param name="progressCallback">The progress callback.</param>
+        /// <returns>The XML document according to AR 2418-6.</returns>
+        /// <exception cref="HanAdapterException">AdapterError from the HAN adapter.</exception>
         public async Task<XDocument> GetCurrentRegisterValues(AdapterContext ctx, CancellationToken ct, Action<ProgressInfo> progressCallback)
         {
             var result = await this.Adapter.GetCurrentRegisterValues(ctx.Contract, ct, progressCallback);
@@ -130,6 +186,13 @@
             return result.trudiXml;
         }
 
+        /// <summary>
+        /// Loads the available contracts.
+        /// </summary>
+        /// <param name="ct">The cancellation token.</param>
+        /// <param name="progressCallback">The progress callback.</param>
+        /// <returns>List of contracts.</returns>
+        /// <exception cref="HanAdapterException">AdapterError from the HAN adapter.</exception>
         public async Task<IReadOnlyList<ContractInfo>> LoadAvailableContracts(CancellationToken ct, Action<ProgressInfo> progressCallback)
         {
             var result = await this.Adapter.LoadAvailableContracts(ct, progressCallback);

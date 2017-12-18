@@ -64,7 +64,6 @@
     {
         Identification_LSB = 0x1,
         Transparency_Bit = 0x2,
-        BitPos2 = 0x4,
         Fatal_Error = 0x100,
         Systemtime_Invalid = 0x200,
         PTB_Warning = 0x1000,
@@ -75,7 +74,6 @@
     [Flags]
     public enum BzStatusWord : uint
     {
-        BitPos2 = 0x4,
         Start_Up = 0x100,
         Magnetically_Influenced = 0x200,
         Manipulation_KD_PS = 0x400,

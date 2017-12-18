@@ -14,8 +14,16 @@
     using Org.BouncyCastle.Utilities;
     using Org.BouncyCastle.X509;
 
+    /// <summary>
+    /// The certificate generator is used to generate a certificate to secure the TLS connection between the Electron frontend and the ASP.Net backend.
+    /// </summary>
     public class CertificateGenerator
     {
+        /// <summary>
+        /// Generates the certificate.
+        /// </summary>
+        /// <param name="subjectName">Name of the subject.</param>
+        /// <returns>The generated certificate.</returns>
         public static X509Certificate2 GenerateCertificate(string subjectName)
         {
             var randomGenerator = new CryptoApiRandomGenerator();
@@ -26,10 +34,9 @@
             var serialNumber =
                 BigIntegers.CreateRandomInRange(
                     BigInteger.One, BigInteger.ValueOf(Int64.MaxValue), random);
-            certificateGenerator.SetSerialNumber(serialNumber);
 
-            const string signatureAlgorithm = "SHA256WithRSA";
-            certificateGenerator.SetSignatureAlgorithm(signatureAlgorithm);
+            certificateGenerator.SetSerialNumber(serialNumber);
+            certificateGenerator.SetSignatureAlgorithm("SHA256WithRSA");
 
             var subjectDN = new X509Name(subjectName);
             var issuerDN = subjectDN;
@@ -42,8 +49,7 @@
             certificateGenerator.SetNotBefore(notBefore);
             certificateGenerator.SetNotAfter(notAfter);
 
-            const int strength = 2048;
-            var keyGenerationParameters = new KeyGenerationParameters(random, strength);
+            var keyGenerationParameters = new KeyGenerationParameters(random, 2048);
 
             var keyPairGenerator = new RsaKeyPairGenerator();
             keyPairGenerator.Init(keyGenerationParameters);
@@ -60,10 +66,8 @@
             store.SetCertificateEntry(friendlyName, certificateEntry);
             store.SetKeyEntry(friendlyName, new AsymmetricKeyEntry(subjectKeyPair.Private), new[] { certificateEntry });
 
-            const string password = "";
-
             var stream = new MemoryStream();
-            store.Save(stream, password.ToCharArray(), random);
+            store.Save(stream, new char[0], random);
 
             return new X509Certificate2(stream.ToArray());
         }

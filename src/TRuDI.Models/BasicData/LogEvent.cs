@@ -47,7 +47,7 @@
         ///     
         /// Das Datenelement ist optional anzugeben.
         /// </summary>
-        public Outcome Outcome 
+        public Outcome? Outcome 
         {
             get; set;
         }

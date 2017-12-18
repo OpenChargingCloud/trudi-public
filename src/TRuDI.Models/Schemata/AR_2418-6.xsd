@@ -6,8 +6,8 @@ VDE AR 2418-6
 XSD schema definition for interfaces IF_Adapter_TRuDI and IF_Lieferant_TRuDI
 
 Schema:  AR_2418-6.xsd
-Version: 1.0     
-Author:  OFFIS, Dr. Martin Kahmann (PTB), Dominik Weingardt (EnBW)
+Version: 1.1     
+Author:  OFFIS, Dr. Martin Kahmann (PTB), Dominik Weingardt (EnBW), IVU
 =====================================================================================================
 
 
@@ -20,6 +20,7 @@ v0.97 - 18.05.2017 - D. Weingardt - Necessary changes for interface IF_Lieferant
 v0.98 - 08.06.2017 - D. Weingardt - Adaption & changes for interface IF_Adapter_TRuDI according to AK BD meetings from 23.05.2017 and 02.06.2017
 v0.99 - 09.06.2017 - D. Weingardt - Minor corrections and merge with if_3d_con v1.0 XSD from OFFIS
 v1.0  - 14.06.2017 - D. Weingardt - Minor corrections for interface IF_Adapter_TRuDI according to AK BD meeting from 14.06.2017
+v1.1  - 05.12.2017 - IVU - Neue optionale Elemente "measurementPeriod" (ReadingType) und "targetTime" (IntervalReading) aufgenommen.
 
 
 
@@ -572,7 +573,9 @@ ______________________________________________________
 							<xs:documentation>The date time and duration of a reading. If not specified, readings for each “intervalLength” in ReadingType are present.</xs:documentation>
 						</xs:annotation>
 					</xs:element>
-					<xs:element name="certId" type="espi:UInt8" minOccurs="0"/>
+          <!-- Change. Element "targetTime" hinzugefügt (v1.1, 05.12.2017) -->
+				  <xs:element name="targetTime" type="xs:dateTime" minOccurs="0"/>
+          <xs:element name="certId" type="espi:UInt8" minOccurs="0"/>
 					<!-- Change: Elemente "meterSig" uund "signature" analog if_3d_con v1.0 von Datentyp "String256" auf "String512" angepasst (v0.99, 09.06.2017) -->
 					<xs:element name="meterSig" type="espi:String512" minOccurs="0"/>
 					<xs:element name="signature" type="espi:String512" minOccurs="0"/>
@@ -605,6 +608,8 @@ ______________________________________________________
 					<xs:element name="obisCode" type="espi:String32" minOccurs="0"/>
 					<xs:element name="qualifiedLogicalName" type="espi:String256" minOccurs="0"/>
 					<xs:element name="description" type="espi:String256" minOccurs="0"/>
+				  <!-- Change: Neues Element "measurementPeriod" (optional) um Probleme bei der Messperioden-Ermittlung aus der Werteliste zu umgehen. Ist in Sekunden anzugeben. -->
+          <xs:element name="measurementPeriod" type="espi:UInt32" minOccurs="0"/>
 				</xs:sequence>
 			</xs:extension>
 		</xs:complexContent>

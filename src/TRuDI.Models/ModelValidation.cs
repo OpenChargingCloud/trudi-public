@@ -23,12 +23,12 @@
 
             if (usagePoint.Customer == null)
             {
-                exceptions.Add(new InvalidOperationException("UsagePoint does not contain an instance of Customer."));
+                exceptions.Add(new InvalidOperationException("Das Element \"UsagePoint\" muss das Element \"Customer\" enthalten."));
             }
 
             if (usagePoint.Certificates.Count < 1)
             {
-                exceptions.Add(new InvalidOperationException("UsagePoint does not contain an instance of Certificate."));
+                exceptions.Add(new InvalidOperationException("Das Element \"UsagePoint\" muss das Element \"Certificate\" enthalten."));
             }
             else
             {
@@ -40,7 +40,7 @@
 
             if (usagePoint.MeterReadings.Count < 1)
             {
-                exceptions.Add(new InvalidOperationException("UsagePoint does not contain an instance of MeterReading."));
+                exceptions.Add(new InvalidOperationException("Das Element \"UsagePoint\" muss das Element \"MeterReading\" enthalten."));
             }
             else
             {
@@ -97,22 +97,22 @@
         {
             if (string.IsNullOrWhiteSpace(usagePoint.UsagePointId))
             {
-                exceptions.Add(new InvalidOperationException("The element UsagePointId is invalid."));
+                exceptions.Add(new InvalidOperationException("Das Element \"UsagePointId\" hat keinen gültigen Wert."));
             }
 
             if (string.IsNullOrWhiteSpace(usagePoint.TariffName))
             {
-                exceptions.Add(new InvalidOperationException("The element TariffName is invalid."));
+                exceptions.Add(new InvalidOperationException("Das Element \"TariffName\" hat keinen gültigen Wert."));
             }
 
             if (usagePoint.InvoicingParty == null)
             {
-                exceptions.Add(new InvalidOperationException("UsagePoint does not contain an instance of InvoicingParty."));
+                exceptions.Add(new InvalidOperationException("Das Element \"UsagePoint\" muss das Element \"InvoicingParty\" enthalten."));
             }
 
             if (usagePoint.Smgw == null)
             {
-                exceptions.Add(new InvalidOperationException("UsagePoint does not contain an instance of SMGW."));
+                exceptions.Add(new InvalidOperationException("Das Element \"UsagePoint\" muss das Element \"SMGW\" enthalten."));
             }
             else if (usagePoint.GetType() == typeof(UsagePointAdapterTRuDI))
             {
@@ -121,7 +121,7 @@
 
             if (usagePoint.ServiceCategory == null)
             {
-                exceptions.Add(new InvalidOperationException("UsagePoint does not contain an instance of ServiceCategory."));
+                exceptions.Add(new InvalidOperationException("Das Element \"UsagePoint\" muss das Element \"ServiceCategory\" enthalten."));
             }
             else
             {
@@ -139,12 +139,12 @@
             }
             else
             {
-                exceptions.Add(new InvalidOperationException("The element CertType in Certificate is null."));
+                exceptions.Add(new InvalidOperationException("Das Element \"CertType\" ist nicht angegeben oder enthält keinen Wert."));
             }
 
             if (cert.CertContent == null)
             {
-                exceptions.Add(new InvalidOperationException("The certificate has no content."));
+                exceptions.Add(new InvalidOperationException("Es wurden keine Zertifikatsdaten gefunden."));
             }
         }
 
@@ -154,13 +154,12 @@
             switch (type)
             {
                 case CertType.SmgwHan:
-                    break;
                 case CertType.Signatur:
-                    break;
                 case CertType.SubCA:
                     break;
+
                 default:
-                    exceptions.Add(new InvalidOperationException($"Invalid CerType {type}."));
+                    exceptions.Add(new InvalidOperationException($"Ungültiger Wert für das Element \"CerType\": \"{type}\"."));
                     break;
             }
         }
@@ -170,12 +169,12 @@
         {
             if (string.IsNullOrWhiteSpace(smgw.SmgwId))
             {
-                exceptions.Add(new InvalidOperationException("The Smgw Id is null."));
+                exceptions.Add(new InvalidOperationException("Die Smart Meter Gateway ID enthält keinen gültigen Wert."));
             }
 
             if (smgw.CertIds.Count < 1)
             {
-                exceptions.Add(new InvalidOperationException("The SMGW instance does not contain any certIds."));
+                exceptions.Add(new InvalidOperationException("Das Element \"SMGW\" enthält keine Zertifikat-IDs (\"certIds\")."));
             }
         }
 
@@ -184,24 +183,18 @@
         {
             switch (kind)
             {
-                case Kind.cold:
+                case Kind.Cold:
+                case Kind.Communication:
+                case Kind.Electricity:
+                case Kind.Gas:
+                case Kind.Heat:
+                case Kind.Pressure:
+                case Kind.Time:
+                case Kind.Water:
                     break;
-                case Kind.communication:
-                    break;
-                case Kind.electricity:
-                    break;
-                case Kind.gas:
-                    break;
-                case Kind.heat:
-                    break;
-                case Kind.pressure:
-                    break;
-                case Kind.time:
-                    break;
-                case Kind.water:
-                    break;
+
                 default:
-                    exceptions.Add(new InvalidOperationException($"Invalid ServiceCategory Kind {kind}."));
+                    exceptions.Add(new InvalidOperationException($"Ungültiger Wert für \"ServiceCategory/Kind\": \"{kind}\"."));
                     break;
             }
         }
@@ -211,12 +204,12 @@
         {
             if (string.IsNullOrWhiteSpace(meterReading.MeterReadingId))
             {
-                exceptions.Add(new InvalidOperationException("The element MeterReadingId is null."));
+                exceptions.Add(new InvalidOperationException("Das Element \"MeterReadingId\" enthält keinen gültigen Wert."));
             }
 
             if (meterReading.ReadingType == null)
             {
-                exceptions.Add(new InvalidOperationException("MeterReading does not contain an instance of ReadingType."));
+                exceptions.Add(new InvalidOperationException("Das Element \"MeterReading\" muss das Element \"ReadingType\" enthalten."));
             }
             else
             {
@@ -225,12 +218,12 @@
 
             if (meterReading.Meters.Count < 1)
             {
-                exceptions.Add(new InvalidOperationException("MeterReading does not contain an instance of Meter."));
+                exceptions.Add(new InvalidOperationException("Das Element \"MeterReading\" muss das Elemnt \"Meter\" enthalten."));
             }
 
             if (meterReading.IntervalBlocks.Count < 1)
             {
-                exceptions.Add(new InvalidOperationException("MeterReading does not contain an instance of IntervalBlock."));
+                exceptions.Add(new InvalidOperationException("Das Element \"MeterReading\" muss das Element \"IntervalBlock\" enthalten."));
             }
             else
             {
@@ -263,17 +256,14 @@
             switch (level)
             {
                 case Level.INFO:
-                    break;
                 case Level.WARNING:
-                    break;
                 case Level.ERROR:
-                    break;
                 case Level.FATAL:
-                    break;
                 case Level.EXTENSION:
                     break;
+
                 default:
-                    exceptions.Add(new InvalidOperationException($"Invalid LogEvent Level {level}."));
+                    exceptions.Add(new InvalidOperationException($"Ungültiger Wert für \"LogEvent/Level\": \"{level}\"."));
                     break;
             }
         }
@@ -283,14 +273,14 @@
         {
             switch (outcome)
             {
+                case null:
                 case Outcome.SUCCESS:
-                    break;
                 case Outcome.FAILURE:
-                    break;
                 case Outcome.EXTENSION:
                     break;
+
                 default:
-                    exceptions.Add(new InvalidOperationException($"Invalid LogEvent Outcome {outcome}."));
+                    exceptions.Add(new InvalidOperationException($"Ungültiger Wert für \"LogEvent/Outcome\": \"{outcome}\"."));
                     break;
             }
         }
@@ -300,19 +290,19 @@
         {
             if (string.IsNullOrWhiteSpace(readingType.ObisCode))
             {
-                exceptions.Add(new InvalidOperationException("The element ObisCode in ReadingType is null."));
+                exceptions.Add(new InvalidOperationException("Das Element \"ObisCode\" innerhalb des Elements \"ReadingType\" enthält keinen gültigen Wert."));
             }
             else
             {
                 if (!readingType.ObisCode.ValidateHexString())
                 {
-                    exceptions.Add(new FormatException("ReadingType: ObisCode is an invalid hex string."));
+                    exceptions.Add(new InvalidOperationException("Das Element \"ObisCode\" innerhalb des Elements \"ReadingType\" enthält keinen gültigen Wert."));
                 }
             }
 
             if (string.IsNullOrEmpty(readingType.QualifiedLogicalName))
             {
-                exceptions.Add(new InvalidOperationException("The element QualifiedLogicalName in ReadingType is null."));
+                exceptions.Add(new InvalidOperationException("Das Element \"QualifiedLogicalName\" innerhalb des Elements \"ReadingType\" enthält keinen gültigen Wert."));
             }
 
             if (readingType.PowerOfTenMultiplier.HasValue)
@@ -321,7 +311,7 @@
             }
             else
             {
-                exceptions.Add(new InvalidOperationException("The element PowerOfTenMultiplier in ReadingType is null."));
+                exceptions.Add(new InvalidOperationException("Das Element \"PowerOfTenMultiplier\" innerhalb des Elements \"ReadingType\" enthält keinen gültigen Wert."));
             }
 
             if (readingType.Uom.HasValue)
@@ -330,7 +320,7 @@
             }
             else
             {
-                exceptions.Add(new InvalidOperationException("The element Uom in ReadingType is null."));
+                exceptions.Add(new InvalidOperationException("Das Element \"Uom\" innerhalb des Elements \"ReadingType\" enthält keinen gültigen Wert."));
             }
         }
 
@@ -340,23 +330,17 @@
             switch (powerOfTenMultiplier)
             {
                 case PowerOfTenMultiplier.deca:
-                    break;
                 case PowerOfTenMultiplier.Giga:
-                    break;
                 case PowerOfTenMultiplier.hecto:
-                    break;
                 case PowerOfTenMultiplier.kilo:
-                    break;
                 case PowerOfTenMultiplier.Mega:
-                    break;
                 case PowerOfTenMultiplier.micro:
-                    break;
                 case PowerOfTenMultiplier.mili:
-                    break;
                 case PowerOfTenMultiplier.None:
                     break;
+
                 default:
-                    exceptions.Add(new InvalidOperationException($"Invalid ReadingType powerOfTenMultiplier {powerOfTenMultiplier}."));
+                    exceptions.Add(new InvalidOperationException($"Ungültiger Wert für \"ReadingType/powerOfTenMultiplier\": \"{powerOfTenMultiplier}\"."));
                     break;
             }
         }
@@ -367,49 +351,30 @@
             switch (uom)
             {
                 case Uom.Ampere:
-                    break;
                 case Uom.Ampere_hours:
-                    break;
                 case Uom.Ampere_squared:
-                    break;
                 case Uom.Apparent_energy:
-                    break;
                 case Uom.Apparent_power:
-                    break;
                 case Uom.Cubic_feet:
-                    break;
                 case Uom.Cubic_feet_per_hour:
-                    break;
                 case Uom.Cubic_meter:
-                    break;
                 case Uom.Cubic_meter_per_hour:
-                    break;
                 case Uom.Frequency:
-                    break;
                 case Uom.Joule:
-                    break;
                 case Uom.Not_Applicable:
-                    break;
                 case Uom.Power_factor:
-                    break;
                 case Uom.Reactive_energie:
-                    break;
                 case Uom.Reactive_power:
-                    break;
                 case Uom.Real_energy:
-                    break;
                 case Uom.Real_power:
-                    break;
                 case Uom.US_Gallons:
-                    break;
                 case Uom.US_Gallons_per_hour:
-                    break;
                 case Uom.Volltage:
-                    break;
                 case Uom.Volts_squared:
                     break;
+
                 default:
-                    exceptions.Add(new InvalidOperationException($"Invalid ReadingType Uom {uom}."));
+                    exceptions.Add(new InvalidOperationException($"Ungültiger Wert für \"ReadingType/Uom\": \"{uom}\"."));
                     break;
             }
         }
@@ -419,7 +384,7 @@
         {
             if (intervalBlock.Interval == null)
             {
-                exceptions.Add(new InvalidOperationException("IntervalBlock does not contain an instance of Interval."));
+                exceptions.Add(new InvalidOperationException("Das Element \"IntervalBlock\" muss das Element \"Interval\" enthalten."));
             }
             else
             {
@@ -428,7 +393,7 @@
 
             if (intervalBlock.IntervalReadings.Count < 1)
             {
-                exceptions.Add(new InvalidOperationException("IntervalBlock does not contain an instance of IntervalReading."));
+                exceptions.Add(new InvalidOperationException("Das Element \"IntervalBlock\" enthält kein Element \"IntervalReading\"."));
             }
             else
             {
@@ -444,19 +409,13 @@
         {
             if (!interval.Duration.HasValue)
             {
-                exceptions.Add(new InvalidOperationException($"The element Duration in {name} is null. "));
-                return false;
-            }
-
-            if (interval.Start == null)
-            {
-                exceptions.Add(new InvalidOperationException($"The element Start in {name} is null. "));
+                exceptions.Add(new InvalidOperationException($"Das Element \"Duration\" innerhalb von \"{name}\" enthält keinen gültigen Wert."));
                 return false;
             }
 
             if (interval.Start == DateTime.MinValue)
             {
-                exceptions.Add(new InvalidOperationException($"The element Start in {name} is not specified. "));
+                exceptions.Add(new InvalidOperationException($"Das Element \"Start\" innerhalb von \"{name}\" enthält keinen gültigen Wert."));
                 return false;
             }
 
@@ -468,7 +427,7 @@
         {
             if (intervalReading.TimePeriod == null)
             {
-                exceptions.Add(new InvalidOperationException("IntervalReading does not contain an instance of TimePeriod."));
+                exceptions.Add(new InvalidOperationException("Das Element \"IntervalReading\" muss das Element \"TimePeriod\" enthalten."));
             }
             else
             {
@@ -477,7 +436,7 @@
 
             if (!intervalReading.Value.HasValue)
             {
-                exceptions.Add(new InvalidOperationException("The element value in intervalReading is null."));
+                exceptions.Add(new InvalidOperationException("Das Element \"value\" enthält keinen gültigen Wert."));
             }
 
             ValidateSetStatus(intervalReading, exceptions);
@@ -488,20 +447,21 @@
 
             if (intervalReading.StatusFNN == null && !intervalReading.StatusPTB.HasValue)
             {
-                exceptions.Add(new InvalidOperationException("In IntervalReading StatusFNN and StatusPTB have no value."));
+                exceptions.Add(new InvalidOperationException("Das Element \"IntervalReading\" muss mindestens \"StatusFNN\" oder \"StatusPTB\" mit einem gültigen Wert enthalten."));
                 return;
             }
-            else if (intervalReading.StatusFNN != null && !intervalReading.StatusPTB.HasValue)
+
+            if (intervalReading.StatusFNN != null && !intervalReading.StatusPTB.HasValue)
             {
                 if (string.IsNullOrWhiteSpace(intervalReading.StatusFNN.Status))
                 {
-                    exceptions.Add(new InvalidOperationException("In IntervalReading StatusFNN and StatusPTB have no value."));
+                    exceptions.Add(new InvalidOperationException("Das Element \"IntervalReading\" muss mindestens \"StatusFNN\" oder \"StatusPTB\" mit einem gültigen Wert enthalten."));
                 }
                 else
                 {
                     if (!intervalReading.StatusFNN.ValidateFNNStatus())
                     {
-                        exceptions.Add(new InvalidOperationException("In IntervalReading StatusFNN is invalid and StatusPTB is null."));
+                        exceptions.Add(new InvalidOperationException("Das Element \"StatusFNN\" hat keinen gültigen Wert."));
                     }
                 }
             }
@@ -509,12 +469,7 @@
             {
                 ValidateIntervalReadingStatusPTB(intervalReading.StatusPTB, exceptions);
             }
-            else
-            {
-                exceptions.Add(new InvalidOperationException("In IntervalReading StatusFNN and StatusPTB have both a value. Only one is permitted."));
-            }
         }
-
 
         // Validate if the StatusPTB of ReadingType is valid
         private static void ValidateIntervalReadingStatusPTB(StatusPTB? statusPtb, List<Exception> exceptions)
@@ -522,17 +477,14 @@
             switch (statusPtb)
             {
                 case StatusPTB.FatalError:
-                    break;
                 case StatusPTB.NoError:
-                    break;
                 case StatusPTB.CriticalTemporaryError:
-                    break;
                 case StatusPTB.TemporaryError:
-                    break;
                 case StatusPTB.Warning:
                     break;
+
                 default:
-                    exceptions.Add(new InvalidOperationException($"Invalid IntervalReading StatusPTB {statusPtb}."));
+                    exceptions.Add(new InvalidOperationException($"Ungültiger Wert für \"StatusPTB\": \"{statusPtb}\"."));
                     break;
             }
         }
@@ -542,11 +494,11 @@
         {
             if (analysisProfile.TariffStages.Count < 1)
             {
-                exceptions.Add(new InvalidOperationException("AnalysisProfile does not contain an instance of TariffStage."));
+                exceptions.Add(new InvalidOperationException("Das Element \"AnalysisProfile\" muss das Element \"TariffStage\" enthalten."));
             }
             else
             {
-                foreach (TariffStage tariffStage in analysisProfile.TariffStages)
+                foreach (var tariffStage in analysisProfile.TariffStages)
                 {
                     ValidateTariffStage(tariffStage, exceptions);
                 }
@@ -554,7 +506,7 @@
 
             if (analysisProfile.TariffChangeTrigger == null)
             {
-                exceptions.Add(new InvalidOperationException("AnalysisProfile does not contain an instance of TariffChangeTrigger."));
+                exceptions.Add(new InvalidOperationException("Das Element \"AnalysisProfile\" muss das Element \"TariffChangeTrigger\" enthalten."));
             }
             else
             {
@@ -563,7 +515,7 @@
 
             if (ValidateInterval(analysisProfile.BillingPeriod, "Billing Period", exceptions))
             {
-                //Validate if we have at least one full day in the BillingPeriod
+                // Validate if we have at least one full day in the BillingPeriod
                 if ((analysisProfile.BillingPeriod.GetEnd().Date - analysisProfile.BillingPeriod.Start.Date).Days < 1)
                 {
                     exceptions.Add(new InvalidOperationException("Die Abrechnungsperiode in der Tarifdatei muss mindestens einen vollen Tag umfassen."));
@@ -617,7 +569,7 @@
 
                 case TafId.Taf9:
                 default:
-                    exceptions.Add(new InvalidOperationException($"Invalid AnalysisProfile TariffUseCase {tariffUseCase}."));
+                    exceptions.Add(new InvalidOperationException($"Ungültiger Wert für \"TariffUseCase\": \"{tariffUseCase}\"."));
                     break;
             }
         }
@@ -627,7 +579,7 @@
         {
             if (!tariffStage.ObisCode.ValidateHexString())
             {
-                exceptions.Add(new FormatException("TariffStage: ObisCode is an invalid hex string."));
+                exceptions.Add(new FormatException("Das Element \"ObisCode\" innerhalb des Elements \"TariffStage\" enthält einen ungülten Wert."));
             }
         }
 
@@ -636,7 +588,7 @@
         {
             if (trigger.TimeTrigger == null)
             {
-                exceptions.Add(new InvalidOperationException("TariffChangeTrigger does not contain an instance of TimeTrigger."));
+                exceptions.Add(new InvalidOperationException("Das Element \"TariffChangeTrigger\" muss ein Element \"TimeTrigger\" enthalten."));
             }
             else
             {
@@ -649,7 +601,7 @@
         {
             if (trigger.DayProfiles.Count < 1)
             {
-                exceptions.Add(new InvalidOperationException("TimeTrigger does not contain an instance of DayProfile."));
+                exceptions.Add(new InvalidOperationException("Das Element \"TimeTrigger\" muss ein Element \"DayProfile\" enthalten."));
             }
             else
             {
@@ -661,7 +613,7 @@
 
             if (trigger.SpecialDayProfiles.Count < 1)
             {
-                exceptions.Add(new InvalidOperationException("TimeTrigger does not contain an instance of SpecialDayProfile."));
+                exceptions.Add(new InvalidOperationException("Das Element \"TimeTrigger\" muss ein Element \"SpecialDayProfile\" enthalten."));
             }
             else
             {
@@ -678,7 +630,7 @@
         {
             if (dayProfile.DayTimeProfiles.Count < 1)
             {
-                exceptions.Add(new InvalidOperationException("DayProfile does not contain an instance of DayTimeProfile."));
+                exceptions.Add(new InvalidOperationException("Das Element \"DayProfile\" muss ein Element \"DayTimeProfile\" enthalten."));
             }
             else
             {
@@ -694,7 +646,7 @@
         {
             if (profile.DayProfile == null)
             {
-                exceptions.Add(new InvalidOperationException("SpecialDayProfile does not reference to an instance of DayProfile."));
+                exceptions.Add(new InvalidOperationException("Das Element \"SpecialDayProfile\" muss ein Element \"DayProfile\" enthalten."));
             }
 
             ValidateDayVarType(profile.SpecialDayDate, exceptions);
@@ -705,7 +657,7 @@
         {
             if (profile.StartTime == null)
             {
-                exceptions.Add(new InvalidOperationException("DayTimeProfile does not contain an instance of StartTime."));
+                exceptions.Add(new InvalidOperationException("Das Element \"DayTimeProfile\" muss ein Element \"StartTime\" enthalten."));
             }
         }
 
@@ -714,7 +666,7 @@
         {
             if (!day.DayOfMonth.HasValue)
             {
-                exceptions.Add(new InvalidOperationException("The element SpecialDayDate of SpecialDayProfile is invalid."));
+                exceptions.Add(new InvalidOperationException("Das Element \"SpecialDayDate\" ist ungültig."));
             }
 
             if (!day.Month.HasValue)
@@ -722,7 +674,7 @@
                 day.Monthly = true;
             }
 
-            if ((!day.Year.HasValue))
+            if (!day.Year.HasValue)
             {
                 day.Yearly = true;
             }

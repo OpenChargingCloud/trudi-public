@@ -35,9 +35,25 @@
         /// <returns>The most frequently found interval or <c>TimeSpan.Zero</c> if no valid interval was found.</returns>
         public static TimeSpan GetMeasurementPeriod(this MeterReading meterReading, bool checkAll = false)
         {
+            if (meterReading.ReadingType.MeasurementPeriod != 0)
+            {
+                return TimeSpan.FromSeconds(meterReading.ReadingType.MeasurementPeriod);
+            }
+
+            // first check only values without critical or fatal errors
             foreach (var block in meterReading.IntervalBlocks)
             {
-                var period = block.IntervalReadings.GetMeasurementPeriod();
+                var period = block.IntervalReadings.GetMeasurementPeriod(true, ignoreErrors: true);
+                if (period != TimeSpan.Zero)
+                {
+                    return period;
+                }
+            }
+
+            // if no measurement period was found, check again and include values with errors
+            foreach (var block in meterReading.IntervalBlocks)
+            {
+                var period = block.IntervalReadings.GetMeasurementPeriod(true, ignoreErrors: false);
                 if (period != TimeSpan.Zero)
                 {
                     return period;
@@ -52,13 +68,20 @@
         /// </summary>
         /// <param name="readings">The interval readings to check.</param>
         /// <param name="checkAll">If set to <c>true</c>, check all interval readings.</param>
+        /// <param name="ignoreErrors">if set to <c>true</c> values with critical or fatal errors are ignored.</param>
         /// <returns>The most frequently found interval or <c>TimeSpan.Zero</c> if no valid interval was found.</returns>
-        public static TimeSpan GetMeasurementPeriod(this List<IntervalReading> readings, bool checkAll = false)
+        public static TimeSpan GetMeasurementPeriod(this List<IntervalReading> readings, bool checkAll = false, bool ignoreErrors = true)
         {
             var stats = new Dictionary<int, int>();
 
             for (int i = 1; i < readings.Count; i++)
             {
+                if (ignoreErrors && (readings[i].StatusPTB >= StatusPTB.CriticalTemporaryError ||
+                    readings[i - 1].StatusPTB >= StatusPTB.CriticalTemporaryError))
+                {
+                    continue;
+                }
+
                 var span = (int)(readings[i].TimePeriod.Start - readings[i - 1].TimePeriod.Start).TotalSeconds;
 
                 var period = GetMatchingMeasurementPeriod(span);
@@ -74,9 +97,9 @@
                 else
                 {
                     stats[period]++;
-                    if (!checkAll && stats[period] == 10)
+                    if (!checkAll && stats[period] == 120)
                     {
-                        // if we don't have to check all: stop after the first period reaches 10
+                        // if we don't have to check all: stop after the first period reaches 120
                         return TimeSpan.FromSeconds(period);
                     }
                 }
@@ -114,7 +137,7 @@
 
             for (int i = 1; i < block.IntervalReadings.Count; i++)
             {
-                var span = block.IntervalReadings[i].TimePeriod.Start - block.IntervalReadings[i - 1].TimePeriod.Start;
+                var span = block.IntervalReadings[i].TimePeriod.Start.ToUniversalTime() - block.IntervalReadings[i - 1].TimePeriod.Start.ToUniversalTime();
                 if (span > measurementPeriod)
                 {
                     count++;
@@ -181,16 +204,41 @@
 
         public static IntervalReading GetIntervalReadingFromDate(this MeterReading reading, DateTime date)
         {
-            IntervalReading result = null;
-
             var blocks = reading.IntervalBlocks?.FirstOrDefault(ib => ib.Interval.IsDateInIntervalBlock(date));
-
-            if(blocks != null)
+            if (blocks != null)
             {
-                result = blocks.IntervalReadings?.FirstOrDefault(ir => ir.TimePeriod.Start == date);
+                return blocks.IntervalReadings?.FirstOrDefault(ir => ir.TimePeriod.Start == date);
             }
 
-            return result;
+            return null;
+        }
+
+        public static DateTime? GetFirstReadingTimestamp(this MeterReading reading, DateTime min, DateTime max)
+        {
+            for (int i = 0; i < reading.IntervalBlocks.Count; i++)
+            {
+                var timestamp = reading.IntervalBlocks[i].IntervalReadings?.FirstOrDefault(ir => ir.TimePeriod.Start >= min && ir.TimePeriod.Start <= max)?.TimePeriod?.Start;
+                if (timestamp != null)
+                {
+                    return timestamp;
+                }
+            }
+
+            return null;
+        }
+
+        public static DateTime? GetLastReadingTimestamp(this MeterReading reading, DateTime min, DateTime max)
+        {
+            for (int i = reading.IntervalBlocks.Count - 1; i >= 0; i--)
+            {
+                var timestamp = reading.IntervalBlocks[i].IntervalReadings?.LastOrDefault(ir => ir.TimePeriod.Start >= min && ir.TimePeriod.Start <= max)?.TimePeriod?.Start;
+                if (timestamp != null)
+                {
+                    return timestamp;
+                }
+            }
+
+            return null;
         }
     }
 }

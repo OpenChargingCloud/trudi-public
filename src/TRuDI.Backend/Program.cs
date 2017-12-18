@@ -26,10 +26,14 @@
 
     public class Program
     {
-        public static CommandLineArguments CommandLineArguments { get; } = new CommandLineArguments();
-
         private static int backendServerPort;
 
+        public static CommandLineArguments CommandLineArguments { get; } = new CommandLineArguments();
+
+        /// <summary>
+        /// The application entry point.
+        /// </summary>
+        /// <param name="args">The command line arguments.</param>
         public static void Main(string[] args)
         {
             var commandLineApplication = new CommandLineApplication(throwOnUnexpectedArg: false);
@@ -97,8 +101,8 @@
             }
 
             Log.Information(
-                "Starting TRuDI {0} on {1}", 
-                Microsoft.Extensions.PlatformAbstractions.PlatformServices.Default.Application.ApplicationVersion, 
+                "Starting TRuDI {0} on {1}",
+                Microsoft.Extensions.PlatformAbstractions.PlatformServices.Default.Application.ApplicationVersion,
                 System.Runtime.InteropServices.RuntimeInformation.OSDescription);
 
             if (testFileOption.HasValue())
@@ -163,22 +167,29 @@
                     {
                         cts.Cancel();
                     }
-                    catch (ObjectDisposedException) { }
+                    catch (ObjectDisposedException)
+                    {
+                    }
                 }
 
                 // Wait on the given reset event
                 resetEvent.Wait();
-            };
+            }
 
             AppDomain.CurrentDomain.ProcessExit += (sender, eventArgs) => Shutdown();
             Console.CancelKeyPress += (sender, eventArgs) =>
                 {
                     Shutdown();
+
                     // Don't terminate the process immediately, wait for the Main thread to exit gracefully.
                     eventArgs.Cancel = true;
                 };
         }
-        
+
+        /// <summary>
+        /// Finds a free TCP port.
+        /// </summary>
+        /// <returns>The TCP port that was found.</returns>
         public static int FindFreeTcpPort()
         {
             var listener = new TcpListener(IPAddress.Loopback, 0);
@@ -203,12 +214,12 @@
                                 {
                                     var httpsOptions =
                                         new HttpsConnectionAdapterOptions
-                                            {
-                                                ServerCertificate =
+                                        {
+                                            ServerCertificate =
                                                     CertificateGenerator
                                                         .GenerateCertificate(
                                                             $"CN={DigestUtils.GetDigestFromAssembly(typeof(Program)).ToLowerInvariant()}")
-                                            };
+                                        };
 
                                     listenOptions.UseHttps(httpsOptions);
                                 });

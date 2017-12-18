@@ -8,7 +8,7 @@
     public static class UnitExtensions
     {
         private static readonly CultureInfo CultureInfoDe = CultureInfo.GetCultureInfo("DE");
-        private static readonly string[] DecimalFormatLookup = { "N", "N1", "N2", "N3", "N4", "N5", "N6" };
+        private static readonly string[] DecimalFormatLookup = { "N6", "N1", "N2", "N3", "N4", "N5", "N6", "N7", "N8", "N9" };
 
         public static string GetSiPrefix(this PowerOfTenMultiplier multiplier)
         {
@@ -170,12 +170,12 @@
             {
                 scaler = scaler - 3;
                 decimal scaledValue = scaler != 0 ? value * (decimal)Math.Pow(10, scaler) : value;
-                return scaledValue.ToString(scaler < 0 && scaler >= -6 ? DecimalFormatLookup[scaler * -1] : "N", CultureInfoDe);
+                return scaledValue.ToString(scaler < 0 && scaler >= -9 ? DecimalFormatLookup[scaler * -1] : "N", CultureInfoDe);
             }
             else
             {
                 decimal scaledValue = scaler != 0 ? value * (decimal)Math.Pow(10, scaler) : value;
-                return scaledValue.ToString(scaler < 0 && scaler >= -6 ? DecimalFormatLookup[scaler * -1] : "N", CultureInfoDe);
+                return scaledValue.ToString(scaler < 0 && scaler >= -9 ? DecimalFormatLookup[scaler * -1] : "N", CultureInfoDe);
             }
         }
     }
