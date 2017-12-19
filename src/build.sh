@@ -25,6 +25,7 @@ cp bin/Release/netcoreapp2.0/TRuDI.Backend.PrecompiledViews.dll bin/dist/linux-x
 
 # Build Electron frontend
 cd ../TRuDI.Frontend
+npm install
 
 # Generate checksums file
 node ../Utils/createDigestList.js ../TRuDI.Backend/bin/dist/linux-x64 checksums-linux.json
