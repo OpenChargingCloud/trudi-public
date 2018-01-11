@@ -13,9 +13,11 @@
     using TRuDI.Backend.MessageHandlers;
     using TRuDI.Backend.Models;
     using TRuDI.HanAdapter.Interface;
+    using TRuDI.HanAdapter.Repository;
     using TRuDI.Models;
     using TRuDI.Models.BasicData;
     using TRuDI.Models.CheckData;
+    using TRuDI.TafAdapter.Repository;
 
     using AnalysisProfile = TRuDI.Models.CheckData.AnalysisProfile;
 
@@ -151,7 +153,7 @@
         /// <param name="serverId">The server identifier to load the HAN adapter for.</param>
         public void LoadAdapter(string serverId)
         {
-            this.activeHanAdapter = HanAdapterRepository.LoadAdapter(serverId);
+            this.activeHanAdapter = new HanAdapterContainer(HanAdapterRepository.LoadAdapter(serverId), serverId);
         }
 
         /// <summary>

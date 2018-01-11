@@ -48,20 +48,6 @@
         }
 
         /// <summary>
-        /// Funktion zur Berechung des Endzeitpunkts des Intervals
-        /// </summary>
-        /// <returns>Den Endzeitpunkt des Intervals</returns>
-        public static DateTime GetCaptureTimeEnd(this Interval interval)
-        {
-            if (interval.Duration == null)
-            {
-                return interval.Start;
-            }
-
-            return interval.CaptureTime.AddUtcSeconds(interval.Duration.Value);
-        }
-
-        /// <summary>
         /// Funktion zum Test ob ein String einen gültigen Hex String darstellt
         /// </summary>
         /// <param name="hex">Der zu überprüfende String</param>
@@ -138,7 +124,7 @@
         /// Die Funktion kürzt mögliche Sekundenwerte eines DateTime Objekts
         /// </summary>
         /// <param name="dateTime">Das zu kürzende DateTime Objekt</param>
-        /// <returns>Das gekürzute DateTime Objekt</returns>
+        /// <returns>Das gekürzte DateTime Objekt</returns>
         public static DateTime GetDateWithoutSeconds(this DateTime dateTime)
         {
             var utcConvertedTime = dateTime.ToUniversalTime();
@@ -147,27 +133,27 @@
         }
 
         /// <summary>
-        /// Die Funktion liefert den "geglätteten" captureTime Zeitstempel zurück
+        /// Die Funktion liefert einen an das Messperiodenintervall ausgerichteten Zeitstempel zurück.
         /// </summary>
-        /// <param name="captureTime">Der zu glättende Zeitwert</param>
-        /// <param name="interval">The period interval.</param>
-        /// <returns>Der gerundete Zeitstempel</returns>
-        public static DateTime GetSmoothCaptureTime(DateTime captureTime, int interval = 900)
+        /// <param name="timestamp">Der auszurichtende Zeitstempel.</param>
+        /// <param name="interval">Das Messperiodenintervall.</param>
+        /// <returns>Der ausgerichtete Zeitstempel.</returns>
+        public static DateTime GetAlignedTimestamp(DateTime timestamp, int interval = 900)
         {
             if (interval < 86400)
             {
-                var isUtc = captureTime.Kind == DateTimeKind.Utc;
-                var captureTimeUtc = captureTime.ToUniversalTime();
+                var isUtc = timestamp.Kind == DateTimeKind.Utc;
+                var captureTimeUtc = timestamp.ToUniversalTime();
                 if (!isUtc)
                 {
-                    captureTimeUtc += TimeZoneInfo.Local.GetUtcOffset(captureTime);
+                    captureTimeUtc += TimeZoneInfo.Local.GetUtcOffset(timestamp);
                 }
 
                 var diffSpan = (int)(captureTimeUtc - captureTimeUtc.Date).TotalSeconds;
                 var diff = interval - (diffSpan % interval);
                 if (diff == 0 || diff == interval)
                 {
-                    return captureTime;
+                    return timestamp;
                 }
 
                 var previousPeriod = captureTimeUtc.Date.AddSeconds((diffSpan / interval) * interval);
@@ -182,26 +168,26 @@
                 }
                 else
                 {
-                    return captureTime;
+                    return timestamp;
                 }
 
-                return isUtc ? captureTimeUtc : (captureTimeUtc - TimeZoneInfo.Local.GetUtcOffset(captureTime)).ToLocalTime();
+                return isUtc ? captureTimeUtc : (captureTimeUtc - TimeZoneInfo.Local.GetUtcOffset(timestamp)).ToLocalTime();
             }
 
             if (interval == 86400)
             {
-                if (captureTime.Hour == 23 && captureTime.Minute >= 45)
+                if (timestamp.Hour == 23 && timestamp.Minute >= 45)
                 {
-                    return captureTime.Date.AddDays(1);
+                    return timestamp.Date.AddDays(1);
                 }
 
-                if (captureTime.Hour == 0 && captureTime.Minute < 15)
+                if (timestamp.Hour == 0 && timestamp.Minute < 15)
                 {
-                    return captureTime.Date;
+                    return timestamp.Date;
                 }
             }
 
-            return captureTime;
+            return timestamp;
         }
 
         /// <summary>
@@ -291,16 +277,6 @@
         public static TimeSpan GetTime(this DayTimeProfile time)
         {
             return new TimeSpan((int)time.StartTime.Hour, (int)time.StartTime.Minute, (int)time.StartTime.Second);
-        }
-
-        public static bool IsDateInIntervalBlock(this Interval interval, DateTime date)
-        {
-            if (date >= interval.Start && date <= interval.GetEnd())
-            {
-                return true;
-            }
-
-            return false;
         }
 
         public static bool IsPeriodInIntervalBlock(this Interval interval, DateTime start, DateTime end)

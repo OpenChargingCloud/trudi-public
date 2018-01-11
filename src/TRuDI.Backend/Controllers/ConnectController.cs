@@ -12,8 +12,8 @@
     using Microsoft.AspNetCore.Mvc;
 
     using TRuDI.Backend.Application;
-    using TRuDI.Backend.Exceptions;
     using TRuDI.Backend.Models;
+    using TRuDI.HanAdapter.Repository;
 
     /// <summary>
     /// The controller of the connect page.
@@ -41,7 +41,7 @@
         {
             try
             {
-                var hanAdapter = HanAdapterRepository.LoadAdapter(deviceId);
+                var hanAdapter = new HanAdapterContainer(HanAdapterRepository.LoadAdapter(deviceId), deviceId);
 
                 var manufacturerParametersView = hanAdapter.ManufacturerParametersView;
                 if (manufacturerParametersView != null)

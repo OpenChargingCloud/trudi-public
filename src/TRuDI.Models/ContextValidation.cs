@@ -232,16 +232,16 @@
             {
                 foreach (var ib in reading.IntervalBlocks)
                 {
-                    var intervalBlockEnd = ib.Interval.GetCaptureTimeEnd();
+                    var intervalBlockEnd = ib.Interval.GetEnd();
                     foreach (var ir in ib.IntervalReadings)
                     {
-                        if (ir.TimePeriod.CaptureTime.ToUniversalTime() < ib.Interval.CaptureTime.ToUniversalTime())
+                        if (ir.CaptureTime.ToUniversalTime() < ib.Interval.Start.ToUniversalTime())
                         {
-                            exceptions.Add(new InvalidOperationException($"TAF-7: IntervalReading befindet sich nicht innerhalb des Zeitbereichs eines IntervalBlocks: Start des IntervalBlocks: {ib.Interval.Start}, Zeitpunkt des IntervalReading: {ir.TimePeriod.CaptureTime}, Kennziffer: {reading.ReadingType.ObisCode}"));
+                            exceptions.Add(new InvalidOperationException($"TAF-7: IntervalReading befindet sich nicht innerhalb des Zeitbereichs eines IntervalBlocks: Start des IntervalBlocks: {ib.Interval.Start}, Zeitpunkt des IntervalReading: {ir.TimePeriod.Start}, Kennziffer: {reading.ReadingType.ObisCode}"));
                         }
-                        else if (ir.TimePeriod.CaptureTime.ToUniversalTime() > intervalBlockEnd.ToUniversalTime())
+                        else if (ir.CaptureTime.ToUniversalTime() > intervalBlockEnd.ToUniversalTime())
                         {
-                            exceptions.Add(new InvalidOperationException($"TAF-7: IntervalReading befindet sich nicht innerhalb des Zeitbereichs eines IntervalBlocks: Ende des IntervalBlocks: {intervalBlockEnd}, Zeitpunkt des IntervalReading: {ir.TimePeriod.GetCaptureTimeEnd()}, Kennziffer: {reading.ReadingType.ObisCode}"));
+                            exceptions.Add(new InvalidOperationException($"TAF-7: IntervalReading befindet sich nicht innerhalb des Zeitbereichs eines IntervalBlocks: Ende des IntervalBlocks: {intervalBlockEnd}, Zeitpunkt des IntervalReading: {ir.TimePeriod.GetEnd()}, Kennziffer: {reading.ReadingType.ObisCode}"));
                         }
                     }
                 }

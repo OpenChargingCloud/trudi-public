@@ -104,6 +104,9 @@
             get; set;
         }
 
+        /// <summary>
+        /// Die verwendete Messperiode in Sekunden. 
+        /// </summary>
         public uint MeasurementPeriod { get; set; }
     }
 }

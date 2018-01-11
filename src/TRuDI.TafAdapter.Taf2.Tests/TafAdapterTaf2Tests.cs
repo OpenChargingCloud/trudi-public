@@ -177,6 +177,8 @@ namespace TRuDI.TafAdapter.Taf2.Tests
                 new IntervalReading() { TimePeriod = new Interval() { Start = new DateTime(2017, 2, 1), Duration = 900 } }
             };
 
+            irSet1.ForEach(i => i.TargetTime = i.CaptureTime);
+
             reading.IntervalBlocks.Add(new IntervalBlock()
             {
                 Interval = new Interval()
@@ -207,6 +209,8 @@ namespace TRuDI.TafAdapter.Taf2.Tests
                 new IntervalReading() { TimePeriod = new Interval() { Start = new DateTime(2017, 2, 28, 23, 45, 0), Duration = 900 } },
                 new IntervalReading() { TimePeriod = new Interval() { Start = new DateTime(2017, 3, 1), Duration = 900 } }
             };
+
+            irSet2.ForEach(i => i.TargetTime = i.CaptureTime);
 
             reading.IntervalBlocks.Add(new IntervalBlock()
             {
@@ -1849,7 +1853,6 @@ namespace TRuDI.TafAdapter.Taf2.Tests
 
             var data = result.Data as Taf2Data;
 
-            
             Assert.AreEqual(6, data.SummaryRegister.Count);
 
             Assert.AreEqual("1-0:1.8.1*255", data.SummaryRegister[0].ObisCode.ToString());
@@ -1908,7 +1911,6 @@ namespace TRuDI.TafAdapter.Taf2.Tests
             Assert.AreEqual("2017-10-31T01:15:00+01:00", result.Data.End.ToString("yyyy-MM-ddTHH:mm:ssK"));
 
             var data = result.Data as Taf2Data;
-
 
             Assert.AreEqual(6, data.SummaryRegister.Count);
 
@@ -3001,6 +3003,42 @@ namespace TRuDI.TafAdapter.Taf2.Tests
 
             Assert.AreEqual("1-0:1.8.63*255", data.SummaryRegister[2].ObisCode.ToString());
             Assert.AreEqual(1490, data.SummaryRegister[2].Amount);
+            Assert.AreEqual(63, data.SummaryRegister[2].TariffId);
+        }
+
+        /// <summary>
+        /// Checks a 3 day data file against a supplier file that contains only the last day of the data file.
+        /// </summary>
+        [TestMethod]
+        [DeploymentItem(@"Data\result_3_days_out_of_raster.xml")]
+        [DeploymentItem(@"Data\supplier_3_day.xml")]
+        public void TestValueOutOfRaster()
+        {
+            var deviceXml = XDocument.Load(@"Data\result_3_days_out_of_raster.xml");
+            var deviceModel = XmlModelParser.ParseHanAdapterModel(deviceXml.Root.Descendants());
+
+            var supplierXml = XDocument.Load(@"Data\supplier_3_day.xml");
+            var supplierModel = XmlModelParser.ParseSupplierModel(supplierXml.Root.Descendants());
+
+            var target = new TafAdapterTaf2();
+            var result = target.Calculate(deviceModel, supplierModel);
+
+            Assert.AreEqual("2017-11-04T00:00:00+01:00", result.Data.Begin.ToString("yyyy-MM-ddTHH:mm:ssK"));
+            Assert.AreEqual("2017-11-07T00:00:00+01:00", result.Data.End.ToString("yyyy-MM-ddTHH:mm:ssK"));
+
+            var data = result.Data as Taf2Data;
+
+            Assert.AreEqual(3, data.SummaryRegister.Count);
+            Assert.AreEqual("1-0:1.8.1*255", data.SummaryRegister[0].ObisCode.ToString());
+            Assert.AreEqual(1150, data.SummaryRegister[0].Amount);
+            Assert.AreEqual(1, data.SummaryRegister[0].TariffId);
+
+            Assert.AreEqual("1-0:1.8.2*255", data.SummaryRegister[1].ObisCode.ToString());
+            Assert.AreEqual(1790, data.SummaryRegister[1].Amount);
+            Assert.AreEqual(2, data.SummaryRegister[1].TariffId);
+
+            Assert.AreEqual("1-0:1.8.63*255", data.SummaryRegister[2].ObisCode.ToString());
+            Assert.AreEqual(20, data.SummaryRegister[2].Amount);
             Assert.AreEqual(63, data.SummaryRegister[2].TariffId);
         }
     }

@@ -2,11 +2,13 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
 
     using TRuDI.Models;
     using TRuDI.TafAdapter.Interface.Taf2;
 
+    [DebuggerDisplay("{Start} - {Reading.ObisCode} - {Reading.Amount}")]
     public class AccountingDay : IAccountingSection
     {
         private readonly List<MeasuringRange> measuringRanges = new List<MeasuringRange>();

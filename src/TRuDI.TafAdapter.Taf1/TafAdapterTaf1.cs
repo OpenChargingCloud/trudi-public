@@ -39,7 +39,7 @@
             }
 
             this.ValidateOriginalValueLists(originalValueLists, supplier, device.MeterReadings.Count);
-            
+
             var registers = supplier.GetRegister();
             this.UpdateReadingTypeFromOriginalValueList(registers);
 
@@ -51,12 +51,12 @@
 
             var dayProfiles = supplier.AnalysisProfile.TariffChangeTrigger.TimeTrigger.DayProfiles;
 
-            foreach(OriginalValueList ovl in originalValueLists)
+            foreach (OriginalValueList ovl in originalValueLists)
             {
                 var startReading = ovl.MeterReading.GetIntervalReadingFromDate(billingPeriodStart);
                 var endReading = ovl.MeterReading.GetIntervalReadingFromDate(billingPeriodEnd);
 
-                if(startReading == null || !IsStatusValid(startReading)) 
+                if (startReading == null || !IsStatusValid(startReading))
                 {
                     throw new InvalidOperationException($"Zu dem Zeitpunkt {billingPeriodStart} ist kein Wert vorhanden oder der Status kritisch oder fatal.");
                 }
@@ -66,7 +66,7 @@
                     throw new InvalidOperationException($"Zu dem Zeitpunkt {billingPeriodEnd} ist kein Wert vorhanden oder der Status kritisch oder fatal.");
                 }
 
-                var dayProfile = this.GetDayProfileNumber(dayProfiles, new ObisId(ovl.MeterReading.ReadingType.ObisCode), 
+                var dayProfile = this.GetDayProfileNumber(dayProfiles, new ObisId(ovl.MeterReading.ReadingType.ObisCode),
                     supplier.AnalysisProfile);
 
                 var tariffStages = supplier.AnalysisProfile.TariffStages;
@@ -108,8 +108,8 @@
                 Reading = new Reading() { Amount = startReading.Value, ObisCode = new ObisId(meterReading.ReadingType.ObisCode) }
             };
 
-            var start = startReading.TimePeriod.Start;
-            var end = endReading.TimePeriod.Start;
+            var start = startReading.TargetTime.Value;
+            var end = endReading.TargetTime.Value;
             long amount = (long)(endReading.Value - startReading.Value);
 
             var range = new MeasuringRange(start, end, tariffId, amount);
@@ -117,7 +117,7 @@
             section.Add(range);
             section.Start = start;
 
-            return (section);
+            return section;
         }
 
         /// <summary>
@@ -133,7 +133,7 @@
                 throw new InvalidOperationException("Es werden maximal 3 originäre Messwertlisten unterstützt.");
             }
 
-            if(originalValueLists.Count != meterReadingsCount)
+            if (originalValueLists.Count != meterReadingsCount)
             {
                 throw new InvalidOperationException("Es sind nur originäre Messwertlisten zulässig.");
             }
@@ -155,7 +155,7 @@
         {
             foreach (SpecialDayProfile profile in specialDayProfiles)
             {
-              if(profile.DayId != dayId)
+                if (profile.DayId != dayId)
                 {
                     return false;
                 }
@@ -200,16 +200,16 @@
         /// </summary>
         public void ValidateBillingPeriod()
         {
-            if(billingPeriodStart.Day != 1)
+            if (billingPeriodStart.Day != 1)
             {
                 throw new InvalidOperationException($"Die Abrechnungsperiode {billingPeriodStart} startet nicht am Monatsanfang.");
             }
 
-            if(billingPeriodStart.AddMonths(1) == billingPeriodEnd)      { return; }
-            else if(billingPeriodStart.AddMonths(2) == billingPeriodEnd) { return; }
-            else if(billingPeriodStart.AddMonths(3) == billingPeriodEnd) { return; }
-            else if(billingPeriodStart.AddMonths(6) == billingPeriodEnd) { return; }
-            else if(billingPeriodStart.AddYears(1) == billingPeriodEnd)  { return; }
+            if (billingPeriodStart.AddMonths(1) == billingPeriodEnd) { return; }
+            else if (billingPeriodStart.AddMonths(2) == billingPeriodEnd) { return; }
+            else if (billingPeriodStart.AddMonths(3) == billingPeriodEnd) { return; }
+            else if (billingPeriodStart.AddMonths(6) == billingPeriodEnd) { return; }
+            else if (billingPeriodStart.AddYears(1) == billingPeriodEnd) { return; }
             else
             {
                 throw new InvalidOperationException($"Die angegebene Abrechnungsperiode von {(billingPeriodEnd - billingPeriodStart).TotalDays} Tagen ist ungültigt. Unterstütz werden 1, 2, 3, 6 oder 12 Monate.");
@@ -227,7 +227,7 @@
         {
             var profileList = dayProfiles.GetValidDayProfilesForMeterReading(obisId, analysisProfile.TariffStages);
 
-            if(profileList == null || profileList.Count != 1)
+            if (profileList == null || profileList.Count != 1)
             {
                 throw new InvalidOperationException($"Es sind {profileList?.Count} Tagesprofile vorhanden. Es ist genau 1 Tagesprofil erlaubt.");
             }
@@ -249,37 +249,37 @@
 
             return tariffId;
         }
-        
-       /// <summary>
-       /// Returns the SpecialDayProfiles which are needed. 
-       /// </summary>
-       /// <param name="supplier">The supplier object which contains the SpecialDayProfiles</param>
-       /// <param name="dayProfile">The dayId</param>
-       /// <returns>The SpecialDayProfiles corresponding to the dayProfile</returns>
-       public List<SpecialDayProfile> GetSpecialDayProfiles(UsagePointLieferant supplier, ushort dayProfile)
-       {
+
+        /// <summary>
+        /// Returns the SpecialDayProfiles which are needed. 
+        /// </summary>
+        /// <param name="supplier">The supplier object which contains the SpecialDayProfiles</param>
+        /// <param name="dayProfile">The dayId</param>
+        /// <returns>The SpecialDayProfiles corresponding to the dayProfile</returns>
+        public List<SpecialDayProfile> GetSpecialDayProfiles(UsagePointLieferant supplier, ushort dayProfile)
+        {
             var trigger = supplier.AnalysisProfile.TariffChangeTrigger.TimeTrigger;
 
             return trigger.SpecialDayProfiles.Where(s => s.DayId == dayProfile)
                 .OrderBy(s => s.SpecialDayDate.GetDate()).ToList();
-       }
+        }
 
-       /// <summary>
-       /// In Taf 1 a tariff change is not allowed. This will be checked in this method.
-       /// </summary>
-       /// <param name="supplier">The supplier object which is checked</param>
-       /// <param name="dayProfile">The current day profile number</param>
-       public void CheckValidSupplierFile(UsagePointLieferant supplier, ushort dayProfile, ushort tariff)
-       {
+        /// <summary>
+        /// In Taf 1 a tariff change is not allowed. This will be checked in this method.
+        /// </summary>
+        /// <param name="supplier">The supplier object which is checked</param>
+        /// <param name="dayProfile">The current day profile number</param>
+        public void CheckValidSupplierFile(UsagePointLieferant supplier, ushort dayProfile, ushort tariff)
+        {
             var profiles = this.GetSpecialDayProfiles(supplier, dayProfile);
 
             var days = (int)(billingPeriodEnd - billingPeriodStart).TotalDays;
 
-            if(profiles.Count % days != 0)
+            if (profiles.Count % days != 0)
             {
                 throw new InvalidOperationException($"Die Anzahl der SpecialDayProfile Objekte muss einem vielfachen von {days} entsprechen.");
             }
-       }
+        }
 
         /// <summary>
         /// Check if the IntervalReading instance has an valid status

@@ -9,20 +9,13 @@
     /// </summary>
     public class Interval
     {
-
-        /// <summary>
-        /// Der genaue Zeitpunkt der Ablesung des Wertes
-        /// </summary>
-        public DateTime CaptureTime { get; set; }
-
         /// <summary>
         /// Der Startzeitpunkt des Intervals
         /// </summary>
         public DateTime Start { get; set; }
 
         /// <summary>
-        /// Die Dauer des Intervals. Wird in ganzzahligen Sekunden
-        /// angegeben.
+        /// Die Dauer des Intervals. Wird in ganzzahligen Sekunden angegeben.
         /// </summary>
         public uint? Duration { get; set; }
     }

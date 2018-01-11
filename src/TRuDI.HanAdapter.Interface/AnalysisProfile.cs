@@ -2,6 +2,9 @@ namespace TRuDI.HanAdapter.Interface
 {
     using System.Xml.Linq;
 
+    /// <summary>
+    /// Analysis profile XML data.
+    /// </summary>
     public class AnalysisProfile
     {
         /// <summary>

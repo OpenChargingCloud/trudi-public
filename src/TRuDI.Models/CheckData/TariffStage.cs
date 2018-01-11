@@ -1,10 +1,13 @@
 ﻿namespace TRuDI.Models.CheckData
 {
+    using System.Diagnostics;
+
     /// <summary>
     /// Die Klasse TariffStage spezifiziert einzelne Tarifstufen 
     /// des Auswerteprofils. Ein Auswerteprofil muss mindestens 
     /// eine Instanz der Klasse TariffStage enthalten.
     /// </summary>
+    [DebuggerDisplay("{ObisCode} - {TariffNumber} ({Description})")]
     public class TariffStage
     {
         /// <summary>

@@ -13,7 +13,7 @@
         /// <summary>
         /// Verweis auf den IntervalBlock, der die Instanz der Klasse IntervalReading enthält.
         /// </summary>
-        public IntervalBlock IntervalBlock 
+        public IntervalBlock IntervalBlock
         {
             get; set;
         }
@@ -31,14 +31,23 @@
         /// 
         /// Bei einem Zählerstandsgang ist die Dauer 0s, da es sich um einen Zeitpunkt handelt.
         /// 
-        /// JEde Instanz der Klasse IntervalReading muss ein Datenelement vom Typ timePeriod enthalten.
+        /// Jede Instanz der Klasse IntervalReading muss ein Datenelement vom Typ timePeriod enthalten.
         /// </summary>
         public Interval TimePeriod
         {
             get; set;
         }
 
+        /// <summary>
+        /// Sollzeit: Zeitpunkt zu dem der Wert abgelesen werden sollte.
+        /// Optional.
+        /// </summary>
         public DateTime? TargetTime { get; set; }
+
+        /// <summary>
+        /// Tatsächlicher Ablesezeitpunkt des Wertes (=> TimePeriod.Start).
+        /// </summary>
+        public DateTime CaptureTime => this.TimePeriod.Start;
 
         /// <summary>
         /// Das Datenelement value repräsentiert den Wert der Messung. Dieser wird als ganzzahliger Wert definiert.

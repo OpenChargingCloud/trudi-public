@@ -1,5 +1,7 @@
 ﻿namespace TRuDI.Models.CheckData
 {
+    using System.Diagnostics;
+
     /// <summary>
     /// Die Klasse SpecialDayProfile spezifiziert Sondertage, 
     /// die ein bestimmtes Tagesprofil abbilden müssen.
@@ -8,11 +10,10 @@
     /// Eine Instanz der Klasse SpecialDayProfile:
 	///     
     ///     - muss auf eine Instanz der Klasse DayProfile verweisen.
-    ///
     /// </summary>
+    [DebuggerDisplay("Id={DayId}, Date={SpecialDayDate.Year}-{SpecialDayDate.Month}-{SpecialDayDate.DayOfMonth}")]
     public class SpecialDayProfile
     {
-
         /// <summary>
         /// Instanzen der Klasse DayProfile kapseln ein oder mehrere 
         /// Instanzen der Klasse DayTimeProfiles.
@@ -21,7 +22,6 @@
         {
             get; set;
         }
-
       
         /// <summary>
         /// Das Datenelement dayId der Klasse SpecialDayProfile referenziert auf das entsprechende 

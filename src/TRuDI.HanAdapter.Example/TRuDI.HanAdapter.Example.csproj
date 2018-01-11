@@ -6,6 +6,10 @@
 
   <PropertyGroup>
     <RestoreSources>$(RestoreSources);../../private-packages;https://api.nuget.org/v3/index.json</RestoreSources>
+    <Authors />
+    <Company>Example GmbH</Company>
+    <Product>TRuDI-HAN-Adapter f�r das Example GmbH Smart Meter Gateway</Product>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

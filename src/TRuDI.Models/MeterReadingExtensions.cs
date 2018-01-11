@@ -120,9 +120,9 @@
             for (int i = 0; i < MeasuringPeriods.Length; i++)
             {
                 int period = MeasuringPeriods[i];
-                int window = (period / 100 * 2);
+                int window = period / 100 * 2;
 
-                if (span == period || span > period - window && span < period + window)
+                if (span == period || (span > period - window && span < period + window))
                 {
                     return period;
                 }
@@ -137,7 +137,7 @@
 
             for (int i = 1; i < block.IntervalReadings.Count; i++)
             {
-                var span = block.IntervalReadings[i].TimePeriod.Start.ToUniversalTime() - block.IntervalReadings[i - 1].TimePeriod.Start.ToUniversalTime();
+                var span = block.IntervalReadings[i].TargetTime?.ToUniversalTime() - block.IntervalReadings[i - 1].TargetTime?.ToUniversalTime();
                 if (span > measurementPeriod)
                 {
                     count++;
@@ -204,20 +204,31 @@
 
         public static IntervalReading GetIntervalReadingFromDate(this MeterReading reading, DateTime date)
         {
-            var blocks = reading.IntervalBlocks?.FirstOrDefault(ib => ib.Interval.IsDateInIntervalBlock(date));
-            if (blocks != null)
-            {
-                return blocks.IntervalReadings?.FirstOrDefault(ir => ir.TimePeriod.Start == date);
-            }
+            var blocks = reading.IntervalBlocks?.FirstOrDefault(ib =>
+                {
+                    if (date >= ib.Interval.Start && date <= ib.Interval.GetEnd())
+                    {
+                        return true;
+                    }
 
-            return null;
+                    var alignedStart = ModelExtensions.GetAlignedTimestamp(ib.Interval.Start);
+                    var alignedEnd = alignedStart.AddUtcSeconds(ib.Interval.Duration.Value);
+                    if (date >= alignedStart && date <= alignedEnd)
+                    {
+                        return true;
+                    }
+
+                    return false;
+                });
+
+            return blocks?.IntervalReadings?.FirstOrDefault(ir => ir.TargetTime == date);
         }
 
         public static DateTime? GetFirstReadingTimestamp(this MeterReading reading, DateTime min, DateTime max)
         {
             for (int i = 0; i < reading.IntervalBlocks.Count; i++)
             {
-                var timestamp = reading.IntervalBlocks[i].IntervalReadings?.FirstOrDefault(ir => ir.TimePeriod.Start >= min && ir.TimePeriod.Start <= max)?.TimePeriod?.Start;
+                var timestamp = reading.IntervalBlocks[i].IntervalReadings?.FirstOrDefault(ir => ir.TargetTime >= min && ir.TargetTime <= max)?.TargetTime;
                 if (timestamp != null)
                 {
                     return timestamp;
@@ -231,7 +242,7 @@
         {
             for (int i = reading.IntervalBlocks.Count - 1; i >= 0; i--)
             {
-                var timestamp = reading.IntervalBlocks[i].IntervalReadings?.LastOrDefault(ir => ir.TimePeriod.Start >= min && ir.TimePeriod.Start <= max)?.TimePeriod?.Start;
+                var timestamp = reading.IntervalBlocks[i].IntervalReadings?.LastOrDefault(ir => ir.TargetTime >= min && ir.TargetTime <= max)?.TargetTime;
                 if (timestamp != null)
                 {
                     return timestamp;

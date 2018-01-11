@@ -43,8 +43,8 @@
                 this.FatalErrorCount += statusCount.FatalError;
             }
 
-            this.Start = this.MeterReading.IntervalBlocks.First().IntervalReadings.First().TimePeriod.Start;
-            this.End = this.MeterReading.IntervalBlocks.Last().IntervalReadings.Last().TimePeriod.Start;
+            this.Start = this.MeterReading.IntervalBlocks.First().IntervalReadings.First().TargetTime.Value;
+            this.End = this.MeterReading.IntervalBlocks.Last().IntervalReadings.Last().TargetTime.Value;
 
             this.Meter = this.MeterReading.Meters.FirstOrDefault()?.MeterId;
 
@@ -96,7 +96,7 @@
                 {
                     foreach (var reading in block.IntervalReadings)
                     {
-                        while (reading.TimePeriod.Start.ToUniversalTime() > currentTimestamp)
+                        while (reading.TargetTime?.ToUniversalTime() > currentTimestamp)
                         {
                             if (currentTimestamp >= start && currentTimestamp <= end)
                             {
@@ -104,8 +104,9 @@
                                 yield return new IntervalReading
                                                  {
                                                      TimePeriod =
-                                                         new Interval { Start = currentTimestamp.ToLocalTime() }
-                                                 };
+                                                         new Interval { Start = currentTimestamp.ToLocalTime() },
+                                                     TargetTime = currentTimestamp.ToLocalTime()
+                                };
                             }
 
                             currentTimestamp += this.MeasurementPeriod;
@@ -115,12 +116,12 @@
                             }
                         }
 
-                        if (reading.TimePeriod.Start.ToUniversalTime() > end)
+                        if (reading.TargetTime?.ToUniversalTime() > end)
                         {
                             yield break;
                         }
 
-                        if (reading.TimePeriod.Start.ToUniversalTime() >= start && reading.TimePeriod.Start.ToUniversalTime() <= end)
+                        if (reading.TargetTime?.ToUniversalTime() >= start && reading.TargetTime?.ToUniversalTime() <= end)
                         {
                             yield return reading;
                             currentTimestamp += this.MeasurementPeriod;
@@ -134,12 +135,12 @@
                 {
                     foreach (var reading in block.IntervalReadings)
                     {
-                        if (reading.TimePeriod.Start.ToUniversalTime() < start)
+                        if (reading.TargetTime?.ToUniversalTime() < start)
                         {
                             continue;
                         }
 
-                        if (reading.TimePeriod.Start.ToUniversalTime() <= end)
+                        if (reading.TargetTime?.ToUniversalTime() <= end)
                         {
                             yield return reading;
                         }
@@ -159,9 +160,9 @@
 
             foreach (var reading in this.GetReadings(this.Start, this.End))
             {
-                if (currentDay.Timestamp != reading.TimePeriod.Start.Date)
+                if (currentDay.Timestamp != reading.TargetTime?.Date)
                 {
-                    currentDay = new DailyOvlErrorStatus { Timestamp = reading.TimePeriod.Start.Date };
+                    currentDay = new DailyOvlErrorStatus { Timestamp = reading.TargetTime.Value.Date };
                     statusList.Add(currentDay);
                 }
 
@@ -207,7 +208,7 @@
         {
             foreach (var block in this.MeterReading.IntervalBlocks)
             {
-                var reading = block.IntervalReadings.FirstOrDefault(ir => ir.TimePeriod.Start == timestamp);
+                var reading = block.IntervalReadings.FirstOrDefault(ir => ir.TargetTime == timestamp);
                 if (reading != null)
                 {
                     return reading;

@@ -42,6 +42,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TRuDI.TafAdapter.Taf1.Tests
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TRuDI.UITests", "TRuDI.UITests\TRuDI.UITests.csproj", "{DBC6BA60-3233-41FA-90E0-588A81FA8030}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TRuDI.TafAdapter.Repository", "TRuDI.TafAdapter.Repository\TRuDI.TafAdapter.Repository.csproj", "{3C08F4DD-B64C-4A6B-9F55-7403CD600E79}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TRuDI.HanAdapter.Repository", "TRuDI.HanAdapter.Repository\TRuDI.HanAdapter.Repository.csproj", "{D683F0AB-B5D9-4D00-80A3-CF09C134562D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -104,6 +108,14 @@ Global
 		{DBC6BA60-3233-41FA-90E0-588A81FA8030}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DBC6BA60-3233-41FA-90E0-588A81FA8030}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DBC6BA60-3233-41FA-90E0-588A81FA8030}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C08F4DD-B64C-4A6B-9F55-7403CD600E79}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C08F4DD-B64C-4A6B-9F55-7403CD600E79}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C08F4DD-B64C-4A6B-9F55-7403CD600E79}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C08F4DD-B64C-4A6B-9F55-7403CD600E79}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D683F0AB-B5D9-4D00-80A3-CF09C134562D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D683F0AB-B5D9-4D00-80A3-CF09C134562D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D683F0AB-B5D9-4D00-80A3-CF09C134562D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D683F0AB-B5D9-4D00-80A3-CF09C134562D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

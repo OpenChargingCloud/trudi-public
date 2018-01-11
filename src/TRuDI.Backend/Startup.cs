@@ -15,7 +15,9 @@
     using TRuDI.Backend.Application;
     using TRuDI.Backend.MessageHandlers;
     using TRuDI.Backend.Utils;
+    using TRuDI.HanAdapter.Repository;
     using TRuDI.TafAdapter.Interface;
+    using TRuDI.TafAdapter.Repository;
 
     using WebSocketManager;
 

@@ -1,5 +1,8 @@
 namespace TRuDI.HanAdapter.Interface
 {
+    /// <summary>
+    /// List of errors that can be returned by HAN adapters.
+    /// </summary>
     public enum ErrorType
     {
         /// <summary>

@@ -123,7 +123,7 @@ namespace TRuDI.TafAdapter.Taf2
 
                 index = startData.index;
                 startReading = startData.startReading;
-                start = startData.startReading != null && IsStatusValid(startData.startReading) ? startData.startReading.TimePeriod.Start : start;
+                start = startData.startReading != null && IsStatusValid(startData.startReading) ? startData.startReading.TargetTime.Value : start;
                 latestTariffId = startData.tariffId;
                 latestReading = startData.latestReading;
             }
@@ -154,7 +154,7 @@ namespace TRuDI.TafAdapter.Taf2
                   
 
                     latestReading = rangeData.latestReading;
-                    start = rangeData.reading.TimePeriod.Start;
+                    start = rangeData.reading.TargetTime.Value;
                     startReading = rangeData.reading;
                     i = rangeData.index;
                     latestTariffId = rangeData.range.TariffId;
@@ -222,7 +222,7 @@ namespace TRuDI.TafAdapter.Taf2
 
                 if (result == start)
                 {
-                    (result, helpindex) = FindNextValidTime(end, profile, dayTimeProfiles, meterReading, index);
+                    (result, helpindex) = this.FindNextValidTime(end, profile, dayTimeProfiles, meterReading, index);
 
                     if (helpindex + 1 == dayTimeProfiles.Count)
                     {
@@ -309,18 +309,19 @@ namespace TRuDI.TafAdapter.Taf2
             }
 
             return (reading, date);
-
-            DateTime LocalSetLastReading(DateTime time, int idx, int dtpCount)
-            {
-                
-                // Checked the TimeOfDay Value. In every case a value from DayTimeProfiles is used. 
-                if (idx == dtpCount-1 && time.TimeOfDay == new TimeSpan(23, 45, 00))
-                {
-                    return time.AddSeconds(900);
-                }
-                return time;
-            }
         }
+
+        private static DateTime LocalSetLastReading(DateTime time, int idx, int dtpCount)
+        {
+            // Checked the TimeOfDay Value. In every case a value from DayTimeProfiles is used. 
+            if (idx == dtpCount - 1 && time.TimeOfDay == new TimeSpan(23, 45, 00))
+            {
+                return time.AddSeconds(900);
+            }
+
+            return time;
+        }
+
 
         /// <summary>
         /// This method is used to create an empty endReading object

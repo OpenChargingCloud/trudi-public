@@ -5,6 +5,8 @@
     using System.Runtime.InteropServices;
     
     using TRuDI.Backend.Utils;
+    using TRuDI.HanAdapter.Repository;
+    using TRuDI.TafAdapter.Repository;
 
     /// <summary>
     /// Helper class used to calculate checksums of important application files.
@@ -33,6 +35,16 @@
                                      this.GetDigest("../../../../app.asar"),
                                      this.GetDigest("../../../../electron.asar"),
                                  };
+            }
+
+            foreach (var hanAdapter in HanAdapterRepository.AvailableAdapters)
+            {
+                hanAdapter.Hash = DigestUtils.GetDigestFromAssembly(hanAdapter.Assembly);
+            }
+
+            foreach (var tafAdapter in TafAdapterRepository.AvailableAdapters)
+            {
+                tafAdapter.Hash = DigestUtils.GetDigestFromAssembly(tafAdapter.Assembly);
             }
         }
 

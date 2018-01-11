@@ -1,8 +1,11 @@
 ﻿namespace TRuDI.Models.CheckData
 {
+    using System.Diagnostics;
+
     /// <summary>
     /// Die Klasse DayTimeProfile spezifiziert die Tageszeit für die übergeordnete DayProfile-Instanz
     /// </summary>
+    [DebuggerDisplay("{StartTime.Hour}:{StartTime.Minute}:{StartTime.Second}, Tariff={TariffNumber}")]
     public class DayTimeProfile
     {
         /// <summary>

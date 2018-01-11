@@ -215,10 +215,7 @@
                             case "interval":
                                 usagePoint.MeterReadings.LastOrDefault()
                                     .IntervalBlocks.LastOrDefault()
-                                    .Interval.CaptureTime = Convert.ToDateTime(e.Value);
-                                usagePoint.MeterReadings.LastOrDefault()
-                                    .IntervalBlocks.LastOrDefault()
-                                    .Interval.Start = ModelExtensions.GetSmoothCaptureTime(Convert.ToDateTime(e.Value));
+                                    .Interval.Start = Convert.ToDateTime(e.Value);
                                 break;
                             case "timePeriod":
                                 usagePoint.MeterReadings.LastOrDefault()
@@ -227,8 +224,7 @@
                                     .TimePeriod.Start = Convert.ToDateTime(e.Value);
                                 break;
                             case "billingPeriod":
-                                usagePoint.AnalysisProfile.BillingPeriod.CaptureTime = Convert.ToDateTime(e.Value);
-                                usagePoint.AnalysisProfile.BillingPeriod.Start = ModelExtensions.GetSmoothCaptureTime(Convert.ToDateTime(e.Value));
+                                usagePoint.AnalysisProfile.BillingPeriod.Start = Convert.ToDateTime(e.Value);
                                 break;
                         }
                         break;
@@ -432,10 +428,18 @@
                     {
                         foreach (var ir in block.IntervalReadings)
                         {
-                            ir.TimePeriod.CaptureTime = ir.TimePeriod.Start;
-                            if (measurementPeriod > 0)
+                            if (ir.TargetTime == null)
                             {
-                                ir.TimePeriod.Start = ModelExtensions.GetSmoothCaptureTime(ir.TimePeriod.Start, measurementPeriod);
+                                if (measurementPeriod > 0)
+                                {
+                                    ir.TargetTime = ModelExtensions.GetAlignedTimestamp(
+                                        ir.TimePeriod.Start,
+                                        measurementPeriod);
+                                }
+                                else
+                                {
+                                    ir.TargetTime = ir.TimePeriod.Start;
+                                }
                             }
                         }
                     }
@@ -544,8 +548,7 @@
                         usagePoint.AnalysisProfile.BillingPeriod.Duration = Convert.ToUInt32(e.Value);
                         break;
                     case "start":
-                        usagePoint.AnalysisProfile.BillingPeriod.CaptureTime = Convert.ToDateTime(e.Value);
-                        usagePoint.AnalysisProfile.BillingPeriod.Start = ModelExtensions.GetSmoothCaptureTime(Convert.ToDateTime(e.Value));
+                        usagePoint.AnalysisProfile.BillingPeriod.Start = Convert.ToDateTime(e.Value);
                         break;
                     case "TariffStage":
                         usagePoint.AnalysisProfile.TariffStages.Add(new TariffStage());

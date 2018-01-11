@@ -30,14 +30,37 @@
 
         public string MissingProperties()
         {
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
 
-            if (String.IsNullOrEmpty(this.CustomerId)) sb.Append("CUstomerId ");
-            if (String.IsNullOrEmpty(this.InvoicingPartyId)) sb.Append("InvoicingPartyId ");
-            if (String.IsNullOrEmpty(this.SmgwId)) sb.Append("SmgwId ");
-            if (String.IsNullOrEmpty(this.Certificate)) sb.Append("Certificate ");
-            if (String.IsNullOrEmpty(this.UsagePointId)) sb.Append("UsagePointId ");
-            if (String.IsNullOrEmpty(this.TariffName)) sb.Append("TariffName ");
+            if (string.IsNullOrEmpty(this.CustomerId))
+            {
+                sb.Append("CustomerId ");
+            }
+
+            if (string.IsNullOrEmpty(this.InvoicingPartyId))
+            {
+                sb.Append("InvoicingPartyId ");
+            }
+
+            if (string.IsNullOrEmpty(this.SmgwId))
+            {
+                sb.Append("SmgwId ");
+            }
+
+            if (string.IsNullOrEmpty(this.Certificate))
+            {
+                sb.Append("Certificate ");
+            }
+
+            if (string.IsNullOrEmpty(this.UsagePointId))
+            {
+                sb.Append("UsagePointId ");
+            }
+
+            if (string.IsNullOrEmpty(this.TariffName))
+            {
+                sb.Append("TariffName ");
+            }
 
             return sb.ToString();
         }
@@ -45,58 +68,54 @@
         private bool HasAllProperties()
         {
             return
-                !String.IsNullOrEmpty(this.CustomerId) &&
-                !String.IsNullOrEmpty(this.InvoicingPartyId) &&
-                !String.IsNullOrEmpty(this.SmgwId) &&
-                !String.IsNullOrEmpty(this.Certificate) &&
-                !String.IsNullOrEmpty(this.UsagePointId) &&
-                !String.IsNullOrEmpty(this.TariffName);
+                !string.IsNullOrEmpty(this.CustomerId) &&
+                !string.IsNullOrEmpty(this.InvoicingPartyId) &&
+                !string.IsNullOrEmpty(this.SmgwId) &&
+                !string.IsNullOrEmpty(this.Certificate) &&
+                !string.IsNullOrEmpty(this.UsagePointId) &&
+                !string.IsNullOrEmpty(this.TariffName);
         }
 
         public XDocument GenerateXmlDocument()
         {
             if (!this.HasAllProperties())
+            {
                 return new XDocument();
+            }
 
-            XElement serviceCategory = new XElement(this.espi + "ServiceCategory", new XElement(this.espi + "kind", (ushort)this.ServiceCategoryKind));
-            XElement customer = new XElement(this.ar + "Customer", new XElement(this.ar + "customerId", this.CustomerId));
-            XElement invoicingParty = new XElement(this.ar + "InvoicingParty", new XElement(this.ar + "invoicingPartyId", this.InvoicingPartyId));
+            var serviceCategory = new XElement(this.espi + "ServiceCategory", new XElement(this.espi + "kind", (ushort)this.ServiceCategoryKind));
+            var customer = new XElement(this.ar + "Customer", new XElement(this.ar + "customerId", this.CustomerId));
+            var invoicingParty = new XElement(this.ar + "InvoicingParty", new XElement(this.ar + "invoicingPartyId", this.InvoicingPartyId));
 
-            XElement smgw = new XElement(this.ar + "SMGW");
+            var smgw = new XElement(this.ar + "SMGW");
             smgw.Add(new XElement(this.ar + "certId", this.CertId));
             smgw.Add(new XElement(this.ar + "smgwId", this.SmgwId.WithNameExtension()));
 
-            XElement usagePoint = new XElement(
+            var usagePoint = new XElement(
                 this.ar + "UsagePoint",
                 serviceCategory,
                 new XElement(this.ar + "usagePointId", this.UsagePointId),
                 customer,
                 invoicingParty,
-                smgw
-            );
-                        
+                smgw);
 
-            // Create root element
-            XElement UsagePoints = new XElement(
+            var trudiXml = new XDocument(new XElement(
                 this.ar + "UsagePoints",
                 new XAttribute("xmlns", this.ar),
                 new XAttribute(XNamespace.Xmlns + "xsi", this.xsi),
                 new XAttribute(this.xsi + "schemaLocation", this.schemaLocation),
                 new XAttribute(XNamespace.Xmlns + "espi", this.espi),
                 new XAttribute(XNamespace.Xmlns + "atom", this.atom),
-                usagePoint
-            );
+                usagePoint));
 
-            XDocument trudiXml = new XDocument(UsagePoints);
-
-            //Certificate
-            XElement cer = new XElement(this.ar + "Certificate", new XElement(this.ar + "certId", this.CertId), new XElement(this.ar + "certType", this.CertType));
+            // Certificate
+            var cer = new XElement(this.ar + "Certificate", new XElement(this.ar + "certId", this.CertId), new XElement(this.ar + "certType", this.CertType));
             cer.Add(new XElement(this.ar + "certContent", this.Certificate));
             usagePoint.Add(cer);
 
             usagePoint.Add(new XElement(this.ar + "tariffName", this.TariffName));
 
-            //event logs
+            // event logs
             if (this.LogList != null && this.LogList.Count > 0)
             {
                 foreach (LogEntry log in this.LogList)
@@ -106,8 +125,7 @@
                             new XElement(this.ar + "level", (byte)log.LogEvent.Level),
                             new XElement(this.ar + "text", log.LogEvent.Text),
                             new XElement(this.ar + "outcome", (byte)log.LogEvent.Outcome),
-                            new XElement(this.ar + "timestamp", log.LogEvent.Timestamp.ToString("yyyy-MM-ddTHH:mm:ssK")
-                        )));
+                            new XElement(this.ar + "timestamp", log.LogEvent.Timestamp.ToString("yyyy-MM-ddTHH:mm:ssK"))));
 
                     if (log.RecordNumber != null)
                     {
@@ -120,20 +138,19 @@
 
             if (this.MeterReadings == null || this.MeterReadings.Count == 0)
             {
-                return trudiXml; //return early to avoid big if statement
+                return trudiXml;
             }
 
-            foreach (MeterReading meterReading in this.MeterReadings)
+            foreach (var meterReading in this.MeterReadings)
             {
-
-                XElement mr = new XElement(
+                var mr = new XElement(
                     this.ar + "MeterReading",
                     new XElement(this.ar + "Meter", new XElement(this.ar + "meterId", meterReading.Meters[0].MeterId)),
                     new XElement(this.ar + "meterReadingId", meterReading.MeterReadingId));
 
                 if (meterReading.ReadingType.MeasurementPeriod == 0)
                 {
-                    mr.Add( new XElement(
+                    mr.Add(new XElement(
                         this.ar + "ReadingType",
                         new XElement(this.espi + "powerOfTenMultiplier", (short)meterReading.ReadingType.PowerOfTenMultiplier),
                         new XElement(this.espi + "uom", (ushort)meterReading.ReadingType.Uom),
@@ -153,36 +170,40 @@
                         new XElement(this.ar + "measurementPeriod", meterReading.ReadingType.MeasurementPeriod)));
                 }
 
-                foreach (IntervalBlock iBlock in meterReading.IntervalBlocks)
+                foreach (var iBlock in meterReading.IntervalBlocks)
                 {
-                    XElement intervalBlock = new XElement(this.ar + "IntervalBlock",
+                    var intervalBlock = new XElement(this.ar + "IntervalBlock",
                         new XElement(this.ar + "interval",
                             new XElement(this.ar + "duration", iBlock.Interval.Duration),
-                            new XElement(this.ar + "start", iBlock.Interval.Start.ToString("yyyy-MM-ddTHH:mm:ssK"))
-                        ));
+                            new XElement(this.ar + "start", iBlock.Interval.Start.ToString("yyyy-MM-ddTHH:mm:ssK"))));
 
-                    foreach (IntervalReading iReading in iBlock.IntervalReadings)
+                    foreach (var iReading in iBlock.IntervalReadings)
                     {
-                        XElement intervalReading = new XElement(this.ar + "IntervalReading",
+                        var intervalReading = new XElement(this.ar + "IntervalReading",
                             new XElement(this.espi + "value", iReading.Value),
                             new XElement(this.ar + "timePeriod",
                                 new XElement(this.ar + "duration", iReading.TimePeriod.Duration),
-                                new XElement(this.ar + "start", iReading.TimePeriod.Start.ToString("yyyy-MM-ddTHH:mm:ssK")))
-                            );
-                        if (iReading.StatusPTB.HasValue)
+                                new XElement(this.ar + "start", iReading.TimePeriod.Start.ToString("yyyy-MM-ddTHH:mm:ssK"))));
+
+                        if (iReading.TargetTime.HasValue)
                         {
-                            intervalReading.Add(new XElement(this.ar + "statusPTB", (int)iReading.StatusPTB));
+                            intervalReading.Add(new XElement(this.ar + "targetTime", iReading.TargetTime.Value.ToString("yyyy-MM-ddTHH:mm:ssK")));
                         }
-                        else
-                        {
-                            intervalReading.Add(new XElement(this.ar + "statusFNN", iReading.StatusFNN.Status));
-                        }
+
+                        intervalReading.Add(
+                            iReading.StatusPTB.HasValue
+                                ? new XElement(this.ar + "statusPTB", (int)iReading.StatusPTB)
+                                : new XElement(this.ar + "statusFNN", iReading.StatusFNN.Status));
+
                         intervalBlock.Add(intervalReading);
                     }
+
                     mr.Add(intervalBlock);
                 }
+
                 usagePoint.Add(mr);
             }
+
             return trudiXml;
         }
     }
@@ -191,7 +212,7 @@
     {
         public static string WithNameExtension(this string id)
         {
-            return id?? (id.EndsWith(".sm") ? id : $"{id}.sm");
+            return id ?? (id.EndsWith(".sm") ? id : $"{id}.sm");
         }
     }
 }

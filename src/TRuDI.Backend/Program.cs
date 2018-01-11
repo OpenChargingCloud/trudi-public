@@ -17,6 +17,7 @@
     using Serilog.Events;
 
     using TRuDI.Backend.Application;
+    using TRuDI.HanAdapter.Repository;
 
 #if !DEBUG
     using System;
@@ -218,7 +219,7 @@
                                             ServerCertificate =
                                                     CertificateGenerator
                                                         .GenerateCertificate(
-                                                            $"CN={DigestUtils.GetDigestFromAssembly(typeof(Program)).ToLowerInvariant()}")
+                                                            $"CN={DigestUtils.GetDigestFromAssembly(typeof(Program).Assembly).ToLowerInvariant()}")
                                         };
 
                                     listenOptions.UseHttps(httpsOptions);

@@ -1,13 +1,14 @@
 ﻿namespace TRuDI.Models.CheckData
 {
     using System.Collections.Generic;
+    using System.Diagnostics;
 
     /// <summary>
     /// Instanzen der Klasse DayProfile kapseln ein oder mehrere Instanzen der Klasse DayTimeProfiles.
     /// 
     /// Eine Instanz der Klasse muss auf mindestens eine Instanz der Klasse DayTimeProfiles verweisen.
-    /// 
     /// </summary>
+    [DebuggerDisplay("DayId={DayId}")]
     public class DayProfile
     {
         /// <summary>

@@ -12,7 +12,9 @@
 
     using TRuDI.Backend.Exceptions;
     using TRuDI.Backend.Models;
+    using TRuDI.HanAdapter.Example;
     using TRuDI.HanAdapter.Interface;
+    using TRuDI.HanAdapter.Repository;
 
     /// <summary>
     /// Wrapper class for HAN adapters.
@@ -33,7 +35,15 @@
         {
             this.DeviceId = deviceId;
             this.hanAdapterInfo = hanAdapterInfo;
-            this.Adapter = hanAdapterInfo.CreateInstance();
+
+            if (this.hanAdapterInfo.Name == nameof(HanAdapterExample))
+            {
+                this.Adapter = new HanAdapterExample(Program.CommandLineArguments.TestConfiguration);
+            }
+            else
+            {
+                this.Adapter = hanAdapterInfo.CreateInstance();
+            }
         }
 
         /// <summary>

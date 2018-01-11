@@ -36,6 +36,8 @@ namespace IVU.Common.Tls.RecordLayer
             // Make sure fragments are not too long
             foreach (Record record in records)
             {
+                token.ThrowIfCancellationRequested();
+
                 if (record.Fragment.Length > MAX_RECORD_SIZE)
                 {
                     throw new RecordTooLargeException("Trying to send a too large fragment: " + record.Fragment.Length);
@@ -47,7 +49,12 @@ namespace IVU.Common.Tls.RecordLayer
 
                 try
                 {
+                    // hook to combine token.cancel with stream.close, otherwise WriteAsync possibly never returns
+                    using (token.Register(this.innerStream.Close))
+                    {
                     await this.innerStream.WriteAsync(buffer, 0, buffer.Length, token);
+                    }
+                    
                     break;
                 }
                 catch (Exception ex)

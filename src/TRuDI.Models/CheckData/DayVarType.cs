@@ -1,5 +1,7 @@
 ﻿namespace TRuDI.Models.CheckData
 {
+    using System.Diagnostics;
+
     /// <summary>
     /// Die Klasse DayVarType kann genutzt werden, um Datumsangaben darzustellen, 
     /// zum Beispiel um Feiertage zu beschreiben. Ist in der Klasse DayVarType keine 
@@ -9,9 +11,9 @@
 	/// Die Klasse DayVarType verweist auf keine weiteren Klassen.
     ///
     /// </summary>
+    [DebuggerDisplay("{Year}-{Month}-{DayOfMonth")]
     public class DayVarType
     {
-
         /// <summary>
         /// Das Datenelement dayOfMonth kann genutzt werden, um den genauen Tag 
         /// innerhalb eines Monats zu spezifizieren. 
@@ -59,6 +61,5 @@
         {
             get; set;
         }
-
     }
 }

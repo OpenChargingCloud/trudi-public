@@ -19,7 +19,7 @@
         {
             
             <tr class="@entry.ToStatusBackground()">
-                <td>@entry.TimePeriod.CaptureTime</td>
+                <td>@entry.CaptureTime</td>
                 <td class="text-right">@entry.Value.GetDisplayValue(Model.Source.Uom, Model.Source.PowerOfTenMultiplier, Model.Source.Scaler)</td>
                 <td>@Model.Source.DisplayUnit</td>
                 <td><i class="@entry.ToStatusIcon()"></i> @entry.ToStatusString()</td>

@@ -2,6 +2,7 @@
 {
     using System;
     using System.IO;
+    using System.Reflection;
 
     using Org.BouncyCastle.Crypto.Digests;
 
@@ -13,12 +14,12 @@
         /// <summary>
         /// Gets the digest for the specified assembly.
         /// </summary>
-        /// <param name="type">The type to get the assembly from.</param>
+        /// <param name="assembly">The assembly to calculate the digest from.</param>
         /// <returns>The digest string.</returns>
-        public static string GetDigestFromAssembly(Type type)
+        public static string GetDigestFromAssembly(Assembly assembly)
         {
             var digest = new RipeMD160Digest();
-            var data = File.ReadAllBytes(type.Assembly.Location);
+            var data = File.ReadAllBytes(assembly.Location);
 
             digest.BlockUpdate(data, 0, data.Length);
 
