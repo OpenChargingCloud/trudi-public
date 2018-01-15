@@ -608,7 +608,7 @@ ______________________________________________________
 					<xs:element name="obisCode" type="espi:String32" minOccurs="0"/>
 					<xs:element name="qualifiedLogicalName" type="espi:String256" minOccurs="0"/>
 					<xs:element name="description" type="espi:String256" minOccurs="0"/>
-				  <!-- Change: Neues Element "measurementPeriod" (optional) um Probleme bei der Messperioden-Ermittlung aus der Werteliste zu umgehen. Ist in Sekunden anzugeben. -->
+				  <!-- Change: Neues Element "measurementPeriod" (optional) um Probleme bei der Messperioden-Ermittlung aus der Werteliste zu umgehen. Ist in Sekunden anzugeben (v1.1, 05.12.2017) -->
           <xs:element name="measurementPeriod" type="espi:UInt32" minOccurs="0"/>
 				</xs:sequence>
 			</xs:extension>
