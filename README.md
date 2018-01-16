@@ -41,7 +41,7 @@ Windows (64-Bit) | http://www.ivu-software.de/apps/TRuDI/TRuDI-Setup-1.0.37-x86_
 Windows (32-Bit) | http://www.ivu-software.de/apps/TRuDI/TRuDI-Setup-1.0.37-x86_32.exe
 Linux ([AppImage](https://de.wikipedia.org/wiki/AppImage), 64-Bit) | http://www.ivu-software.de/apps/TRuDI/TRuDI-1.0.37-x86_64.AppImage
 Linux (deb, 64-Bit) | http://www.ivu-software.de/apps/TRuDI/TRuDI-1.0.37_amd64.deb
-Linux Live-Image | (in Vorbereitung)
+Linux Live-Image | http://www.ivu-software.de/apps/TRuDI/TRuDI_1.0.37_live.iso (Testversion!)
 
 ## HAN-Adapter
 
