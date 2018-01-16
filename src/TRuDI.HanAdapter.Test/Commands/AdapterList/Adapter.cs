@@ -1,6 +1,6 @@
-﻿namespace TRuDI.HanAdapter.Test.Models
+﻿namespace TRuDI.HanAdapter.Test.Commands.AdapterList
 {
-    public class AdapterInfo
+    public class Adapter
     {
         public string FlagId { get; set; }
         public string ManufacturerName { get; set; }

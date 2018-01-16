@@ -1,4 +1,4 @@
-﻿namespace TRuDI.HanAdapter.Test.Models
+﻿namespace TRuDI.HanAdapter.Test.Commands.ContractList
 {
     using System;
     using System.Linq;

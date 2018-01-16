@@ -126,6 +126,80 @@ Die Ausgabe der Log-Meldungen übernimmt dadurch der Logger im aufrufenden Progr
 
 Das Projekt TRuDI.HanAdapter.Test dient als Test-Programm für die HAN-Adapter. Damit können diese über die Kommandozeile aufgerufen werden.
 
+```
+TRuDI HAN Adapter Test Application
+
+Usage: TRuDI.HanAdapter.Test [options] [command]
+
+Options:
+  -?|-h|--help               Show help information
+  -l|--log <log-file>        Logmeldungen werden in die angegebene Datei geschrieben.
+  --log-console              Logmeldungen werden auf der Konsole ausgegeben.
+  --loglevel <log-level>     Log Level: verbose, debug, info, warning, error, fatal. Standard ist info.
+  -t|--test <test-config>    Aktiviert den Test-HAN-Adapter mit der angegebenen Konfigurationsdatei.
+  -o|--output <output-file>  Ausgabedatei.
+
+Commands:
+  adapter-list       Generiert eine List mit allen bekannten HAN-Adaptern.
+  contract-list      Liest die Liste der für den Benutzer verfügbaren Verträge aus dem SMGW.
+  current-registers  Liest die aktuellen Registerwerte für den angegebenen Vertrag aus dem SMGW.
+  load-data          Liest die Daten des angegebenen Vertrags aus dem SMGW.
+
+Use "TRuDI.HanAdapter.Test [command] --help" for more information about a command.
+```
+
+```
+Usage: TRuDI.HanAdapter.Test contract-list [options]
+
+Options:
+  --help|-h|-?         Show help information
+  --user <username>    Benutzername
+  --cert <cert-file>   PKCS#12-Datei mit Client-Zertifikat und dazugehörigen Key
+  --pass <password>    Passwort zum Benutzernamen oder ggf. für die PKCS#12-Datei.
+  --id <serverid>      Herstellerübergreifende ID des SMGW (z.B. "EABC0012345678")
+  --addr <address>     IP-Adresse des SMGW.
+  --port <port>        Port des SMGW.
+  --timeout <timeout>  Timeout in Sekunden nachdem der Vorgang über das CancellationToken abgebrochen wird.
+```
+
+```
+Usage: TRuDI.HanAdapter.Test load-data [options]
+
+Options:
+  --help|-h|-?                   Show help information
+  --user <username>              Benutzername
+  --cert <cert-file>             PKCS#12-Datei mit Client-Zertifikat und dazugehörigen Key
+  --pass <password>              Passwort zum Benutzernamen oder ggf. für die PKCS#12-Datei.
+  --id <serverid>                Herstellerübergreifende ID des SMGW (z.B. "EABC0012345678")
+  --addr <address>               IP-Adresse des SMGW.
+  --port <port>                  Port des SMGW.
+  --timeout <timeout>            Timeout in Sekunden nachdem der Vorgang über das CancellationToken abgebrochen wird.
+  --usagepointid <usagePointId>  Zählpunktsbezeichnung (optional)
+  --tariffname <tariffName>      Identifikation des Tarifs
+  --billingperiod <index>        Index der Abrechnungsperiode (bei TAF-7 nicht benötigt)
+  --start <start>                Zeitstempel, formatiert nach ISO8601
+  --end <end>                    Zeitstempel, formatiert nach ISO8601
+  --skip-validation              XML-Validierung nicht durchführen
+  --taf6                         TAF-6-Abrechnungsperiode verwenden (nicht bei TAF-7)
+```
+
+```
+Usage: TRuDI.HanAdapter.Test current-registers [options]
+
+Options:
+  --help|-h|-?                   Show help information
+  --user <username>              Benutzername
+  --cert <cert-file>             PKCS#12-Datei mit Client-Zertifikat und dazugehörigen Key
+  --pass <password>              Passwort zum Benutzernamen oder ggf. für die PKCS#12-Datei.
+  --id <serverid>                Herstellerübergreifende ID des SMGW (z.B. "EABC0012345678")
+  --addr <address>               IP-Adresse des SMGW.
+  --port <port>                  Port des SMGW.
+  --timeout <timeout>            Timeout in Sekunden nachdem der Vorgang über das CancellationToken abgebrochen wird.
+  --usagepointid <usagePointId>  Zählpunktsbezeichnung (optional)
+  --tariffname <tariffName>      Identifikation des Tarifs
+  --skip-validation              XML-Validierung nicht durchführen
+```
+
 ### Beispiele
 
 #### Abruf der verfügbaren HAN-Adapter
@@ -133,7 +207,7 @@ Das Projekt TRuDI.HanAdapter.Test dient als Test-Programm für die HAN-Adapter. 
 Zeigt eine Liste der verfügbaren HAN-Adapter an und schreibt diese ebenfalls in die Datei export.xml:
 
 ```
-dotnet TRuDI.HanAdapter.Test.dll --output=export.xml adapters
+dotnet TRuDI.HanAdapter.Test.dll --output export.xml adapter-list
 ```
 
 #### Abruf der für einen Benutzer verfügbaren Vertragsdaten
@@ -141,7 +215,15 @@ dotnet TRuDI.HanAdapter.Test.dll --output=export.xml adapters
 Zeigt die für den angegebenen Benutzer verfügbaren Vertragsdaten an und schreibt diese ebenfalls in die Datei export.xml:
 
 ```
-dotnet TRuDI.HanAdapter.Test.dll --output=export.xml --user consumer --pass consumer --addr 1.2.3.4 --port 1234 --id EXXX0012345678 contracts
+dotnet TRuDI.HanAdapter.Test.dll --output export.xml contract-list --user consumer --pass consumer --addr 1.2.3.4 --port 1234 --id EXXX0012345678
+```
+
+#### Datenabruf für eine TAF-6-Abrechnungsperiode
+
+Schreibt eine XML-Datei nach AR 2418-6 in die Datei export.xml:
+
+```
+dotnet TRuDI.HanAdapter.Test.dll --output export.xml load-data --user consumer --pass consumer --addr 1.2.3.4 --port 1234 --id EXXX0012345678 --billingperiod 0 --tariffname taf-2-test --taf6
 ```
 
 ## Ablauf
@@ -344,6 +426,15 @@ ConsumerId|ObjectID des Letztverbrauchers, dem die die Daten zugeordnet werden (
 Begin|Startzeitpunkt des Vertrags, **muss geliefert werden**|||
 End|Endzeitpunkt des Vertrags, **optional**|||
 
+#### Transparenzfunktion
+
+Die Zurdnung zwischen Liefranten-XML-Datei und den Vertragsdaten des SMGWs wird über folgende Felder vorgenommen:
+
+Lieferanten-XML|ContractInfo|AR 2418-6-Datei vom Gateway
+--- | --- | --- 
+nicht relevant |TafId == TAF7|
+UsagePoint.usagePointId|MeteringPointId|UsagePoint.usagePointId
+UsagePoint.AnalysisProfile.tariffId|TafName|UsagePoint.tariffName
 
 #### TAF-6
 
