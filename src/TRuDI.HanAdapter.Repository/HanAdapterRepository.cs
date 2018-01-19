@@ -4,6 +4,7 @@
     using System.Linq;
 
     using TRuDI.HanAdapter.DrNeuhaus;
+    using TRuDI.HanAdapter.Efr;
     using TRuDI.HanAdapter.Example;
     using TRuDI.HanAdapter.Kiwigrid;
     using TRuDI.HanAdapter.LandisGyr;
@@ -23,6 +24,7 @@
             {
                 new HanAdapterInfo("DNT", "Sagemcom Dr. Neuhaus GmbH", typeof(HanAdapterDrNeuhaus)),
                 new HanAdapterInfo("DVL", "devolo AG", typeof(HanAdapterKiwigrid)),
+                new HanAdapterInfo("EFR", "EFR - Europäische Funk-Rundsteuerung GmbH", typeof(HanAdapterEfr)),
                 new HanAdapterInfo("KIG", "Kiwigrid GmbH", typeof(HanAdapterKiwigrid)),
                 new HanAdapterInfo("LGZ", "Landis+Gyr AG", typeof(HanAdapterLandisGyr)),
                 new HanAdapterInfo("PPC", "Power Plus Communications AG", typeof(HanAdapterPpc)),
