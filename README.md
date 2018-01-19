@@ -492,6 +492,26 @@ new TafAdapterInfo(TafId.Taf1, "Standard Adapter für TAF-1", typeof(TafAdapterT
 Das Interface ``ITafAdapter`` enthält nur die Methode ``Calculate()``. Als Parameter werden die vom SMGW 
 abgelesenen Daten sowie die XML-Datei des Lieferanten übergeben. Diese Methode liefert als Ergebnis ``TafAdapterData`` zurück. 
 
+## TAF-Adapter-Test-Programm
+
+Das Projekt TRuDI.TafAdapter.Test dient als Test-Programm für die TAF-Adapter. Damit können diese über die Kommandozeile aufgerufen werden.
+
+```
+Usage: TRuDI.TafAdapter.Test [options]
+
+Options:
+  -o|--output <output-file>  Ausgabedatei.
+  -d|--data <data-file>      Daten aus dem SMGW.
+  -t|--taf <taf-file>        TAF-Datei.
+  -? | -h | --help           Show help information
+```
+
+### Beispiel
+
+```
+dotnet TRuDI.TafAdapter.Test.dll --data taf7-daten.xml --taf tariff-datei-vom-lieferanten.xml --output berechnete-tariff-register.txt
+```
+
 ## Starten von TRuDI aus Visual Studio
 
 Um TRuDI aus Visual Studio heraus zu starten, sind folgende Einstellungen auf der Seite Debug des Projekts TRuDI.Backend nötig:
@@ -516,8 +536,6 @@ Log Level: ``verbose``, ``debug``, ``info``, ``warning``, ``error``, ``fatal``. 
 #### ``-t|--test <testconfig>``
 
 Aktiviert den Test-HAN-Adapter mit der angegebenen Konfigurationsdatei.
-
-
 
 
 

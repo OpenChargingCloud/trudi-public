@@ -25,8 +25,6 @@
                 FullName = "TRuDI TAF Adapter Test Application"
             };
 
-            app.HelpOption("-?|-h|--help");
-
             var outputFile = app.Option("-o|--output <output-file>", "Ausgabedatei.", CommandOptionType.SingleValue);
             var dataFile = app.Option("-d|--data <data-file>", "Daten aus dem SMGW.", CommandOptionType.SingleValue);
             var tariffFile = app.Option("-t|--taf <taf-file>", "TAF-Datei.", CommandOptionType.SingleValue);
