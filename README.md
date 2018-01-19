@@ -33,14 +33,14 @@ Erzeugt ein AppImage sowie ein DEB-Software-Paket.
 
 ## Installations-Pakete
 
-Die aktuelle Version von TRuDI ist 1.0.37.
+Die aktuelle Version von TRuDI ist 1.0.38.
 
 System           | Download
 ---              | ---
-Windows (64-Bit) | http://www.ivu-software.de/apps/TRuDI/TRuDI-Setup-1.0.37-x86_64.exe
-Windows (32-Bit) | http://www.ivu-software.de/apps/TRuDI/TRuDI-Setup-1.0.37-x86_32.exe
-Linux ([AppImage](https://de.wikipedia.org/wiki/AppImage), 64-Bit) | http://www.ivu-software.de/apps/TRuDI/TRuDI-1.0.37-x86_64.AppImage
-Linux (deb, 64-Bit) | http://www.ivu-software.de/apps/TRuDI/TRuDI-1.0.37_amd64.deb
+Windows (64-Bit) | http://www.ivu-software.de/apps/TRuDI/TRuDI-Setup-1.0.38-x86_64.exe
+Windows (32-Bit) | http://www.ivu-software.de/apps/TRuDI/TRuDI-Setup-1.0.38-x86_32.exe
+Linux ([AppImage](https://de.wikipedia.org/wiki/AppImage), 64-Bit) | http://www.ivu-software.de/apps/TRuDI/TRuDI-1.0.38-x86_64.AppImage
+Linux (deb, 64-Bit) | http://www.ivu-software.de/apps/TRuDI/TRuDI-1.0.38_amd64.deb
 Linux Live-Image | http://www.ivu-software.de/apps/TRuDI/TRuDI_1.0.37_live.iso (Testversion!)
 
 ## HAN-Adapter
