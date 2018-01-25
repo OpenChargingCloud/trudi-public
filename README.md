@@ -5,7 +5,7 @@ Ansprechpartner:
 	Thomas Müller
 	IVU Softwareentwicklung GmbH
 	tmueller@ivugmbh.de
-	Tel.: 09471 / 30 73 237  
+	Tel.: 09471 / 30 73 237
 
 ## Entwicklungsumgebung
 
@@ -42,6 +42,12 @@ Windows (32-Bit) | http://www.ivu-software.de/apps/TRuDI/TRuDI-Setup-1.0.38-x86_
 Linux ([AppImage](https://de.wikipedia.org/wiki/AppImage), 64-Bit) | http://www.ivu-software.de/apps/TRuDI/TRuDI-1.0.38-x86_64.AppImage
 Linux (deb, 64-Bit) | http://www.ivu-software.de/apps/TRuDI/TRuDI-1.0.38_amd64.deb
 Linux Live-Image | http://www.ivu-software.de/apps/TRuDI/TRuDI_1.0.37_live.iso (Testversion!)
+
+## Dokumentation
+
+[Architektur-Dokumentation](doc/architecture-documentation.md)
+
+[Erstellen eines Live Linux ISO-Image](doc/linux-live-image.md)
 
 ## HAN-Adapter
 
@@ -536,10 +542,4 @@ Log Level: ``verbose``, ``debug``, ``info``, ``warning``, ``error``, ``fatal``. 
 #### ``-t|--test <testconfig>``
 
 Aktiviert den Test-HAN-Adapter mit der angegebenen Konfigurationsdatei.
-
-
-
-## Erzeugen eines Live-Images für Ubuntu
-
-(wird aktuell noch erstellt)
 
