@@ -14,42 +14,42 @@
         public void TestGetSmoothCaptureTime()
         {
             var expected = new DateTime(2017, 1, 1, 10, 15, 0, DateTimeKind.Local);
-            var actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 1, 1, 10, 15, 0, DateTimeKind.Local));
+            var actual = ModelExtensions.GetAlignedTimestamp(new DateTime(2017, 1, 1, 10, 15, 0, DateTimeKind.Local));
             Assert.AreEqual(expected, actual);
             Assert.AreEqual(expected.Kind, actual.Kind);
 
             expected = new DateTime(2017, 1, 1, 10, 15, 0, DateTimeKind.Utc);
-            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 1, 1, 10, 15, 7, DateTimeKind.Utc));
+            actual = ModelExtensions.GetAlignedTimestamp(new DateTime(2017, 1, 1, 10, 15, 7, DateTimeKind.Utc));
             Assert.AreEqual(expected, actual);
             Assert.AreEqual(expected.Kind, actual.Kind);
 
             expected = new DateTime(2017, 1, 1, 10, 15, 0, DateTimeKind.Local);
-            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 1, 1, 10, 14, 53, DateTimeKind.Local));
+            actual = ModelExtensions.GetAlignedTimestamp(new DateTime(2017, 1, 1, 10, 14, 53, DateTimeKind.Local));
             Assert.AreEqual(expected, actual);
             Assert.AreEqual(expected.Kind, actual.Kind);
 
             expected = new DateTime(2017, 1, 1, 10, 15, 0, DateTimeKind.Local);
-            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 1, 1, 10, 15, 9, DateTimeKind.Local));
+            actual = ModelExtensions.GetAlignedTimestamp(new DateTime(2017, 1, 1, 10, 15, 9, DateTimeKind.Local));
             Assert.AreEqual(expected, actual);
             Assert.AreEqual(expected.Kind, actual.Kind);
 
             expected = new DateTime(2017, 1, 1, 10, 15, 0, DateTimeKind.Local);
-            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 1, 1, 10, 14, 51, DateTimeKind.Local));
+            actual = ModelExtensions.GetAlignedTimestamp(new DateTime(2017, 1, 1, 10, 14, 51, DateTimeKind.Local));
             Assert.AreEqual(expected, actual);
             Assert.AreEqual(expected.Kind, actual.Kind);
 
             expected = new DateTime(2017, 1, 1, 10, 0, 0, DateTimeKind.Local);
-            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 1, 1, 10, 0, 18, DateTimeKind.Local), 3600);
+            actual = ModelExtensions.GetAlignedTimestamp(new DateTime(2017, 1, 1, 10, 0, 18, DateTimeKind.Local), 3600);
             Assert.AreEqual(expected, actual);
             Assert.AreEqual(expected.Kind, actual.Kind);
 
             expected = new DateTime(2017, 1, 1, 0, 0, 0, DateTimeKind.Local);
-            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 1, 1, 0, 12, 0, DateTimeKind.Local), 86400);
+            actual = ModelExtensions.GetAlignedTimestamp(new DateTime(2017, 1, 1, 0, 12, 0, DateTimeKind.Local), 86400);
             Assert.AreEqual(expected, actual);
             Assert.AreEqual(expected.Kind, actual.Kind);
 
             expected = new DateTime(2017, 1, 1, 0, 0, 0, DateTimeKind.Local);
-            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2016, 12, 31, 23, 53, 5, DateTimeKind.Local), 86400);
+            actual = ModelExtensions.GetAlignedTimestamp(new DateTime(2016, 12, 31, 23, 53, 5, DateTimeKind.Local), 86400);
             Assert.AreEqual(expected, actual);
             Assert.AreEqual(expected.Kind, actual.Kind);
 
@@ -58,32 +58,32 @@
 
             var period = 7200;
             expected = new DateTime(2017, 8, 1, 0, 0, 0, DateTimeKind.Local);
-            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 8, 1, 0, 1, 12, DateTimeKind.Local), period);
+            actual = ModelExtensions.GetAlignedTimestamp(new DateTime(2017, 8, 1, 0, 1, 12, DateTimeKind.Local), period);
             Assert.AreEqual(expected, actual);
             Assert.AreEqual(expected.Kind, actual.Kind);
 
             expected = new DateTime(2017, 8, 1, 0, 0, 0, DateTimeKind.Local);
-            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 8, 1, 0, 1, 11, DateTimeKind.Local), period);
+            actual = ModelExtensions.GetAlignedTimestamp(new DateTime(2017, 8, 1, 0, 1, 11, DateTimeKind.Local), period);
             Assert.AreEqual(expected, actual);
             Assert.AreEqual(expected.Kind, actual.Kind);
 
             expected = new DateTime(2017, 8, 1, 0, 0, 0, DateTimeKind.Local);
-            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 7, 31, 23, 58, 48, DateTimeKind.Local), period);
+            actual = ModelExtensions.GetAlignedTimestamp(new DateTime(2017, 7, 31, 23, 58, 48, DateTimeKind.Local), period);
             Assert.AreEqual(expected, actual);
             Assert.AreEqual(expected.Kind, actual.Kind);
 
             expected = new DateTime(2017, 8, 1, 0, 0, 0, DateTimeKind.Local);
-            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 7, 31, 23, 58, 49, DateTimeKind.Local), period);
+            actual = ModelExtensions.GetAlignedTimestamp(new DateTime(2017, 7, 31, 23, 58, 49, DateTimeKind.Local), period);
             Assert.AreEqual(expected, actual);
             Assert.AreEqual(expected.Kind, actual.Kind);
 
             expected = new DateTime(2017, 8, 1, 0, 1, 13, DateTimeKind.Local);
-            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 8, 1, 0, 1, 13, DateTimeKind.Local), period);
+            actual = ModelExtensions.GetAlignedTimestamp(new DateTime(2017, 8, 1, 0, 1, 13, DateTimeKind.Local), period);
             Assert.AreEqual(expected, actual);
             Assert.AreEqual(expected.Kind, actual.Kind);
 
             expected = new DateTime(2017, 7, 31, 23, 58, 47, DateTimeKind.Local);
-            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 7, 31, 23, 58, 47, DateTimeKind.Local), period);
+            actual = ModelExtensions.GetAlignedTimestamp(new DateTime(2017, 7, 31, 23, 58, 47, DateTimeKind.Local), period);
             Assert.AreEqual(expected, actual);
             Assert.AreEqual(expected.Kind, actual.Kind);
 
@@ -91,32 +91,32 @@
 
             period = 10800;
             expected = new DateTime(2017, 8, 1, 0, 0, 0, DateTimeKind.Local);
-            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 8, 1, 0, 1, 48, DateTimeKind.Local), period);
+            actual = ModelExtensions.GetAlignedTimestamp(new DateTime(2017, 8, 1, 0, 1, 48, DateTimeKind.Local), period);
             Assert.AreEqual(expected, actual);
             Assert.AreEqual(expected.Kind, actual.Kind);
 
             expected = new DateTime(2017, 8, 1, 0, 0, 0, DateTimeKind.Local);
-            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 8, 1, 0, 1, 47, DateTimeKind.Local), period);
+            actual = ModelExtensions.GetAlignedTimestamp(new DateTime(2017, 8, 1, 0, 1, 47, DateTimeKind.Local), period);
             Assert.AreEqual(expected, actual);
             Assert.AreEqual(expected.Kind, actual.Kind);
 
             expected = new DateTime(2017, 8, 1, 0, 0, 0, DateTimeKind.Local);
-            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 7, 31, 23, 58, 12, DateTimeKind.Local), period);
+            actual = ModelExtensions.GetAlignedTimestamp(new DateTime(2017, 7, 31, 23, 58, 12, DateTimeKind.Local), period);
             Assert.AreEqual(expected, actual);
             Assert.AreEqual(expected.Kind, actual.Kind);
 
             expected = new DateTime(2017, 8, 1, 0, 0, 0, DateTimeKind.Local);
-            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 7, 31, 23, 58, 13, DateTimeKind.Local), period);
+            actual = ModelExtensions.GetAlignedTimestamp(new DateTime(2017, 7, 31, 23, 58, 13, DateTimeKind.Local), period);
             Assert.AreEqual(expected, actual);
             Assert.AreEqual(expected.Kind, actual.Kind);
 
             expected = new DateTime(2017, 8, 1, 0, 1, 49, DateTimeKind.Local);
-            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 8, 1, 0, 1, 49, DateTimeKind.Local), period);
+            actual = ModelExtensions.GetAlignedTimestamp(new DateTime(2017, 8, 1, 0, 1, 49, DateTimeKind.Local), period);
             Assert.AreEqual(expected, actual);
             Assert.AreEqual(expected.Kind, actual.Kind);
 
             expected = new DateTime(2017, 7, 31, 23, 58, 11, DateTimeKind.Local);
-            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 7, 31, 23, 58, 11, DateTimeKind.Local), period);
+            actual = ModelExtensions.GetAlignedTimestamp(new DateTime(2017, 7, 31, 23, 58, 11, DateTimeKind.Local), period);
             Assert.AreEqual(expected, actual);
             Assert.AreEqual(expected.Kind, actual.Kind);
 
@@ -124,32 +124,32 @@
 
             period = 21600;
             expected = new DateTime(2017, 8, 1, 0, 0, 0, DateTimeKind.Local);
-            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 8, 1, 0, 3, 36, DateTimeKind.Local), period);
+            actual = ModelExtensions.GetAlignedTimestamp(new DateTime(2017, 8, 1, 0, 3, 36, DateTimeKind.Local), period);
             Assert.AreEqual(expected, actual);
             Assert.AreEqual(expected.Kind, actual.Kind);
 
             expected = new DateTime(2017, 8, 1, 0, 0, 0, DateTimeKind.Local);
-            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 8, 1, 0, 3, 35, DateTimeKind.Local), period);
+            actual = ModelExtensions.GetAlignedTimestamp(new DateTime(2017, 8, 1, 0, 3, 35, DateTimeKind.Local), period);
             Assert.AreEqual(expected, actual);
             Assert.AreEqual(expected.Kind, actual.Kind);
 
             expected = new DateTime(2017, 8, 1, 0, 0, 0, DateTimeKind.Local);
-            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 7, 31, 23, 56, 24, DateTimeKind.Local), period);
+            actual = ModelExtensions.GetAlignedTimestamp(new DateTime(2017, 7, 31, 23, 56, 24, DateTimeKind.Local), period);
             Assert.AreEqual(expected, actual);
             Assert.AreEqual(expected.Kind, actual.Kind);
 
             expected = new DateTime(2017, 8, 1, 0, 0, 0, DateTimeKind.Local);
-            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 7, 31, 23, 56, 25, DateTimeKind.Local), period);
+            actual = ModelExtensions.GetAlignedTimestamp(new DateTime(2017, 7, 31, 23, 56, 25, DateTimeKind.Local), period);
             Assert.AreEqual(expected, actual);
             Assert.AreEqual(expected.Kind, actual.Kind);
 
             expected = new DateTime(2017, 8, 1, 0, 3, 37, DateTimeKind.Local);
-            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 8, 1, 0, 3, 37, DateTimeKind.Local), period);
+            actual = ModelExtensions.GetAlignedTimestamp(new DateTime(2017, 8, 1, 0, 3, 37, DateTimeKind.Local), period);
             Assert.AreEqual(expected, actual);
             Assert.AreEqual(expected.Kind, actual.Kind);
 
             expected = new DateTime(2017, 7, 31, 23, 56, 23, DateTimeKind.Local);
-            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 7, 31, 23, 56, 23, DateTimeKind.Local), period);
+            actual = ModelExtensions.GetAlignedTimestamp(new DateTime(2017, 7, 31, 23, 56, 23, DateTimeKind.Local), period);
             Assert.AreEqual(expected, actual);
             Assert.AreEqual(expected.Kind, actual.Kind);
 
@@ -157,32 +157,32 @@
 
             period = 7200;
             expected = new DateTime(2017, 11, 1, 0, 0, 0, DateTimeKind.Local);
-            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 11, 1, 0, 1, 12, DateTimeKind.Local), period);
+            actual = ModelExtensions.GetAlignedTimestamp(new DateTime(2017, 11, 1, 0, 1, 12, DateTimeKind.Local), period);
             Assert.AreEqual(expected, actual);
             Assert.AreEqual(expected.Kind, actual.Kind);
 
             expected = new DateTime(2017, 11, 1, 0, 0, 0, DateTimeKind.Local);
-            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 11, 1, 0, 1, 11, DateTimeKind.Local), period);
+            actual = ModelExtensions.GetAlignedTimestamp(new DateTime(2017, 11, 1, 0, 1, 11, DateTimeKind.Local), period);
             Assert.AreEqual(expected, actual);
             Assert.AreEqual(expected.Kind, actual.Kind);
 
             expected = new DateTime(2017, 11, 1, 0, 0, 0, DateTimeKind.Local);
-            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 10, 31, 23, 58, 48, DateTimeKind.Local), period);
+            actual = ModelExtensions.GetAlignedTimestamp(new DateTime(2017, 10, 31, 23, 58, 48, DateTimeKind.Local), period);
             Assert.AreEqual(expected, actual);
             Assert.AreEqual(expected.Kind, actual.Kind);
 
             expected = new DateTime(2017, 11, 1, 0, 0, 0, DateTimeKind.Local);
-            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 10, 31, 23, 58, 49, DateTimeKind.Local), period);
+            actual = ModelExtensions.GetAlignedTimestamp(new DateTime(2017, 10, 31, 23, 58, 49, DateTimeKind.Local), period);
             Assert.AreEqual(expected, actual);
             Assert.AreEqual(expected.Kind, actual.Kind);
 
             expected = new DateTime(2017, 11, 1, 0, 1, 13, DateTimeKind.Local);
-            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 11, 1, 0, 1, 13, DateTimeKind.Local), period);
+            actual = ModelExtensions.GetAlignedTimestamp(new DateTime(2017, 11, 1, 0, 1, 13, DateTimeKind.Local), period);
             Assert.AreEqual(expected, actual);
             Assert.AreEqual(expected.Kind, actual.Kind);
 
             expected = new DateTime(2017, 10, 31, 23, 58, 47, DateTimeKind.Local);
-            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 10, 31, 23, 58, 47, DateTimeKind.Local), period);
+            actual = ModelExtensions.GetAlignedTimestamp(new DateTime(2017, 10, 31, 23, 58, 47, DateTimeKind.Local), period);
             Assert.AreEqual(expected, actual);
             Assert.AreEqual(expected.Kind, actual.Kind);
 
@@ -190,32 +190,32 @@
 
             period = 10800;
             expected = new DateTime(2017, 11, 1, 0, 0, 0, DateTimeKind.Local);
-            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 11, 1, 0, 1, 48, DateTimeKind.Local), period);
+            actual = ModelExtensions.GetAlignedTimestamp(new DateTime(2017, 11, 1, 0, 1, 48, DateTimeKind.Local), period);
             Assert.AreEqual(expected, actual);
             Assert.AreEqual(expected.Kind, actual.Kind);
 
             expected = new DateTime(2017, 11, 1, 0, 0, 0, DateTimeKind.Local);
-            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 11, 1, 0, 1, 47, DateTimeKind.Local), period);
+            actual = ModelExtensions.GetAlignedTimestamp(new DateTime(2017, 11, 1, 0, 1, 47, DateTimeKind.Local), period);
             Assert.AreEqual(expected, actual);
             Assert.AreEqual(expected.Kind, actual.Kind);
 
             expected = new DateTime(2017, 11, 1, 0, 0, 0, DateTimeKind.Local);
-            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 10, 31, 23, 58, 12, DateTimeKind.Local), period);
+            actual = ModelExtensions.GetAlignedTimestamp(new DateTime(2017, 10, 31, 23, 58, 12, DateTimeKind.Local), period);
             Assert.AreEqual(expected, actual);
             Assert.AreEqual(expected.Kind, actual.Kind);
 
             expected = new DateTime(2017, 11, 1, 0, 0, 0, DateTimeKind.Local);
-            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 10, 31, 23, 58, 13, DateTimeKind.Local), period);
+            actual = ModelExtensions.GetAlignedTimestamp(new DateTime(2017, 10, 31, 23, 58, 13, DateTimeKind.Local), period);
             Assert.AreEqual(expected, actual);
             Assert.AreEqual(expected.Kind, actual.Kind);
 
             expected = new DateTime(2017, 11, 1, 0, 1, 49, DateTimeKind.Local);
-            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 11, 1, 0, 1, 49, DateTimeKind.Local), period);
+            actual = ModelExtensions.GetAlignedTimestamp(new DateTime(2017, 11, 1, 0, 1, 49, DateTimeKind.Local), period);
             Assert.AreEqual(expected, actual);
             Assert.AreEqual(expected.Kind, actual.Kind);
 
             expected = new DateTime(2017, 10, 31, 23, 58, 11, DateTimeKind.Local);
-            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 10, 31, 23, 58, 11, DateTimeKind.Local), period);
+            actual = ModelExtensions.GetAlignedTimestamp(new DateTime(2017, 10, 31, 23, 58, 11, DateTimeKind.Local), period);
             Assert.AreEqual(expected, actual);
             Assert.AreEqual(expected.Kind, actual.Kind);
 
@@ -223,32 +223,32 @@
 
             period = 21600;
             expected = new DateTime(2017, 11, 1, 0, 0, 0, DateTimeKind.Local);
-            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 11, 1, 0, 3, 36, DateTimeKind.Local), period);
+            actual = ModelExtensions.GetAlignedTimestamp(new DateTime(2017, 11, 1, 0, 3, 36, DateTimeKind.Local), period);
             Assert.AreEqual(expected, actual);
             Assert.AreEqual(expected.Kind, actual.Kind);
 
             expected = new DateTime(2017, 11, 1, 0, 0, 0, DateTimeKind.Local);
-            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 11, 1, 0, 3, 35, DateTimeKind.Local), period);
+            actual = ModelExtensions.GetAlignedTimestamp(new DateTime(2017, 11, 1, 0, 3, 35, DateTimeKind.Local), period);
             Assert.AreEqual(expected, actual);
             Assert.AreEqual(expected.Kind, actual.Kind);
 
             expected = new DateTime(2017, 11, 1, 0, 0, 0, DateTimeKind.Local);
-            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 10, 31, 23, 56, 24, DateTimeKind.Local), period);
+            actual = ModelExtensions.GetAlignedTimestamp(new DateTime(2017, 10, 31, 23, 56, 24, DateTimeKind.Local), period);
             Assert.AreEqual(expected, actual);
             Assert.AreEqual(expected.Kind, actual.Kind);
 
             expected = new DateTime(2017, 11, 1, 0, 0, 0, DateTimeKind.Local);
-            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 10, 31, 23, 56, 25, DateTimeKind.Local), period);
+            actual = ModelExtensions.GetAlignedTimestamp(new DateTime(2017, 10, 31, 23, 56, 25, DateTimeKind.Local), period);
             Assert.AreEqual(expected, actual);
             Assert.AreEqual(expected.Kind, actual.Kind);
 
             expected = new DateTime(2017, 11, 1, 0, 3, 37, DateTimeKind.Local);
-            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 11, 1, 0, 3, 37, DateTimeKind.Local), period);
+            actual = ModelExtensions.GetAlignedTimestamp(new DateTime(2017, 11, 1, 0, 3, 37, DateTimeKind.Local), period);
             Assert.AreEqual(expected, actual);
             Assert.AreEqual(expected.Kind, actual.Kind);
 
             expected = new DateTime(2017, 10, 31, 23, 56, 23, DateTimeKind.Local);
-            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 10, 31, 23, 56, 23, DateTimeKind.Local), period);
+            actual = ModelExtensions.GetAlignedTimestamp(new DateTime(2017, 10, 31, 23, 56, 23, DateTimeKind.Local), period);
             Assert.AreEqual(expected, actual);
             Assert.AreEqual(expected.Kind, actual.Kind);
 
@@ -257,14 +257,14 @@
 
             period = 900;
             expected = new DateTime(2017, 3, 26, 2, 30, 0, DateTimeKind.Local);
-            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 3, 26, 2, 30, 0, DateTimeKind.Local), period);
+            actual = ModelExtensions.GetAlignedTimestamp(new DateTime(2017, 3, 26, 2, 30, 0, DateTimeKind.Local), period);
             Assert.AreEqual(expected, actual);
             Assert.AreEqual(expected.Kind, actual.Kind);
 
             // Umstellung auf Winterzeit 2017 
 
             expected = new DateTime(2017, 10, 29, 3, 0, 0, DateTimeKind.Local);
-            actual = ModelExtensions.GetSmoothCaptureTime(new DateTime(2017, 10, 29, 3, 0, 0, DateTimeKind.Local), period);
+            actual = ModelExtensions.GetAlignedTimestamp(new DateTime(2017, 10, 29, 3, 0, 0, DateTimeKind.Local), period);
             Assert.AreEqual(expected, actual);
             Assert.AreEqual(expected.Kind, actual.Kind);
 

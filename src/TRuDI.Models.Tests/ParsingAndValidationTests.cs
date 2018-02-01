@@ -1,8 +1,10 @@
 ﻿namespace TRuDI.Models.Tests
 {
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using System;
     using System.Xml.Linq;
+
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+
     using TRuDI.HanAdapter.Interface;
     using TRuDI.Models;
     using TRuDI.Models.BasicData;
@@ -41,7 +43,6 @@
 
             CheckIntervalReading(irs[1372], "2017-07-31T23:45:00+02:00", "2017-07-31T23:45:00+02:00", 43843);
             CheckIntervalReading(irs[1373], "2017-08-01T00:00:00+02:00", "2017-08-01T00:00:00+02:00", 43848);
-
         }
 
         [TestMethod]
@@ -112,8 +113,6 @@
             CheckIntervalReading(irs2[1], "2017-09-10T00:15:00+02:00", "2017-09-10T00:15:00+02:00", 13269149000);
             CheckIntervalReading(irs2[357], "2017-09-13T17:15:00+02:00", "2017-09-13T17:15:00+02:00", 16468918000);
             CheckIntervalReading(irs2[358], "2017-09-13T17:30:00+02:00", "2017-09-13T17:30:00+02:00", 16478081000);
-
-
         }
 
         [TestMethod]
@@ -185,8 +184,6 @@
             CheckIntervalReading(irs2[1], "2017-09-01T00:15:00+02:00", "2017-09-01T00:15:00+02:00", 5491012000);
             CheckIntervalReading(irs2[671], "2017-09-07T23:45:00+02:00", "2017-09-07T23:45:00+02:00", 11524575000);
             CheckIntervalReading(irs2[672], "2017-09-08T00:00:00+02:00", "2017-09-08T00:00:00+02:00", 11533777000);
-
-
         }
 
         [TestMethod]
@@ -210,7 +207,7 @@
 
             var irs = model.MeterReadings[0].IntervalBlocks[0].IntervalReadings;
 
-            //check the 1st measurement with the skewed timestamp
+            // check the 1st measurement with the skewed timestamp
             CheckIntervalReading(irs[0], "2017-10-29T02:45:00+02:00", "2017-10-29T02:45:00+02:00", 741092);
         }
 
@@ -295,11 +292,11 @@
             return model;
         }
 
-        private static void CheckIntervalReading(IntervalReading ir, string startTime, string captureTime, long value)
+        private static void CheckIntervalReading(IntervalReading ir, string targetTime, string captureTime, long value)
         {
             Assert.AreEqual(ir.Value, value);
-            Assert.AreEqual(startTime, ir.TimePeriod.Start.ToString("yyyy-MM-ddTHH:mm:ssK"));
-            Assert.AreEqual(captureTime, ir.TimePeriod.CaptureTime.ToString("yyyy-MM-ddTHH:mm:ssK"));
+            Assert.AreEqual(targetTime, ir.TargetTime?.ToString("yyyy-MM-ddTHH:mm:ssK"));
+            Assert.AreEqual(captureTime, ir.CaptureTime.ToString("yyyy-MM-ddTHH:mm:ssK"));
         }
     }
 }
