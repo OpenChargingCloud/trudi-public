@@ -81,10 +81,12 @@ XKBOPTIONS=""
 BACKSPACE="guess"
 ```
 
-Installieren sie die aktuelle TRuDI-Version. (alle abhängigen Pakete werden automatisch mitinstalliert):
+Kopieren Sie das Installationspaket der aktuelle TRuDI-Version in den ``squashfs`` Verzeichnisbaum und führen Sie die Installation aus. (alle abhängigen Pakete werden automatisch mitinstalliert):
 
 ```
+~/TRuDI_LiveCD$ sudo cp TRuDI-1.0.38_amd64.deb ./squashfs/usr/share/
 ~/TRuDI_LiveCD$ sudo chroot squashfs apt install /usr/share/TRuDI-1.0.38_amd64.deb
+~/TRuDI_LiveCD$ sudo rm ./squashfs/usr/share/TRuDI-1.0.38_amd64.deb
 ```
 
 Eine Desktopverknüpfung für die TRuDI legt man im Verzeichnis squashfs/etc/skel/ an, da ein Benutzer beim Live System immer dynamisch angelegt wird:
@@ -101,7 +103,7 @@ Der Dateiinhalt sollte folgendermaßen aussehen:
 [Desktop Entry]
 Name=TRuDI
 Exec=trudi
-Icon=/home/ubuntu/trudi/icon.png
+Icon=/usr/share/backgounds/trudi/icon.png
 Terminal=false
 Type=Application
 ```
@@ -109,9 +111,49 @@ Type=Application
 Es muss noch ein Icon für die Verknüpfung eingerichtet werden (Es wird angenommen, dass Sie eine Datei namens icon.png bereits in das Arbeitsverzeichnis kopiert haben):
 
 ```
-~/TRuDI_LiveCD$ sudo mkdir squashfs/etc/skel/trudi
-~/TRuDI_LiveCD$ sudo cp icon.png squashfs/etc/skel/trudi/icon.png
+~/TRuDI_LiveCD$ sudo mkdir squashfs/usr/share/backgounds/trudi
+~/TRuDI_LiveCD$ sudo cp icon.png squashfs/usr/share/backgounds/trudi/icon.png
 ```
+
+### Optionale Schritte
+
+#### Festes Benutzerkonto einrichten
+
+Die Standardversion des Ubuntu Live Systems legt bei jedem Start einen Benutzer namens ``ubuntu`` dynamisch an. 
+Dieser Benutzer hat standardmäßig kein Passwort und kann mit ``sudo`` Administratorrechte bekommen. 
+Es ist daher ratsam einen festen Benutzer mit eingeschränkten Benutzerrechten auf dem System einzurichten. 
+Standardmäßig kann dieser Benutzer keine Aktionen die Systemadministratorrechte benötigen ausführen.
+
+Neuer Benutzer wird mit dem Kommando ``adduser`` erstellt. 
+Benutzername und Passwort kann man auf ``trudi`` setzen und alle weiteren Fragen überspringen.
+
+```
+~/TRuDI_LiveCD$ sudo chroot squashfs adduser trudi
+```
+
+#### Erscheinungsbild anpassen
+
+Sie können das Aussehens des Live-Systems individuell anpassen. Man kann z.B. das Aussehen der Benutzeroberfläche 
+für die Benutzeranmeldung anpassen, indem man eigenen Hintergrund und eigenes Logo verwendet.
+
+Das Hintergrundbild und Logo sollten in Verzeichnisse ``squashfs/usr/share/backgrounds/``, 
+bzw.  ``squashfs/usr/share/unity-greeter/`` kopiert werden. Dann ändert man folgende Datei:
+
+```
+~/TRuDI_LiveCD$ sudo nano squashfs/usr/share/glib-2.0/schemas/10_unity_greeter_background.gschema.override
+```
+
+Der Dateiinhalt sollte folgendermaßen aussehen:
+
+```
+[com.canonical.unity-greeter]
+draw-user-backgrounds=false
+background='/usr/share/backgrounds/trudi_background.png'
+logo='/usr/share/unity-greeter/trudi_greeter_logo.png'
+```
+
+
+## ISO-Image Fertigstellen
 
 Erstellen Sie nun das ISO-Image wie folgt. Das Ergebnis ist eine neue Datei namens live.iso in Ihrem Arbeitsverzeichnis: 
 
