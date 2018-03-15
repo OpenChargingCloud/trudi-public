@@ -15,13 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TRuDI.Models", "TRuDI.Model
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3E533041-A848-4BC1-916A-6D336E1720AB}"
 	ProjectSection(SolutionItems) = preProject
-		TRuDI.Frontend\backend_connect_failed.html = TRuDI.Frontend\backend_connect_failed.html
 		build.cmd = build.cmd
-		TRuDI.Frontend\integrity_check_failed.html = TRuDI.Frontend\integrity_check_failed.html
-		TRuDI.Frontend\main.js = TRuDI.Frontend\main.js
-		TRuDI.Frontend\package.json = TRuDI.Frontend\package.json
-		..\README.md = ..\README.md
-		TRuDI.Frontend\startup.html = TRuDI.Frontend\startup.html
+		build.sh = build.sh
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TRuDI.TafAdapter.Taf2", "TRuDI.TafAdapter.Taf2\TRuDI.TafAdapter.Taf2.csproj", "{336EFA96-ACF4-4B5B-B03D-A897D165EADF}"
@@ -47,6 +42,25 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TRuDI.HanAdapter.Repository", "TRuDI.HanAdapter.Repository\TRuDI.HanAdapter.Repository.csproj", "{D683F0AB-B5D9-4D00-80A3-CF09C134562D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TRuDI.TafAdapter.Test", "TRuDI.TafAdapter.Test\TRuDI.TafAdapter.Test.csproj", "{51108CD5-093F-49B6-9372-E88D2B9D9C50}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "doc", "doc", "{19B0E030-83A5-4E91-8431-35BF3AA534A6}"
+	ProjectSection(SolutionItems) = preProject
+		..\doc\architecture-documentation.md = ..\doc\architecture-documentation.md
+		..\doc\han-adapter.md = ..\doc\han-adapter.md
+		..\doc\if_lieferant.md = ..\doc\if_lieferant.md
+		..\doc\linux-live-image.md = ..\doc\linux-live-image.md
+		..\README.md = ..\README.md
+		..\doc\taf-adapter.md = ..\doc\taf-adapter.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TRuDI.Frontend", "TRuDI.Frontend", "{49A33E23-CDBE-4795-A144-42EB3EE92767}"
+	ProjectSection(SolutionItems) = preProject
+		TRuDI.Frontend\backend_connect_failed.html = TRuDI.Frontend\backend_connect_failed.html
+		TRuDI.Frontend\integrity_check_failed.html = TRuDI.Frontend\integrity_check_failed.html
+		TRuDI.Frontend\main.js = TRuDI.Frontend\main.js
+		TRuDI.Frontend\package.json = TRuDI.Frontend\package.json
+		TRuDI.Frontend\startup.html = TRuDI.Frontend\startup.html
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -125,6 +139,10 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{19B0E030-83A5-4E91-8431-35BF3AA534A6} = {3E533041-A848-4BC1-916A-6D336E1720AB}
+		{49A33E23-CDBE-4795-A144-42EB3EE92767} = {3E533041-A848-4BC1-916A-6D336E1720AB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {565EC445-3E27-4783-93D6-863C62B6DD8F}

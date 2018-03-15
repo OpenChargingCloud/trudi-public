@@ -6,7 +6,7 @@ Ein neues Projekt soll der Projektmappe hinzugefügt werden. Als Zielframework m
 
 ### Namenskonvention HAN-Adapter
 
-Projektname soll nach folgendem Schema gebildet werden: ``TRuDI.HanAdapter.<Adaptername>``.
+Der Projektname soll nach folgendem Schema gebildet werden: ``TRuDI.HanAdapter.<Adaptername>``.
 
 Dabei ist `"<Adaptername>"` durch den gewünschten Namen des Gateway-Herstellers zu ersetzten.
 Es können z.B. die 3 Buchstaben der FLAG Hersteller ID verwendet werden, aber auch der vollständige Herstellername ist gültig.
@@ -34,9 +34,7 @@ namespace TRuDI.HanAdapter.<Adaptername>
 Eine Externe NuGet Paketquelle muss zum Projekt hinzugefügt werden. 
 Als Quelle wird der Ordner ``private-packages`` aus dem Repository verwendet.
 
-Das Paket ``IVU.Http`` aus dieser Quelle ist dem Projekt hinzuzufügen.
-
-Es müssen auch Verweise auf Projekte ``TRuDI.HanAdapter.Interface`` und ``TRuDI.Models`` hinzugefügt werden.
+Es müssen auch Verweise auf Projekte ``TRuDI.HanAdapter.Interface``, ``TRuDI.Models`` und ``IVU.Http`` hinzugefügt werden.
 
 Außerdem müssen auch die öffentliche NuGet Pakete 
 - ``Microsoft.AspNetCore.All`` 
@@ -46,7 +44,7 @@ dem Projekt hinzugefügt werden.
 
 ### Beispiel-Projekt-Datei
 
-```XML
+```xml
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
@@ -54,7 +52,7 @@ dem Projekt hinzugefügt werden.
   </PropertyGroup>
 
   <PropertyGroup>
-    <!--  -->
+    <!-- Pfade zum Verzeichnis private-packages an-->
     <RestoreSources>$(RestoreSources);../../private-packages;https://api.nuget.org/v3/index.json</RestoreSources>
     <PackageOutputPath>..\..\private-packages</PackageOutputPath>
 
@@ -132,24 +130,18 @@ Dem Ordner ``GatewayImage<Adaptername>View`` soll die View-Datei ``Default.cshtm
 Dem Ordner ``Components`` sollen zwei Klassendateien hinzugefügt werden: ``GatewayImage<Adaptername>View.cs`` und ``GatewayImage<Adaptername>ViewModel.cs``. Der Inhalt dieser Dateien kann 
 aus entsprechenden Dateien im Projekt ``TRuDI.HanAdapter.Example`` entnommen werden.
 
-### Projektstruktur
-
-Die Projektstruktur sollte jetzt wie folgt aussehen (als Beispiel-Adaptername wurde *Mfc* gewählt):
-
-![HAN-Adapter Projektstruktur](Images/HAN-Adapter_Struktur.png)
-
 ### IHanAdapter Schnittstelle
 
 Die Zentrale Klasse des HAN.Adapters ``HanAdapter<AdapterName>`` muss die Schnittstelle ``IHanAdapter`` implementieren.
-Dabei kann die Property ``SmgwImageViewComponent`` wie folgt implementiert werden:
+Dabei kann das Property ``SmgwImageViewComponent`` wie folgt implementiert werden:
 
 ```csharp
 public Type SmgwImageViewComponent => typeof(GatewayImageMfcView);
 ```
 
-Die Property ``ManufacturerParametersViewComponent`` kann auf ``null`` gesetzt werden.
-Diese View-Komponente wird nur dann verwendet, wenn ein Smart Meter Gateway spezielle Parameter (z.B. bei dem Verbindungsaufbau) benötigt.
-
+Das Property ``ManufacturerParametersViewComponent`` kann ``null`` zurück liefern: 
+Diese View-Komponente wird nur dann verwendet, wenn ein Smart Meter Gateway spezielle zusätzliche 
+Parameter (z.B. für den Verbindungsaufbau) benötigt.
 
 ## Einbinden des neuen HAN-Adapters
 
@@ -160,9 +152,7 @@ In der Klasse (Projekt TRuDI.HanAdapter.Repository)
 TRuDI.HanAdapter.Repository.HanAdapterRepository
 ```
 
-muss der neue HAN-Adapter in die Liste ```availableAdapters``` eingetragen werden.
-
-Z.B.: 
+muss der neue HAN-Adapter in die Liste ```availableAdapters``` eingetragen werden, z.B.: 
 
 ```csharp
 new HanAdapterInfo("MFC", "Beispiel GmbH", typeof(HanAdapterMfc)),

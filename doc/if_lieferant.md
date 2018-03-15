@@ -7,10 +7,10 @@ Die Lieferanten-XML-Datei enthält einen ausgerollten Kalender mit Tarifschaltze
 [Beispiel-Lieferanten-XML aus dem Lastenheft (Januar 2017)](Lastenheft/IF_Lieferant_TRuDI_example.xml)
 
 Lieferanten-XML-Datei für Januar 2018:
-* [Lieferanten-XML_Jan_2018.xml](Lieferanten-XML/Lieferanten-XML_Jan_2018.xml)
+- [Lieferanten-XML_Jan_2018.xml](Lieferanten-XML/Lieferanten-XML_Jan_2018.xml)
 
 Dazu passende TAF-7-Ablesung:
-* [TAF-7-Ablesung_Jan_2018.xml](Lieferanten-XML/TAF-7-Ablesung_Jan_2018.xml)
+- [TAF-7-Ablesung_Jan_2018.xml](Lieferanten-XML/TAF-7-Ablesung_Jan_2018.xml)
 
 ### Anpassen der Beispiel-Dateien
 
