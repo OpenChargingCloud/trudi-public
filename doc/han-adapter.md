@@ -1,7 +1,159 @@
 # TRuDI-HAN-Adapter
 
-## Einbinden eines neuen HAN-Adapters
+## Erstellen eines neuen HAN-Adapters
 
+Ein neues Projekt soll der Projektmappe hinzugefügt werden. Als Zielframework muss .NET Core 2.0 ausgewählt werden. Als Projekttyp soll Klassenbibliothek ausgewählt werden.
+
+### Namenskonvention HAN-Adapter
+
+Projektname soll nach folgendem Schema gebildet werden: ``TRuDI.HanAdapter.<Adaptername>``.
+
+Dabei ist `"<Adaptername>"` durch den gewünschten Namen des Gateway-Herstellers zu ersetzten.
+Es können z.B. die 3 Buchstaben der FLAG Hersteller ID verwendet werden, aber auch der vollständige Herstellername ist gültig.
+
+Assemblies müssen folgendermaßen benannt werden (analog zum Projektnamen), z.B.:
+
+```csharp
+TRuDI.HanAdapter.<Adaptername>
+```
+
+Die Klasse, welche das Interface IHanAdapter impelmentiert, muss wie folgt benannt werden (ebenfalls wieder wie der Projektname):
+
+```csharp
+namespace TRuDI.HanAdapter.<Adaptername>
+{
+   public class HanAdapter<Adaptername> : IHanAdapter
+   {
+      // ...
+   }
+}
+```
+
+### Abhängigkeiten und NuGet Pakete
+
+Eine Externe NuGet Paketquelle muss zum Projekt hinzugefügt werden. 
+Als Quelle wird der Ordner ``private-packages`` aus dem Repository verwendet.
+
+Das Paket ``IVU.Http`` aus dieser Quelle ist dem Projekt hinzuzufügen.
+
+Es müssen auch Verweise auf Projekte ``TRuDI.HanAdapter.Interface`` und ``TRuDI.Models`` hinzugefügt werden.
+
+Außerdem müssen auch die öffentliche NuGet Pakete 
+- ``Microsoft.AspNetCore.All`` 
+- ``Newtonsoft.Json`` 
+ 
+dem Projekt hinzugefügt werden.
+
+### Beispiel-Projekt-Datei
+
+```XML
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!--  -->
+    <RestoreSources>$(RestoreSources);../../private-packages;https://api.nuget.org/v3/index.json</RestoreSources>
+    <PackageOutputPath>..\..\private-packages</PackageOutputPath>
+
+    <!-- NuGet-Paket beim Build erstellen: true -->
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+
+    <!-- Nach Änderungen am Adapter muss die Versions-Nummer entsprechend angepasst werden: -->
+    <Version>1.0.0</Version>
+    
+    <!-- Diese Angaben sollten entsprechend angepasst werden: -->
+    <Company>Hersteller-Name</Company>
+    <Authors>Hersteller-Name</Authors>
+    <Product>TRuDI-HAN-Adapter für Produktname des Herstellers</Product>
+  </PropertyGroup>
+
+  <!-- Für das Logging wird LibLog (siehe unten) verwendet: LIBLOG_PORTABLE muss hierzu definiert werden: -->
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>TRACE;DEBUG;NETCOREAPP2_0;LIBLOG_PORTABLE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DefineConstants>TRACE;RELEASE;NETCOREAPP2_0;LIBLOG_PORTABLE</DefineConstants>
+  </PropertyGroup>
+
+  <!-- Hier ist <Adaptername> entsprechend zu ersetzten (und die Dateien natürlich auch anzulegen)! -->
+  <ItemGroup>
+    <EmbeddedResource Include="Content\bild_vom_smgw.jpg" />
+    <EmbeddedResource Include="Views\Shared\Components\GatewayImage<Adaptername>View\Default.cshtml" />
+  </ItemGroup>
+  
+  <!-- Hier werden die benötigten Nuget-Pakete eingebunden: -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\IVU.Http\IVU.Http.csproj" />
+    <ProjectReference Include="..\TRuDI.HanAdapter.Interface\TRuDI.HanAdapter.Interface.csproj" />
+    <ProjectReference Include="..\TRuDI.Models\TRuDI.Models.csproj" />
+  </ItemGroup>
+
+</Project>
+```
+
+### Ordnerstruktur
+
+Hier kann das Projekt ``TRuDI.HanAdapter.Example`` als Beispiel genommen werden.
+
+```
+Projektverzeichnis (TRuDI.HanAdapter.<Adaptername>)
+|
++- Components
+|  
++- Content
+|
++- Views
+   |
+   +- Shared
+      |
+      +- Components
+         |
+         +- GatewayImage<Adaptername>View
+```
+
+In den Ordner ``Content`` muss das Bild des Smart Meter Gateways als PNG-Datei in der Auflösung von mind. 320 x 320 Pixel als eingebettete Ressource angelegt werden.
+Dem Ordner ``GatewayImage<Adaptername>View`` soll die View-Datei ``Default.cshtml`` mit foldendem Inhalt hinzugefügt werden:
+
+```xml
+<div>
+    <img src="/resources/Content/<Name der Bild-Datei>.png" class="img-responsive"/>
+</div>
+```
+
+Dem Ordner ``Components`` sollen zwei Klassendateien hinzugefügt werden: ``GatewayImage<Adaptername>View.cs`` und ``GatewayImage<Adaptername>ViewModel.cs``. Der Inhalt dieser Dateien kann 
+aus entsprechenden Dateien im Projekt ``TRuDI.HanAdapter.Example`` entnommen werden.
+
+### Projektstruktur
+
+Die Projektstruktur sollte jetzt wie folgt aussehen (als Beispiel-Adaptername wurde *Mfc* gewählt):
+
+![HAN-Adapter Projektstruktur](Images/HAN-Adapter_Struktur.png)
+
+### IHanAdapter Schnittstelle
+
+Die Zentrale Klasse des HAN.Adapters ``HanAdapter<AdapterName>`` muss die Schnittstelle ``IHanAdapter`` implementieren.
+Dabei kann die Property ``SmgwImageViewComponent`` wie folgt implementiert werden:
+
+```csharp
+public Type SmgwImageViewComponent => typeof(GatewayImageMfcView);
+```
+
+Die Property ``ManufacturerParametersViewComponent`` kann auf ``null`` gesetzt werden.
+Diese View-Komponente wird nur dann verwendet, wenn ein Smart Meter Gateway spezielle Parameter (z.B. bei dem Verbindungsaufbau) benötigt.
+
+
+## Einbinden des neuen HAN-Adapters
+
+Der HAN-Adapter soll wie folgt in die TRuDI Anwendung eingebunden werden.
 In der Klasse (Projekt TRuDI.HanAdapter.Repository)
 
 ```csharp
@@ -13,7 +165,7 @@ muss der neue HAN-Adapter in die Liste ```availableAdapters``` eingetragen werde
 Z.B.: 
 
 ```csharp
-new HanAdapterInfo("XXX", "Beispiel GmbH", typeof(HanAdapterBeispiel)),
+new HanAdapterInfo("MFC", "Beispiel GmbH", typeof(HanAdapterMfc)),
 ```
 
 Während der Entwicklung des HAN-Adapters kann dieser als Projekt-Referenz in das Projekt TRuDI.HanAdapter.Repository.csproj aufgenommen werden:
@@ -30,31 +182,6 @@ Die spätere Integration erfolgt als NuGet-Paket. Beispiel für die entsprechend
 
 Die NuGet-Pakete der HAN-Adapter werden im Verzeichnis private-packages abgelegt.
 
-## Namenskonvention HAN-Adapter
-
-Assemblies müssen folgendermaßen benannt werden, z.B.:
-
-```csharp
-TRuDI.HanAdapter.Example
-```
-
-Wobei "Example" durch den Namen des Gateway-Herstellers zu ersetzten ist. 
-
-Die Klasse, welche das Interface IHanAdapter impelmentiert, muss wie folgt benannt werden:
-
-```csharp
-namespace TRuDI.HanAdapter.Example
-{
-   public class HanAdapterExample : IHanAdapter
-   {
-      // ...
-   }
-}
-```
-
-## Einbinden von IHanAdapter
-
-Das Interface ist im Projekt ```TRuDI.HanAdapter.Interface``` zu finden.
 
 ## HTTPS
 
@@ -82,7 +209,8 @@ Die NuGet-Pakete sind im Verzeichnis "private-packages" zu funden. Dieses Verzei
 
 Zum Logging innerhalb des Adapters empfehlen wir LibLog zu verwenden: https://github.com/damianh/LibLog 
 
-Die Ausgabe der Log-Meldungen übernimmt dadurch der Logger im aufrufenden Programm. In TRuDI wird hierzu Serilog (https://serilog.net/) verwendet.
+Die Ausgabe der Log-Meldungen übernimmt dadurch der Logger im aufrufenden Programm. 
+In TRuDI wird hierzu Serilog (https://serilog.net/) verwendet.
 
 ## HAN-Adapter-Test-Programm
 

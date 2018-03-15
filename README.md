@@ -34,6 +34,14 @@ Erzeugt ein AppImage sowie ein DEB-Software-Paket.
 
 Die aktuelle Version von TRuDI ist 1.0.38.
 
+### Offizielle Download-Seite der PTB
+
+Die jeweils aktuelle Version kann von der PTB-Seite unter folgenden Link heruntergeladen werden:
+
+https://www.ptb.de/cms/de/ptb/fachabteilungen/abt2/fb-23/ag-234/info-center-234/trudi.html
+
+### Weitere Download-Links
+
 System           | Download
 ---              | ---
 Windows (64-Bit) | http://www.ivu-software.de/apps/TRuDI/TRuDI-Setup-1.0.38-x86_64.exe
@@ -52,6 +60,7 @@ Linux Live-Image | http://www.ivu-software.de/apps/TRuDI/TRuDI_1.0.38_live.iso
 
 [Erstellen eines Live Linux ISO-Image](doc/linux-live-image.md)
 
+[Lieferanten-XML](doc/if_lieferant.md)
 
 ## Programm-Argumente von TRuDI
 

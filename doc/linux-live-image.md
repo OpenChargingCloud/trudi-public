@@ -234,7 +234,7 @@ Benutzen Sie dazu das Programm _ufw_. Es muss zuerst in das chroot-System instal
 ~/TRuDI_LiveCD$ sudo chroot squashfs apt-get install ufw
 ``` 
 
-__Wichtig:__ vor dem Einrichten der Firewall Regeln im chroot-System, sollte das Programm _ufw_ auch auf dem Host-Rechner installiert sein, weil das chroot-System während der Live-Image Einrichtung das Kernel (und die Module) des Host-Rechners benutzt. AUs diesem Grund muss auch zuerst die Firewall des Host-Rechners laufen:
+__Wichtig:__ vor dem Einrichten der Firewall Regeln im chroot-System, sollte das Programm _ufw_ auch auf dem Host-Rechner installiert sein, weil das chroot-System während der Live-Image Einrichtung das Kernel (und die Module) des Host-Rechners benutzt. Aus diesem Grund muss auch zuerst die Firewall des Host-Rechners laufen:
 
 ```
 ~/TRuDI_LiveCD$ sudo ufw enable
