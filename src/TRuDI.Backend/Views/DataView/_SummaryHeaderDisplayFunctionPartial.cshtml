@@ -105,12 +105,12 @@
                 var status = reading.IntervalBlocks.FirstOrDefault()?.IntervalReadings.FirstOrDefault();
 
         <tr class="@status.ToStatusBackground()">
-            <td>@obisId.ToString()</td>
-            <td>
+            <td style="white-space: nowrap;">@obisId.ToString()</td>
+            <td style="white-space: nowrap;">
                 @reading.IntervalBlocks.FirstOrDefault()?.IntervalReadings.FirstOrDefault()?.Value.GetDisplayValue(reading.ReadingType.Uom ?? Uom.Not_Applicable, reading.ReadingType.PowerOfTenMultiplier ?? PowerOfTenMultiplier.None, reading.ReadingType.Scaler)
             </td>
             <td>@reading.ReadingType.Uom.GetDisplayUnit(@reading.ReadingType.PowerOfTenMultiplier ?? PowerOfTenMultiplier.None)</td>
-            <td><i class="@status.ToStatusIcon()"></i> @status.ToStatusString()</td>
+            <td style="white-space: nowrap;"><i class="@status.ToStatusIcon()"></i> @status.ToStatusString()</td>
             <td>@obisId.GetLabel()</td>
         </tr>
             }
