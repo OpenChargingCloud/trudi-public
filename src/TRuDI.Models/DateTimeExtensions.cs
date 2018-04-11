@@ -57,7 +57,7 @@
 
             return new DateTime(value.Year, value.Month, value.Day, 0, 0, 0, value.Kind);
         }
-        
+
         public static string ToIso8601Local(this DateTime timestamp)
         {
             return timestamp.ToString("yyyy-MM-ddTHH:mm:ssK");
@@ -102,6 +102,39 @@
             }
 
             return t.AddSeconds(seconds);
+        }
+
+        public static DateTime GetPrevMeasurementPeriod(this DateTime t, TimeSpan measurementPeriod)
+        {
+            if (measurementPeriod == TimeSpan.Zero)
+            {
+                return t;
+            }
+
+            if (measurementPeriod < TimeSpan.FromDays(1))
+            {
+                var baseTimestamp = new DateTime(t.Year, t.Month, t.Day, 0, 0, 0, t.Kind);
+
+                var span = t.ToUniversalTime() - baseTimestamp.ToUniversalTime();
+                if (span == TimeSpan.Zero)
+                {
+                    return t;
+                }
+
+                return baseTimestamp.AddUtcSeconds((int)span.TotalSeconds / (int)measurementPeriod.TotalSeconds * (int)measurementPeriod.TotalSeconds);
+            }
+
+            if (measurementPeriod == TimeSpan.FromDays(1))
+            {
+                return new DateTime(t.Year, t.Month, t.Day, 0, 0, 0, t.Kind);
+            }
+
+            if (measurementPeriod == TimeSpan.FromDays(31) || measurementPeriod == TimeSpan.FromDays(30) || measurementPeriod == TimeSpan.FromDays(29) || measurementPeriod == TimeSpan.FromDays(28))
+            {
+                return new DateTime(t.Year, t.Month, 1, 0, 0, 0, t.Kind);
+            }
+
+            return t;
         }
     }
 }
