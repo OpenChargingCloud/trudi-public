@@ -141,7 +141,7 @@ namespace Org.BouncyCastle.Crypto.Generators
             {
                 cost = Int32.Parse(bcryptString.Substring(4, 2));
             }
-            catch (Exception nfe)
+            catch (Exception)
             {
                 throw new ArgumentException("Invalid cost factor: " + bcryptString.Substring(4, 2), "bcryptString");
             }
