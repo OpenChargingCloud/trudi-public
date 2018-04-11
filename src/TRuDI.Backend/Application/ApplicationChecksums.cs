@@ -3,7 +3,8 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Runtime.InteropServices;
-    
+    using System.Threading.Tasks;
+
     using TRuDI.Backend.Utils;
     using TRuDI.HanAdapter.Repository;
     using TRuDI.TafAdapter.Repository;
@@ -14,59 +15,70 @@
     public class ApplicationChecksums
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ApplicationChecksums"/> class.
+        /// Calculates the digest values.
         /// </summary>
-        public ApplicationChecksums()
+        public void Calculate()
         {
+            var items = new List<DigestItem>();
+            this.Items = items;
+
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                this.Items = new List<DigestItem>
-                                 {
-                                     this.GetDigest("../../../../../TRuDI.exe"),
-                                     this.GetDigest("../../../../app.asar"),
-                                     this.GetDigest("../../../../electron.asar"),
-                                 };
+                items.Add(new DigestItem("../../../../../TRuDI.exe"));
+                items.Add(new DigestItem("../../../../app.asar"));
+                items.Add(new DigestItem("../../../../electron.asar"));
             }
             else
             {
-                this.Items = new List<DigestItem>
-                                 {
-                                     this.GetDigest("../../../../../trudi"),
-                                     this.GetDigest("../../../../app.asar"),
-                                     this.GetDigest("../../../../electron.asar"),
-                                 };
+                items.Add(new DigestItem("../../../../../trudi"));
+                items.Add(new DigestItem("../../../../app.asar"));
+                items.Add(new DigestItem("../../../../electron.asar"));
             }
 
-            foreach (var hanAdapter in HanAdapterRepository.AvailableAdapters)
-            {
-                hanAdapter.Hash = DigestUtils.GetDigestFromAssembly(hanAdapter.Assembly);
-            }
+            Task.Run(() =>
+                {
+                    foreach (var item in items)
+                    {
+                        this.GetDigest(item);
+                    }
+                });
 
-            foreach (var tafAdapter in TafAdapterRepository.AvailableAdapters)
-            {
-                tafAdapter.Hash = DigestUtils.GetDigestFromAssembly(tafAdapter.Assembly);
-            }
+            Task.Run(() =>
+                {
+                    foreach (var hanAdapter in HanAdapterRepository.AvailableAdapters)
+                    {
+                        hanAdapter.Hash = DigestUtils.GetDigestFromAssembly(hanAdapter.Assembly).AddSpace(4).Value;
+                    }
+
+                    foreach (var tafAdapter in TafAdapterRepository.AvailableAdapters)
+                    {
+                        tafAdapter.Hash = DigestUtils.GetDigestFromAssembly(tafAdapter.Assembly).AddSpace(4).Value;
+                    }
+                });
         }
 
         /// <summary>
         /// Gets the list of files with calculated digest values.
         /// </summary>
-        public IReadOnlyList<DigestItem> Items { get; }
+        public IReadOnlyList<DigestItem> Items { get; private set; }
 
         /// <summary>
         /// Gets the digest of the specified file.
         /// </summary>
-        /// <param name="filename">The absolute or relative path to the file.</param>
-        /// <returns>A new instance of <see cref="DigestItem"/>.</returns>
-        private DigestItem GetDigest(string filename)
+        /// <param name="item">The item to calculate the digest for.</param>
+        private void GetDigest(DigestItem item)
         {
             var directory = Path.GetDirectoryName(this.GetType().Assembly.Location);
-            if (File.Exists(Path.Combine(directory, filename)))
-            {
-                return new DigestItem { Filename = Path.GetFileName(filename), Digest = DigestUtils.GetRipemd160(filename) };
-            }
+            var filepath = Path.Combine(directory, item.Filepath);
 
-            return new DigestItem { Filename = Path.GetFileName(filename), Digest = "nicht gefunden" };
+            if (File.Exists(filepath))
+            {
+                item.Digest = DigestUtils.GetRipemd160(filepath).AddSpace(4).Value;
+            }
+            else
+            {
+                item.Digest = "nicht gefunden";
+            }
         }
 
         /// <summary>
@@ -75,9 +87,44 @@
         public class DigestItem
         {
             /// <summary>
+            /// Initializes a new instance of the <see cref="DigestItem"/> class.
+            /// </summary>
+            /// <param name="adapter">The adapter.</param>
+            public DigestItem(TafAdapterInfo adapter)
+            {
+                this.Digest = adapter.Hash;
+                this.Filename = adapter.Assembly.GetName().Name;
+            }
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="DigestItem"/> class.
+            /// </summary>
+            /// <param name="adapter">The adapter.</param>
+            public DigestItem(HanAdapterInfo adapter)
+            {
+                this.Digest = adapter.Hash;
+                this.Filename = adapter.Assembly.GetName().Name + $"_{adapter.ManufacturerName}";
+            }
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="DigestItem"/> class.
+            /// </summary>
+            /// <param name="filepath">The filepath.</param>
+            public DigestItem(string filepath)
+            {
+                this.Filepath = filepath;
+                this.Filename = Path.GetFileName(filepath);
+            }
+
+            /// <summary>
             /// Gets or sets the filename (without path).
             /// </summary>
             public string Filename { get; set; }
+
+            /// <summary>
+            /// Gets or sets the file path.
+            /// </summary>
+            public string Filepath { get; set; }
 
             /// <summary>
             /// Gets or sets the digest value as hex formatted string.

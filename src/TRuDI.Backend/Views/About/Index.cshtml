@@ -30,7 +30,16 @@
             {
                 <tr>
                     <td>@item.Filename</td>
-                    <td style="font-family: monospace;">@item.Digest.AddSpace(4)</td>
+                    <td style="font-family: monospace;" id="@item.Filename">
+                        @if (item.Digest == null)
+                        {
+                            <text>Wird berechnet...</text>
+                        }
+                        else
+                        {
+                            @item.Digest
+                        }
+                    </td>
                 </tr>
             }
 
@@ -70,8 +79,15 @@
                         @adapter.Assembly.GetName().Version
                     </td>
 
-                    <td style="font-family: monospace;">
-                        @adapter.Hash.AddSpace(4)
+                    <td style="font-family: monospace;" id="@(adapter.Assembly.GetName().Name + "_" + adapter.ManufacturerName)">
+                        @if (adapter.Hash == null)
+                        {
+                            <text>Wird berechnet...</text>
+                        }
+                        else
+                        {
+                            @adapter.Hash
+                        }
                     </td>
                 </tr>
             }
@@ -107,8 +123,15 @@
                         @adapter.Assembly.GetName().Version
                     </td>
 
-                    <td style="font-family: monospace;">
-                        @adapter.Hash.AddSpace(4)
+                    <td style="font-family: monospace;" id="@adapter.Assembly.GetName().Name">
+                        @if (adapter.Hash == null)
+                        {
+                            <text>Wird berechnet...</text>
+                        }
+                        else
+                        {
+                            @adapter.Hash
+                        }
                     </td>
                 </tr>
             }
@@ -145,3 +168,37 @@
 
 <a href="/BreadCrumb/ClosePage">Zurück</a>
 
+<script language="javascript" type="text/javascript">
+    $(document).ready(function() {
+        var interval = setInterval(function(){ updateDigest() }, 300);
+
+        function updateDigest() {
+            $.ajax({
+                url: '/About/GetDigestItems',
+                type: "GET",
+                contentType: false,
+                processData: false,
+                success: function (result) {
+                    console.log(result);
+
+                    var unprocessedItems = 0;
+                    for (var i = 0; i < result.length; i++)
+                    {
+                        if (result[i].digest) {
+                            document.getElementById(result[i].filename).innerHTML = result[i].digest;
+                        } else {
+                            unprocessedItems++;
+                        }
+                    }
+
+                    if (unprocessedItems === 0) {
+                        clearInterval(interval);
+                    }
+                },
+                error: function (err) { }
+            });
+        }
+
+        updateDigest();
+    });
+</script>
