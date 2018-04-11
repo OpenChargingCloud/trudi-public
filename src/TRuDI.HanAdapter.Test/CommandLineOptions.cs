@@ -1,19 +1,12 @@
 namespace TRuDI.HanAdapter.Test
 {
-    using System;
-    using System.IO;
-    using System.Net;
-
     using Microsoft.Extensions.CommandLineUtils;
 
     using Serilog;
     using Serilog.Core;
     using Serilog.Events;
 
-    using TRuDI.HanAdapter.Interface;
-    using TRuDI.HanAdapter.Repository;
     using TRuDI.HanAdapter.Test.Commands;
-    using TRuDI.Models;
 
     public class CommandLineOptions
     {
@@ -35,7 +28,7 @@ namespace TRuDI.HanAdapter.Test
             var testFileOption = app.Option("-t|--test <test-config>", "Aktiviert den Test-HAN-Adapter mit der angegebenen Konfigurationsdatei.", CommandOptionType.SingleValue);
 
             var outputFile = app.Option("-o|--output <output-file>", "Ausgabedatei.", CommandOptionType.SingleValue);
-
+            
             RootCommandConfiguration.Configure(app, options);
 
             var result = app.Execute(args);
