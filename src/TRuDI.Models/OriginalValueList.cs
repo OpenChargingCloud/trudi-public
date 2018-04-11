@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
 
     using TRuDI.Models.BasicData;
@@ -43,11 +44,18 @@
                 this.FatalErrorCount += statusCount.FatalError;
             }
 
-            this.Start = this.MeterReading.IntervalBlocks.First().IntervalReadings.First().TargetTime.Value;
-            this.End = this.MeterReading.IntervalBlocks.Last().IntervalReadings.Last().TargetTime.Value;
+            if (this.MeterReading.IntervalBlocks.Count != 0)
+            {
+                this.Start = this.MeterReading.IntervalBlocks.First().IntervalReadings.First().TargetTime.Value;
+                this.End = this.MeterReading.IntervalBlocks.Last().IntervalReadings.Last().TargetTime.Value;
+            }
+            else
+            {
+                this.Start = null;
+                this.End = null;
+            }
 
             this.Meter = this.MeterReading.Meters.FirstOrDefault()?.MeterId;
-
             this.HistoricValues = this.CalculateHistoricConsumption();
         }
 
@@ -62,6 +70,11 @@
         public int TempErrorCount { get; set; }
         public int WarningCount { get; set; }
         public int OkCount { get; set; }
+
+        /// <summary>
+        /// Gets a value indicating whether this instance uses the TargetTime property.
+        /// </summary>
+        public bool IsTargetTimeUsed => this.MeterReading.IsTargetTimeUsed;
 
         public bool HasErrors => this.FatalErrorCount > 0 || this.WarningCount > 0 || this.TempErrorCount > 0
                                  || this.CriticalTempErrorCount > 0 || this.WarningCount > 0;
@@ -80,39 +93,72 @@
 
         public string Meter { get; }
 
-        public DateTime Start { get; }
-        public DateTime End { get; }
+        public DateTime? Start { get; }
+        public DateTime? End { get; }
+
+        public bool HasData => this.MeterReading.IntervalBlocks.Count != 0;
 
         public IEnumerable<IntervalReading> GetReadings(DateTime start, DateTime end)
         {
+            if (this.MeterReading.IntervalBlocks.Count == 0)
+            {
+                yield break;
+            }
+
             start = start.ToUniversalTime();
             end = end.ToUniversalTime();
 
+            var lastTimestamp = this.Start.Value.ToUniversalTime();
+
             if (this.MeasurementPeriod != TimeSpan.Zero)
             {
-                var currentTimestamp = this.Start.ToUniversalTime();
+                var currentTimestamp = this.Start?.GetPrevMeasurementPeriod(this.MeasurementPeriod).ToUniversalTime();
+                if (currentTimestamp < this.Start?.ToUniversalTime())
+                {
+                    currentTimestamp += this.MeasurementPeriod;
+                }
 
                 foreach (var block in this.MeterReading.IntervalBlocks)
                 {
                     foreach (var reading in block.IntervalReadings)
                     {
-                        while (reading.TargetTime?.ToUniversalTime() > currentTimestamp)
+                        if (reading.TargetTime?.ToUniversalTime() > currentTimestamp)
                         {
-                            if (currentTimestamp >= start && currentTimestamp <= end)
-                            {
-                                // found a gap: create the missing element with only the timestamp.
-                                yield return new IntervalReading
-                                                 {
-                                                     TimePeriod =
-                                                         new Interval { Start = currentTimestamp.ToLocalTime() },
-                                                     TargetTime = currentTimestamp.ToLocalTime()
-                                };
-                            }
+                            var alignedTargetTime = ModelExtensions.GetAlignedTimestamp(
+                                reading.TargetTime.Value,
+                                (int)this.MeasurementPeriod.TotalSeconds).ToUniversalTime();
 
-                            currentTimestamp += this.MeasurementPeriod;
-                            if (this.MeasurementPeriod == TimeSpan.Zero)
+                            var lastTargetTimeAligned = ModelExtensions.GetAlignedTimestamp(
+                                lastTimestamp,
+                                (int)this.MeasurementPeriod.TotalSeconds);
+
+                            if (lastTargetTimeAligned != currentTimestamp && (alignedTargetTime > currentTimestamp || (alignedTargetTime > currentTimestamp && lastTargetTimeAligned > currentTimestamp)))
                             {
-                                yield break;
+                                while (reading.TargetTime?.ToUniversalTime() > currentTimestamp)
+                                {
+                                    if (currentTimestamp >= start && currentTimestamp <= end)
+                                    {
+                                        // found a gap: create the missing element with only the timestamp.
+                                        yield return new IntervalReading
+                                        {
+                                            TimePeriod =
+                                                new Interval
+                                                {
+                                                    Start = currentTimestamp
+                                                            .Value.ToLocalTime()
+                                                },
+                                            TargetTime = currentTimestamp?.ToLocalTime()
+                                        };
+
+                                        lastTimestamp = currentTimestamp.Value;
+                                    }
+
+                                    currentTimestamp += this.MeasurementPeriod;
+                                    if (this.MeasurementPeriod == TimeSpan.Zero)
+                                    {
+                                        yield break;
+                                    }
+                                }
                             }
                         }
 
@@ -121,10 +167,23 @@
                             yield break;
                         }
 
-                        if (reading.TargetTime?.ToUniversalTime() >= start && reading.TargetTime?.ToUniversalTime() <= end)
+                        if (reading.TargetTime?.ToUniversalTime() >= start)
                         {
                             yield return reading;
-                            currentTimestamp += this.MeasurementPeriod;
+
+                            lastTimestamp = reading.TargetTime.Value.ToUniversalTime();
+                            if (reading.TargetTime?.ToUniversalTime() >= currentTimestamp)
+                            {
+                                currentTimestamp += this.MeasurementPeriod;
+                            }
+                        }
+                        else
+                        {
+                            currentTimestamp = reading.TargetTime?.GetPrevMeasurementPeriod(this.MeasurementPeriod).ToUniversalTime();
+                            if (currentTimestamp < reading.TargetTime?.ToUniversalTime())
+                            {
+                                currentTimestamp += this.MeasurementPeriod;
+                            }
                         }
                     }
                 }
@@ -156,9 +215,15 @@
         public List<DailyOvlErrorStatus> GetErrorsList()
         {
             var statusList = new List<DailyOvlErrorStatus>();
+
+            if (this.MeterReading.IntervalBlocks.Count == 0)
+            {
+                return statusList;
+            }
+
             var currentDay = new DailyOvlErrorStatus { Timestamp = DateTime.MinValue.Date };
 
-            foreach (var reading in this.GetReadings(this.Start, this.End))
+            foreach (var reading in this.GetReadings(this.Start.Value, this.End.Value))
             {
                 if (currentDay.Timestamp != reading.TargetTime?.Date)
                 {
@@ -173,7 +238,7 @@
                     currentDay.GapCount++;
                     continue;
                 }
-                
+
                 switch (reading.StatusPTB ?? reading.StatusFNN.MapToStatusPtb())
                 {
                     case StatusPTB.NoError:
@@ -230,6 +295,11 @@
         {
             var retList = new List<HistoricConsumption>();
 
+            if (this.MeterReading.IntervalBlocks.Count == 0)
+            {
+                return retList;
+            }
+
             var dayStartHour = 0;
             if (this.ServiceCategory == Kind.Gas)
             {
@@ -239,7 +309,7 @@
 
             // Dayly Historic Reads
             int daysGoingBack = 7;
-            var lastDayEnd = new DateTime(this.End.Year, this.End.Month, this.End.Day, dayStartHour, 0, 0, DateTimeKind.Local);
+            var lastDayEnd = new DateTime(this.End.Value.Year, this.End.Value.Month, this.End.Value.Day, dayStartHour, 0, 0, DateTimeKind.Local);
 
             for (int i = 0; i < daysGoingBack; i++)
             {
@@ -257,13 +327,13 @@
                 {
                     retList.Add(val);
                 }
-                
+
                 lastDayEnd = lastDayEnd.AddDays(-1);
             }
 
             // Weekly
             int weeksGoingBack = 4;
-            var lastSundayEnd = new DateTime(this.End.Year, this.End.Month, this.End.Day, dayStartHour, 0, 0, DateTimeKind.Local);
+            var lastSundayEnd = new DateTime(this.End.Value.Year, this.End.Value.Month, this.End.Value.Day, dayStartHour, 0, 0, DateTimeKind.Local);
 
             while (lastSundayEnd.DayOfWeek != DayOfWeek.Monday)
             {
@@ -292,7 +362,7 @@
 
             // Monthly
             int monthsGoingBack = 36;
-            var lastMonthEnd = new DateTime(this.End.Year, this.End.Month, 1, dayStartHour, 0, 0, DateTimeKind.Local);
+            var lastMonthEnd = new DateTime(this.End.Value.Year, this.End.Value.Month, 1, dayStartHour, 0, 0, DateTimeKind.Local);
 
             for (int i = 0; i < monthsGoingBack; i++)
             {
@@ -316,7 +386,7 @@
 
             // Yearly
             int yearsGoingBack = 3;
-            var lastYearEnd = new DateTime(this.End.Year, 1, 1, dayStartHour, 0, 0, DateTimeKind.Local);
+            var lastYearEnd = new DateTime(this.End.Value.Year, 1, 1, dayStartHour, 0, 0, DateTimeKind.Local);
 
             for (int i = 0; i < yearsGoingBack; i++)
             {
