@@ -7,6 +7,7 @@
     using Org.BouncyCastle.Asn1.X509;
     using Org.BouncyCastle.Crypto;
     using Org.BouncyCastle.Crypto.Generators;
+    using Org.BouncyCastle.Crypto.Operators;
     using Org.BouncyCastle.Crypto.Prng;
     using Org.BouncyCastle.Math;
     using Org.BouncyCastle.Pkcs;
@@ -36,7 +37,6 @@
                     BigInteger.One, BigInteger.ValueOf(Int64.MaxValue), random);
 
             certificateGenerator.SetSerialNumber(serialNumber);
-            certificateGenerator.SetSignatureAlgorithm("SHA256WithRSA");
 
             var subjectDN = new X509Name(subjectName);
             var issuerDN = subjectDN;
@@ -58,7 +58,9 @@
             certificateGenerator.SetPublicKey(subjectKeyPair.Public);
 
             var issuerKeyPair = subjectKeyPair;
-            var certificate = certificateGenerator.Generate(issuerKeyPair.Private, random);
+
+            ISignatureFactory signatureFactory = new Asn1SignatureFactory("SHA256WithRSA", issuerKeyPair.Private, random);
+            var certificate = certificateGenerator.Generate(signatureFactory);
 
             var store = new Pkcs12Store();
             string friendlyName = certificate.SubjectDN.ToString();
