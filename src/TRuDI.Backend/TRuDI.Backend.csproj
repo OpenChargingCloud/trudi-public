@@ -14,9 +14,9 @@
 
   <PropertyGroup>
     <RestoreSources>$(RestoreSources);../../private-packages;https://api.nuget.org/v3/index.json</RestoreSources>
-    <AssemblyVersion>1.0.38.0</AssemblyVersion>
-    <FileVersion>1.0.38.0</FileVersion>
-    <Version>1.0.38</Version>
+    <AssemblyVersion>1.0.53.0</AssemblyVersion>
+    <FileVersion>1.0.53.0</FileVersion>
+    <Version>1.0.53</Version>
     <Product>Transparenz- und Display-Software (TRuDI)</Product>
     <Authors />
     <Company>Arbeitskreis Bundesdisplay</Company>
@@ -27,6 +27,69 @@
     <Content Remove="Data\**" />
     <EmbeddedResource Remove="Data\**" />
     <None Remove="Data\**" />
+
+    <!-- Only include needed content -->
+    <Content Remove="wwwroot\lib\**" />
+
+    <Content Include="wwwroot\lib\bootstrap\dist\css\**" />
+    <Content Update="wwwroot\lib\bootstrap\dist\css\**">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+
+    <Content Include="wwwroot\lib\bootstrap\dist\fonts\**" />
+    <Content Update="wwwroot\lib\bootstrap\dist\fonts\**">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+
+    <Content Include="wwwroot\lib\bootstrap\dist\js\bootstrap.min.js" />
+    <Content Update="wwwroot\lib\bootstrap\dist\js\bootstrap.min.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+
+
+    <Content Include="wwwroot\lib\eonasdan-bootstrap-datetimepicker\build\css\bootstrap-datetimepicker.min.css" />
+    <Content Update="wwwroot\lib\eonasdan-bootstrap-datetimepicker\build\css\bootstrap-datetimepicker.min.css">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+
+    <Content Include="wwwroot\lib\eonasdan-bootstrap-datetimepicker\build\js\bootstrap-datetimepicker.min.js" />
+    <Content Update="wwwroot\lib\eonasdan-bootstrap-datetimepicker\build\js\bootstrap-datetimepicker.min.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+
+    <Content Include="wwwroot\lib\font-awesome\css\font-awesome.min.css" />
+    <Content Update="wwwroot\lib\font-awesome\css\font-awesome.min.css">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+
+    <Content Include="wwwroot\lib\font-awesome\fonts\fontawesome-webfont.woff2" />
+    <Content Update="wwwroot\lib\font-awesome\fonts\fontawesome-webfont.woff2">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+
+    <Content Include="wwwroot\lib\jquery\dist\jquery.min.js" />
+    <Content Update="wwwroot\lib\jquery\dist\jquery.min.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+
+    <Content Include="wwwroot\lib\jquery\external\sizzle\dist\sizzle.min.js" />
+    <Content Update="wwwroot\lib\jquery\external\sizzle\dist\sizzle.min.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+
+    <Content Include="wwwroot\lib\jquery-validation\dist\jquery.validate.min.js" />
+    <Content Update="wwwroot\lib\jquery-validation\dist\jquery.validate.min.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+
+    <Content Include="wwwroot\lib\moment\min\moment-with-locales.min.js" />
+    <Content Update="wwwroot\lib\moment\min\moment-with-locales.min.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ILLink.Tasks" Version="0.1.5-preview-1461378" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.3" />
     <PackageReference Include="Microsoft.Extensions.CommandLineUtils" Version="1.1.1" />
     <PackageReference Include="Serilog.Sinks.File" Version="4.0.0" />
