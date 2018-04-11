@@ -40,7 +40,7 @@
             <li role="presentation" class="active"><a href="#tab_tariffdata" aria-controls="tab_tariffdata" role="tab" data-toggle="tab">Tarifdaten</a></li>
         }
 
-        @if (originalValueLists.Count == 1)
+        @if (originalValueLists?.Count == 1)
         {
             var ovl = originalValueLists.First();
             <li role="presentation" class="@(StateService.CurrentSupplierFile?.TafData == null ? "active" : "")"><a href="#tab_hvl_@ovl.GetOriginalValueListIdent()" aria-controls="tab_hvl_@ovl.GetOriginalValueListIdent()" role="tab" data-toggle="tab">Historische Verbrauchswerte</a></li>
@@ -51,7 +51,7 @@
             <li role="presentation" class="dropdown @(StateService.CurrentSupplierFile?.TafData == null ? "active" : "")">
                 <a href="#" class="dropdown-toggle" id="tab-dropdown-hvl" data-toggle="dropdown" aria-controls="tab-dropdown-contents" aria-expanded="false">Historische Verbrauchswerte<span class="caret"></span></a>
                 <ul class="dropdown-menu" aria-labelledby="tab-dropdown-hvl" id="tab-dropdown-hvl-contents">
-                    @foreach (var ovl in originalValueLists)
+                    @foreach (var ovl in originalValueLists ?? new List<OriginalValueList>())
                     {
                         <li class="@(StateService.CurrentSupplierFile?.TafData == null && originalValueLists.First() == ovl ? "active" : "")"><a href="#tab_hvl_@ovl.GetOriginalValueListIdent()" id="#tab_hvl_@ovl.GetOriginalValueListIdent()-tab" aria-expanded="false" aria-controls="tab_hvl_@ovl.GetOriginalValueListIdent()" role="tab" data-toggle="tab">@ovl.Meter.ToFormattedDeviceId() (@ovl.Obis.ToString())</a></li>
                     }
@@ -203,155 +203,169 @@
 
         @foreach (var ovl in originalValueLists)
         {
-            var ovlBegin = ovl.Start;
-            var ovlEnd = ovl.End;
+            if(ovl.HasData)
+            { 
+                var ovlBegin = ovl.Start.Value;
+                var ovlEnd = ovl.End.Value;
 
-            if (ovlBegin.Date == ovlEnd.Date)
-            {
-                ovlEnd = ovlBegin + TimeSpan.FromDays(1);
-            }
+                if (ovlBegin.Date == ovlEnd.Date)
+                {
+                    ovlEnd = ovlBegin + TimeSpan.FromDays(1);
+                }
 
-            <div role="tabpanel" class="tab-pane" id="tab_@ovl.GetOriginalValueListIdent()">
-                <div class="panel panel-primary">
-                    <div class="panel-heading">Originäre Messwertliste @ovl.Meter.ToFormattedDeviceId() (@ovl.Obis.ToString())</div>
-                    <div class="panel-body">
+                <div role="tabpanel" class="tab-pane" id="tab_@ovl.GetOriginalValueListIdent()">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">Originäre Messwertliste @ovl.Meter.ToFormattedDeviceId() (@ovl.Obis.ToString())</div>
+                        <div class="panel-body">
 
-                        <table class="table">
-                            <tr>
-                                <th>Zähler</th>
-                                <th>Messperiode</th>
-                                <th>Register</th>
-                                <th>Beschreibung</th>
-                            </tr>
-                            <tr>
-                                <td>@ovl.Meter.ToFormattedDeviceId()</td>
-                                <td>@ovl.MeasurementPeriod.GetMeasurementPeriodString()</td>
-                                <td>@ovl.Obis.ToString()</td>
-                                <td>@ovl.Obis.GetLabel()</td>
-                            </tr>
+                            <table class="table">
+                                <tr>
+                                    <th>Zähler</th>
+                                    <th>Messperiode</th>
+                                    <th>Register</th>
+                                    <th>Beschreibung</th>
+                                </tr>
+                                <tr>
+                                    <td>@ovl.Meter.ToFormattedDeviceId()</td>
+                                    <td>@ovl.MeasurementPeriod.GetMeasurementPeriodString()</td>
+                                    <td>@ovl.Obis.ToString()</td>
+                                    <td>@ovl.Obis.GetLabel()</td>
+                                </tr>
 
-                            <tr>
-                                <th>Startzeitpunkt</th>
-                                <th>Endzeitpunkt</th>
-                                <th>Werte</th>
-                                <th>Lücken/Fehler</th>
-                            </tr>
+                                <tr>
+                                    <th>Startzeitpunkt</th>
+                                    <th>Endzeitpunkt</th>
+                                    <th>Werte</th>
+                                    <th>Lücken/Fehler</th>
+                                </tr>
 
-                            <tr>
-                                <td>@ovl.Start.ToFormatedString()</td>
-                                <td>@ovl.End.ToFormatedString()</td>
-                                <td>@ovl.ValueCount</td>
+                                <tr>
+                                    <td>@ovl.Start.ToFormatedString()</td>
+                                    <td>@ovl.End.ToFormatedString()</td>
+                                    <td>@ovl.ValueCount</td>
 
-                                <td>
-                                    @if (!ovl.HasErrors && ovl.GapCount == 0)
-                                    {
-                                        <span>keine Fehler</span>
-                                    }
-                                    else
-                                    {
-                                        if (ovl.GapCount > 0)
+                                    <td>
+                                        @if (!ovl.HasErrors && ovl.GapCount == 0)
                                         {
-                                            <span>
-                                                <i class="fa fa-warning"></i>
-                                                @ovl.GapCount @(ovl.GapCount == 1 ? "Lücke" : "Lücken") gefunden
+                                            <span>keine Fehler</span>
+                                        }
+                                        else
+                                        {
+                                            if (ovl.GapCount > 0)
+                                            {
+                                                <span>
+                                                    <i class="fa fa-warning"></i>
+                                                    @ovl.GapCount @(ovl.GapCount == 1 ? "Lücke" : "Lücken") gefunden
+                                                </span>
+                                            }
+
+                                            if (ovl.FatalErrorCount > 0)
+                                            {
+                                                <div>
+                                                    <span>
+                                                        <i class="@StatusPTB.FatalError.ToStatusIcon()"></i>
+                                                        @ovl.FatalErrorCount @(StatusPTB.FatalError.GetStatusString(ovl.FatalErrorCount))
+                                                    </span>
+                                                </div>
+                                            }
+
+                                            {
+                                                <div>
+                                                    <span>
+                                                        <i class="@StatusPTB.CriticalTemporaryError.ToStatusIcon()"></i>
+                                                        @(ovl.CriticalTempErrorCount) @(StatusPTB.CriticalTemporaryError.GetStatusString(ovl.CriticalTempErrorCount))
+                                                    </span>
+                                                </div>
+                                            }
+
+                                            if (ovl.TempErrorCount > 0)
+                                            {
+                                                <div>
+                                                    <span>
+                                                        <i class="@StatusPTB.TemporaryError.ToStatusIcon()"></i>
+                                                        @(ovl.TempErrorCount) @(StatusPTB.TemporaryError.GetStatusString(ovl.TempErrorCount))
+                                                    </span>
+                                                </div>
+                                            }
+
+                                            if (ovl.WarningCount > 0)
+                                            {
+                                                <div>
+                                                    <span>
+                                                        <i class="@StatusPTB.Warning.ToStatusIcon()"></i>
+                                                        @ovl.WarningCount @(StatusPTB.Warning.GetStatusString(ovl.WarningCount))
+                                                    </span>
+                                                </div>
+                                            }
+                                        }
+
+                                    </td>
+
+                                </tr>
+                            </table>
+
+                            <table style="width: 100%">
+                                <tr>
+                                    <td>
+                                        <div class='input-group date' id="dp_start_@ovl.GetOriginalValueListIdent()" style="width: auto;">
+                                            <input type='text' class="form-control" />
+                                            <span class="input-group-addon" style="width: auto;">
+                                                <span class="glyphicon glyphicon-calendar"></span>
                                             </span>
-                                        }
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="text-right">
+                                            <button type="button" class="btn btn-default" id="btnFilterOvlErrors_@ovl.GetOriginalValueListIdent()" onclick="showErrorsList('@ovl.GetOriginalValueListIdent()');">Status-Übersicht anzeigen</button>
+                                            <button type="button" class="btn btn-default" style="display: none;" id="btnShowOvlData_@ovl.GetOriginalValueListIdent()" onclick="showDataList('@ovl.GetOriginalValueListIdent()');">Messwerte anzeigen</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
 
-                                        if (ovl.FatalErrorCount > 0)
-                                        {
-                                            <div>
-                                                <span>
-                                                    <i class="@StatusPTB.FatalError.ToStatusIcon()"></i>
-                                                    @ovl.FatalErrorCount @(StatusPTB.FatalError.GetStatusString(ovl.FatalErrorCount))
-                                                </span>
-                                            </div>
-                                        }
+                            <div id="ovl_@ovl.GetOriginalValueListIdent()">
+                                @await Component.InvokeAsync("OriginalValueListView", new { ovl, startTime = ovlBegin })
+                            </div>
 
-                                        {
-                                            <div>
-                                                <span>
-                                                    <i class="@StatusPTB.CriticalTemporaryError.ToStatusIcon()"></i>
-                                                    @(ovl.CriticalTempErrorCount) @(StatusPTB.CriticalTemporaryError.GetStatusString(ovl.CriticalTempErrorCount))
-                                                </span>
-                                            </div>
-                                        }
+                            <script type="text/javascript">
+                                $(function() {
+                                    $("#dp_start_@ovl.GetOriginalValueListIdent()").datetimepicker({
+                                        locale: 'de',
+                                        format: 'DD.MM.YYYY'
+                                    });
 
-                                        if (ovl.TempErrorCount > 0)
-                                        {
-                                            <div>
-                                                <span>
-                                                    <i class="@StatusPTB.TemporaryError.ToStatusIcon()"></i>
-                                                    @(ovl.TempErrorCount) @(StatusPTB.TemporaryError.GetStatusString(ovl.TempErrorCount))
-                                                </span>
-                                            </div>
-                                        }
-
-                                        if (ovl.WarningCount > 0)
-                                        {
-                                            <div>
-                                                <span>
-                                                    <i class="@StatusPTB.Warning.ToStatusIcon()"></i>
-                                                    @ovl.WarningCount @(StatusPTB.Warning.GetStatusString(ovl.WarningCount))
-                                                </span>
-                                            </div>
-                                        }
-                                    }
-
-                                </td>
-
-                            </tr>
-                        </table>
-
-                        <table style="width: 100%">
-                            <tr>
-                                <td>
-                                    <div class='input-group date' id="dp_start_@ovl.GetOriginalValueListIdent()" style="width: auto;">
-                                        <input type='text' class="form-control" />
-                                        <span class="input-group-addon" style="width: auto;">
-                                            <span class="glyphicon glyphicon-calendar"></span>
-                                        </span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="text-right">
-                                        <button type="button" class="btn btn-default" id="btnFilterOvlErrors_@ovl.GetOriginalValueListIdent()" onclick="showErrorsList('@ovl.GetOriginalValueListIdent()');">Status-Übersicht anzeigen</button>
-                                        <button type="button" class="btn btn-default" style="display: none;" id="btnShowOvlData_@ovl.GetOriginalValueListIdent()" onclick="showDataList('@ovl.GetOriginalValueListIdent()');">Messwerte anzeigen</button>
-                                    </div>
-                                </td>
-                            </tr>
-                        </table>
-
-                        <div id="ovl_@ovl.GetOriginalValueListIdent()">
-                            @await Component.InvokeAsync("OriginalValueListView", new { ovl, startTime = ovlBegin })
-                        </div>
-
-                        <script type="text/javascript">
-                            $(function() {
-                                $("#dp_start_@ovl.GetOriginalValueListIdent()").datetimepicker({
-                                    locale: 'de',
-                                    format: 'DD.MM.YYYY'
-                                });
-
-                                $("#dp_start_@ovl.GetOriginalValueListIdent()").on("dp.change", function (e) {
-                                    loadOvlDay("@ovl.GetOriginalValueListIdent()");
-                                });
-
-                                $("#dp_start_@ovl.GetOriginalValueListIdent()").on("dp.hide", function (e) {
-                                    if (ovlStatusVisible) {
+                                    $("#dp_start_@ovl.GetOriginalValueListIdent()").on("dp.change", function (e) {
                                         loadOvlDay("@ovl.GetOriginalValueListIdent()");
-                                        ovlStatusVisible = false;
-                                    }
+                                    });
+
+                                    $("#dp_start_@ovl.GetOriginalValueListIdent()").on("dp.hide", function (e) {
+                                        if (ovlStatusVisible) {
+                                            loadOvlDay("@ovl.GetOriginalValueListIdent()");
+                                            ovlStatusVisible = false;
+                                        }
+                                    });
+
+                                    $("#dp_start_@ovl.GetOriginalValueListIdent()").data("DateTimePicker").minDate(moment('@ovlBegin.Date.ToIso8601()'));
+                                    $("#dp_start_@ovl.GetOriginalValueListIdent()").data("DateTimePicker").maxDate(moment('@ovlEnd.GetDateTimePickerEndDate().ToIso8601()'));
+                                    $("#dp_start_@ovl.GetOriginalValueListIdent()").data("DateTimePicker").date(moment('@ovlBegin.Date.ToIso8601()'));
                                 });
+                            </script>
 
-                                $("#dp_start_@ovl.GetOriginalValueListIdent()").data("DateTimePicker").minDate(moment('@ovlBegin.Date.ToIso8601()'));
-                                $("#dp_start_@ovl.GetOriginalValueListIdent()").data("DateTimePicker").maxDate(moment('@ovlEnd.GetDateTimePickerEndDate().ToIso8601()'));
-                                $("#dp_start_@ovl.GetOriginalValueListIdent()").data("DateTimePicker").date(moment('@ovlBegin.Date.ToIso8601()'));
-                            });
-                        </script>
-
+                        </div>
                     </div>
                 </div>
-            </div>
+            }
+            else
+            { 
+                <div role="tabpanel" class="tab-pane" id="tab_@ovl.GetOriginalValueListIdent()">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">Originäre Messwertliste @ovl.Meter.ToFormattedDeviceId() (@ovl.Obis.ToString())</div>
+                        <div class="panel-body">
+                            <p>Es konnten keine gültigen Messwerte ermittelt werden.</p>
+                        </div>
+                    </div>
+                </div>
+            }
         }
 
         <script type="text/javascript">
