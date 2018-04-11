@@ -254,6 +254,8 @@
                         usagePoint.MeterReadings.LastOrDefault()
                             .IntervalBlocks.LastOrDefault()
                             .IntervalReadings.LastOrDefault().TargetTime = Convert.ToDateTime(e.Value);
+
+                        usagePoint.MeterReadings.LastOrDefault().IsTargetTimeUsed = true;
                         break;
 
                     case "statusFNN":
@@ -448,7 +450,16 @@
 
             if (usagePoint?.LogEntries != null && usagePoint.LogEntries.Any())
             {
-                usagePoint.LogEntries.Sort((a, b) => a.LogEvent.Timestamp.ToUniversalTime().CompareTo(b.LogEvent.Timestamp.ToUniversalTime()));
+                usagePoint.LogEntries.Sort((a, b) =>
+                    {
+                        if (a.RecordNumber != null && b.RecordNumber != null)
+                        {
+                            return a.RecordNumber.Value.CompareTo(b.RecordNumber.Value);
+                        }
+
+                        return a.LogEvent.Timestamp.ToUniversalTime()
+                                .CompareTo(b.LogEvent.Timestamp.ToUniversalTime());
+                    });
             }
 
             return usagePoint;
