@@ -119,16 +119,18 @@
 
     </table>
 
-
     @{
         var dtpIdStart = $"dtp_start_{contractIndex}";
         var dtpIdEnd = $"dtp_end_{contractIndex}";
+
+        var hasBillingPeriods = false;
     }
 
     <form>
         @if (cnt.Contract.BillingPeriods != null && cnt.Contract.BillingPeriods.Count > 0)
         {
             int billingPeriodIndex = 0;
+            hasBillingPeriods = true;
 
             <h3>Abrechnungsperioden</h3>
 
@@ -159,10 +161,11 @@
                 }
             </table>
         }
-
+        
         @if (cnt.Taf6?.BillingPeriods != null && cnt.Taf6.BillingPeriods.Count > 0)
         {
             int billingPeriodIndex = 0;
+            hasBillingPeriods = true;
 
             <h3>Tageswerte</h3>
 
@@ -196,49 +199,66 @@
 
     </form>
 
+        @if (cnt.Contract.Begin <= DateTime.Now)
+        {
+            if (hasBillingPeriods || cnt.Contract.TafId == TafId.Taf7)
+            {
+                <table class="table-condensed">
+                    <tr>
+                        <th>Startzeitpunkt der Ablesung</th>
+                        <th>Endzeitpunkt der Ablesung</th>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="form-group">
+                                <div class='input-group date' id="@dtpIdStart">
+                                    <input type='text' class="form-control"/>
+                                    <span class="input-group-addon">
+                                        <span class="glyphicon glyphicon-calendar"></span>
+                                    </span>
+                                </div>
+                            </div>
+                        </td>
 
-    <table class="table-condensed">
-        <tr>
-            <th>Startzeitpunkt der Ablesung</th>
-            <th>Endzeitpunkt der Ablesung</th>
-            <th></th>
-        </tr>
-        <tr>
-            <td>
-                <div class="form-group">
-                    <div class='input-group date' id="@dtpIdStart">
-                        <input type='text' class="form-control" />
-                        <span class="input-group-addon">
-                            <span class="glyphicon glyphicon-calendar"></span>
-                        </span>
-                    </div>
+                        <td>
+                            <div class="form-group">
+                                <div class='input-group date' id="@dtpIdEnd">
+                                    <input type='text' class="form-control"/>
+                                    <span class="input-group-addon">
+                                        <span class="glyphicon glyphicon-calendar"></span>
+                                    </span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-group">
+                                @if (cnt.Contract.TafId == TafId.Taf7)
+                                {
+                                    <button type="button" class="btn btn-default" id="btnRead" onclick="startReadingTaf7(@contractIndex);" @(hasParamErrors ? "disabled" : "")>Auslesung starten...</button>
+                                }
+                                else
+                                {
+                                    <button type="button" class="btn btn-default" id="btnRead" onclick="startReading();" @(hasParamErrors ? "disabled" : "")>Auslesung starten...</button>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            }
+            else
+            {
+                <div>
+                    <p>Es sind keine Abrechnungsperioden vorhanden.</p>
                 </div>
-            </td>
-
-            <td>
-                <div class="form-group">
-                    <div class='input-group date' id="@dtpIdEnd">
-                        <input type='text' class="form-control" />
-                        <span class="input-group-addon">
-                            <span class="glyphicon glyphicon-calendar"></span>
-                        </span>
-                    </div>
-                </div>
-            </td>
-            <td>
-                <div class="form-group">
-                    @if (cnt.Contract.TafId == TafId.Taf7)
-                    {
-                        <button type="button" class="btn btn-default" id="btnRead" onclick="startReadingTaf7(@contractIndex);" @(hasParamErrors ? "disabled" : "")>Auslesung starten...</button>
-                    }
-                    else
-                    {
-                        <button type="button" class="btn btn-default" id="btnRead" onclick="startReading();" @(hasParamErrors ? "disabled" : "")>Auslesung starten...</button>
-                    }
-                </div>
-            </td>
-        </tr>
-    </table>
+            }
+        }
+        else
+        {
+            <div>
+                <p>Vertragsbeginn liegt in der Zukunft: eine Ablesung ist noch nicht möglich.</p>
+            </div>
+        }
 
     <script type="text/javascript">
         $(function () {
@@ -255,11 +275,11 @@
             @if (cnt.Contract.TafId == TafId.Taf7)
             {
                 <text>
-                    $("#@dtpIdStart").data("DateTimePicker").minDate(moment('@cnt.Contract.Begin.ToIso8601()'));
+                    $("#@dtpIdStart").data("DateTimePicker").minDate(moment('@cnt.Contract.Begin.DayStart().ToIso8601()'));
                     $("#@dtpIdStart").data("DateTimePicker").maxDate(moment('@cnt.Contract.End.GetEndTimeOrNow().DayStart().ToIso8601()'));
                     $("#@dtpIdStart").data("DateTimePicker").date(moment('@cnt.Contract.Begin.DayStart().ToIso8601()'));
 
-                    $("#@dtpIdEnd").data("DateTimePicker").minDate(moment('@cnt.Contract.Begin.ToIso8601()'));
+                    $("#@dtpIdEnd").data("DateTimePicker").minDate(moment('@cnt.Contract.Begin.DayStart().ToIso8601()'));
                     $("#@dtpIdEnd").data("DateTimePicker").maxDate(moment('@cnt.Contract.End.GetEndTimeOrNow().DayEnd().ToIso8601()'));
                     $("#@dtpIdEnd").data("DateTimePicker").date(moment('@cnt.Contract.End.GetEndTimeOrNow().DayEnd().ToIso8601()'));
                 </text>
