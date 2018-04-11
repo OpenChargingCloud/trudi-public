@@ -101,5 +101,16 @@ namespace TRuDI.Models.Tests
             target = new DateTime(2017, 1, 2, 0, 0, 0, DateTimeKind.Local);
             Assert.AreEqual("2017-01-01T23:59:59+01:00", target.GetDateTimePickerEndDate().ToIso8601Local());
         }
+
+        [TestMethod]
+        public void TestGetPrevMeasurementPeriod()
+        {
+            var target = new DateTime(2018, 3, 12, 14, 24, 39, DateTimeKind.Local);
+            Assert.AreEqual("2018-03-12T14:24:39+01:00", target.GetPrevMeasurementPeriod(TimeSpan.FromMinutes(0)).ToIso8601Local());
+            Assert.AreEqual("2018-03-12T14:15:00+01:00", target.GetPrevMeasurementPeriod(TimeSpan.FromMinutes(15)).ToIso8601Local());
+            Assert.AreEqual("2018-03-12T14:00:00+01:00", target.GetPrevMeasurementPeriod(TimeSpan.FromMinutes(60)).ToIso8601Local());
+            Assert.AreEqual("2018-03-12T14:20:00+01:00", target.GetPrevMeasurementPeriod(TimeSpan.FromMinutes(5)).ToIso8601Local());
+            Assert.AreEqual("2018-03-12T00:00:00+01:00", target.GetPrevMeasurementPeriod(TimeSpan.FromDays(1)).ToIso8601Local());
+        }
     }
 }

@@ -46,6 +46,25 @@ namespace TRuDI.Models.Tests
         }
 
         [TestMethod]
+        [DeploymentItem(@"Data\oml_error_dup_timestamps.xml")]
+        public void TestOriginalValueListDupTimestamps()
+        {
+            var xml = XDocument.Load(@"Data\oml_error_dup_timestamps.xml");
+            var model = XmlModelParser.ParseHanAdapterModel(xml.Root.Descendants());
+
+            var target = new OriginalValueList(model.MeterReadings[0], Kind.Electricity);
+
+            Assert.AreEqual("1-0:1.8.0*255", target.Obis.ToString());
+            Assert.AreEqual(0, target.GapCount);
+
+            Assert.AreEqual(DateTime.Parse("2018-03-12T00:00:00+01:00"), target.Start);
+            Assert.AreEqual(DateTime.Parse("2018-03-12T02:00:00+01:00"), target.End);
+
+            var items = target.GetReadings(DateTime.MinValue, DateTime.MaxValue).ToList();
+            Assert.AreEqual(9, items.Count);
+        }
+
+        [TestMethod]
         [DeploymentItem(@"Data\result_oml_gas_0_period.xml")]
         public void TestIsOriginalValueListGasZeroMeasurementPeriod()
         {
@@ -67,6 +86,27 @@ namespace TRuDI.Models.Tests
             Assert.AreEqual(DateTime.Parse("2017-11-30T00:04:46+01:00"), items[1].TimePeriod.Start);
             Assert.AreEqual(DateTime.Parse("2017-11-30T05:20:22+01:00"), items[2].TimePeriod.Start);
             Assert.AreEqual(DateTime.Parse("2017-11-30T06:05:44+01:00"), items[3].TimePeriod.Start);
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"Data\result_oml_start_not_aligned.xml")]
+        public void TestIsOriginalValueListStartNotAligned()
+        {
+            var xml = XDocument.Load(@"Data\result_oml_start_not_aligned.xml");
+            var model = XmlModelParser.ParseHanAdapterModel(xml.Root.Descendants());
+
+            var target = new OriginalValueList(model.MeterReadings[0], Kind.Electricity);
+
+            Assert.AreEqual("1-0:1.8.0*255", target.Obis.ToString());
+            //Assert.AreEqual(3, target.GapCount);
+
+            Assert.AreEqual(DateTime.Parse("2018-03-12T14:24:39+01:00"), target.Start);
+            Assert.AreEqual(DateTime.Parse("2018-03-13T10:15:00+01:00"), target.End);
+
+            var items = target.GetReadings(DateTime.MinValue, DateTime.MaxValue).ToList();
+            Assert.AreEqual(83, items.Count);
+
+            //Assert.AreEqual(DateTime.Parse("2017-11-29T17:09:00+01:00"), items[0].TimePeriod.Start);
         }
 
         [TestMethod]
