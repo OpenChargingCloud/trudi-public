@@ -32,27 +32,20 @@
             }
             else
             {
-                foreach (Certificate cert in usagePoint.Certificates)
+                foreach (var cert in usagePoint.Certificates)
                 {
                     ValidateCertificate(cert, exceptions);
                 }
             }
 
-            if (usagePoint.MeterReadings.Count < 1)
+            foreach (var meterReading in usagePoint.MeterReadings)
             {
-                exceptions.Add(new InvalidOperationException("Das Element \"UsagePoint\" muss das Element \"MeterReading\" enthalten."));
-            }
-            else
-            {
-                foreach (MeterReading meterReading in usagePoint.MeterReadings)
-                {
-                    ValidateMeterReading(meterReading, exceptions);
-                }
+                ValidateMeterReading(meterReading, exceptions);
             }
 
             if (usagePoint.LogEntries.Count >= 1)
             {
-                foreach (LogEntry logEntry in usagePoint.LogEntries)
+                foreach (var logEntry in usagePoint.LogEntries)
                 {
                     ValidateLogEntry(logEntry, exceptions);
                 }
@@ -223,7 +216,6 @@
 
             if (meterReading.IntervalBlocks.Count < 1)
             {
-                exceptions.Add(new InvalidOperationException("Das Element \"MeterReading\" muss das Element \"IntervalBlock\" enthalten."));
             }
             else
             {

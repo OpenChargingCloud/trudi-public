@@ -210,7 +210,7 @@
                 }
             }
         }
-        
+
         // Taf-7: Validate if all meter readings are original value lists
         private static void ValidateTaf7MeterReadingsAreOriginalValueLists(UsagePointAdapterTRuDI model, List<Exception> exceptions)
         {
@@ -267,7 +267,7 @@
                 exceptions.Add(new InvalidOperationException($"TAF-7: Die Service-Kategory \"{model.ServiceCategory.Kind}\" stimmt nicht mit der Service-Kategory \"{supplier.ServiceCategory.Kind}\" aus der Tarifdatei des Lieferanten überein."));
             }
 
-            if (model.Smgw.SmgwId != supplier.Smgw.SmgwId)
+            if (string.Compare(model.Smgw.SmgwId, supplier.Smgw.SmgwId, StringComparison.OrdinalIgnoreCase) != 0)
             {
                 exceptions.Add(new InvalidOperationException($"TAF-7: Die ID des Smart Meter Gateway \"{model.Smgw.SmgwId}\" stimmt nicht mit der ID \"{supplier.Smgw.SmgwId}\" aus der Tarifdatei des Lieferanten überein."));
             }
