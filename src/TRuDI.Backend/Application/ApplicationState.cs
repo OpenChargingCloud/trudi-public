@@ -141,6 +141,7 @@
                 if (this.backendChecksums == null)
                 {
                     this.backendChecksums = new ApplicationChecksums();
+                    this.backendChecksums.Calculate();
                 }
 
                 return this.backendChecksums;
@@ -336,9 +337,9 @@
                             return;
                         }
 
-                        if (ctx.BillingPeriod?.End == null)
+                        if (ctx.BillingPeriod?.End == null && (ctx.Contract.Begin <= DateTime.Now && (ctx.Contract.End == null || ctx.Contract.End > DateTime.Now)))
                         {
-                            Log.Information("Billing period not completetd: get current register values", this.ConnectData.DeviceId);
+                            Log.Information("Billing period not completed: get current register values", this.ConnectData.DeviceId);
 
                             XDocument rawCurrentRegisters = null;
 
@@ -398,6 +399,7 @@
         public void LoadSupplierXml()
         {
             this.LastErrorMessages.Clear();
+            this.BreadCrumbTrail.RemoveUnselectedItems();
 
             try
             {
@@ -494,6 +496,12 @@
                     var tafAdapter = TafAdapterRepository.LoadAdapter(this.CurrentSupplierFile.Model.AnalysisProfile.TariffUseCase);
                     this.CurrentSupplierFile.TafData = tafAdapter.Calculate(this.CurrentDataResult.Model, this.CurrentSupplierFile.Model);
                 }
+            }
+            catch(UnknownTafAdapterException ex)
+            {
+                Log.Error(ex, "Unknown TAF adapter: {0}", ex.TafId);
+                this.LastErrorMessages.Add($"Die Berechnung des Tarifanwendungsfall {ex.TafId} wird nicht unterstützt.");
+                throw;
             }
             catch (AggregateException ex)
             {
@@ -685,7 +693,7 @@
             this.CurrentProgressState.StatusText = progressInfo.Message;
             this.CurrentProgressState.Progress = progressInfo.Progress;
 
-            this.notificationsMessageHandler.ProgressUpdate(progressInfo.Message, progressInfo.Progress);
+            this.notificationsMessageHandler.ProgressUpdate(progressInfo.Message, progressInfo.Progress).Wait();
         }
 
         /// <summary>
@@ -702,6 +710,13 @@
                 case ErrorType.TcpConnectFailed:
                     this.LastErrorMessages.Add("Netzwerkverbindung zum Smart Meter Gateway konnte nicht hergestellt werden.");
                     this.LastErrorMessages.Add("Bitte überprüfen Sie die IP-Addresse sowie den Port.");
+
+                    if (!string.IsNullOrWhiteSpace(ex.AdapterError?.Message))
+                    {
+                        this.LastErrorMessages.Add("Systemmeldung:");
+                        this.LastErrorMessages.Add(ex.AdapterError.Message);
+                    }
+
                     return;
 
                 case ErrorType.TlsConnectFailed:
