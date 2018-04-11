@@ -35,10 +35,10 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.3" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+    <PackageReference Include="IVU.Http" Version="1.0.14" />
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\IVU.Http\IVU.Http.csproj" />
     <ProjectReference Include="..\TRuDI.HanAdapter.Interface\TRuDI.HanAdapter.Interface.csproj" />
     <ProjectReference Include="..\TRuDI.Models\TRuDI.Models.csproj" />
   </ItemGroup>

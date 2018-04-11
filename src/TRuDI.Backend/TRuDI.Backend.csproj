@@ -99,9 +99,9 @@
     <PackageReference Include="Serilog.Sinks.ColoredConsole" Version="3.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.ViewCompilation" Version="2.0.1" />
     
-    <PackageReference Include="IVU.Http" Version="1.0.13" />
-    <PackageReference Include="IVU.Common.Tls" Version="2.1.1" />
-    <PackageReference Include="IVU.BouncyCastle.Crypto" Version="2.1.0" />
+    <PackageReference Include="IVU.Http" Version="1.0.14" />
+    <PackageReference Include="IVU.Common.Tls" Version="2.1.2" />
+    <PackageReference Include="IVU.BouncyCastle.Crypto" Version="2.1.1" />
   </ItemGroup>
 
   <ItemGroup>
