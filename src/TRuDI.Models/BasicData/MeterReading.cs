@@ -71,5 +71,9 @@
             get; set;
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether this instance uses the TargetTime property.
+        /// </summary>
+        public bool IsTargetTimeUsed { get; set; }
     }
 }

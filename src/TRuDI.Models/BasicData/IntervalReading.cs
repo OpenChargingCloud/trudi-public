@@ -7,7 +7,7 @@
     /// Die Klasse IntervalReading repräsentiert die Daten zu einem konkreten Messwert. Jede 
     /// Nachricht muss mindestens eine Instanz der Klasse IntervalReading enthalten.
     /// </summary>
-    [DebuggerDisplay("Start: {TimePeriod.Start}, Value: {Value}")]
+    [DebuggerDisplay("TargetTime: {TargetTime}, CaptureTime: {CaptureTime}, Value: {Value}, PTB-Status: {StatusPTB}")]
     public class IntervalReading
     {
         /// <summary>
