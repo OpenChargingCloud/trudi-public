@@ -115,12 +115,22 @@ Es muss noch ein Icon für die Verknüpfung eingerichtet werden (Es wird angenom
 ~/TRuDI_LiveCD$ sudo cp icon.png squashfs/usr/share/backgounds/trudi/icon.png
 ```
 
+Das TRuDI Handbuch sollte sich auch im Desktop-Verzeichnis des Live-Systems befinden (Es wird angenommen, dass Sie das Dokument bereits in das Arbeitsverzeichnis kopiert haben):
+```
+~/TRuDI_LiveCD$ sudo cp TRuDI-Handbuch.pdf squashfs/etc/skel/Desktop/TRuDI-Handbuch.pdf
+```
+
+Um das PDF-Dokument öffnen zu können, muss auch ein passender Viewer installiert werden (z.B. evince):
+
+```
+~/TRuDI_LiveCD$ sudo chroot squashfs apt install evince
+```
 
 
 ## Optionale Schritte
 
 Folgende Schritte sind für ein lauffähiges Live-Image nicht notwendig.
-Wenn das Live-Image die PTB Anforderungen aus dem **_Merkblatt: Einrichten eines Live-Mediums_** _(PTB-8.51-MB08-BSLM-DE-V01)_ erfüllen soll, müssen sie aber gemacht werden.
+Wenn das Live-Image die PTB Anforderungen aus dem **_Merkblatt: Einrichten eines Live-Mediums_** _(PTB-8.51-MB08-BSLM-DE-V01)_ erfüllen soll, sollten sie aber gemacht werden.
 
 
 ### Nicht benötigte Pakete deinstallieren
@@ -133,16 +143,18 @@ Um das Live-Image möglichst klein zu halten, sollten möglichst viele Pakete di
 ~/TRuDI_LiveCD$ sudo chroot squashfs apt-get autoremove --purge ubuntu-wallpapers-xenial
 ~/TRuDI_LiveCD$ sudo chroot squashfs apt-get autoremove --purge ubiquity-casper
 ~/TRuDI_LiveCD$ sudo chroot squashfs apt-get autoremove --purge samba-libs
+~/TRuDI_LiveCD$ sudo chroot squashfs apt-get autoremove --purge gnome-terminal
 ~/TRuDI_LiveCD$ sudo chroot squashfs apt-get autoremove --purge ubuntu-wallpapers-xenial
 ~/TRuDI_LiveCD$ sudo chroot squashfs apt-get autoremove --purge ubuntu-mobile-icons
 ~/TRuDI_LiveCD$ sudo chroot squashfs apt-get autoremove --purge openssh-client
 ~/TRuDI_LiveCD$ sudo chroot squashfs apt-get autoremove --purge suru-icon-theme
 ```
 
-Durch die Aktualisierung der Softwarepakete werden im chroot-System womöglich mehrere Kernels installiert sein. Sie sollten alle Versionen, bis auf die neueste (im Moment ist es die: `linux-image-4.4.0-112-generic`), deinstallieren: 
+Durch die Aktualisierung der Softwarepakete werden im chroot-System womöglich mehrere Kernels installiert sein. Sie sollten alle alten Versionen deinstallieren. Neueste Version zum Aktuellen Zeitpunkt ist die Version: `linux-image-4.4.0-119-generic`). 
 
 ```
 ~/TRuDI_LiveCD$ sudo chroot squashfs apt-get autoremove --purge linux-image-4.4.0-109-generic
+~/TRuDI_LiveCD$ sudo chroot squashfs apt-get autoremove --purge linux-image-4.4.0-112-generic
 ```
 
 ### Festes Benutzerkonto einrichten
@@ -180,6 +192,39 @@ autologin-user-timeout=0
 allow-guest=false
 ```
 
+### Automatischer Start des TRuDI Programms
+
+Dieser Schritt bezieht sich auf die Absätze: **_Schutz in Verwendung_** und **_Bootvorgang und Laden der rechtlich relevanten Software_** _(PTB-8.51-MB08-BSLM-DE-V01)_.
+
+Es bietet sich auch die Möglichkeit, das TRuDI-Programm nach der Benutzeranmeldung automatisch zu starten. Dazu kopiert man die Datei, die für die Desktopverknüpfung bereits angelegt wurde, in das Verzeichnis ``autostart``.
+Falls nicht vorhanden, muss das Verzeichnis zuerst angelegt werden.
+```
+~/TRuDI_LiveCD$ sudo chroot squashfs mkdir /etc/skel/.config
+~/TRuDI_LiveCD$ sudo chroot squashfs mkdir /etc/skel/.config/autostart
+~/TRuDI_LiveCD$ sudo cp squashfs/etc/skel/Desktop/TRuDI.desktop squashfs/etc/skel/.config/autostart/
+```
+
+### Deaktivierung von virtuellen Konsolen
+Dieser Schritt bezieht sich auf die Absätze: **_Schutz in Verwendung_** und **_Bootvorgang und Laden der rechtlich relevanten Software_** _(PTB-8.51-MB08-BSLM-DE-V01)_.
+
+Man kann die Tastenkombinationen für die virtuellen Konsolen abfangen. Legen Sie dazu eine Datei mit `.config` Erweiterung im Verzeichnis `etc/X11/xorg.conf.d`:
+```
+~/TRuDI_LiveCD$ sudo chroot squashfs mkdir /etc/X11/xorg.conf.d
+~/TRuDI_LiveCD$ sudo nano squashfs/etc/X11/xorg.conf.d/50-novtswitch.conf
+```
+Der Dateiinhalt sollte folgendermaßen aussehen:
+
+```
+Section "ServerFlags"
+Option "DontVTSwitch" "true"
+EndSection
+``` 
+
+Ausser dem Abfangen von Tastenkombinationen, kann man auch in den systemd Prozess eingreifen. Man muss dazu die Datei `/etc/systemd/logind.conf` anpassen, indem man Zeilen für Parameter `NAutoVTs` und `ReserveVT`, wie folgt modifiziert:
+```
+NAutoVTs=0
+ReserveVT=0
+``` 
 
 
 ### Bootvorgang anpassen
@@ -290,10 +335,10 @@ To                         Action      From
 
 ### Erscheinungsbild anpassen
 
-Sie können das Aussehen des Live-Systems individuell anpassen. Dieser Schritt ist nicht für die Anforderungen der PTB unbedingt notwendig. Es können aber unnötige Hintergrundbilder, sowie Ikonen-Pakete entfernt werden, und das ist wiederum im Absatz: **_Zulässige Komponenten_** _(PTB-8.51-MB08-BSLM-DE-V01)_ relevant, um das Live-Image möglichst klein zu halten. Dazu löschen Sie alle Dateien und Verzeichnisse aus dem Verzeichnis ``squashfs/usr/share/backgrounds/`` und kopieren Sie dort nur Euer individuelles Hintergrundbild.
+Sie können das Aussehen des Live-Systems individuell anpassen. Dieser Schritt ist nicht für die Anforderungen der PTB unbedingt notwendig. Es können aber unnötige Hintergrundbilder, sowie Icon-Pakete entfernt werden, und das ist wiederum im Absatz: **_Zulässige Komponenten_** _(PTB-8.51-MB08-BSLM-DE-V01)_ relevant, um das Live-Image möglichst klein zu halten. Dazu löschen Sie alle Dateien und Verzeichnisse aus dem Verzeichnis ``squashfs/usr/share/backgrounds/`` und kopieren Sie dort nur Euer individuelles Hintergrundbild.
 
 
-Sie können das Hintergrundbild für die Desktopsitzung für alle Benutzer festlegen. Generieren Sie dazu in dem Verzeichnis `squashfs/etc/skel/.config/autostart` eine neue Datei mit der `.desktop` Erweiterung an. Das Kommando in dieser Datei wird beim Start der Gnome Sitzung automatisch ausgeführt.
+Sie können das Hintergrundbild für die Desktopsitzung für alle Benutzer festlegen. Generieren Sie dazu in dem Verzeichnis `squashfs/etc/skel/.config/autostart` eine neue Datei mit der `.desktop` Erweiterung an. Das Kommando in dieser Datei wird beim Start der Gnome Sitzung automatisch ausgeführt. Falls nicht vorhanden, muss das Verzeichnis `squashfs/etc/skel/.config/autostart` zuerst angelegt werden.
 
 ```
 ~/TRuDI_LiveCD$ sudo chroot squashfs mkdir /etc/skel/.config

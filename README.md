@@ -10,29 +10,40 @@ Ansprechpartner:
 
 ### Microsoft .Net Core
 
-- Visual Studio 2017 15.4: https://www.visualstudio.com/de/vs/
-- .Net Core SDK 2.1.2: https://www.microsoft.com/net/core/
+- Visual Studio 2017 15.6: https://www.visualstudio.com/de/vs/
+- .Net Core SDK 2.1.104: https://www.microsoft.com/net/core/
 - Alternativ zu Visual Studio kann auch Visual Studio Code verwendet werden: https://code.visualstudio.com/
 
 ### Electron
 
-- Node.js 8.9: https://nodejs.org/
+- Node.js 8.11: https://nodejs.org/
 
 ### Build
 
 Sind das .Net Core SDK sowie Node.js installiert, können die folgenden Build-Skripte zum erstellen der Installations-Pakete verwendet werden.
 
+Die Installations-Pakete werden im Verzeichnis ``dist`` abgelegt. 
+
 #### Windows: src/build.cmd 
   
 Erzeugt jeweils ein Installations-Paket für 32- und 64-Bit-Windows-System ab Windows 7.
+
+Es ist möglich die Windows-Installer sowie die TRuDI.exe mit einem Code Signing-Zertifikat 
+signieren zu lassen. Dazu müssen die Umgebungsvariablen ``CSC_LINK`` und ``CSC_KEY_PASSWORD`` definiert 
+werden. ``CSC_LINK`` muss den Pfad zu einer PKCS#12-Datei mit dem Zertifikat und dem privaten Schlüssel enthalten.
+``CSC_KEY_PASSWORD`` das Passwort für die PKCS#12-Datei.
 
 #### Linux: src/build.sh
 
 Erzeugt ein AppImage sowie ein DEB-Software-Paket.
 
+Sollte es beim Build zu der Fehlermeldung ``"error NU1101: Unable to find package ILLink.Tasks"`` kommen, 
+so muss in der Datei ``~/.nuget/NuGet/NuGet.Config`` das Verzeichnis ``private-packages`` 
+unter ``packageSources`` aufgenommen werden.
+
 ## Installations-Pakete
 
-Die aktuelle Version von TRuDI ist 1.0.38.
+Die aktuelle offiziell freigegebene Version von TRuDI ist **1.0.38**.
 
 ### Offizielle Download-Seite der PTB
 
@@ -49,6 +60,13 @@ Windows (32-Bit) | http://www.ivu-software.de/apps/TRuDI/TRuDI-Setup-1.0.38-x86_
 Linux ([AppImage](https://de.wikipedia.org/wiki/AppImage), 64-Bit) | http://www.ivu-software.de/apps/TRuDI/TRuDI-1.0.38-x86_64.AppImage
 Linux (deb, 64-Bit) | http://www.ivu-software.de/apps/TRuDI/TRuDI-1.0.38_amd64.deb
 Linux Live-Image | http://www.ivu-software.de/apps/TRuDI/TRuDI_1.0.38_live.iso
+
+### Aktuelle Vorab-Test-Version
+
+System           | Download
+---              | ---
+Windows (64-Bit) | http://www.ivu-software.de/apps/TRuDI/TRuDI-Setup-1.0.53-x86_64.exe
+Windows (32-Bit) | http://www.ivu-software.de/apps/TRuDI/TRuDI-Setup-1.0.53-x86_32.exe
 
 ## Dokumentation
 
