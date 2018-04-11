@@ -88,7 +88,7 @@
         [HttpPost]
         public async Task<IActionResult> UploadClientCert(List<IFormFile> files)
         {
-            var file = Request?.Form?.Files?.FirstOrDefault();
+            var file = this.Request?.Form?.Files?.FirstOrDefault();
             if (file == null)
             {
                 return this.PartialView("_CertWithoutPasswordPartial", null);
@@ -105,7 +105,7 @@
 
 
         [HttpPost]
-        public async Task<IActionResult> UploadXmlFile(List<IFormFile> files)
+        public IActionResult UploadXmlFile(List<IFormFile> files)
         {
             this.applicationState.BreadCrumbTrail.Add("Verbinden", "/Connect", true);
 
@@ -122,7 +122,7 @@
                 {
                     doc = XDocument.Load(stream);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     this.applicationState.CurrentDataResult.Raw = null;
                     return this.BadRequest();

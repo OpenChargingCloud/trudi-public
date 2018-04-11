@@ -16,9 +16,9 @@
             this.data = data as ITaf2Data;
         }
 
-        public async Task<IViewComponentResult> InvokeAsync()
+        public Task<IViewComponentResult> InvokeAsync()
         {
-            return this.View(this.data);
+            return Task.FromResult<IViewComponentResult>(this.View(this.data));
         }
     }
 }

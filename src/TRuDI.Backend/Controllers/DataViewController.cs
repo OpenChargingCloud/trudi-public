@@ -54,7 +54,7 @@
 
                 System.IO.File.WriteAllBytes(filename, ms.ToArray());
             }
-            catch (Exception ex)
+            catch (Exception)
             {
             }
 
