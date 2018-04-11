@@ -8,7 +8,7 @@
     <RestoreSources>$(RestoreSources);../../private-packages;https://api.nuget.org/v3/index.json</RestoreSources>
     <Authors />
     <Company>Example GmbH</Company>
-    <Product>TRuDI-HAN-Adapter f�r das Example GmbH Smart Meter Gateway</Product>
+    <Product>TRuDI-HAN-Adapter für das Example GmbH Smart Meter Gateway</Product>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
@@ -38,6 +38,7 @@
   </ItemGroup>
   
   <ItemGroup>
+    <ProjectReference Include="..\IVU.Http\IVU.Http.csproj" />
     <ProjectReference Include="..\TRuDI.HanAdapter.Interface\TRuDI.HanAdapter.Interface.csproj" />
     <ProjectReference Include="..\TRuDI.Models\TRuDI.Models.csproj" />
   </ItemGroup>

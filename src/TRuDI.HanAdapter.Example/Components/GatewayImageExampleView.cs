@@ -5,9 +5,9 @@
 
     public class GatewayImageExampleView : ViewComponent
     {
-        public async Task<IViewComponentResult> InvokeAsync(string deviceId)
+        public Task<IViewComponentResult> InvokeAsync(string deviceId)
         {
-            return View(new GatewayImageExampleViewModel { DeviceId = deviceId });
+            return Task.FromResult<IViewComponentResult>(this.View(new GatewayImageExampleViewModel { DeviceId = deviceId }));
         }
     }
 }

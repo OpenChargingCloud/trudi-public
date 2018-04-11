@@ -5,9 +5,9 @@
 
     public class ManufacturerParametersExampleView : ViewComponent
     {
-        public async Task<IViewComponentResult> InvokeAsync()
+        public Task<IViewComponentResult> InvokeAsync()
         {
-            return View();
+            return Task.FromResult<IViewComponentResult>(this.View());
         }
     }
 }
