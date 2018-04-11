@@ -22,7 +22,6 @@ namespace IVU.Http
     public partial class HttpClientHandler : HttpMessageHandler
     {
         private readonly ManagedHandler _managedHandler;
-        private bool _useProxy;
 
         public HttpClientHandler()
         {

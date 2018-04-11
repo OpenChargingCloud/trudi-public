@@ -4,7 +4,7 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <AssemblyName>IVU.Http</AssemblyName>
     <RootNamespace>IVU.Http</RootNamespace>
-    <Version>1.0.13</Version>
+    <Version>1.0.14</Version>
     <Description>IVU HTTP client based on CoreFX</Description>
     <Authors />
     <Company>IVU Softwareentwicklung</Company>
@@ -30,7 +30,5 @@
     <ProjectReference Include="..\IVU.BouncyCastle.Crypto\IVU.BouncyCastle.Crypto.csproj" />
     <ProjectReference Include="..\IVU.Common.Tls\IVU.Common.Tls.csproj" />
   </ItemGroup>
-
- 
 
 </Project>

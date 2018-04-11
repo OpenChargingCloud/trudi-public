@@ -61,32 +61,32 @@
 
                 return await base.SendAsync(request, cancellationToken);
             }
-            else
+
+            // the AuthorizationParameter ist in the cache
+            AddAuthenticationHeader(
+                request,
+                this._username, this._password,
+                authorizationParameter);
+
+            var responseThatShouldBeAuthenticated = await base.SendAsync(request, cancellationToken);
+
+            // If already sending an Authorization header but the period of a valid tickets is exceeded, the server sends a 401 status code and the ticket has to be renewed...
+            if (responseThatShouldBeAuthenticated.StatusCode == HttpStatusCode.Unauthorized)
             {
-                // the AuthorizationParameter ist in the cache
+                await responseThatShouldBeAuthenticated.Content.ReadAsStringAsync();
+
+                var renewedAuthorizationParameter = GetAuthorizationParameter(
+                    authorizationParameter, responseThatShouldBeAuthenticated);
+
                 AddAuthenticationHeader(
                     request,
                     this._username, this._password,
-                    authorizationParameter);
+                    renewedAuthorizationParameter);
 
-                var responseThatShouldBeAuthenticated = await base.SendAsync(request, cancellationToken);
-
-                // If already sending an Authorization header but the period of a valid tickets is exceeded, the server sends a 401 status code and the ticket has to be renewed...
-                if (responseThatShouldBeAuthenticated.StatusCode == HttpStatusCode.Unauthorized)
-                {
-                    var renewedAuthorizationParameter = GetAuthorizationParameter(
-                        authorizationParameter, responseThatShouldBeAuthenticated);
-
-                    AddAuthenticationHeader(
-                        request,
-                        this._username, this._password,
-                        renewedAuthorizationParameter);
-
-                    responseThatShouldBeAuthenticated = await base.SendAsync(request, cancellationToken);
-                }
-
-                return responseThatShouldBeAuthenticated;
+                responseThatShouldBeAuthenticated = await base.SendAsync(request, cancellationToken);
             }
+
+            return responseThatShouldBeAuthenticated;
         }
 
         private static AuthorizationParameter GetAuthorizationParameter(
@@ -112,15 +112,15 @@
             _authorizationCache.TryRemove(domain, out oldAuthorizationParameter);
 
             authorizationParameter = new AuthorizationParameter
-                                         {
-                                             realm = realm,
-                                             nonce = nonce,
-                                             qop = qop,
-                                             cnonce = cnonce,
-                                             opaque = opaque,
-                                             algorithm = algorithm,
-                                             cnonceDate = cnonceDate
-                                         };
+            {
+                realm = realm,
+                nonce = nonce,
+                qop = qop,
+                cnonce = cnonce,
+                opaque = opaque,
+                algorithm = algorithm,
+                cnonceDate = cnonceDate
+            };
 
             _authorizationCache.TryAdd(
                 domain, authorizationParameter);
@@ -148,7 +148,7 @@
                 // algorithm is optional, default to MD5
                 algorithm = "MD5";
             }
-            
+
             if (string.IsNullOrWhiteSpace(algorithm))
             {
                 algorithm = "MD5";
@@ -246,7 +246,7 @@
             return $"username=\"{username}\", realm=\"{realm}\", nonce=\"{nonce}\", uri=\"{path}\", "
                        + $"algorithm=\"{algorithm}\", response=\"{digestResponse}\", qop=\"{qop}\", nc=\"{nc:00000000}\", cnonce=\"{cnonce}\", opaque=\"{opaque}\"";
         }
-        
+
         private static string CalculateMd5Hash(string input)
         {
             var inputBytes = Encoding.UTF8.GetBytes(input);
