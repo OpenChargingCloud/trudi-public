@@ -140,6 +140,11 @@
         /// <returns>Der ausgerichtete Zeitstempel.</returns>
         public static DateTime GetAlignedTimestamp(DateTime timestamp, int interval = 900)
         {
+            if (interval <= 0)
+            {
+                return timestamp;
+            }
+
             if (interval < 86400)
             {
                 var isUtc = timestamp.Kind == DateTimeKind.Utc;

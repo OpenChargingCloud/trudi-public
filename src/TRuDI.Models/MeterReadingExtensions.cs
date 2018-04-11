@@ -137,7 +137,13 @@
 
             for (int i = 1; i < block.IntervalReadings.Count; i++)
             {
-                var span = block.IntervalReadings[i].TargetTime?.ToUniversalTime() - block.IntervalReadings[i - 1].TargetTime?.ToUniversalTime();
+                var lastTimestamp = block.IntervalReadings[i - 1].TargetTime?.ToUniversalTime();
+                var currentTimestamp = block.IntervalReadings[i].TargetTime?.ToUniversalTime();
+
+                lastTimestamp = ModelExtensions.GetAlignedTimestamp(lastTimestamp.Value, (int)measurementPeriod.TotalSeconds);
+                currentTimestamp = ModelExtensions.GetAlignedTimestamp(currentTimestamp.Value, (int)measurementPeriod.TotalSeconds);
+
+                var span = currentTimestamp - lastTimestamp;
                 if (span > measurementPeriod)
                 {
                     count++;
