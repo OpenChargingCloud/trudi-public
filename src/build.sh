@@ -15,6 +15,17 @@ rm -rf ../../dist/linux-unpacked
 dotnet build -c Release
 dotnet publish -c Release -r linux-x64 --self-contained -o bin/dist/linux-x64 -p:SelfContainedBuild=true
 
+# Delete file not needed for TRuDI deployment
+find bin/dist/ -name '*.pdb' -delete
+rm -rf bin/dist/linux-x64/es
+rm -rf bin/dist/linux-x64/fr
+rm -rf bin/dist/linux-x64/it
+rm -rf bin/dist/linux-x64/ja
+rm -rf bin/dist/linux-x64/ko
+rm -rf bin/dist/linux-x64/ru
+rm -rf bin/dist/linux-x64/zh-Hans
+rm -rf bin/dist/linux-x64/zh-Hant
+
 # Copy additional dependencies of .Net Core
 mkdir bin/dist/linux-x64/netcoredeps
 cp /usr/lib/x86_64-linux-gnu/libunwind.so.8 bin/dist/linux-x64/netcoredeps
