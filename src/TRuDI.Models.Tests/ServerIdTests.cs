@@ -120,5 +120,19 @@ namespace TRuDI.Models.Tests
             Assert.AreEqual("1 MUC 10 00 12345678", target.ToString());
             Assert.AreEqual("064D554301001DD8594E", target.ToHexString());
         }
+
+
+        [TestMethod]
+        public void TestServerEMH_WMBus()
+        {
+            var target = new ServerId("e230197600150003");
+            Assert.IsTrue(target.IsValid);
+            Assert.AreEqual(ObisMedium.Gas, target.Medium);
+            Assert.AreEqual("LGB", target.FlagId);
+            Assert.AreEqual(15007619u, target.Number);
+            Assert.AreEqual("LGB 15007619", target.ToString());
+            Assert.AreEqual("E230197600150003", target.ToHexString());
+            Assert.AreEqual(ServerId.ServerIdType.WirelessMBusAddress, target.Type);
+        }
     }
 }
