@@ -40,7 +40,7 @@
                 context.Request.Scheme,
                 context.Request.Host,
                 context.Request.Path,
-                DateTime.Now.ToString("hh:mm:ss.fff"));
+                DateTime.Now.ToString("HH:mm:ss.fff"));
 
             await this.next(context);
 

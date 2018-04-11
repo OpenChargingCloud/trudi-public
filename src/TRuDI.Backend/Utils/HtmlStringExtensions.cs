@@ -25,6 +25,11 @@
         /// <returns>The source string with inserted spaces.</returns>
         public static HtmlString AddSpace(this string source, int length)
         {
+            if (string.IsNullOrWhiteSpace(source))
+            {
+                return new HtmlString("");
+            }
+
             var sb = new StringBuilder();
 
             for (int i = 0; i < source.Length; i++)

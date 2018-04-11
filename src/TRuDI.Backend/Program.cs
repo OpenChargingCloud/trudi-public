@@ -20,7 +20,6 @@
     using TRuDI.HanAdapter.Repository;
 
 #if !DEBUG
-    using System;
     using Microsoft.AspNetCore.Server.Kestrel.Https;
     using TRuDI.Backend.Utils;
 #endif
