@@ -44,6 +44,7 @@ namespace IVU.Common.Tls
         private bool _isAuthenticated;
         private RecordHandler _recordHandler;
         private HandshakeSession _handshakeSession;
+        private List<Record> currentDataRecords;
 
         public SecureSession(Stream stream, SecurityParameters securityParameters)
         {
@@ -96,8 +97,8 @@ namespace IVU.Common.Tls
 
             try
             {
-                Record[] records = await _recordStream.ReceiveAsync(ctsLinked.Token);
-                if (records == null || records.Length == 0)
+                var records = await _recordStream.ReceiveAsync(ctsLinked.Token);
+                if (records == null || records.Count == 0)
                 {
                     return;
                 }
@@ -129,8 +130,8 @@ namespace IVU.Common.Tls
 
             while (!token.IsCancellationRequested)
             {
-                Record[] records = await _recordStream.ReceiveAsync(token);
-                if (records == null || records.Length == 0)
+                var records = await _recordStream.ReceiveAsync(token);
+                if (records == null || records.Count == 0)
                 {
                     continue;
                 }
@@ -284,8 +285,8 @@ namespace IVU.Common.Tls
         {
             while (!token.IsCancellationRequested)
             {
-                Record[] records = await _recordStream.ReceiveAsync(token);
-                if (records.Length == 0)
+                var records = await _recordStream.ReceiveAsync(token);
+                if (records.Count == 0)
                 {
                     continue;
                 }
@@ -434,8 +435,8 @@ namespace IVU.Common.Tls
             while (!token.IsCancellationRequested)
             {
                 await Task.Delay(50, token);
-                Record[] records = await _recordStream.ReceiveAsync(token);
-                if (records.Length == 0)
+                var records = await _recordStream.ReceiveAsync(token);
+                if (records.Count == 0)
                 {
                     continue;
                 }
@@ -511,13 +512,13 @@ namespace IVU.Common.Tls
             while (!token.IsCancellationRequested)
             {
                 await Task.Delay(100, token);
-                Record[] records = await _recordStream.ReceiveAsync(token);
-                if (records.Length == 0)
+                var records = await _recordStream.ReceiveAsync(token);
+                if (records.Count == 0)
                 {
                     continue;
                 }
 
-                if (records.Length > 1)
+                if (records.Count > 1)
                 {
                     throw new AlertException(AlertDescription.UnexpectedMessage,
                         "Too many records. Only one record with client hello expected");
@@ -566,26 +567,43 @@ namespace IVU.Common.Tls
                 throw new InvalidOperationException("Receiving data during renegotiation not implemented");
             }
 
-            //try
+            if (this.currentDataRecords == null || currentDataRecords.Count == 0)
             {
-                Record[] records = await _recordStream.ReceiveAsync(token);
-                if (records.Length == 0)
+                this.currentDataRecords = await _recordStream.ReceiveAsync(token);
+                if (this.currentDataRecords.Count == 0)
                 {
                     throw new IOException("No TLS record received");
                 }
-                MemoryStream memStream = new MemoryStream();
-                foreach (Record record in records)
+            }
+
+            var memStream = new MemoryStream();
+            while(this.currentDataRecords.Count > 0)
+            {
+                var record = this.currentDataRecords[0];
+
+                if (record.Type == RecordType.Alert)
                 {
+                    if (memStream.Length > 0)
+                {
+                        // Process the alert record with the next call to Receive(). 
+                        // First the current application data will be returned to the caller.
+                        break;
+                    }
+
                     if (!_recordHandler.ProcessInputRecord(record))
                     {
                         logger?.Error("Processing input record failed!");
                     }
 
-                    if (record.Type == RecordType.Alert)
+                    ProcessAlertRecord(record);
+                }
+
+                if (!_recordHandler.ProcessInputRecord(record))
                     {
-                        ProcessAlertRecord(record);
+                    logger?.Error("Processing input record failed!");
                     }
-                    else if (record.Type == RecordType.Data)
+
+                if (record.Type == RecordType.Data)
                     {
                         memStream.Write(record.Fragment, 0, record.Fragment.Length);
                     }
@@ -593,23 +611,10 @@ namespace IVU.Common.Tls
                     {
                         ProcessUnknownRecord(record);
                     }
-                }
-                return memStream.ToArray();
+
+                this.currentDataRecords.RemoveAt(0);
             }
-            /*catch (AlertException ae)
-            {
-                ProcessSendFatalAlert(new Alert(ae.AlertDescription, _handshakeSession.NegotiatedVersion));
-                throw new Exception("Connection closed because of local alert", ae);
-            }
-            catch (IOException)
-            {
-                throw new EndOfStreamException("Connection closed unexpectedly");
-            }
-            catch (Exception e)
-            {
-                ProcessSendFatalAlert(new Alert(AlertDescription.InternalError, _handshakeSession.NegotiatedVersion));
-                throw new Exception("Connection closed because of local error", e);
-            }*/
+            return memStream.ToArray();
         }
 
         public async Task SendAsync(byte[] buffer, CancellationToken token)
@@ -683,9 +688,13 @@ namespace IVU.Common.Tls
 
         private void ProcessAlertRecord(Record record)
         {
-            // TODO: Received an alert, handle correctly
             Alert alert = new Alert(record.Fragment);
             logger?.Debug("Received an alert: " + alert.Description);
+            if (alert.Description == AlertDescription.CloseNotify)
+            {
+                throw new AlertException(alert.Description);
+            }
+
             if (alert.Level == AlertLevel.Fatal)
             {
                 // Fatal alerts don't need close notify
@@ -725,6 +734,13 @@ namespace IVU.Common.Tls
         private void ProcessUnknownRecord(Record record)
         {
             throw new InvalidOperationException("Unknown record");
+        }
+
+        public async Task SendCloseNotify(CancellationToken ct)
+        {
+            var record = new Record(RecordType.Alert, _handshakeSession.NegotiatedVersion, new[] { (byte)AlertLevel.None, (byte)AlertDescription.CloseNotify });
+            _recordHandler.ProcessOutputRecord(record);
+            await _recordStream.SendAsync(new[] { record }, ct);
         }
     }
 }

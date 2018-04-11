@@ -231,12 +231,10 @@ namespace IVU.Common.Tls.RecordLayer
         
         private static void CompressRecord(Record record)
         {
-            //throw new NotImplementedException();}
         }
 
         private static void DecompressRecord(Record record)
         {
-            //throw new NotImplementedException();
         }
 
 

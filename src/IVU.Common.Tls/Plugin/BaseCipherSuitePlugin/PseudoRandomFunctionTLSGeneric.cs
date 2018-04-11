@@ -151,8 +151,6 @@ namespace IVU.Common.Tls.Plugin.BaseCipherSuitePlugin
         private byte[] _Ai;
         private byte[] _Hash;
 
-        private TLSGenericType _type;
-
 
         public TLSGenericDeriveBytes(TLSGenericType type, byte[] secret, byte[] seed)
         {

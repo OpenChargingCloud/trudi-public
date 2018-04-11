@@ -1,15 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
-    <Version>2.1.1</Version>
+    <TargetFrameworks>netcoreapp2.0</TargetFrameworks>
+    <Version>2.1.2</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors />
     <Company>IVU Softwareentwicklung GmbH</Company>
     <Description>TLS library with Brainpool support.</Description>
     <PackageOutputPath>..\..\private-packages</PackageOutputPath>
-    <AssemblyVersion>2.1.1.0</AssemblyVersion>
-    <FileVersion>2.1.1.0</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
@@ -27,6 +25,5 @@
   <ItemGroup>
     <ProjectReference Include="..\IVU.BouncyCastle.Crypto\IVU.BouncyCastle.Crypto.csproj" />
   </ItemGroup>
-
 
 </Project>

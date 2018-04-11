@@ -52,7 +52,7 @@ namespace IVU.Common.Tls.RecordLayer
                     // hook to combine token.cancel with stream.close, otherwise WriteAsync possibly never returns
                     using (token.Register(this.innerStream.Close))
                     {
-                    await this.innerStream.WriteAsync(buffer, 0, buffer.Length, token);
+                        await this.innerStream.WriteAsync(buffer, 0, buffer.Length, token);
                     }
                     
                     break;
@@ -65,7 +65,7 @@ namespace IVU.Common.Tls.RecordLayer
             }
         }
 
-        public async Task<Record[]> ReceiveAsync(CancellationToken token)
+        public async Task<List<Record>> ReceiveAsync(CancellationToken token)
         {
             var records = new List<Record>();
             var readBuffer = new byte[MAX_RECORD_SIZE];
@@ -81,9 +81,9 @@ namespace IVU.Common.Tls.RecordLayer
                         try
                         {
                             var readBytes = await this.innerStream.ReadAsync(readBuffer, 0, readBuffer.Length, token);
-                            if (readBytes < 1)
+                            if (readBytes == 0)
                             {
-                                continue;
+                                return records;
                             }
                             this.rcvBuffer.AddRange(readBuffer.Take(readBytes));
                         }
@@ -137,7 +137,7 @@ namespace IVU.Common.Tls.RecordLayer
                 }
             }
 
-            return records.ToArray();
+            return records;
         }
 
 
