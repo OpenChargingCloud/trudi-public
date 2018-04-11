@@ -4,7 +4,7 @@
     using System.Security.Cryptography.X509Certificates;
 
     /// <summary>
-    /// Instance of this class is returned by the <see cref="IHanAdapter.Connect"/>.
+    /// Instance of this class is returned by the <see cref="IHanAdapter.Connect(string, System.Net.IPEndPoint, byte[], string, System.Collections.Generic.Dictionary{string, string}, System.TimeSpan, System.Threading.CancellationToken, System.Action{ProgressInfo})"/>.
     /// </summary>
     public class ConnectResult
     {
