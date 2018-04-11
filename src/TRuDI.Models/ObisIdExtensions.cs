@@ -71,6 +71,37 @@
 
         private static string GetElectricityLabel(ObisId id)
         {
+            if (id.D == 7 && id.E == 0)
+            {
+                switch (id.C)
+                {
+                    case 14:
+                        return "Frequenz";
+
+                    case 16:
+                        return "Wirkleistung Verbrauch";
+
+                    case 32:
+                        return "Spannung L1";
+
+                    case 52:
+                        return "Spannung L2";
+
+                    case 72:
+                        return "Spannung L3";
+
+                    case 31:
+                        return "Strom L1";
+
+                    case 51:
+                        return "Strom L2";
+
+                    case 71:
+                        return "Strom L3";
+                }
+            }
+
+
             string tariff;
             switch (id.E)
             {
@@ -90,10 +121,10 @@
             switch (id.C)
             {
                 case 1:
-                    return "Elektrische Wirkleistung Bezug " + tariff;
+                    return "Elektrische Wirkarbeit Bezug " + tariff;
 
                 case 2:
-                    return "Elektrische Wirkleistung Lieferung " + tariff;
+                    return "Elektrische Wirkarbeit Lieferung " + tariff;
             }
 
             return $"Für die Kennziffer {id} ist keine Beschreibung hinterlegt.";
