@@ -24,6 +24,10 @@ Sind das .Net Core SDK sowie Node.js installiert, können die folgenden Build-Sk
 
 Die Installations-Pakete werden im Verzeichnis ``dist`` abgelegt. 
 
+Die für Electron benötigten NPM-Pakete (www.npmjs.com) werden während des Build-Vorgangs herunter geladen. 
+Es ist daher erforderlich, dass zumindest beim ersten (danach werden sie ggf. aus einem lokalen Cache geladen) 
+eine Internet-Verbindung besteht oder ggf. die Proxy-Einstellungen von ``npm`` entsprechend angepasst werden.
+
 #### Windows: src/build.cmd 
   
 Erzeugt jeweils ein Installations-Paket für 32- und 64-Bit-Windows-System ab Windows 7.

@@ -9,6 +9,15 @@ echo.
 
 setlocal EnableDelayedExpansion
 
+echo Build started at: %DATE% %TIME%
+where git >nul
+IF %ERRORLEVEL% EQU 0 (
+	echo Last git tag: 
+	git describe --tags --dirty
+	echo Last commit hash: 
+	git rev-parse HEAD
+)
+
 echo.
 echo ===========================================================================
 echo.
