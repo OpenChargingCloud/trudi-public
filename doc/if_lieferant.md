@@ -12,6 +12,16 @@ Lieferanten-XML-Datei für Januar 2018:
 Dazu passende TAF-7-Ablesung:
 - [TAF-7-Ablesung_Jan_2018.xml](Lieferanten-XML/TAF-7-Ablesung_Jan_2018.xml)
 
+
+## XSD-Schema-Dateien
+
+Es werden folgende XSD-Schema-Dateien verwendet:
+
+- [AR_2418-6.xsd](/src/TRuDI.Models/Schemata/AR_2418-6.xsd)
+- [espi_derived.xsd](/src/TRuDI.Models/Schemata/espi_derived.xsd)
+- [atom.xsd](/src/TRuDI.Models/Schemata/atom.xsd)
+- [xml.xsd](/src/TRuDI.Models/Schemata/xml.xsd)
+
 ### Anpassen der Beispiel-Dateien
 
 Die Beispiel-Dateien können nicht direkt verwendet werden. Sie müssen angepasst werden,
