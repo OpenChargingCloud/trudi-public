@@ -258,6 +258,18 @@
                         usagePoint.MeterReadings.LastOrDefault().IsTargetTimeUsed = true;
                         break;
 
+                    case "signature":
+                        usagePoint.MeterReadings.LastOrDefault()
+                            .IntervalBlocks.LastOrDefault()
+                            .IntervalReadings.LastOrDefault().Signature = e.Value;
+                        break;
+
+                    case "meterSig":
+                        usagePoint.MeterReadings.LastOrDefault()
+                            .IntervalBlocks.LastOrDefault()
+                            .IntervalReadings.LastOrDefault().Signature = e.Value;
+                        break;
+
                     case "statusFNN":
                         if (e.Value.ValidateHexString())
                         {

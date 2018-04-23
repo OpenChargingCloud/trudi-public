@@ -190,6 +190,16 @@
                             intervalReading.Add(new XElement(this.ar + "targetTime", iReading.TargetTime.Value.ToString("yyyy-MM-ddTHH:mm:ssK")));
                         }
 
+                        if (!string.IsNullOrWhiteSpace(iReading.MeterSignature))
+                        {
+                            intervalReading.Add(new XElement(this.ar + "meterSig", iReading.MeterSignature));
+                        }
+                        
+                        if (!string.IsNullOrWhiteSpace(iReading.Signature))
+                        {
+                            intervalReading.Add(new XElement(this.ar + "signature", iReading.Signature));
+                        }
+
                         intervalReading.Add(
                             iReading.StatusPTB.HasValue
                                 ? new XElement(this.ar + "statusPTB", (int)iReading.StatusPTB)
