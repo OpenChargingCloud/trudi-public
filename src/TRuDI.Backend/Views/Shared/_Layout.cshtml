@@ -122,13 +122,13 @@
     $(window).resize(adjust_body_offset);
     $(document).ready(adjust_body_offset);
 
-    function showSaveFileDialog(url) {
+    function showSaveFileDialog(url, fileExtensionDescription, fileExtension) {
         var remote = require('electron').remote;
         var dialog = remote.dialog;
 
         dialog.showSaveDialog({
             filters: [
-                { name: 'XML-Datei', extensions: ['xml'] },
+                { name: fileExtensionDescription, extensions: [fileExtension] },
             ]
         }, function (fileName) {
 
@@ -145,7 +145,6 @@
                 success: function(result) {},
                 error: function(err) {}
             });
-
         });
     }
 </script>

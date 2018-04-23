@@ -203,8 +203,8 @@
 
         @foreach (var ovl in originalValueLists)
         {
-            if(ovl.HasData)
-            { 
+            if (ovl.HasData)
+            {
                 var ovlBegin = ovl.Start.Value;
                 var ovlEnd = ovl.End.Value;
 
@@ -356,7 +356,7 @@
                 </div>
             }
             else
-            { 
+            {
                 <div role="tabpanel" class="tab-pane" id="tab_@ovl.GetOriginalValueListIdent()">
                     <div class="panel panel-primary">
                         <div class="panel-heading">Originäre Messwertliste @ovl.Meter.ToFormattedDeviceId() (@ovl.Obis.ToString())</div>
@@ -371,8 +371,8 @@
         <script type="text/javascript">
 
             function loadOvlDay(ovlId) {
-                    $("#btnFilterOvlErrors_" + ovlId).show();
-                    $("#btnShowOvlData_" + ovlId).hide();
+                $("#btnFilterOvlErrors_" + ovlId).show();
+                $("#btnShowOvlData_" + ovlId).hide();
 
                 $.ajax({
                     url: '/DataView/FilterOvl',
@@ -383,10 +383,10 @@
                         encodeURIComponent(ovlId),
                     contentType: 'application/x-www-form-urlencoded',
                     processData: false,
-                    success: function(result) {
+                    success: function (result) {
                         $("#ovl_" + ovlId).html(result);
                     },
-                    error: function(err) {}
+                    error: function (err) { }
                 });
             };
 
@@ -410,10 +410,10 @@
                     data: "ovlId=" + encodeURIComponent(ovlId),
                     contentType: 'application/x-www-form-urlencoded',
                     processData: false,
-                    success: function(result) {
+                    success: function (result) {
                         $("#ovl_" + ovlId).html(result);
                     },
-                    error: function(err) {}
+                    error: function (err) { }
                 });
             };
 
@@ -454,3 +454,6 @@
 
     </div>
 </div>
+
+@await Html.PartialAsync("_ExportDataDialog");
+

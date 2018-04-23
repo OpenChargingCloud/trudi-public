@@ -25,34 +25,92 @@
             this.applicationState.SideBarMenu.Clear();
             this.applicationState.SideBarMenu.Add(null, null);
             this.applicationState.SideBarMenu.Add("Zertifikate", "/CertificateDetails");
-#if DEBUG
-            this.applicationState.SideBarMenu.Add("Daten exportieren", "/DataView/DownloadXml");
-#else
-            this.applicationState.SideBarMenu.Add("Daten exportieren", "showSaveFileDialog('/DataView/DownloadXml')", useOnClick:true);
-#endif
+            this.applicationState.SideBarMenu.Add("Daten exportieren", "$('#exportSelectionDialog').modal('show');", useOnClick: true);
+
             return this.View();
         }
 
-        public FileResult DownloadXml()
+#if DEBUG
+        /// <summary>
+        /// Returns the export data to the browser.
+        /// </summary>
+        /// <param name="exportType">Specifies the export type.</param>
+        /// <returns>A FileResult with the export data.</returns>
+        [HttpGet("/DataView/Export/{exportType}")]
+        public IActionResult Export(string exportType)
         {
-            var ms = new MemoryStream();
-            this.applicationState.CurrentDataResult.VersionedExportXml.Save(ms);
-            ms.Position = 0;
+            switch (exportType)
+            {
+                case "XML":
+                    var ms = new MemoryStream();
+                    this.applicationState.CurrentDataResult.VersionedExportXml.Save(ms);
+                    ms.Position = 0;
 
-            this.Response.Headers.Add("Content-Disposition", "attachment; filename=result.xml");
-            return new FileStreamResult(ms, "text/xml");
+                    this.Response.Headers.Add("Content-Disposition", "attachment; filename=result.xml");
+                    return new FileStreamResult(ms, "text/xml");
+
+                case "CSV_LOG_ITEMS":
+                    this.Response.Headers.Add("Content-Disposition", "attachment; filename=export.csv");
+                    return new FileContentResult(CsvExport.ExportLog(this.applicationState.CurrentDataResult?.Model?.LogEntries), "text/csv");
+
+                default:
+                    var selectedOvl = this.applicationState.CurrentDataResult.OriginalValueLists.FirstOrDefault(
+                        ovl => ovl.GetOriginalValueListIdent() == exportType);
+
+                    if (selectedOvl != null)
+                    {
+                        this.Response.Headers.Add("Content-Disposition", "attachment; filename=export.csv");
+                        return new FileContentResult(CsvExport.ExportOriginalValueList(selectedOvl), "text/csv");
+                    }
+
+                    break;
+            }
+
+            return this.NotFound();
         }
+#endif
 
-        [HttpPost]
-        public IActionResult DownloadXml(string filename)
+        /// <summary>
+        /// Writes the export data directly to the specified file.
+        /// </summary>
+        /// <param name="exportType">Type of the export.</param>
+        /// <param name="filename">The filename.</param>
+        /// <returns>OK on success.</returns>
+        [HttpPost("/DataView/ExportToFile/{exportType}")]
+        public IActionResult Export(string exportType, string filename)
         {
             try
             {
-                var ms = new MemoryStream();
-                this.applicationState.CurrentDataResult.VersionedExportXml.Save(ms);
-                ms.Position = 0;
+                byte[] exportData = null;
 
-                System.IO.File.WriteAllBytes(filename, ms.ToArray());
+                switch (exportType)
+                {
+                    case "XML":
+                        var ms = new MemoryStream();
+                        this.applicationState.CurrentDataResult.VersionedExportXml.Save(ms);
+                        exportData = ms.ToArray();
+                        break;
+
+                    case "CSV_LOG_ITEMS":
+                        exportData = CsvExport.ExportLog(this.applicationState.CurrentDataResult?.Model?.LogEntries);
+                        break;
+
+                    default:
+                        var selectedOvl = this.applicationState.CurrentDataResult.OriginalValueLists.FirstOrDefault(
+                            ovl => ovl.GetOriginalValueListIdent() == exportType);
+
+                        if (selectedOvl != null)
+                        {
+                            exportData = CsvExport.ExportOriginalValueList(selectedOvl);
+                        }
+
+                        break;
+                }
+
+                if (exportData != null)
+                {
+                    System.IO.File.WriteAllBytes(filename, exportData);
+                }
             }
             catch (Exception)
             {
