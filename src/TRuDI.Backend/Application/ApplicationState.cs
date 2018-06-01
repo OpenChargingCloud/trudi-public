@@ -709,7 +709,7 @@
             {
                 case ErrorType.TcpConnectFailed:
                     this.LastErrorMessages.Add("Netzwerkverbindung zum Smart Meter Gateway konnte nicht hergestellt werden.");
-                    this.LastErrorMessages.Add("Bitte überprüfen Sie die IP-Addresse sowie den Port.");
+                    this.LastErrorMessages.Add("Bitte überprüfen Sie die IP-Adresse sowie den Port.");
 
                     if (!string.IsNullOrWhiteSpace(ex.AdapterError?.Message))
                     {
