@@ -46,7 +46,7 @@
         /// The cancellation token that is used to cancel HAN adapter operations.
         /// </summary>
         private CancellationTokenSource cts;
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ApplicationState" /> class.
         /// </summary>
@@ -252,9 +252,9 @@
                                 return;
                             }
 
-                            var tariffContract = taf7Contracts.FirstOrDefault( c => 
-                                     c.MeteringPointId == this.CurrentSupplierFile.Model.UsagePointId
-                                     && c.TafName == this.CurrentSupplierFile.Model.AnalysisProfile.TariffId);
+                            var tariffContract = taf7Contracts.FirstOrDefault(c =>
+                                    c.MeteringPointId == this.CurrentSupplierFile.Model.UsagePointId
+                                    && c.TafName == this.CurrentSupplierFile.Model.AnalysisProfile.TariffId);
 
                             if (tariffContract == null)
                             {
@@ -361,7 +361,7 @@
 
                             try
                             {
-                                
+
                                 if (rawCurrentRegisters != null)
                                 {
                                     this.UpdateRegisterValuesFromXml(rawCurrentRegisters, ctx);
@@ -497,7 +497,7 @@
                     this.CurrentSupplierFile.TafData = tafAdapter.Calculate(this.CurrentDataResult.Model, this.CurrentSupplierFile.Model);
                 }
             }
-            catch(UnknownTafAdapterException ex)
+            catch (UnknownTafAdapterException ex)
             {
                 Log.Error(ex, "Unknown TAF adapter: {0}", ex.TafId);
                 this.LastErrorMessages.Add($"Die Berechnung des Tarifanwendungsfall {ex.TafId} wird nicht unterstützt.");
@@ -567,11 +567,11 @@
             if (this.CurrentDataResult.MeterReadings.Count == 0)
             {
                 var ts = new TariffStage
-                             {
-                                 ObisCode = "010000000FF",
-                                 TariffNumber = 0,
-                                 Description = string.Empty
-                             };
+                {
+                    ObisCode = "010000000FF",
+                    TariffNumber = 0,
+                    Description = string.Empty
+                };
                 lowestTariffId = 0;
                 this.CurrentDataResult.Model.AnalysisProfile.TariffStages.Add(ts);
             }
@@ -580,11 +580,11 @@
                 foreach (var mr in this.CurrentDataResult.MeterReadings)
                 {
                     var ts = new TariffStage
-                                 {
-                                     ObisCode = mr.ReadingType.ObisCode,
-                                     TariffNumber = new ObisId(mr.ReadingType.ObisCode).E,
-                                     Description = string.Empty
-                                 };
+                    {
+                        ObisCode = mr.ReadingType.ObisCode,
+                        TariffNumber = new ObisId(mr.ReadingType.ObisCode).E,
+                        Description = string.Empty
+                    };
 
                     lowestTariffId = Math.Min(lowestTariffId, ts.TariffNumber);
                     this.CurrentDataResult.Model.AnalysisProfile.TariffStages.Add(ts);
@@ -672,15 +672,13 @@
                 throw;
             }
 
-            var meterReadings = model.MeterReadings.Where(mr => !mr.IsOriginalValueList()).ToList();
-
-            meterReadings.Sort((a, b) => string.Compare(a.ReadingType.ObisCode, b.ReadingType.ObisCode, StringComparison.InvariantCultureIgnoreCase));
-            this.CurrentDataResult.MeterReadings = meterReadings;
-            this.CurrentDataResult.Begin = meterReadings.FirstOrDefault()?.IntervalBlocks?.FirstOrDefault()?.Interval?.Start;
+            model.MeterReadings.Sort((a, b) => string.Compare(a.ReadingType.ObisCode, b.ReadingType.ObisCode, StringComparison.InvariantCultureIgnoreCase));
+            this.CurrentDataResult.MeterReadings = model.MeterReadings;
+            this.CurrentDataResult.Begin = model.MeterReadings.FirstOrDefault()?.IntervalBlocks?.FirstOrDefault()?.Interval?.Start;
 
             if (this.CurrentDataResult.Begin != null)
             {
-                var duration = meterReadings.FirstOrDefault()?.IntervalBlocks?.FirstOrDefault()?.Interval?.Duration;
+                var duration = model.MeterReadings.FirstOrDefault()?.IntervalBlocks?.FirstOrDefault()?.Interval?.Duration;
                 if (duration != null)
                 {
                     this.CurrentDataResult.End = this.CurrentDataResult.Begin + TimeSpan.FromSeconds(duration.Value);
@@ -730,7 +728,7 @@
                 case ErrorType.NoTafProfileForUser:
                     this.LastErrorMessages.Add($"Für den Benutzer {(this.ConnectData.AuthMode == AuthMode.UserPassword ? this.ConnectData.Username : this.ClientCert.Subject)} sind keine Vertragsdaten im Smart Meter Gateway vorhanden.");
                     return;
-                
+
                 case ErrorType.DeviceError:
                     this.LastErrorMessages.Add("Fehler während der Kommunikation mit dem Smart Meter Gateway. Das Smart Meter Gateway lieferte folgenden Fehler zurück:");
                     break;
