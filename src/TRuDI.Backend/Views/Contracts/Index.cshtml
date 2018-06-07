@@ -13,7 +13,7 @@
     var hasParamErrors = false;
 
     <div class="panel panel-primary">
-    
+
         @if (!string.IsNullOrWhiteSpace(cnt.Contract.MeteringPointId))
         {
             <div class="panel-heading">Zählpunkt @cnt.Contract.MeteringPointId</div>
@@ -23,244 +23,264 @@
             hasParamErrors = true;
             <div class="error">Zählpunkt: (Parameterierung nicht vollständig)</div>
         }
-    <div class="panel-body">
+        <div class="panel-body">
 
-    <table class="table">
+            <table class="table">
 
-        <tr>
-            <th>Tarifbezeichnung</th>
+                <tr>
+                    <th>Tarifbezeichnung</th>
 
-            @if (!string.IsNullOrWhiteSpace(cnt.Contract.TafName))
-            {
-                <td>@cnt.Contract.TafName</td>
-            }
-            else
-            {
-                hasParamErrors = true;
-                <td class="error">Parameterierung des Smart Meter Gateways nicht vollständig</td>
-            }
-        </tr>
-
-        <tr>
-            <th>Energieart</th>
-            <td>@cnt.Contract.GetMedium()</td>
-        </tr>
-
-        <tr>
-            <th>Tarifanwendungsfall</th>
-            <td>@cnt.Contract.TafId.TafToFriendlyName()</td>
-        </tr>
-
-        @if (!string.IsNullOrWhiteSpace(cnt.Contract.Description))
-        {
-            <tr>
-                <th>Beschreibung</th>
-                <td>@cnt.Contract.Description</td>
-            </tr>
-        }
-
-        <tr>
-            <th>ID des Kunden</th>
-
-            @if (!string.IsNullOrWhiteSpace(cnt.Contract.ConsumerId))
-            {
-                <td>@cnt.Contract.ConsumerId</td>
-            }
-            else
-            {
-                hasParamErrors = true;
-                <td class="error">Parameterierung des Smart Meter Gateways nicht vollständig</td>
-            }
-        </tr>
-
-        <tr>
-            <th>ID des Rechnungsstellers</th>
-            @if (!string.IsNullOrWhiteSpace(cnt.Contract.SupplierId))
-            {
-                <td>@cnt.Contract.SupplierId</td>
-            }
-            else
-            {
-                hasParamErrors = true;
-                <td class="error">Parameterierung des Smart Meter Gateways nicht vollständig</td>
-            }
-        </tr>
-
-        <tr>
-            <th>Vertragsbeginn</th>
-            <td>@cnt.Contract.Begin.ToFormatedString()</td>
-        </tr>
-
-        <tr>
-            <th>Vertragsende</th>
-            <td>@cnt.Contract.End.ToFormatedString()</td>
-        </tr>
-
-        <tr>
-            <th>
-                Zähler
-            </th>
-
-            @if (cnt.Contract.Meters == null || cnt.Contract.Meters.Count == 0)
-            {
-                hasParamErrors = true;
-                <td class="error">Parameterierung des Smart Meter Gateways nicht vollständig</td>
-            }
-            else
-            {
-                <td>
-                    @foreach (var meter in cnt.Contract.Meters)
+                    @if (!string.IsNullOrWhiteSpace(cnt.Contract.TafName))
                     {
-                        @meter.ToFormattedDeviceId()<br />
+                        <td>@cnt.Contract.TafName</td>
                     }
-                </td>
+                    else
+                    {
+                        hasParamErrors = true;
+                        <td class="error">Parameterierung des Smart Meter Gateways nicht vollständig</td>
+                    }
+                </tr>
+
+                <tr>
+                    <th>Energieart</th>
+                    <td>@cnt.Contract.GetMedium()</td>
+                </tr>
+
+                <tr>
+                    <th>Tarifanwendungsfall</th>
+                    <td>@cnt.Contract.TafId.TafToFriendlyName()</td>
+                </tr>
+
+                @if (!string.IsNullOrWhiteSpace(cnt.Contract.Description))
+                {
+                    <tr>
+                        <th>Beschreibung</th>
+                        <td>@cnt.Contract.Description</td>
+                    </tr>
+                }
+
+                <tr>
+                    <th>ID des Kunden</th>
+
+                    @if (!string.IsNullOrWhiteSpace(cnt.Contract.ConsumerId))
+                    {
+                        <td>@cnt.Contract.ConsumerId</td>
+                    }
+                    else
+                    {
+                        hasParamErrors = true;
+                        <td class="error">Parameterierung des Smart Meter Gateways nicht vollständig</td>
+                    }
+                </tr>
+
+                <tr>
+                    <th>ID des Rechnungsstellers</th>
+                    @if (!string.IsNullOrWhiteSpace(cnt.Contract.SupplierId))
+                    {
+                        <td>@cnt.Contract.SupplierId</td>
+                    }
+                    else
+                    {
+                        hasParamErrors = true;
+                        <td class="error">Parameterierung des Smart Meter Gateways nicht vollständig</td>
+                    }
+                </tr>
+
+                <tr>
+                    <th>Vertragsbeginn</th>
+                    <td>@cnt.Contract.Begin.ToFormatedString()</td>
+                </tr>
+
+                <tr>
+                    <th>Vertragsende</th>
+                    <td>@cnt.Contract.End.ToFormatedString()</td>
+                </tr>
+
+                <tr>
+                    <th>
+                        Zähler
+                    </th>
+
+                    @if (cnt.Contract.Meters == null || cnt.Contract.Meters.Count == 0)
+                    {
+                        hasParamErrors = true;
+                        <td class="error">Parameterierung des Smart Meter Gateways nicht vollständig</td>
+                    }
+                    else
+                    {
+                        <td>
+                            @foreach (var meter in cnt.Contract.Meters)
+                            {
+                                @meter.ToFormattedDeviceId()<br />
+                            }
+                        </td>
+                    }
+                </tr>
+
+            </table>
+
+            @{
+                var dtpIdStart = $"dtp_start_{contractIndex}";
+                var dtpIdEnd = $"dtp_end_{contractIndex}";
+
+                var hasBillingPeriods = cnt.Contract.BillingPeriods != null && cnt.Contract.BillingPeriods.Count > 0;
+                var hasDayValues = cnt.Taf6?.BillingPeriods != null && cnt.Taf6.BillingPeriods.Count > 0;
             }
-        </tr>
 
-    </table>
+            <form>
 
-    @{
-        var dtpIdStart = $"dtp_start_{contractIndex}";
-        var dtpIdEnd = $"dtp_end_{contractIndex}";
+                <div>
+                    @if (hasBillingPeriods || hasDayValues)
+                    {
+                        <ul class="nav nav-tabs">
+                            <li role="presentation" class='@(hasBillingPeriods ? "active" : "disabled")'><a href='@string.Format("#tab_billingperiods_{0}", contractIndex)' aria-controls='@string.Format("tab_billingperiods_{0}", contractIndex)' role="tab" data-toggle="tab">Abrechnungsperioden</a></li>
+                            <li role="presentation" class='@(hasBillingPeriods ? (hasDayValues ? "" : "disabled") : (hasDayValues ? "active" : "disabled"))'><a href='@string.Format("#tab_dayvalues_{0}", contractIndex)' aria-controls='@string.Format("tab_dayvalues_{0}", contractIndex)' role="tab" data-toggle="tab">Tageswerte</a></li>
+                        </ul>
+                    }
 
-        var hasBillingPeriods = false;
-    }
+                    <div class="tab-content">
 
-    <form>
-        @if (cnt.Contract.BillingPeriods != null && cnt.Contract.BillingPeriods.Count > 0)
-        {
-            int billingPeriodIndex = 0;
-            hasBillingPeriods = true;
+                        @if (hasBillingPeriods)
+                        {
+                            int billingPeriodIndex = 0;
 
-            <h3>Abrechnungsperioden</h3>
+                            <div role="tabpanel" class="tab-pane active" id="@string.Format("tab_billingperiods_{0}", contractIndex)">
+                                <table class="table table-fixed">
+                                    <thead>
+                                        <tr>
+                                            <th class="col-xs-1">&nbsp;</th>
+                                            <th class="col-xs-3">Von</th>
+                                            <th class="col-xs-3">Bis</th>
+                                            <th class="col-xs-5">Abgeschlossen</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var period in cnt.Contract.BillingPeriods)
+                                        {
+                                            <tr id="@string.Format("{0}_{1}_BP", contractIndex, billingPeriodIndex)">
+                                                <td class="col-xs-1">
+                                                    <input style="height: 11px;" type="radio"
+                                                           name='@string.Format("{0}", contractIndex)'
+                                                           value='@string.Format("{0}_{1}", contractIndex, billingPeriodIndex)'
+                                                           onclick="selectBillingPeriod(@contractIndex, @billingPeriodIndex, '@period.Begin.ToIso8601()', '@period.End.GetEndTimeOrNow().RoundDown(15).ToIso8601()', 'BP');">
+                                                </td>
+                                                <td class="col-xs-3">@period.Begin.ToFormatedString()</td>
+                                                <td class="col-xs-3">@period.End.ToFormatedString()</td>
+                                                <td class="col-xs-5">@period.IsCompleted()</td>
+                                            </tr>
 
-            <table class="table">
+                                            billingPeriodIndex++;
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
 
-                <tr>
-                    <th></th>
-                    <th>Von</th>
-                    <th>Bis</th>
-                    <th>Abgeschlossen</th>
-                </tr>
+                        @if (hasDayValues)
+                        {
+                            int billingPeriodIndex = 0;
 
-                @foreach (var period in cnt.Contract.BillingPeriods)
-                {
-                    <tr id="@string.Format("{0}_{1}_BP", contractIndex, billingPeriodIndex)">
-                        <td>
-                            <input type="radio"
-                                   name='@string.Format("{0}", contractIndex)'
-                                   value='@string.Format("{0}_{1}", contractIndex, billingPeriodIndex)'
-                                   onclick="selectBillingPeriod(@contractIndex, @billingPeriodIndex, '@period.Begin.ToIso8601()', '@period.End.GetEndTimeOrNow().RoundDown(15).ToIso8601()', 'BP');">
-                        </td>
-                        <td>@period.Begin.ToFormatedString()</td>
-                        <td>@period.End.ToFormatedString()</td>
-                        <td>@period.IsCompleted()</td>
-                    </tr>
+                            <div role="tabpanel" class="tab-pane" id="@string.Format("tab_dayvalues_{0}", contractIndex)">
+                                <table class="table table-fixed">
+                                    <thead>
+                                        <tr>
+                                            <th class="col-xs-1">&nbsp;</th>
+                                            <th class="col-xs-3">Von</th>
+                                            <th class="col-xs-3">Bis</th>
+                                            <th class="col-xs-5">Abgeschlossen</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
 
-                    billingPeriodIndex++;
-                }
-            </table>
-        }
-        
-        @if (cnt.Taf6?.BillingPeriods != null && cnt.Taf6.BillingPeriods.Count > 0)
-        {
-            int billingPeriodIndex = 0;
-            hasBillingPeriods = true;
+                                        @foreach (var period in cnt.Taf6.BillingPeriods)
+                                        {
+                                            <tr id="@string.Format("{0}_{1}_TAF6", contractIndex, billingPeriodIndex)">
+                                                <td class="col-xs-1">
+                                                    <input style="height: 11px;" type="radio"
+                                                           name='@string.Format("{0}", contractIndex)'
+                                                           value='@string.Format("{0}_{1}", contractIndex, billingPeriodIndex)'
+                                                           onclick="selectBillingPeriod(@contractIndex, @billingPeriodIndex, '@period.Begin.ToIso8601()', '@period.End.GetEndTimeOrNow().RoundDown(15).ToIso8601()', 'TAF6');">
+                                                </td>
+                                                <td class="col-xs-3">@period.Begin.ToFormatedString()</td>
+                                                <td class="col-xs-3">@period.End.ToFormatedString()</td>
+                                                <td class="col-xs-5">@period.IsCompleted()</td>
+                                            </tr>
 
-            <h3>Tageswerte</h3>
+                                            billingPeriodIndex++;
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
 
-            <table class="table">
+                    </div>
+                </div>
+                
 
-                <tr>
-                    <th></th>
-                    <th>Von</th>
-                    <th>Bis</th>
-                    <th>Abgeschlossen</th>
-                </tr>
+            </form>
 
-                @foreach (var period in cnt.Taf6.BillingPeriods)
-                {
-                    <tr id="@string.Format("{0}_{1}_TAF6", contractIndex, billingPeriodIndex)">
-                        <td>
-                            <input type="radio"
-                                   name='@string.Format("{0}", contractIndex)'
-                                   value='@string.Format("{0}_{1}", contractIndex, billingPeriodIndex)'
-                                   onclick="selectBillingPeriod(@contractIndex, @billingPeriodIndex, '@period.Begin.ToIso8601()', '@period.End.GetEndTimeOrNow().RoundDown(15).ToIso8601()', 'TAF6');">
-                        </td>
-                        <td>@period.Begin.ToFormatedString()</td>
-                        <td>@period.End.ToFormatedString()</td>
-                        <td>@period.IsCompleted()</td>
-                    </tr>
-
-                    billingPeriodIndex++;
-                }
-            </table>
-        }
-
-    </form>
-
-        @if (cnt.Contract.Begin <= DateTime.Now)
-        {
-            if (hasBillingPeriods || cnt.Contract.TafId == TafId.Taf7)
+            @if (cnt.Contract.Begin <= DateTime.Now)
             {
-                <table class="table-condensed">
-                    <tr>
-                        <th>Startzeitpunkt der Ablesung</th>
-                        <th>Endzeitpunkt der Ablesung</th>
-                        <th></th>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div class="form-group">
-                                <div class='input-group date' id="@dtpIdStart">
-                                    <input type='text' class="form-control"/>
-                                    <span class="input-group-addon">
-                                        <span class="glyphicon glyphicon-calendar"></span>
-                                    </span>
+                if (hasBillingPeriods || hasDayValues || cnt.Contract.TafId == TafId.Taf7)
+                {
+                    <table class="table-condensed">
+                        <tr>
+                            <th>Startzeitpunkt der Ablesung</th>
+                            <th>Endzeitpunkt der Ablesung</th>
+                            <th></th>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="form-group">
+                                    <div class='input-group date' id="@dtpIdStart">
+                                        <input type='text' class="form-control" />
+                                        <span class="input-group-addon">
+                                            <span class="glyphicon glyphicon-calendar"></span>
+                                        </span>
+                                    </div>
                                 </div>
-                            </div>
-                        </td>
+                            </td>
 
-                        <td>
-                            <div class="form-group">
-                                <div class='input-group date' id="@dtpIdEnd">
-                                    <input type='text' class="form-control"/>
-                                    <span class="input-group-addon">
-                                        <span class="glyphicon glyphicon-calendar"></span>
-                                    </span>
+                            <td>
+                                <div class="form-group">
+                                    <div class='input-group date' id="@dtpIdEnd">
+                                        <input type='text' class="form-control" />
+                                        <span class="input-group-addon">
+                                            <span class="glyphicon glyphicon-calendar"></span>
+                                        </span>
+                                    </div>
                                 </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="form-group">
-                                @if (cnt.Contract.TafId == TafId.Taf7)
-                                {
-                                    <button type="button" class="btn btn-default" id="btnRead" onclick="startReadingTaf7(@contractIndex);" @(hasParamErrors ? "disabled" : "")>Auslesung starten...</button>
-                                }
-                                else
-                                {
-                                    <button type="button" class="btn btn-default" id="btnRead" onclick="startReading();" @(hasParamErrors ? "disabled" : "")>Auslesung starten...</button>
-                                }
-                            </div>
-                        </td>
-                    </tr>
-                </table>
+                            </td>
+                            <td>
+                                <div class="form-group">
+                                    @if (cnt.Contract.TafId == TafId.Taf7)
+                                    {
+                                        <button type="button" class="btn btn-default" id="btnRead" onclick="startReadingTaf7(@contractIndex);" @(hasParamErrors ? "disabled" : "")>Auslesung starten...</button>
+                                    }
+                                    else
+                                    {
+                                        <button type="button" class="btn btn-default" id="btnRead" onclick="startReading();" @(hasParamErrors ? "disabled" : "")>Auslesung starten...</button>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                }
+                else
+                {
+                    <div>
+                        <p>Es sind keine Abrechnungsperioden vorhanden.</p>
+                    </div>
+                }
             }
             else
             {
                 <div>
-                    <p>Es sind keine Abrechnungsperioden vorhanden.</p>
+                    <p>Vertragsbeginn liegt in der Zukunft: eine Ablesung ist noch nicht möglich.</p>
                 </div>
             }
-        }
-        else
-        {
-            <div>
-                <p>Vertragsbeginn liegt in der Zukunft: eine Ablesung ist noch nicht möglich.</p>
-            </div>
-        }
 
-    <script type="text/javascript">
+            <script type="text/javascript">
         $(function () {
             $("#@dtpIdStart").datetimepicker({
                 locale: 'de',
@@ -285,78 +305,83 @@
                 </text>
             }
         });
-    </script>
+            </script>
 
-    </div>
+        </div>
     </div>
 
-                    contractIndex++;
-                }
+    contractIndex++;
+}
 
 <script type="text/javascript">
 
-                var selectedContract = -1;
-                var selectedBillingPeriod = -1;
-                var selectedMode = '';
+    jQuery(document).ready(function () {
+        jQuery(".table4").clone(true).appendTo("#table4").addClass("clone");
+        jQuery(".table4").clone(true).appendTo("#table4").addClass("clone2");
+    });
 
-                function selectBillingPeriod(contractIndex, billingPeriodIndex, startTime, endTime, mode) {
-                    console.log("start = " + startTime + ", end = " + endTime);
+    var selectedContract = -1;
+    var selectedBillingPeriod = -1;
+    var selectedMode = '';
 
-                    selectedContract = contractIndex;
-                    selectedBillingPeriod = billingPeriodIndex;
-                    selectedMode = mode;
+    function selectBillingPeriod(contractIndex, billingPeriodIndex, startTime, endTime, mode) {
+        console.log("start = " + startTime + ", end = " + endTime);
 
-                    $("#dtp_start_" + contractIndex).data("DateTimePicker").maxDate(false);
-                    $("#dtp_start_" + contractIndex).data("DateTimePicker").minDate(false);
-                    $("#dtp_start_" + contractIndex).data("DateTimePicker").maxDate(moment(startTime));
+        selectedContract = contractIndex;
+        selectedBillingPeriod = billingPeriodIndex;
+        selectedMode = mode;
 
-                    $("#dtp_end_" + contractIndex).data("DateTimePicker").minDate(false);
-                    $("#dtp_end_" + contractIndex).data("DateTimePicker").maxDate(false);
-                    $("#dtp_end_" + contractIndex).data("DateTimePicker").minDate(moment(endTime));
+        $("#dtp_start_" + contractIndex).data("DateTimePicker").maxDate(false);
+        $("#dtp_start_" + contractIndex).data("DateTimePicker").minDate(false);
+        $("#dtp_start_" + contractIndex).data("DateTimePicker").maxDate(moment(startTime));
 
-                    $("#dtp_start_" + contractIndex).data("DateTimePicker").date(moment(startTime));
-                    $("#dtp_end_" + contractIndex).data("DateTimePicker").date(moment(endTime));
-                }
+        $("#dtp_end_" + contractIndex).data("DateTimePicker").minDate(false);
+        $("#dtp_end_" + contractIndex).data("DateTimePicker").maxDate(false);
+        $("#dtp_end_" + contractIndex).data("DateTimePicker").minDate(moment(endTime));
 
-                function startReading() {
-                    if (selectedBillingPeriod == -1 || selectedContract == -1) {
-                        return;
-                    }
+        $("#dtp_start_" + contractIndex).data("DateTimePicker").date(moment(startTime));
+        $("#dtp_end_" + contractIndex).data("DateTimePicker").date(moment(endTime));
+    }
 
-                    $.ajax({
-                        url: '/Contracts/StartReadout',
-                        type: "POST",
-                        data:
-                        "contractIndex=" + selectedContract +
-                        "&billingPeriodIndex=" + selectedBillingPeriod +
-                        "&startTime=" + encodeURIComponent($("#dtp_start_" + selectedContract).data("DateTimePicker").date().toISOString()) +
-                        "&endTime=" + encodeURIComponent($("#dtp_end_" + selectedContract).data("DateTimePicker").date().toISOString()) +
-                        "&mode=" + selectedMode,
-                        contentType: 'application/x-www-form-urlencoded',
-                        processData: false,
-                        success: function (result) {
-                            window.location.href = "/Progress";
-                        },
-                        error: function (err) { }
-                    });
-                }
+    function startReading() {
+        if (selectedBillingPeriod == -1 || selectedContract == -1) {
+            return;
+        }
 
-                function startReadingTaf7(contractIndex) {
+        $.ajax({
+            url: '/Contracts/StartReadout',
+            type: "POST",
+            data:
+                "contractIndex=" + selectedContract +
+                "&billingPeriodIndex=" + selectedBillingPeriod +
+                "&startTime=" + encodeURIComponent($("#dtp_start_" + selectedContract).data("DateTimePicker").date().toISOString()) +
+                "&endTime=" + encodeURIComponent($("#dtp_end_" + selectedContract).data("DateTimePicker").date().toISOString()) +
+                "&mode=" + selectedMode,
+            contentType: 'application/x-www-form-urlencoded',
+            processData: false,
+            success: function (result) {
+                window.location.href = "/Progress";
+            },
+            error: function (err) { }
+        });
+    }
 
-                    $.ajax({
-                        url: '/Contracts/StartReadoutTaf7',
-                        type: "POST",
-                        data:
-                        "contractIndex=" + contractIndex +
-                        "&startTime=" + encodeURIComponent($("#dtp_start_" + contractIndex).data("DateTimePicker").date().toISOString()) +
-                        "&endTime=" + encodeURIComponent($("#dtp_end_" + contractIndex).data("DateTimePicker").date().toISOString()),
-                        contentType: 'application/x-www-form-urlencoded',
-                        processData: false,
-                        success: function (result) {
-                            window.location.href = "/Progress";
-                        },
-                        error: function (err) { }
-                    });
-                }
+    function startReadingTaf7(contractIndex) {
+
+        $.ajax({
+            url: '/Contracts/StartReadoutTaf7',
+            type: "POST",
+            data:
+                "contractIndex=" + contractIndex +
+                "&startTime=" + encodeURIComponent($("#dtp_start_" + contractIndex).data("DateTimePicker").date().toISOString()) +
+                "&endTime=" + encodeURIComponent($("#dtp_end_" + contractIndex).data("DateTimePicker").date().toISOString()),
+            contentType: 'application/x-www-form-urlencoded',
+            processData: false,
+            success: function (result) {
+                window.location.href = "/Progress";
+            },
+            error: function (err) { }
+        });
+    }
 
 </script>
