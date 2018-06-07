@@ -436,7 +436,17 @@
 
                 foreach (var block in meterReading.IntervalBlocks)
                 {
-                    block.IntervalReadings.Sort((a, b) => a.TimePeriod.Start.ToUniversalTime().CompareTo(b.TimePeriod.Start.ToUniversalTime()));
+                    block.IntervalReadings.Sort((a, b) =>
+                        {
+                            if (a.TargetTime != null && b.TargetTime != null)
+                            {
+                                return a.TargetTime.Value.ToUniversalTime()
+                                    .CompareTo(b.TargetTime.Value.ToUniversalTime());
+                            }
+
+                            return a.TimePeriod.Start.ToUniversalTime()
+                                    .CompareTo(b.TimePeriod.Start.ToUniversalTime());
+                        });
 
                     if (meterReading.IsOriginalValueList())
                     {
