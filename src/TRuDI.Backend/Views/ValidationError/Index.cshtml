@@ -19,11 +19,11 @@
             <p>
                 @if (ViewData.ContainsKey("Debug"))
                 {
-                    <a asp-action="DownloadXml" asp-controller="DataView">XML-Datei speichern</a>
+                    <a href="/DataView/Export/XML">XML-Datei speichern</a>
                 }
                 else
                 {
-                    <a onclick="showSaveFileDialog('/DataView/DownloadXml', 'XML-Datei', 'xml')" style="cursor:pointer;">XML-Datei speichern</a>
+                    <a onclick="showSaveFileDialog('/DataView/ExportToFile/XML', 'XML-Datei', 'xml')" style="cursor:pointer;">XML-Datei speichern</a>
                 }
             </p>
         }
