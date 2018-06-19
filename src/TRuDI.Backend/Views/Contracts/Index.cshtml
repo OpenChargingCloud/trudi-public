@@ -133,8 +133,8 @@
                     @if (hasBillingPeriods || hasDayValues)
                     {
                         <ul class="nav nav-tabs">
-                            <li role="presentation" class='@(hasBillingPeriods ? "active" : "disabled")'><a href='@string.Format("#tab_billingperiods_{0}", contractIndex)' aria-controls='@string.Format("tab_billingperiods_{0}", contractIndex)' role="tab" data-toggle="tab">Abrechnungsperioden</a></li>
-                            <li role="presentation" class='@(hasBillingPeriods ? (hasDayValues ? "" : "disabled") : (hasDayValues ? "active" : "disabled"))'><a href='@string.Format("#tab_dayvalues_{0}", contractIndex)' aria-controls='@string.Format("tab_dayvalues_{0}", contractIndex)' role="tab" data-toggle="tab">Tageswerte</a></li>
+                            <li role="presentation" class="active"><a href='@string.Format("#tab_billingperiods_{0}", contractIndex)' aria-controls='@string.Format("tab_billingperiods_{0}", contractIndex)' role="tab" data-toggle="tab">Abrechnungsperioden</a></li>
+                            <li role="presentation" class=""><a href='@string.Format("#tab_dayvalues_{0}", contractIndex)' aria-controls='@string.Format("tab_dayvalues_{0}", contractIndex)' role="tab" data-toggle="tab">Tageswerte</a></li>
                         </ul>
                     }
 
@@ -211,10 +211,18 @@
                                 </table>
                             </div>
                         }
+                        else
+                        {
+                            <div role="tabpanel" class="tab-pane" id="@string.Format("tab_dayvalues_{0}", contractIndex)">
+                                <div>
+                                    <p>Es sind keine Tageswerte vorhanden.</p>
+                                </div>
+                            </div>
+                        }
 
                     </div>
                 </div>
-                
+
 
             </form>
 
