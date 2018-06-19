@@ -155,7 +155,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach (var period in cnt.Contract.BillingPeriods)
+                                        @foreach (var period in cnt.Contract.BillingPeriods.OrderByDescending(bp => bp.Begin))
                                         {
                                             <tr id="@string.Format("{0}_{1}_BP", contractIndex, billingPeriodIndex)">
                                                 <td class="col-xs-1">
@@ -191,8 +191,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-
-                                        @foreach (var period in cnt.Taf6.BillingPeriods)
+                                        @foreach (var period in cnt.Taf6.BillingPeriods.OrderByDescending(bp => bp.Begin))
                                         {
                                             <tr id="@string.Format("{0}_{1}_TAF6", contractIndex, billingPeriodIndex)">
                                                 <td class="col-xs-1">
