@@ -525,7 +525,7 @@ TAF-6 wird als eigenes ``ContractInfo`` zurückgeliefert, welches sich nur druch
 
 #### Beispiel für TAF-1/TAF-2
 
-```json
+```javascript
 [
   // Beispiel für TAF-1 bzw. TAF-2
   {
