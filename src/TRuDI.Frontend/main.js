@@ -333,22 +333,40 @@ function startBackendService() {
     createWindow();
     checkIntegrity();
 
-    backendServiceProcess = require('child_process').spawn(backendConfig.executablePath, backendConfig.commandLineOptions, { cwd: backendConfig.workPath });
-    backendServiceProcess.stdout.on('data', (data) => {
-        writeLog(`stdout: ${data}`);
-        var s = data.toString();
+    try {
+        backendServiceProcess = require('child_process').spawn(backendConfig.executablePath,
+            backendConfig.commandLineOptions,
+            { cwd: backendConfig.workPath });
+        backendServiceProcess.stdout.on('data',
+            (data) => {
+                writeLog(`stdout: ${data}`);
+                var s = data.toString();
 
-        var match = s.match("##### TRUDI\-BACKEND\-PORT: ([0-9]+) #####");
-        if (match) {
-            var backendPort = match[1];
-            writeLog("Backend-Port: %s", backendPort);
-            connectToBackend(backendPort);
-        }
-    });
+                var match = s.match("##### TRUDI\-BACKEND\-PORT: ([0-9]+) #####");
+                if (match) {
+                    var backendPort = match[1];
+                    writeLog("Backend-Port: %s", backendPort);
+                    backendStarted = true;
+                    connectToBackend(backendPort);
+                }
+            });
 
-    backendServiceProcess.on('exit', function () {
-        writeLog('Backend process exited');
-    });
+        backendServiceProcess.on('exit',
+            function(exitCode) {
+                writeLog('Backend process exited: ' + exitCode);
+                mainWindow.loadURL(url.format({
+                    pathname: path.join(__dirname, 'backend_connect_failed.html'),
+                    protocol: 'file:',
+                    slashes: true
+                }));
+            });
+    } catch (error) {
+        mainWindow.loadURL(url.format({
+            pathname: path.join(__dirname, 'backend_connect_failed.html'),
+            protocol: 'file:',
+            slashes: true
+        }));
+    }
 }
 
 // Kill process when electron exits
