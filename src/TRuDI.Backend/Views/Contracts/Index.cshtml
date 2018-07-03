@@ -162,7 +162,8 @@
                                                     <input style="height: 11px;" type="radio"
                                                            name='@string.Format("{0}", contractIndex)'
                                                            value='@string.Format("{0}_{1}", contractIndex, billingPeriodIndex)'
-                                                           onclick="selectBillingPeriod(@contractIndex, @billingPeriodIndex, '@period.Begin.ToIso8601()', '@period.End.GetEndTimeOrNow().RoundDown(15).ToIso8601()', 'BP');">
+                                                           onclick="selectBillingPeriod(@contractIndex, @billingPeriodIndex, '@period.Begin.ToIso8601()', '@period.End.GetEndTimeOrNow().RoundDown(15).ToIso8601()', 'BP');"
+                                                           @(billingPeriodIndex == 0 ? "checked" : "")>
                                                 </td>
                                                 <td class="col-xs-3">@period.Begin.ToFormatedString()</td>
                                                 <td class="col-xs-3">@period.End.ToFormatedString()</td>
@@ -310,6 +311,16 @@
                     $("#@dtpIdEnd").data("DateTimePicker").maxDate(moment('@cnt.Contract.End.GetEndTimeOrNow().DayEnd().ToIso8601()'));
                     $("#@dtpIdEnd").data("DateTimePicker").date(moment('@cnt.Contract.End.GetEndTimeOrNow().DayEnd().ToIso8601()'));
                 </text>
+            }
+            else
+            {
+                if (hasBillingPeriods)
+                {
+                    var period = cnt.Contract.BillingPeriods.OrderByDescending(bp => bp.Begin).FirstOrDefault();
+                    <text>
+                    selectBillingPeriod(@contractIndex, 0, '@period.Begin.ToIso8601()', '@period.End.GetEndTimeOrNow().RoundDown(15).ToIso8601()', 'BP');
+                    </text>
+                }
             }
         });
             </script>
