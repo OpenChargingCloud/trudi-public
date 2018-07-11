@@ -21,7 +21,7 @@ v0.98 - 08.06.2017 - D. Weingardt - Adaption & changes for interface IF_Adapter_
 v0.99 - 09.06.2017 - D. Weingardt - Minor corrections and merge with if_3d_con v1.0 XSD from OFFIS
 v1.0  - 14.06.2017 - D. Weingardt - Minor corrections for interface IF_Adapter_TRuDI according to AK BD meeting from 14.06.2017
 v1.1  - 05.12.2017 - IVU - Neue optionale Elemente "measurementPeriod" (ReadingType) und "targetTime" (IntervalReading) aufgenommen.
-v1.2  - 19.06.2018 - IVU - customerId auf 64 Zeichen erweitert.
+v1.2  - 11.07.2018 - IVU - customerId und invoicingPartyId auf 64 Zeichen erweitert.
 
 
 
@@ -104,7 +104,7 @@ ______________________________________________________
 		<xs:complexContent>
 			<xs:extension base="espi:Object">
 				<xs:sequence>
-					<xs:element name="invoicingPartyId" type="espi:String32"/>
+					<xs:element name="invoicingPartyId" type="espi:String64"/>
 				</xs:sequence>
 			</xs:extension>
 		</xs:complexContent>
